@@ -1,0 +1,12 @@
+D&D EVENT RULES FOR EXTRACTION
+
+- "Roll initiative" means combat has begun.
+- Attacks, saving throws, spells, damage, healing, conditions, death saves, concentration checks, and movement that changes combat are gameplay events.
+- Damage numbers matter when they affect encounter state.
+- Conditions such as frightened, unconscious, stunned, charmed, restrained, poisoned, prone, or dead should be captured.
+- Spells and abilities such as Eldritch Blast, Fireball, Web, Cloud of Daggers, Bardic Inspiration, Lay on Hands, Healing Word, Misty Step, Shield of Faith, Sneak Attack, Riposte, Breath Weapon, and Nightmare Breath should be captured.
+- "Hit", "miss", "natural 20", "critical", "fails the save", "takes damage", "goes down", "dies", and "defeated" are important event markers.
+- Named monsters, dragons, demons, cultists, warlocks, bosses, or faction agents are important.
+- Locations, terrain, cover, hazards, and battlefield layout are environment events.
+- Wells, artifacts, prophecies, curses, gods, factions, and campaign history are lore events.
+- Table jokes, dice math, repeated words, and rules lookups should be ignored unless they determine the gameplay outcome.

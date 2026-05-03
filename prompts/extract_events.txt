@@ -1,0 +1,65 @@
+Extract factual D&D gameplay events from the transcript.
+
+Use this exact event record format:
+
+EVENT:
+timestamp:
+event_type:
+summary:
+actors:
+targets:
+location:
+mechanical_tags:
+story_tags:
+outcome:
+importance:
+confidence:
+verify:
+
+Allowed event_type values:
+- recap
+- environment
+- combat
+- roleplay
+- exploration
+- lore
+- decision
+- resource
+- item
+- npc_faction
+- character_development
+- quest_objective
+- consequence
+- unclear_verify
+
+Importance values:
+- high
+- medium
+- low
+
+Confidence values:
+- high
+- medium
+- low
+
+Rules:
+- Output ONLY EVENT records.
+- Do not include markdown headings.
+- Do not include explanations.
+- Do not include empty sections.
+- Ignore pure table chatter.
+- Ignore repeated filler such as "yep", "snap", or repeated cheering unless it affects play.
+- If no useful event exists, output exactly:
+NO_EVENTS
+
+High importance examples:
+- initiative begins
+- dragon or boss appears
+- breath weapon
+- major damage
+- character drops or nearly dies
+- enemy defeated
+- major spell
+- important lore discovery
+- party decision
+- item acquired/lost/revealed
