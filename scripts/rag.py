@@ -14,6 +14,7 @@ from raglib.normalize import normalize_session
 from raglib.merge import merge_session
 from raglib.validate import validate_session
 from raglib.summarize import summarize_session
+from scripts.load_summaries import apply_sql, write_sql
 
 
 STAGES = {
@@ -72,15 +73,28 @@ def parse_args():
     )
     parser.add_argument(
         "command",
-        choices=[*STAGES.keys(), "postextract", "status"],
+        choices=[*STAGES.keys(), "postextract", "status", "dbload"],
         help="Workflow command to run.",
     )
-    parser.add_argument("session_name", help="Session name, e.g. session20.")
+    parser.add_argument("session_name", nargs="?", help="Session name, e.g. session20.")
+    parser.add_argument("--apply", action="store_true", help="Apply generated database SQL.")
+    parser.add_argument("--container", default="farrlind_db", help="Postgres Docker container name.")
+    parser.add_argument("--user", default="admin", help="Postgres user.")
+    parser.add_argument("--database", default="farrlind", help="Postgres database.")
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
+
+    if args.command == "dbload":
+        sql_path = write_sql()
+        if args.apply:
+            apply_sql(sql_path, args.container, args.user, args.database)
+        return
+
+    if not args.session_name:
+        raise SystemExit(f"{args.command} requires a session name, e.g. session20")
 
     if args.command == "status":
         print_status(args.session_name)
