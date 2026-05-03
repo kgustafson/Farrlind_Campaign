@@ -86,7 +86,7 @@ def get_field(block: str, field: str) -> str:
     for variant in variants:
         pattern = (
             rf"(?im)^\s*{re.escape(variant)}\s*:\s*"
-            rf"(.*?)(?=^\s*(?:{'|'.join(re.escape(x) for x in labels)})\s*:|\Z)"
+            rf"(.*?)(?=^\s*(?:{'|'.join(re.escape(x) for x in labels)})\s*:|^\s*##\s+Event\b|^\s*#\s+|\Z)"
         )
         match = re.search(pattern, block, re.DOTALL)
         if match:

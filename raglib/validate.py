@@ -68,11 +68,30 @@ def find_suspect_terms(text: str):
 
 def find_generic_placeholders(text: str):
     findings = []
-    low = text.lower()
 
-    for phrase in BAD_GENERIC_PHRASES:
-        if phrase in low:
-            findings.append(f"- Generic/uncertain phrase found: `{phrase}`")
+    substantive_fields = {"summary", "actors", "targets", "outcome", "verify"}
+
+    for block in extract_event_blocks(text):
+        lines = block.splitlines()
+        title = lines[0].strip() if lines else "Unknown event"
+
+        for line in lines:
+            match = re.match(r"\s*-\s*([a-z_]+):\s*(.*)", line, re.IGNORECASE)
+            if not match:
+                continue
+
+            field = match.group(1).lower()
+            value = match.group(2).strip()
+
+            if field not in substantive_fields or not value:
+                continue
+
+            low = value.lower()
+            for phrase in BAD_GENERIC_PHRASES:
+                if phrase in low:
+                    findings.append(
+                        f"- Generic/uncertain phrase found in `{title}` {field}: `{phrase}`"
+                    )
 
     return findings
 
@@ -113,11 +132,15 @@ def find_malformed_fields(text: str):
 
 def validate_required_facts(source_text: str, summary_text: str = ""):
     findings = []
-    source_low = source_text.lower()
     summary_low = summary_text.lower()
 
-    for rule in REQUIRED_IF_PRESENT:
-        if all(trigger in source_low for trigger in rule["triggers"]):
+    for block in extract_event_blocks(source_text):
+        source_low = block.lower()
+
+        for rule in REQUIRED_IF_PRESENT:
+            if not all(trigger in source_low for trigger in rule["triggers"]):
+                continue
+
             if summary_text:
                 missing = [
                     required for required in rule["required"]
@@ -133,7 +156,7 @@ def validate_required_facts(source_text: str, summary_text: str = ""):
                     f"- Required summary topic detected: `{rule['name']}`"
                 )
 
-    return findings
+    return list(dict.fromkeys(findings))
 
 
 def validate_session(session_name: str):
