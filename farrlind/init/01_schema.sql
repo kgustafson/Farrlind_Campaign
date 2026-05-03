@@ -86,6 +86,18 @@ CREATE TABLE threat_level (
     sort_order      SMALLINT NOT NULL
 );
 
+CREATE TABLE knowledge_state (
+    id              SERIAL PRIMARY KEY,
+    state_code      VARCHAR(30) NOT NULL UNIQUE,  -- 'unknown','rumored','suspected','known','witnessed'
+    description     TEXT
+);
+
+CREATE TABLE visibility_level (
+    id              SERIAL PRIMARY KEY,
+    level_code      VARCHAR(30) NOT NULL UNIQUE,  -- 'dm_only','private_pc','shared_party','public_world','rumor'
+    description     TEXT
+);
+
 
 -- =============================================================================
 -- CORE WORLD TABLES
@@ -93,7 +105,7 @@ CREATE TABLE threat_level (
 
 CREATE TABLE location (
     id              SERIAL PRIMARY KEY,
-    name            VARCHAR(150) NOT NULL,
+    name            VARCHAR(150) NOT NULL UNIQUE,
     location_type_id INT REFERENCES location_type(id),
     parent_location_id INT REFERENCES location(id),   -- region hierarchy (Catur is in coastal region, etc.)
     description     TEXT,
@@ -226,6 +238,46 @@ ALTER TABLE npc            ADD CONSTRAINT fk_npc_first_session     FOREIGN KEY (
 ALTER TABLE enemy          ADD CONSTRAINT fk_enemy_first_session   FOREIGN KEY (first_encountered_session) REFERENCES session(id);
 ALTER TABLE artifact       ADD CONSTRAINT fk_artifact_session      FOREIGN KEY (discovered_session)       REFERENCES session(id);
 ALTER TABLE lore_item      ADD CONSTRAINT fk_lore_session          FOREIGN KEY (discovered_session)       REFERENCES session(id);
+
+
+-- =============================================================================
+-- ENTITY KNOWLEDGE / VISIBILITY
+-- =============================================================================
+
+CREATE TABLE entity_knowledge (
+    id                  SERIAL PRIMARY KEY,
+    entity_type         VARCHAR(50) NOT NULL CHECK (entity_type IN (
+                            'artifact','npc','location','enemy','well','faction','lore_item','song'
+                        )),
+    entity_id           INT NOT NULL,                  -- polymorphic reference to the table named by entity_type
+    subject_type        VARCHAR(50) NOT NULL CHECK (subject_type IN (
+                            'dm','party','pc','npc','faction','public_world'
+                        )),
+    subject_character_id INT REFERENCES player_character(id),
+    subject_npc_id      INT REFERENCES npc(id),
+    subject_faction_id  INT REFERENCES faction(id),
+    knowledge_state_id  INT NOT NULL REFERENCES knowledge_state(id),
+    visibility_level_id INT NOT NULL REFERENCES visibility_level(id),
+    first_known_session INT REFERENCES session(id),
+    is_revealed_to_party BOOLEAN DEFAULT FALSE,
+    notes               TEXT,
+    metadata            JSONB,
+    CONSTRAINT entity_knowledge_subject CHECK (
+        (subject_type = 'pc' AND subject_character_id IS NOT NULL AND subject_npc_id IS NULL AND subject_faction_id IS NULL) OR
+        (subject_type = 'npc' AND subject_character_id IS NULL AND subject_npc_id IS NOT NULL AND subject_faction_id IS NULL) OR
+        (subject_type = 'faction' AND subject_character_id IS NULL AND subject_npc_id IS NULL AND subject_faction_id IS NOT NULL) OR
+        (subject_type IN ('dm','party','public_world') AND subject_character_id IS NULL AND subject_npc_id IS NULL AND subject_faction_id IS NULL)
+    )
+);
+
+CREATE UNIQUE INDEX unique_entity_knowledge_subject ON entity_knowledge (
+    entity_type,
+    entity_id,
+    subject_type,
+    COALESCE(subject_character_id, 0),
+    COALESCE(subject_npc_id, 0),
+    COALESCE(subject_faction_id, 0)
+);
 
 
 -- =============================================================================
@@ -562,6 +614,10 @@ CREATE INDEX idx_pipeline_session         ON pipeline_run(session_id);
 CREATE INDEX idx_pipeline_stage           ON pipeline_run(pipeline_stage);
 CREATE INDEX idx_extraction_needs_review  ON extraction_confidence(needs_review) WHERE needs_review = TRUE;
 
+-- knowledge visibility
+CREATE INDEX idx_entity_knowledge_entity  ON entity_knowledge(entity_type, entity_id);
+CREATE INDEX idx_entity_knowledge_subject ON entity_knowledge(subject_type, subject_character_id, subject_npc_id, subject_faction_id);
+
 -- JSONB indexes for metadata columns (GIN for containment queries)
 CREATE INDEX idx_npc_metadata             ON npc USING GIN (metadata);
 CREATE INDEX idx_artifact_metadata        ON artifact USING GIN (metadata);
@@ -595,6 +651,20 @@ INSERT INTO threat_level (level_code, sort_order) VALUES
     ('major',       3),
     ('critical',    4),
     ('existential', 5);
+
+INSERT INTO knowledge_state (state_code, description) VALUES
+    ('unknown',   'Subject does not know this entity or fact'),
+    ('rumored',   'Subject has heard an unverified or incomplete version'),
+    ('suspected', 'Subject has reason to suspect this entity or fact'),
+    ('known',     'Subject knows this entity or fact'),
+    ('witnessed', 'Subject directly witnessed this entity or fact');
+
+INSERT INTO visibility_level (level_code, description) VALUES
+    ('dm_only',      'True in canon but hidden from players'),
+    ('private_pc',   'Known privately by one player character'),
+    ('shared_party', 'Known by the adventuring party'),
+    ('public_world', 'Broadly known in-world'),
+    ('rumor',        'Available as rumor, incomplete or unverified');
 
 INSERT INTO event_type (type_name) VALUES
     ('combat'), ('travel'), ('discovery'), ('social'),
@@ -725,6 +795,29 @@ INSERT INTO artifact_custody (artifact_id, character_id, session_id, notes) VALU
     ((SELECT id FROM artifact WHERE name='Brigit''s Upgraded Bow'),  (SELECT id FROM player_character WHERE name='Brigit'),      (SELECT id FROM session WHERE session_number=20), 'Given by Balrog dwarves, Session 20'),
     ((SELECT id FROM artifact WHERE name='Corvinas'' Flame Blade'),  (SELECT id FROM player_character WHERE name='Corvinas'),    (SELECT id FROM session WHERE session_number=20), 'Given by Balrog dwarves, Session 20'),
     ((SELECT id FROM artifact WHERE name='Roon''s Shield'),          (SELECT id FROM player_character WHERE name='Roon'),        (SELECT id FROM session WHERE session_number=20), 'Given by Balrog dwarves, Session 20');
+
+-- Knowledge visibility
+INSERT INTO entity_knowledge (
+    entity_type,
+    entity_id,
+    subject_type,
+    subject_character_id,
+    knowledge_state_id,
+    visibility_level_id,
+    first_known_session,
+    is_revealed_to_party,
+    notes
+) VALUES (
+    'artifact',
+    (SELECT id FROM artifact WHERE name='Grimoire Mutandi'),
+    'pc',
+    (SELECT id FROM player_character WHERE name='Faban Colon'),
+    (SELECT id FROM knowledge_state WHERE state_code='known'),
+    (SELECT id FROM visibility_level WHERE level_code='private_pc'),
+    NULL,
+    FALSE,
+    'Faban knows the Grimoire Mutandi well; it remains secret from the rest of the party.'
+);
 
 -- Songbook
 INSERT INTO song (song_number, title, style_id, category_id, summary, lyrics_url, mp3_url) VALUES
