@@ -1,15 +1,18 @@
 from pathlib import Path
+ 
+BASE   = Path("/Volumes/T7_WORK/AI_RAG/knowledge/Faban")
+RAW    = BASE / "raw"
+CLEAN  = BASE / "clean"
+SESSIONS = BASE / "sessions"      # ← new
+BASE2 = Path("/Volumes/T7_WORK/AI_RAG")  # ← new
+ 
+# Ensure directories exist
+for d in [RAW, CLEAN, SESSIONS]:
+    d.mkdir(parents=True, exist_ok=True)
 
-# ===== Base Paths =====
-BASE = Path("/Volumes/T7_WORK/AI_RAG")
+NOTES = BASE / "notes"
 
-KNOWLEDGE = BASE / "knowledge" / "Faban"
-RAW = KNOWLEDGE / "raw"
-CLEAN = KNOWLEDGE / "clean"
-SUMMARIES = KNOWLEDGE / "summaries"
-NOTES = KNOWLEDGE / "notes"
-
-PROMPTS = BASE / "prompts"
+PROMPTS = BASE2 / "prompts"
 
 # ===== Ollama =====
 OLLAMA_URL = "http://localhost:11434"

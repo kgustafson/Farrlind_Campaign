@@ -42,6 +42,32 @@ Confidence values:
 - medium
 - low
 
+IMPORTANT: A D&D session may contain no combat.
+
+You must extract non-combat events when present.
+
+Non-combat events include:
+- travel
+- arriving at a location
+- meeting NPCs
+- conversations with NPCs
+- learning lore
+- receiving gifts or rewards
+- making plans
+- choosing a destination
+- resolving consequences from a prior session
+- discovering information
+- party debates or decisions
+- character moments
+- quest progress
+- item transfers
+- changes in relationships
+- faction activity
+
+Do NOT output NO_EVENTS merely because there is no combat.
+
+Only output NO_EVENTS if the transcript chunk contains no meaningful gameplay, story, lore, decision, or character information.
+
 Rules:
 - Output ONLY EVENT records.
 - Do not include markdown headings.
@@ -49,8 +75,6 @@ Rules:
 - Do not include empty sections.
 - Ignore pure table chatter.
 - Ignore repeated filler such as "yep", "snap", or repeated cheering unless it affects play.
-- If no useful event exists, output exactly:
-NO_EVENTS
 
 High importance examples:
 - initiative begins

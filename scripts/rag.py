@@ -1,6 +1,7 @@
 import sys
 from raglib.extract import extract_session
 from raglib.filter_events import filter_session
+from raglib.classify_events import classify_session
 from raglib.normalize import normalize_session
 from raglib.merge import merge_session
 from raglib.validate import validate_session
@@ -12,10 +13,12 @@ def main():
         print("Usage:")
         print("  rag extract session_name")
         print("  rag filter session_name")
+        print("  rag classify session_name")
         print("  rag normalize session_name")
         print("  rag merge session_name")
         print("  rag validate session_name")
         print("  rag summarize session_name")
+        print("  rag postextract session_name")
         sys.exit(1)
 
     command = sys.argv[1]
@@ -37,6 +40,17 @@ def main():
         validate_session(session_name)
 
     elif command == "summarize":
+        summarize_session(session_name)
+
+    elif command == "classify":
+        classify_session(session_name)
+
+    elif command == "postextract":
+        filter_session(session_name)
+        classify_session(session_name)
+        normalize_session(session_name)
+        merge_session(session_name)
+        validate_session(session_name)
         summarize_session(session_name)
 
     else:

@@ -6,19 +6,93 @@ from raglib.io_utils import read_text, write_text
 from raglib.normalize import normalize_key
 
 
-def split_event_blocks(text: str):
-    blocks = re.split(r"\n## Event \d+\n", text)
-    return [b.strip() for b in blocks if "EVENT:" in b]
+def is_valid_event(block: str) -> bool:
+    """
+    Only allow real, well-formed events through.
+    """
 
+    low = block.lower()
+
+    # Must have a summary
+    if "summary:" not in low:
+        return False
+
+    summary = get_field(block, "summary")
+    if not summary or len(summary.strip()) < 10:
+        return False
+
+    # Must have event_type
+    if not get_field(block, "event_type"):
+        return False
+
+    # Reject obvious junk blocks
+    if "here are the extracted event records" in low:
+        return False
+    if "extract chunk" in low:
+        return False
+    if "note:" in low and len(block.splitlines()) < 10:
+        return False
+
+    return True
+
+def split_event_blocks(text: str):
+    raw_blocks = re.split(r"(?im)^\s*(?:\d+\.\s*)?EVENT\s*:\s*$", text)
+
+    blocks = []
+    for block in raw_blocks:
+        block = block.strip()
+        if not block:
+            continue
+
+        # Drop prompt/template leftovers
+        low = block.lower()
+        if (
+            "timestamp:" in low
+            and "event_type:" in low
+            and "summary:" in low
+            and not re.search(r"\d{1,2}:\d{2}", block)
+        ):
+            continue
+
+        blocks.append("EVENT:\n" + block)
+
+    return blocks
 
 def get_field(block: str, field: str) -> str:
-    pattern = rf"{field}:\s*(.*?)(?=\n[a-zA-Z_ ]+:|\n$)"
-    match = re.search(pattern, block, re.DOTALL | re.IGNORECASE)
+    field_variants = {
+        "timestamp": ["timestamp"],
+        "event_type": ["event_type", "event type"],
+        "summary": ["summary"],
+        "actors": ["actors"],
+        "targets": ["targets", "target"],
+        "location": ["location"],
+        "mechanical_tags": ["mechanical_tags", "mechanical tags"],
+        "story_tags": ["story_tags", "story tags"],
+        "outcome": ["outcome"],
+        "importance": ["importance"],
+        "confidence": ["confidence"],
+        "verify": ["verify"],
+    }
 
-    if not match:
-        return ""
+    labels = [
+        "timestamp", "event_type", "event type", "summary", "actors",
+        "targets", "target", "location", "mechanical_tags",
+        "mechanical tags", "story_tags", "story tags", "outcome",
+        "importance", "confidence", "verify"
+    ]
 
-    return clean_field(match.group(1).strip())
+    variants = field_variants.get(field, [field])
+
+    for variant in variants:
+        pattern = (
+            rf"(?im)^\s*{re.escape(variant)}\s*:\s*"
+            rf"(.*?)(?=^\s*(?:{'|'.join(re.escape(x) for x in labels)})\s*:|\Z)"
+        )
+        match = re.search(pattern, block, re.DOTALL)
+        if match:
+            return clean_field(match.group(1).strip())
+
+    return ""
 
 def clean_field(value: str) -> str:
     if not value:
@@ -70,7 +144,9 @@ def event_key(block: str) -> str:
     if "damage" in summary or "damage" in tags:
         return f"damage_{actors[:20]}"
 
-    return summary[:60]
+    clean = summary.strip().rstrip(".")
+
+    return clean[:60] if len(clean) > 10 else "minor_event"
 
 
 def importance_rank(block: str) -> int:
@@ -89,13 +165,55 @@ def first_timestamp(event):
         return "99:99:99"
     return event["timestamps"][0].replace("[", "").replace("]", "")
 
+def get_lane(block: str) -> str:
+    """
+    Detects the classified lane from nearby section headers.
+    Falls back to event_type when no lane header is available.
+    """
+    low = block.lower()
+
+    if "# combat events" in low:
+        return "combat"
+    if "# story events" in low:
+        return "story"
+    if "# lore events" in low:
+        return "lore"
+    if "# exploration events" in low:
+        return "exploration"
+    if "# items events" in low:
+        return "items"
+    if "# character events" in low:
+        return "character"
+    if "# quest events" in low:
+        return "quest"
+
+    event_type = get_field(block, "event_type").lower()
+
+    if event_type in {"combat"}:
+        return "combat"
+    if event_type in {"roleplay", "decision", "recap"}:
+        return "story"
+    if event_type == "lore":
+        return "lore"
+    if event_type in {"exploration", "environment", "travel"}:
+        return "exploration"
+    if event_type in {"item", "gift", "resource"}:
+        return "items"
+    if event_type == "character_development":
+        return "character"
+    if event_type == "quest_objective":
+        return "quest"
+
+    return "other"
+
 def merge_blocks(blocks):
     grouped = defaultdict(list)
 
     for block in blocks:
+        lane = get_lane(block)
         raw_key = event_key(block)
         norm_key = normalize_key(raw_key)
-        grouped[norm_key].append(block)
+        grouped[(lane,norm_key)].append(block)
 
     merged = []
 
@@ -157,8 +275,12 @@ def merge_blocks(blocks):
             elif "medium" in confidence and max_confidence != "high":
                 max_confidence = "medium"
 
+        if not summaries:
+            continue
+
         merged.append({
-            "key": key,
+            "lane": key[0],
+            "key": key[1],
             "timestamps": sorted(set(timestamps)),
             "summary": "; ".join(dict.fromkeys(summaries)),
             "actors": ", ".join(sorted(actors)),
@@ -191,6 +313,7 @@ def format_merged_events(events):
             f"- actors: {event['actors']}",
             f"- targets: {event['targets']}",
             f"- location: {event['locations']}",
+            f"- lane: {event['lane']}",
             f"- mechanical_tags: {event['mechanical_tags']}",
             f"- story_tags: {event['story_tags']}",
             f"- outcome: {event['outcome']}",
@@ -209,6 +332,7 @@ def merge_session(session_name: str):
 
     text = read_text(input_path)
     blocks = split_event_blocks(text)
+    blocks = [b for b in blocks if is_valid_event(b)]
     merged = merge_blocks(blocks)
     output = format_merged_events(merged)
 

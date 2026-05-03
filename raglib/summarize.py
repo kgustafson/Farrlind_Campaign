@@ -1,5 +1,6 @@
 from raglib.config import CLEAN, NOTES
 from raglib.io_utils import read_text, write_text
+from raglib.normalize import load_session_notes
 from raglib.ollama_client import chat
 from raglib.prompts import load_prompt, build_prompt
 
@@ -26,41 +27,60 @@ def optional_read(path):
     return ""
 
 
-def summarize_session(session_name: str):
-    merged = read_text(merged_path(session_name))
-    validation = optional_read(validation_path(session_name))
-    corrections = optional_read(corrections_path(session_name))
-
-    system_prompt = build_prompt(
-        "You are an impartial Dungeons & Dragons campaign archivist.",
-        "Your job is to write a factual session summary from structured event records.",
-        "Use human correction notes as authoritative when present.",
-        "Use validation notes to avoid known transcription errors.",
-        "Do not invent events.",
-        "Do not write in character voice.",
-        "Do not include prompt instructions in the output.",
+def build_system_prompt(context_notes: str) -> str:
+    """
+    Builds system prompt with context notes baked in directly.
+    Local models respond better to facts in system prompt than user prompt.
+    """
+    base = [
+        "You are a Dungeons & Dragons campaign archivist writing a factual session summary.",
+        "You write in clear, factual prose. You do not invent events.",
+        "You do not write in character voice.",
+        "You do not include prompt instructions in your output.",
         "Output ONLY the completed session summary.",
-        load_prompt("session_summary"),
-    )
+        "",
+    ]
+
+    if context_notes:
+        base += [
+            "=== CONFIRMED SESSION FACTS ===",
+            "The following events are confirmed true and MUST be included in your summary.",
+            "These are not optional. Do not omit any of them.",
+            "",
+            context_notes.strip(),
+            "",
+            "=== END CONFIRMED SESSION FACTS ===",
+            "",
+            "Any extracted event records that contradict the above facts should be ignored.",
+            "Any extracted event records that add detail to the above facts may be included.",
+        ]
+
+    base.append(load_prompt("session_summary"))
+
+    return "\n".join(base)
+
+
+def summarize_session(session_name: str):
+    merged        = read_text(merged_path(session_name))
+    validation    = optional_read(validation_path(session_name))
+    corrections   = optional_read(corrections_path(session_name))
+    context_notes = load_session_notes(session_name)
+
+    print(f"[summarize] Context notes length: {len(context_notes)} chars")
+    print(f"[summarize] Context notes preview: {context_notes[:200]}")
+
+    system_prompt = build_system_prompt(context_notes)
 
     user_prompt = f"""
-Create a clean factual session summary for: {session_name}
+Write a session summary for: {session_name}
 
-Use these sources in priority order:
+HUMAN CORRECTIONS (treat as ground truth):
+{corrections if corrections else "(none)"}
 
-1. HUMAN CORRECTIONS
-These override transcription and extraction errors.
+VALIDATION NOTES (flag known transcription errors):
+{validation if validation else "(none)"}
 
-{corrections if corrections else "(No human corrections provided.)"}
-
-2. VALIDATION NOTES
-These identify possible transcription problems and required topics.
-
-{validation if validation else "(No validation report provided.)"}
-
-3. MERGED EVENT RECORDS
-These are the extracted and merged factual events.
-
+EXTRACTED EVENT RECORDS (use for detail; defer to confirmed facts above):
 {merged}
 """
 
@@ -71,5 +91,4 @@ These are the extracted and merged factual events.
     )
 
     write_text(summary_path(session_name), result.strip() + "\n")
-
-    print(f"Summary written to: {summary_path(session_name)}")
+    print(f"[summarize] Summary written to: {summary_path(session_name)}")

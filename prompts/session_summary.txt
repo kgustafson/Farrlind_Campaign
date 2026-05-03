@@ -2,6 +2,40 @@ D&D SESSION SUMMARY FORMAT
 
 You are writing a factual campaign session summary.
 
+PRIORITY RULES (CRITICAL):
+
+When selecting content for the summary, prioritize events in this order:
+
+1. QUEST PROGRESSION
+   - decisions about where to go
+   - objectives
+   - plans
+   - travel direction
+
+2. NPC INTERACTIONS THAT PROVIDE INFORMATION
+   - lore
+   - warnings
+   - relationships
+   - history (e.g., Catur conflict)
+
+3. ITEMS / REWARDS
+   - gifts
+   - equipment
+   - magical items
+
+4. MAJOR ENVIRONMENT / LOCATION CHANGES
+   - arriving somewhere new
+   - discovering locations
+
+5. COMBAT (if present)
+
+6. GENERAL CONVERSATION (LOWEST PRIORITY)
+   - casual talk
+   - jokes
+   - filler dialogue
+
+DO NOT prioritize casual conversation over story progression.
+
 CRITICAL RULES:
 - Use ONLY the provided event data and corrections
 - Do NOT invent events
@@ -19,6 +53,24 @@ STRICT ACCURACY RULES:
 - Do NOT assume death unless explicitly confirmed
 - Avoid redundant phrasing
 - Prefer confirmed names from correction notes (e.g., Lightdelver, Orsydon)
+
+STRICT FACTUALITY RULES:
+
+- NEVER infer identity of unclear entities (e.g., "the guy in the back")
+- NEVER guess or assign names unless explicitly confirmed in corrections or events
+- NEVER reinterpret D&D mechanics incorrectly
+- Do NOT assume a character is dead unless explicitly stated as "dead" or "killed"
+- If a character is unconscious or crushed, describe it exactly as such
+
+CLARITY RULES:
+
+- Remove or ignore vague references like "unknown", "guy in the back", or incomplete entities
+- Prefer omission over incorrect guessing
+
+MECHANICS RULES:
+
+- Describe spells correctly (e.g., Cloud of Daggers is an area effect, not targeted)
+- Avoid redundant phrasing (e.g., "breathed its breath weapon" → "used its breath weapon")
 
 STYLE:
 - Neutral narrator (not in-character)
@@ -39,6 +91,16 @@ The summary MUST include:
 OUTPUT FORMAT:
 
 Session Summary:
+
+Before writing the summary, determine:
+
+- Is this session primarily:
+  - story / roleplay
+  - combat
+  - exploration
+  - planning
+
+Then write the summary focusing on that type.
 
 [Write 2–5 paragraphs describing the session in chronological order.]
 
