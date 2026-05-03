@@ -1,6 +1,8 @@
 import re
 
-from raglib.config import CLEAN, NOTES
+import yaml
+
+from raglib.config import CLEAN, NOTES, SESSIONS
 from raglib.io_utils import read_text, write_text
 from raglib.normalize import load_session_notes
 from raglib.ollama_client import chat
@@ -44,10 +46,28 @@ def summary_path(session_name: str):
     return CLEAN / f"{session_name}_summary.md"
 
 
+def context_path(session_name: str):
+    return SESSIONS / f"{session_name}_context.yaml"
+
+
 def optional_read(path):
     if path.exists():
         return read_text(path)
     return ""
+
+
+def load_session_metadata(session_name: str) -> dict:
+    path = context_path(session_name)
+    if not path.exists():
+        return {}
+
+    with open(path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
+
+
+def format_physical_date(metadata: dict) -> str:
+    value = metadata.get("date")
+    return str(value) if value else ""
 
 
 def extract_context_terms(*texts: str) -> set[str]:
@@ -186,7 +206,7 @@ def summary_has_quality_issue(summary: str) -> bool:
     )
 
 
-def context_fallback_summary(context_notes: str) -> str:
+def context_fallback_summary(context_notes: str, physical_date: str = "") -> str:
     notes = [
         line.strip()
         for line in context_notes.splitlines()
@@ -210,12 +230,52 @@ def context_fallback_summary(context_notes: str) -> str:
 
     key_events = "\n".join(f"- {note.rstrip('.')}" for note in notes)
 
-    return "\n\n".join([
-        "Session Summary:",
+    sections = ["Session Summary:"]
+
+    if physical_date:
+        sections.append(f"Physical Session Date: {physical_date}")
+
+    sections.extend([
         "\n\n".join(paragraphs),
         "Key Events:",
         key_events,
     ])
+
+    return "\n\n".join(sections)
+
+
+def ensure_physical_date(summary: str, physical_date: str) -> str:
+    if not physical_date:
+        return summary
+
+    if re.search(r"(?im)^Physical Session Date\s*:", summary):
+        return summary
+
+    lines = summary.strip().splitlines()
+    if lines and lines[0].strip().lower().startswith("session summary"):
+        return "\n".join([
+            lines[0],
+            "",
+            f"Physical Session Date: {physical_date}",
+            *lines[1:],
+        ]).strip()
+
+    return f"Physical Session Date: {physical_date}\n\n{summary.strip()}"
+
+
+def clean_summary_output(summary: str, physical_date: str = "") -> str:
+    cleaned = summary.strip()
+
+    if physical_date:
+        cleaned = cleaned.replace(f"[{physical_date}]", physical_date)
+
+    cleaned = re.sub(
+        r"(?im)^\s*Session Summary ends here\.\s*$",
+        "",
+        cleaned,
+    )
+
+    return cleaned.strip()
 
 
 def build_system_prompt(context_notes: str) -> str:
@@ -258,6 +318,8 @@ def summarize_session(session_name: str):
     merged        = read_text(merged_path(session_name))
     validation    = optional_read(validation_path(session_name))
     corrections   = optional_read(corrections_path(session_name))
+    metadata      = load_session_metadata(session_name)
+    physical_date = format_physical_date(metadata)
     context_notes = load_session_notes(session_name)
     summary_events = select_events_for_summary(merged, context_notes, corrections)
 
@@ -268,6 +330,9 @@ def summarize_session(session_name: str):
 
     user_prompt = f"""
 Write a session summary for: {session_name}
+
+PHYSICAL SESSION DATE:
+{physical_date if physical_date else "(not provided; omit date line)"}
 
 SUMMARY PRIORITY:
 1. Confirmed session facts below and in the system prompt.
@@ -297,7 +362,10 @@ CURATED EXTRACTED EVENT RECORDS (use for detail; defer to confirmed facts above)
 
     if context_notes and summary_has_quality_issue(result):
         print("[summarize] LLM summary failed quality gate; using context fallback.")
-        result = context_fallback_summary(context_notes)
+        result = context_fallback_summary(context_notes, physical_date)
+
+    result = ensure_physical_date(result, physical_date)
+    result = clean_summary_output(result, physical_date)
 
     write_text(summary_path(session_name), result.strip() + "\n")
     print(f"[summarize] Summary written to: {summary_path(session_name)}")
