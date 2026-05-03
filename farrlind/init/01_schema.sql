@@ -210,7 +210,7 @@ CREATE TABLE session (
     id              SERIAL PRIMARY KEY,
     session_number  SMALLINT NOT NULL UNIQUE,
     session_date    DATE,
-    in_game_date    VARCHAR(50),                       -- '1832 AS — Namal 20' (keep as string, it's flavor)
+    in_game_date    TEXT,                              -- flavor date/range, sometimes multiple in-world dates
     title           VARCHAR(200),
     summary         TEXT,
     party_level     SMALLINT,
@@ -356,11 +356,12 @@ CREATE TABLE npc_npc_relationship (
     npc_id_b            INT NOT NULL REFERENCES npc(id),
     relationship_type_id INT REFERENCES relationship_type(id),
     description         TEXT,
-    CONSTRAINT no_self_relationship CHECK (npc_id_a <> npc_id_b),
-    CONSTRAINT unique_npc_pair UNIQUE (
-        LEAST(npc_id_a, npc_id_b),
-        GREATEST(npc_id_a, npc_id_b)
-    )
+    CONSTRAINT no_self_relationship CHECK (npc_id_a <> npc_id_b)
+);
+
+CREATE UNIQUE INDEX unique_npc_pair ON npc_npc_relationship (
+    LEAST(npc_id_a, npc_id_b),
+    GREATEST(npc_id_a, npc_id_b)
 );
 
 
@@ -422,7 +423,7 @@ CREATE TABLE diary_entry (
     id              SERIAL PRIMARY KEY,
     character_id    INT NOT NULL REFERENCES player_character(id),
     session_id      INT REFERENCES session(id),
-    in_game_date    VARCHAR(50),
+    in_game_date    TEXT,
     title           VARCHAR(200),
     content         TEXT NOT NULL,
     emotional_tone  VARCHAR(50),                       -- 'reflective','triumphant','uneasy','grieving','hopeful'
@@ -619,6 +620,15 @@ INSERT INTO artifact_type (type_name) VALUES
     ('weapon'), ('armor'), ('orb'), ('grimoire'), ('wand'),
     ('staff'), ('shield'), ('cap'), ('axe'), ('bow');
 
+INSERT INTO song_style (style_name) VALUES
+    ('tavern_song'), ('ballad'), ('sea_shanty'), ('war_chant'), ('jig'), ('lament')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO song_category (category_name) VALUES
+    ('humor'), ('political_satire'), ('heroic_saga'), ('lament'),
+    ('fey_folklore'), ('lore'), ('fellowship'), ('personal')
+ON CONFLICT DO NOTHING;
+
 INSERT INTO character_class (class_name, hit_die) VALUES
     ('bard',      8),  ('wizard',   6),  ('ranger',   10),
     ('cleric',    8),  ('paladin',  10), ('fighter',  10),
@@ -639,7 +649,7 @@ INSERT INTO location (name, location_type_id, description) VALUES
     ('Thataways',         (SELECT id FROM location_type WHERE type_name='feywild'),      'Fey village; location of Khorag Well and the World Tree'),
     ('Paramon',           (SELECT id FROM location_type WHERE type_name='coastal'),      'Coastal city; Ordor Well disturbed here by Salazar'),
     ('Balrog',            (SELECT id FROM location_type WHERE type_name='dwarven_hold'), 'Dwarven hold; location of Saiffi Well; site of black dragon attack'),
-    ('Catur',             (SELECT id FROM location_type WHERE type_name='underwater'),   'Sunken city beneath the coast; location of Catur Well', TRUE, FALSE),
+    ('Catur',             (SELECT id FROM location_type WHERE type_name='underwater'),   'Sunken city beneath the coast; location of Catur Well'),
     ('Gale Monastery',    (SELECT id FROM location_type WHERE type_name='monastery'),    'Monastery of Open Hand; location of Open Hand Well'),
     ('Hanedal Island',    (SELECT id FROM location_type WHERE type_name='island'),       'Tiefling island; location of Hanedal Well'),
     ('Alexander''s Inn',  (SELECT id FROM location_type WHERE type_name='inn'),          'Starting point; where the party formed in Bentrios');
@@ -702,19 +712,19 @@ INSERT INTO artifact (name, artifact_type_id, description, lore_significance, is
     ('Corvinas'' Flame Blade',  (SELECT id FROM artifact_type WHERE type_name='weapon'),  'Blade wreathed in real fire; given by Balrog dwarves', 'Suits Corvinas; line between judgment and destruction negotiable', FALSE, FALSE, FALSE),
     ('Roon''s Shield',          (SELECT id FROM artifact_type WHERE type_name='shield'),  'Given by Balrog dwarves; weight and balance of a refusal; an anchor', 'Not merely defensive — a statement of continued existence', FALSE, FALSE, FALSE);
 
--- Artifact Custody — current holders
-INSERT INTO artifact_custody (artifact_id, character_id, session_id, notes) VALUES
-    ((SELECT id FROM artifact WHERE name='The Black Blade'),         (SELECT id FROM player_character WHERE name='Faban Colon'), 20, 'Given by Balrog dwarves, Session 20'),
-    ((SELECT id FROM artifact WHERE name='Grimoire Mutandi'),        (SELECT id FROM player_character WHERE name='Faban Colon'), 1,  'Faban''s burden throughout the campaign'),
-    ((SELECT id FROM artifact WHERE name='Gildas'' Enhanced Staff'), (SELECT id FROM player_character WHERE name='Gildas'),      20, 'Given by Balrog dwarves, Session 20'),
-    ((SELECT id FROM artifact WHERE name='Mikani''s Breathing Cap'), (SELECT id FROM player_character WHERE name='Mikani'),      20, 'Given by Balrog dwarves, Session 20'),
-    ((SELECT id FROM artifact WHERE name='Brigit''s Upgraded Bow'),  (SELECT id FROM player_character WHERE name='Brigit'),      20, 'Given by Balrog dwarves, Session 20'),
-    ((SELECT id FROM artifact WHERE name='Corvinas'' Flame Blade'),  (SELECT id FROM player_character WHERE name='Corvinas'),    20, 'Given by Balrog dwarves, Session 20'),
-    ((SELECT id FROM artifact WHERE name='Roon''s Shield'),          (SELECT id FROM player_character WHERE name='Roon'),        20, 'Given by Balrog dwarves, Session 20');
-
 -- Sessions (known so far)
 INSERT INTO session (session_number, session_date, in_game_date, title, party_level, location_id) VALUES
     (20, '2026-04-27', '1832 AS — Namal 20', 'Salt, Steel, and the Distance Between Legends', 7, (SELECT id FROM location WHERE name='Balrog'));
+
+-- Artifact Custody — current holders
+INSERT INTO artifact_custody (artifact_id, character_id, session_id, notes) VALUES
+    ((SELECT id FROM artifact WHERE name='The Black Blade'),         (SELECT id FROM player_character WHERE name='Faban Colon'), (SELECT id FROM session WHERE session_number=20), 'Given by Balrog dwarves, Session 20'),
+    ((SELECT id FROM artifact WHERE name='Grimoire Mutandi'),        (SELECT id FROM player_character WHERE name='Faban Colon'), (SELECT id FROM session WHERE session_number=20), 'Faban''s burden throughout the campaign'),
+    ((SELECT id FROM artifact WHERE name='Gildas'' Enhanced Staff'), (SELECT id FROM player_character WHERE name='Gildas'),      (SELECT id FROM session WHERE session_number=20), 'Given by Balrog dwarves, Session 20'),
+    ((SELECT id FROM artifact WHERE name='Mikani''s Breathing Cap'), (SELECT id FROM player_character WHERE name='Mikani'),      (SELECT id FROM session WHERE session_number=20), 'Given by Balrog dwarves, Session 20'),
+    ((SELECT id FROM artifact WHERE name='Brigit''s Upgraded Bow'),  (SELECT id FROM player_character WHERE name='Brigit'),      (SELECT id FROM session WHERE session_number=20), 'Given by Balrog dwarves, Session 20'),
+    ((SELECT id FROM artifact WHERE name='Corvinas'' Flame Blade'),  (SELECT id FROM player_character WHERE name='Corvinas'),    (SELECT id FROM session WHERE session_number=20), 'Given by Balrog dwarves, Session 20'),
+    ((SELECT id FROM artifact WHERE name='Roon''s Shield'),          (SELECT id FROM player_character WHERE name='Roon'),        (SELECT id FROM session WHERE session_number=20), 'Given by Balrog dwarves, Session 20');
 
 -- Songbook
 INSERT INTO song (song_number, title, style_id, category_id, summary, lyrics_url, mp3_url) VALUES
@@ -744,16 +754,6 @@ INSERT INTO song (song_number, title, style_id, category_id, summary, lyrics_url
     (24, 'The Road We Walk Together',             (SELECT id FROM song_style WHERE style_name='tavern_song'),   (SELECT id FROM song_category WHERE category_name='fellowship'),       'Tribute to bonds of friendship between companions who face hardship together',                 'https://docs.google.com/document/d/1BLJfHTXok4ktyoKZB5MzXXIF4EYKNcnBYMzY93Q4dKQ', 'https://drive.google.com/open?id=1mOPNnuugEWf2KhwM3rtfHW'),
     (25, 'The Long Road Home',                    (SELECT id FROM song_style WHERE style_name='ballad'),        (SELECT id FROM song_category WHERE category_name='fellowship'),       'Comforting song reminding wanderers they carry companionship wherever they go',                'https://docs.google.com/document/d/1_3c26SDHz7Nz9E_0VAbHhhQUrWeYexbWj8ZQfrNSuVw', 'https://drive.google.com/open?id=1j6EPxRpflVmqaY1uWYCYDo85e0vopVIc'),
     (26, 'The Lantern in Your Window',            (SELECT id FROM song_style WHERE style_name='ballad'),        (SELECT id FROM song_category WHERE category_name='fellowship'),       'Beloved love song: love will always light the way home',                                       'https://docs.google.com/document/d/1s4csJXwiWNpeNf7GUZbF79tl0pA2HKaUYhr5QC9DKPc', 'https://drive.google.com/open?id=1VdestSb1WF9TOP39N4K4Li2_eemoYro7');
-
--- Song style seeds (needed before song inserts above — move to ref section if running fresh)
-INSERT INTO song_style (style_name) VALUES
-    ('tavern_song'), ('ballad'), ('sea_shanty'), ('war_chant'), ('jig'), ('lament')
-ON CONFLICT DO NOTHING;
-
-INSERT INTO song_category (category_name) VALUES
-    ('humor'), ('political_satire'), ('heroic_saga'), ('lament'),
-    ('fey_folklore'), ('lore'), ('fellowship'), ('personal')
-ON CONFLICT DO NOTHING;
 
 -- Lore Items
 INSERT INTO lore_item (title, category, description, is_confirmed) VALUES

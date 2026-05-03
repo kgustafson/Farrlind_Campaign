@@ -8,6 +8,7 @@ knowledge/
 #Temp
 *.log
 *.tmp
+farrlind/out/
 
 #OS
 .DS_Store
