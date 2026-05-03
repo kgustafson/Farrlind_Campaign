@@ -1,12 +1,11 @@
 from pathlib import Path
- 
-BASE   = Path("/Volumes/T7_WORK/AI_RAG/knowledge/Faban")
-RAW    = BASE / "raw"
-CLEAN  = BASE / "clean"
-SESSIONS = BASE / "sessions"      # ← new
-BASE2 = Path("/Volumes/T7_WORK/AI_RAG")  # ← new
- 
-# Ensure directories exist
+
+BASE2 = Path(__file__).resolve().parents[1]
+BASE = BASE2 / "knowledge" / "Faban"
+RAW = BASE / "raw"
+CLEAN = BASE / "clean"
+SESSIONS = BASE / "sessions"
+
 for d in [RAW, CLEAN, SESSIONS]:
     d.mkdir(parents=True, exist_ok=True)
 

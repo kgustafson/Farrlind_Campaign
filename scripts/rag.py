@@ -1,4 +1,12 @@
+import argparse
 import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from raglib.config import CLEAN, RAW, SESSIONS
 from raglib.extract import extract_session
 from raglib.filter_events import filter_session
 from raglib.classify_events import classify_session
@@ -8,54 +16,77 @@ from raglib.validate import validate_session
 from raglib.summarize import summarize_session
 
 
+STAGES = {
+    "extract": extract_session,
+    "filter": filter_session,
+    "classify": classify_session,
+    "normalize": normalize_session,
+    "merge": merge_session,
+    "validate": validate_session,
+    "summarize": summarize_session,
+}
+
+POSTEXTRACT_STAGES = [
+    "filter",
+    "classify",
+    "normalize",
+    "merge",
+    "validate",
+    "summarize",
+]
+
+STATUS_FILES = [
+    ("transcript", RAW, "{session}_transcript.txt"),
+    ("context", SESSIONS, "{session}_context.yaml"),
+    ("events", CLEAN, "{session}_events.md"),
+    ("filtered", CLEAN, "{session}_filtered.md"),
+    ("classified", CLEAN, "{session}_classified.md"),
+    ("normalized", CLEAN, "{session}_normalized.md"),
+    ("merged", CLEAN, "{session}_merged.md"),
+    ("validation", CLEAN, "{session}_validation.md"),
+    ("summary", CLEAN, "{session}_summary.md"),
+]
+
+
+def print_status(session_name: str):
+    print(f"Workflow status for {session_name}")
+    print("")
+
+    for label, base, pattern in STATUS_FILES:
+        path = base / pattern.format(session=session_name)
+        marker = "ok" if path.exists() else "missing"
+        print(f"{marker:7} {label:11} {path}")
+
+
+def run_stages(session_name: str, stages: list[str]):
+    for stage in stages:
+        print(f"\n=== {stage} {session_name} ===")
+        STAGES[stage](session_name)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        prog="rag",
+        description="Run the local campaign RAG workflow.",
+    )
+    parser.add_argument(
+        "command",
+        choices=[*STAGES.keys(), "postextract", "status"],
+        help="Workflow command to run.",
+    )
+    parser.add_argument("session_name", help="Session name, e.g. session20.")
+    return parser.parse_args()
+
+
 def main():
-    if len(sys.argv) < 3:
-        print("Usage:")
-        print("  rag extract session_name")
-        print("  rag filter session_name")
-        print("  rag classify session_name")
-        print("  rag normalize session_name")
-        print("  rag merge session_name")
-        print("  rag validate session_name")
-        print("  rag summarize session_name")
-        print("  rag postextract session_name")
-        sys.exit(1)
+    args = parse_args()
 
-    command = sys.argv[1]
-    session_name = sys.argv[2]
-
-    if command == "extract":
-        extract_session(session_name)
-
-    elif command == "filter":
-        filter_session(session_name)
-
-    elif command == "normalize":
-        normalize_session(session_name)
-
-    elif command == "merge":
-        merge_session(session_name)
-
-    elif command == "validate":
-        validate_session(session_name)
-
-    elif command == "summarize":
-        summarize_session(session_name)
-
-    elif command == "classify":
-        classify_session(session_name)
-
-    elif command == "postextract":
-        filter_session(session_name)
-        classify_session(session_name)
-        normalize_session(session_name)
-        merge_session(session_name)
-        validate_session(session_name)
-        summarize_session(session_name)
-
+    if args.command == "status":
+        print_status(args.session_name)
+    elif args.command == "postextract":
+        run_stages(args.session_name, POSTEXTRACT_STAGES)
     else:
-        print(f"Unknown command: {command}")
-        sys.exit(1)
+        run_stages(args.session_name, [args.command])
 
 
 if __name__ == "__main__":

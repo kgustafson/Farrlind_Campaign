@@ -1,8 +1,16 @@
 import argparse
 import os
 import subprocess
+import sys
 import tempfile
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 from faster_whisper import WhisperModel
+from raglib.config import RAW
 
 
 #DEFAULT_CHUNK_SECONDS = 30
@@ -107,9 +115,7 @@ def main():
 
     audio_stem = os.path.splitext(os.path.basename(audio_file))[0]
 
-    output_file = args.output or (
-        f"/Volumes/T7_WORK/AI_RAG/knowledge/Faban/raw/{audio_stem}_transcript.txt"
-    )
+    output_file = args.output or str(RAW / f"{audio_stem}_transcript.txt")
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
     chunk_seconds = args.chunk_seconds
     model_size = args.model
