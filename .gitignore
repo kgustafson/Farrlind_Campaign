@@ -1,0 +1,13 @@
+rag-env/
+__pycache__/
+*.pyc
+
+#Data
+knowledge/
+
+#Temp
+*.log
+*.tmp
+
+#OS
+.DS_Store
