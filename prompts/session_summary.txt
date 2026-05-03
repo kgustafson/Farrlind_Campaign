@@ -44,6 +44,10 @@ CRITICAL RULES:
 - Do NOT include meta commentary
 - Maintain chronological order
 - Prefer confirmed names from correction notes
+- If confirmed session facts are provided, use them as the summary outline
+- Validation issues are warnings about suspect data; do not summarize events that are only present in validation warnings
+- Do NOT output placeholders such as "[insert date]", "[Not specified]", or "[bullet points]"
+- If a date, duration, or player list is not provided, omit that field entirely
 
 STRICT ACCURACY RULES:
 
@@ -61,6 +65,8 @@ STRICT FACTUALITY RULES:
 - NEVER reinterpret D&D mechanics incorrectly
 - Do NOT assume a character is dead unless explicitly stated as "dead" or "killed"
 - If a character is unconscious or crushed, describe it exactly as such
+- Do NOT treat locations, wells, factions, or destinations as party members
+- Catur is a place/well context, not a player character, unless a correction explicitly says otherwise
 
 CLARITY RULES:
 
@@ -81,31 +87,21 @@ STYLE:
 CONTENT REQUIREMENTS:
 The summary MUST include:
 - Where the session takes place (if known)
-- How combat begins (initiative, ambush, etc.)
-- Major enemies (especially named ones like dragons)
-- Key combat events (breath weapons, major damage, conditions)
-- Important player actions (spells, attacks, decisions)
-- Outcome of the combat
-- Any deaths, defeats, or major consequences
+- How combat begins, if combat is present
+- Major enemies, if enemies are present
+- Key combat events, if combat is present
+- Important player actions, spells, attacks, and decisions
+- Outcome of the combat, if combat is present
+- Any deaths, defeats, or major consequences that are explicitly confirmed
 
 OUTPUT FORMAT:
 
 Session Summary:
 
-Before writing the summary, determine:
-
-- Is this session primarily:
-  - story / roleplay
-  - combat
-  - exploration
-  - planning
-
-Then write the summary focusing on that type.
-
-[Write 2–5 paragraphs describing the session in chronological order.]
+Write 2–5 paragraphs describing the session in chronological order.
 
 Key Events:
-- [bullet points of the most important events]
+- Use concise bullet points for the most important confirmed events.
 
 Outstanding Questions:
 - [only include if there are unresolved or unclear elements]
