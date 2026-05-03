@@ -36,6 +36,7 @@ POSTEXTRACT_STAGES = [
 ]
 
 STATUS_FILES = [
+    ("diary", CLEAN, "{session}_diary.md"),
     ("transcript", RAW, "{session}_transcript.txt"),
     ("context", SESSIONS, "{session}_context.yaml"),
     ("events", CLEAN, "{session}_events.md"),

@@ -34,6 +34,10 @@ def merged_path(session_name: str):
     return CLEAN / f"{session_name}_merged.md"
 
 
+def diary_path(session_name: str):
+    return CLEAN / f"{session_name}_diary.md"
+
+
 def validation_path(session_name: str):
     return CLEAN / f"{session_name}_validation.md"
 
@@ -68,6 +72,49 @@ def load_session_metadata(session_name: str) -> dict:
 def format_physical_date(metadata: dict) -> str:
     value = metadata.get("date")
     return str(value) if value else ""
+
+
+def parse_diary_physical_date(diary: str) -> str:
+    first_line = diary.splitlines()[0] if diary.splitlines() else ""
+    match = re.search(r"(\d{1,2})/(\d{1,2})/(\d{2,4})", first_line)
+    if not match:
+        return ""
+
+    month, day, year = match.groups()
+    if len(year) == 2:
+        year = f"20{year}"
+
+    return f"{int(year):04d}-{int(month):02d}-{int(day):02d}"
+
+
+def parse_diary_in_game_dates(diary: str) -> list[str]:
+    dates = []
+    for match in re.finditer(r"\*\*(1832\s+AS\s+[^\*]+?)\*\*", diary):
+        date = re.sub(r"\s+", " ", match.group(1).replace("—", " ")).strip()
+        if date not in dates:
+            dates.append(date)
+    return dates
+
+
+def parse_diary_title(diary: str) -> str:
+    generic_titles = {
+        "background information",
+        "first entry",
+        "second entry",
+        "entry",
+    }
+
+    lines = [line.strip() for line in diary.splitlines()]
+    for line in lines[1:40]:
+        is_heading = line.startswith("#") or (line.startswith("**") and line.endswith("**"))
+        if not is_heading:
+            continue
+
+        clean = line.strip("# ").strip("*").strip()
+        low = clean.lower()
+        if clean and len(clean) < 120 and "1832 AS" not in clean and not low.startswith("session") and low not in generic_titles:
+            return clean
+    return ""
 
 
 def extract_context_terms(*texts: str) -> set[str]:
@@ -199,6 +246,11 @@ def select_events_for_summary(merged: str, context_notes: str, corrections: str)
     return "\n".join(lines)
 
 
+def diary_excerpt(diary: str) -> str:
+    max_chars = 24000
+    return diary[:max_chars]
+
+
 def summary_has_quality_issue(summary: str) -> bool:
     return any(
         re.search(pattern, summary, re.IGNORECASE)
@@ -315,13 +367,16 @@ def build_system_prompt(context_notes: str) -> str:
 
 
 def summarize_session(session_name: str):
-    merged        = read_text(merged_path(session_name))
+    merged        = optional_read(merged_path(session_name))
+    diary         = optional_read(diary_path(session_name))
     validation    = optional_read(validation_path(session_name))
     corrections   = optional_read(corrections_path(session_name))
     metadata      = load_session_metadata(session_name)
-    physical_date = format_physical_date(metadata)
+    physical_date = format_physical_date(metadata) or parse_diary_physical_date(diary)
+    in_game_dates = parse_diary_in_game_dates(diary)
+    diary_title   = parse_diary_title(diary)
     context_notes = load_session_notes(session_name)
-    summary_events = select_events_for_summary(merged, context_notes, corrections)
+    summary_events = select_events_for_summary(merged, context_notes, corrections) if merged else ""
 
     print(f"[summarize] Context notes length: {len(context_notes)} chars")
     print(f"[summarize] Context notes preview: {context_notes[:200]}")
@@ -334,10 +389,17 @@ Write a session summary for: {session_name}
 PHYSICAL SESSION DATE:
 {physical_date if physical_date else "(not provided; omit date line)"}
 
+IN-GAME DATE(S):
+{", ".join(in_game_dates) if in_game_dates else "(not provided; omit date line)"}
+
+DIARY TITLE:
+{diary_title if diary_title else "(not provided; omit title line)"}
+
 SUMMARY PRIORITY:
 1. Confirmed session facts below and in the system prompt.
 2. Human corrections below.
-3. Curated extracted event records below.
+3. Curated extracted event records below, when present.
+4. Diary source below, when no extracted events exist.
 
 Treat validation notes as warnings about suspect extracted data. Do not include a validation issue unless it is confirmed by session facts, human corrections, or high-confidence event records.
 
@@ -352,6 +414,9 @@ VALIDATION NOTES (flag known transcription errors):
 
 CURATED EXTRACTED EVENT RECORDS (use for detail; defer to confirmed facts above):
 {summary_events if summary_events else "(none)"}
+
+DIARY SOURCE (use as primary source when extracted events are absent):
+{diary_excerpt(diary) if diary and not summary_events else "(none)"}
 """
 
     result = chat(

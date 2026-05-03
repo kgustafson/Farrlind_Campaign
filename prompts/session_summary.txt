@@ -99,6 +99,8 @@ OUTPUT FORMAT:
 Session Summary:
 
 Physical Session Date: [only include when provided]
+In-Game Date: [only include when provided]
+Title: [only include when provided]
 
 Write 2–5 paragraphs describing the session in chronological order.
 
