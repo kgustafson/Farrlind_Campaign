@@ -326,6 +326,11 @@ def clean_summary_output(summary: str, physical_date: str = "") -> str:
         "",
         cleaned,
     )
+    cleaned = re.sub(
+        r"(?im)^\s*Outstanding Questions:\s*None\s*$",
+        "",
+        cleaned,
+    )
 
     return cleaned.strip()
 
