@@ -15,6 +15,8 @@ from raglib.merge import merge_session
 from raglib.validate import validate_session
 from raglib.summarize import summarize_session
 from scripts.load_summaries import apply_sql, write_sql
+from scripts.load_songbook import apply_sql as apply_songbook_sql
+from scripts.load_songbook import write_songbook_sql
 
 
 STAGES = {
@@ -73,7 +75,7 @@ def parse_args():
     )
     parser.add_argument(
         "command",
-        choices=[*STAGES.keys(), "postextract", "status", "dbload"],
+        choices=[*STAGES.keys(), "postextract", "status", "dbload", "songbook-load"],
         help="Workflow command to run.",
     )
     parser.add_argument("session_name", nargs="?", help="Session name, e.g. session20.")
@@ -91,6 +93,12 @@ def main():
         sql_path = write_sql()
         if args.apply:
             apply_sql(sql_path, args.container, args.user, args.database)
+        return
+
+    if args.command == "songbook-load":
+        sql_path, _report_path, _prompts, _warnings = write_songbook_sql()
+        if args.apply:
+            apply_songbook_sql(sql_path, args.container, args.user, args.database)
         return
 
     if not args.session_name:

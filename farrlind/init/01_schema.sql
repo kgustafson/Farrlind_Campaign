@@ -433,9 +433,9 @@ CREATE TABLE song (
     short_description TEXT,                            -- compact editorial category/description
     long_description TEXT,                             -- songbook-facing description
     suno_prompt     TEXT,                              -- generation prompt used for Suno AI, if known
-    musical_key     VARCHAR(40),                       -- e.g. 'D minor', 'G major'
-    meter           VARCHAR(40),                       -- e.g. '4/4', '3/4', '6/8'
-    tempo           VARCHAR(60),                       -- e.g. '90 BPM', '100-110 BPM'
+    musical_key     VARCHAR(120),                      -- e.g. 'D minor', 'G major'
+    meter           VARCHAR(120),                      -- e.g. '4/4', '3/4', '6/8'
+    tempo           VARCHAR(120),                      -- e.g. '90 BPM', '100-110 BPM'
     instrumentation TEXT,
     lyrics_local_path TEXT,                            -- local lyrics file if downloaded/curated
     lyrics_url      TEXT,                              -- Google Doc link
