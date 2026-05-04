@@ -26,6 +26,7 @@ from raglib.summarize import (
 OUT_DIR = BASE2 / "farrlind" / "out"
 OUT_SQL = OUT_DIR / "load_summaries.sql"
 TRAVEL_FACTS_PATH = BASE2 / "knowledge" / "Faban" / "travel.yaml"
+SONG_PROMPTS_PATH = BASE2 / "knowledge" / "Faban" / "songbook" / "prompts.md"
 
 KNOWN_LOCATIONS = [
     "Bentrios",
@@ -75,11 +76,61 @@ KNOWN_ARTIFACTS = [
     "Roon's Shield",
 ]
 
+SONG_TITLE_TO_NUMBER = {
+    "the off-key dragon": 1,
+    "sally and the good day": 2,
+    "roll the barrel": 3,
+    "the one-legged lass": 4,
+    "the one legged lass": 4,
+    "the contract of baron wells": 5,
+    "the contract of baron welles": 5,
+    "the lord who bought his battles": 6,
+    "the lord who hires heroes": 6,
+    "the braggart baron who bought his battles": 6,
+    "the fool who outsang the devil": 7,
+    "flight of the fairies": 8,
+    "the flight of the fairies": 8,
+    "don't step in the fairy ring": 9,
+    "don’t step in the fairy ring": 9,
+    "the stars and the centaurs": 10,
+    "urgan wyrmbane": 11,
+    "the day we called it victory": 12,
+    "the defense of the watery dunes": 13,
+    "the defense of the watery deep": 13,
+    "the fallen few": 14,
+    "the fallen few at devilspawn valley": 14,
+    "the lost miners of karadum": 15,
+    "the battle of flintrock": 16,
+    "the ballad of flintrock": 16,
+    "the fate of the emerald eel": 17,
+    "ranger rick and his mighty stick": 18,
+    "mihira's rise": 19,
+    "mihira’s rise": 19,
+    "mihira's rise (the ballad of justice untamed)": 19,
+    "mihira’s rise (the ballad of justice untamed)": 19,
+    "the ballad of mortalkind": 20,
+    "the keeper of the quiet key": 21,
+    "keeper of the quiet key": 21,
+    "silent queen of whisper vale": 22,
+    "the silent queen of whisper vale": 22,
+    "the hand that did not open": 23,
+    "the road we walk together": 24,
+    "the long road home": 25,
+    "the lantern in your window": 26,
+    "the lantern in the window": 26,
+}
+
+PROMPT_FIELDS = {"title", "alias", "prompt", "tempo", "meter", "key", "instrumentation"}
+
 
 def sql_quote(value):
     if value is None or value == "":
         return "NULL"
     return "'" + str(value).replace("'", "''") + "'"
+
+
+def normalize_lookup(value: str) -> str:
+    return " ".join(value.replace("’", "'").split()).strip().lower()
 
 
 def parse_session_number(path: Path) -> int:
@@ -100,6 +151,108 @@ def parse_session_ref(value) -> int:
 
 def strip_bullet(line: str) -> str:
     return re.sub(r"^\s*(?:[-*•]|\d+[.)])\s*", "", line).strip()
+
+
+def clean_prompt_value(value: str) -> str:
+    value = value.strip()
+    value = re.sub(r"\*\*(.+?)\*\*", r"\1", value)
+    value = re.sub(r"\n{3,}", "\n\n", value)
+    return value.strip()
+
+
+def parse_song_prompts() -> tuple[list[dict], list[str]]:
+    if not SONG_PROMPTS_PATH.exists():
+        return [], []
+
+    entries = []
+    warnings = []
+    current = None
+    current_field = None
+
+    def flush():
+        nonlocal current
+        if not current:
+            return
+
+        title = clean_prompt_value(current.get("title", ""))
+        prompt = clean_prompt_value(current.get("prompt", ""))
+        if not title and not prompt:
+            current = None
+            return
+        if not title:
+            warnings.append("Skipped prompt block with no title.")
+            current = None
+            return
+        if not prompt:
+            warnings.append(f"Skipped {title}: prompt is blank.")
+            current = None
+            return
+
+        song_number = SONG_TITLE_TO_NUMBER.get(normalize_lookup(title))
+        if song_number is None:
+            warnings.append(f"Skipped {title}: no matching song number.")
+            current = None
+            return
+
+        entry = {
+            "song_number": song_number,
+            "title": title,
+            "prompt": prompt,
+            "tempo": clean_prompt_value(current.get("tempo", "")),
+            "meter": clean_prompt_value(current.get("meter", "")),
+            "key": clean_prompt_value(current.get("key", "")),
+            "instrumentation": clean_prompt_value(current.get("instrumentation", "")),
+        }
+
+        if not entry["tempo"]:
+            match = re.search(r"(?im)\btempo:\s*([^\n]+)", prompt)
+            if match:
+                entry["tempo"] = clean_prompt_value(match.group(1))
+        if not entry["meter"]:
+            match = re.search(r"(?im)\bmeter:\s*([^\n]+)", prompt)
+            if match:
+                entry["meter"] = clean_prompt_value(match.group(1))
+        if not entry["key"]:
+            match = re.search(r"(?im)\bkey:\s*([^\n]+)", prompt)
+            if match:
+                entry["key"] = clean_prompt_value(match.group(1))
+
+        entries.append(entry)
+        current = None
+
+    for line in SONG_PROMPTS_PATH.read_text(encoding="utf-8").splitlines():
+        field_match = re.match(r"^\s*([A-Za-z_]+)\s*:\s*(.*)$", line)
+        if field_match and field_match.group(1).lower() in PROMPT_FIELDS:
+            field = field_match.group(1).lower()
+            value = field_match.group(2)
+            if field == "title":
+                flush()
+                current = {"title": value}
+            else:
+                if current is None:
+                    current = {}
+                current[field] = value
+            current_field = field
+            continue
+
+        if current is not None and current_field:
+            current[current_field] = "\n".join(
+                part for part in [current.get(current_field, ""), line] if part != ""
+            )
+
+    flush()
+
+    by_number = {}
+    for entry in entries:
+        previous = by_number.get(entry["song_number"])
+        if previous:
+            warnings.append(
+                f"Duplicate prompt for song {entry['song_number']}: "
+                f"using {entry['title']} over {previous['title']}."
+            )
+        by_number[entry["song_number"]] = entry
+
+    return [by_number[number] for number in sorted(by_number)], warnings
 
 
 def parse_summary(path: Path) -> dict:
@@ -483,6 +636,48 @@ VALUES (
 """.strip()
 
 
+def song_prompt_sql(entry: dict) -> str:
+    assignments = [
+        f"suno_prompt = {sql_quote(entry['prompt'])}",
+    ]
+    if entry.get("key"):
+        assignments.append(f"musical_key = {sql_quote(entry['key'])}")
+    if entry.get("meter"):
+        assignments.append(f"meter = {sql_quote(entry['meter'])}")
+    if entry.get("tempo"):
+        assignments.append(f"tempo = {sql_quote(entry['tempo'])}")
+    if entry.get("instrumentation"):
+        assignments.append(f"instrumentation = {sql_quote(entry['instrumentation'])}")
+
+    return f"""
+UPDATE song
+SET {", ".join(assignments)}
+WHERE song_number = {entry["song_number"]};
+""".strip()
+
+
+def song_schema_sql() -> str:
+    return """
+ALTER TABLE song ADD COLUMN IF NOT EXISTS tempo VARCHAR(60);
+
+DROP VIEW IF EXISTS v_songbook;
+CREATE VIEW v_songbook AS
+    SELECT s.song_number, s.title, ss.style_name AS style,
+           sc.category_name AS category, s.song_type, s.short_description,
+           s.long_description, s.summary, s.suno_prompt, s.musical_key,
+           s.meter, s.tempo, s.instrumentation,
+           s.lyrics_local_path, s.mp3_local_path, s.mp3_url, s.lyrics_url
+    FROM song s
+    LEFT JOIN song_style ss ON s.style_id = ss.id
+    LEFT JOIN song_category sc ON s.category_id = sc.id
+    LEFT JOIN song_performance sp ON s.id = sp.song_id
+    GROUP BY s.id, s.song_number, s.title, ss.style_name, sc.category_name, s.song_type,
+             s.short_description, s.long_description, s.summary, s.suno_prompt, s.musical_key,
+             s.meter, s.tempo, s.instrumentation, s.lyrics_local_path, s.mp3_local_path, s.mp3_url, s.lyrics_url
+    ORDER BY s.song_number;
+""".strip()
+
+
 def pipeline_run_sql(session_count: int, event_count: int) -> str:
     return f"""
 INSERT INTO pipeline_run (
@@ -567,9 +762,11 @@ def build_sql(summaries: list[dict]) -> str:
             if (log["session_number"], log["from_location"], log["to_location"]) not in trusted_keys
         ],
     ]
+    song_prompts, _warnings = parse_song_prompts()
     statements = [
         "-- Generated by scripts/load_summaries.py. Safe to rerun.",
         "BEGIN;",
+        song_schema_sql(),
     ]
 
     for summary in summaries:
@@ -585,6 +782,9 @@ def build_sql(summaries: list[dict]) -> str:
     statements.append("DELETE FROM travel_log WHERE notes LIKE '%Loaded from travel.yaml%';")
     for log in travel_logs:
         statements.append(travel_log_sql(log))
+
+    for prompt in song_prompts:
+        statements.append(song_prompt_sql(prompt))
 
     statements.append(first_seen_sql(summaries))
     statements.append(pipeline_run_sql(len(summaries), total_events + len(travel_logs)))
@@ -618,6 +818,7 @@ def write_sql() -> Path:
         for log in inferred_travel_logs
         if (log["session_number"], log["from_location"], log["to_location"]) not in trusted_keys
     ])
+    song_prompts, song_prompt_warnings = parse_song_prompts()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     OUT_SQL.write_text(build_sql(summaries), encoding="utf-8")
@@ -625,6 +826,9 @@ def write_sql() -> Path:
     print(f"Sessions: {len(summaries)}")
     print(f"Events: {sum(len(summary['events']) for summary in summaries)}")
     print(f"Travel logs: {travel_log_count}")
+    print(f"Song prompts: {len(song_prompts)}")
+    for warning in song_prompt_warnings:
+        print(f"Song prompt warning: {warning}")
     return OUT_SQL
 
 

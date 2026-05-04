@@ -429,6 +429,15 @@ CREATE TABLE song (
     style_id        INT REFERENCES song_style(id),
     category_id     INT REFERENCES song_category(id),
     summary         TEXT,
+    song_type       VARCHAR(120),                      -- exact editorial type/style from the revealed songbook
+    short_description TEXT,                            -- compact editorial category/description
+    long_description TEXT,                             -- songbook-facing description
+    suno_prompt     TEXT,                              -- generation prompt used for Suno AI, if known
+    musical_key     VARCHAR(40),                       -- e.g. 'D minor', 'G major'
+    meter           VARCHAR(40),                       -- e.g. '4/4', '3/4', '6/8'
+    tempo           VARCHAR(60),                       -- e.g. '90 BPM', '100-110 BPM'
+    instrumentation TEXT,
+    lyrics_local_path TEXT,                            -- local lyrics file if downloaded/curated
     lyrics_url      TEXT,                              -- Google Doc link
     mp3_url         TEXT,                              -- Google Drive link
     mp3_local_path  TEXT,                              -- local path if downloaded
@@ -446,6 +455,14 @@ CREATE TABLE song_performance (
     location_id     INT REFERENCES location(id),
     audience_notes  TEXT,                              -- who heard it, reaction
     effect          TEXT                               -- mechanical or narrative effect
+);
+
+CREATE TABLE songbook_front_matter (
+    id              SERIAL PRIMARY KEY,
+    title           VARCHAR(200) NOT NULL,
+    foreword_path   TEXT,
+    foreword_text   TEXT,
+    notes           TEXT
 );
 
 -- Songs referencing campaign entities (lore connections)
@@ -848,6 +865,48 @@ INSERT INTO song (song_number, title, style_id, category_id, summary, lyrics_url
     (25, 'The Long Road Home',                    (SELECT id FROM song_style WHERE style_name='ballad'),        (SELECT id FROM song_category WHERE category_name='fellowship'),       'Comforting song reminding wanderers they carry companionship wherever they go',                'https://docs.google.com/document/d/1_3c26SDHz7Nz9E_0VAbHhhQUrWeYexbWj8ZQfrNSuVw', 'https://drive.google.com/open?id=1j6EPxRpflVmqaY1uWYCYDo85e0vopVIc'),
     (26, 'The Lantern in Your Window',            (SELECT id FROM song_style WHERE style_name='ballad'),        (SELECT id FROM song_category WHERE category_name='fellowship'),       'Beloved love song: love will always light the way home',                                       'https://docs.google.com/document/d/1s4csJXwiWNpeNf7GUZbF79tl0pA2HKaUYhr5QC9DKPc', 'https://drive.google.com/open?id=1VdestSb1WF9TOP39N4K4Li2_eemoYro7');
 
+UPDATE song AS s
+SET
+    title = v.title,
+    song_type = v.song_type,
+    short_description = v.short_description,
+    long_description = v.long_description,
+    summary = v.long_description,
+    lyrics_local_path = v.lyrics_local_path,
+    mp3_local_path = v.mp3_local_path
+FROM (VALUES
+    (1,  'The Off-Key Dragon', 'Comic tavern song', 'Humor / Tavern Entertainment', 'A ridiculous tale of a dragon whose singing voice is so terrible that it terrifies villages more than its fire ever could.', 'knowledge/Faban/songbook/The_Off_Key_Dragon/lyrics.md', 'knowledge/Faban/songbook/The_Off_Key_Dragon/song.mp3'),
+    (2,  'Sally and the Good Day', '3/4 tavern jig', 'Tavern morale song', 'The story of Sally, whose cheerful spirit and refusal to surrender to gloom turns every misfortune into a reason to celebrate life.', 'knowledge/Faban/songbook/Sally_and_the_Good_Day/lyrics.md', 'knowledge/Faban/songbook/Sally_and_the_Good_Day/song.mp3'),
+    (3,  'Roll the Barrel', 'Traditional sea shanty', 'Sailor tavern song', 'A rollicking drinking song celebrating the reckless joy of sailors who find courage and camaraderie at the bottom of a rum barrel.', 'knowledge/Faban/songbook/Roll_the_Barrel/lyrics.md', 'knowledge/Faban/songbook/Roll_the_Barrel/song.mp3'),
+    (4,  'The One-Legged Lass', 'Bawdy drinking song', 'Tavern comedy', 'A legendary tavern woman with a wooden leg who outdrinks, outdances, and outwits every challenger foolish enough to test her.', 'knowledge/Faban/songbook/The_One_Legged_Lass/lyrics.md', 'knowledge/Faban/songbook/The_One_Legged_Lass/song.mp3'),
+    (5,  'The Contract of Baron Wells', 'Political cautionary ballad', 'Consequence / power', 'A warning tale about a noble whose pact and ambition unleashed forces beyond control.', 'knowledge/Faban/songbook/The_Contract_of_Baron_Wells/lyrics.md', 'knowledge/Faban/songbook/The_Contract_of_Baron_Wells/song.mp3'),
+    (6,  'The Lord Who Bought His Battles', 'Satirical tavern folk song', 'Political satire', 'A mocking tale of a boastful noble who hires heroes to fight his monsters and then proudly claims their victories as his own.', 'knowledge/Faban/songbook/The_Lord_Who_Bought_His_Battles/lyrics.md', 'knowledge/Faban/songbook/The_Lord_Who_Bought_His_Battles/song.mp3'),
+    (7,  'The Fool Who Outsang the Devil', 'Clever Tavern folk song', 'Trickster tale / wit defeating evil', 'A quick-thinking bard challenges a disguised devil to a singing contest and wins by singing of love, hope, and human joy - things the devil cannot match.', 'knowledge/Faban/songbook/The_Fool_Who_Outsang_the_Devil/lyrics.md', 'knowledge/Faban/songbook/The_Fool_Who_Outsang_the_Devil/song.mp3'),
+    (8,  'Flight of the Fairies', 'Whimsical folk dance', 'Fey folklore', 'A lighthearted celebration of the mysterious fair folk, whose laughter and mischief fill moonlit glades and forest clearings.', 'knowledge/Faban/songbook/Flight_of_the_Fairies/lyrics.md', 'knowledge/Faban/songbook/Flight_of_the_Fairies/song.mp3'),
+    (9,  'Don''t Step in the Fairy Ring', 'Folk warning song', 'Fey cautionary tale', 'A cheerful but cautionary tale warning travelers that stepping into a fairy ring may carry them to strange lands from which they may never return.', 'knowledge/Faban/songbook/Don_t_Step_in_the_Fairy_Ring/lyrics.md', 'knowledge/Faban/songbook/Don_t_Step_in_the_Fairy_Ring/song.mp3'),
+    (10, 'The Stars and the Centaurs', 'Lively cosmic jig', 'Mythic lore', 'A mythic tale describing how the wisdom of the stars and the spirit of the wild plains gave birth to the centaur race.', 'knowledge/Faban/songbook/The_Stars_and_the_Centaurs/lyrics.md', 'knowledge/Faban/songbook/The_Stars_and_the_Centaurs/song.mp3'),
+    (11, 'Urgan Wyrmbane', 'Orc war chant', 'Heroic saga / Orc legend', 'A battle anthem recounting the fearless deeds of the warrior Urgan, whose courage carried him through countless battles.', 'knowledge/Faban/songbook/Urgan_Wyrmbane/lyrics.md', 'knowledge/Faban/songbook/Urgan_Wyrmbane/song.mp3'),
+    (12, 'The Day We Called It Victory', 'Quiet reflective bardic ballad', 'Moral lament / truth of war', 'A somber reflection on the illusion of victory, honoring the forgotten valor of the enemy and exposing the quiet sins of the victors that time chooses to forget.', 'knowledge/Faban/songbook/The_Day_We_Called_It_Victory/lyrics.md', 'knowledge/Faban/songbook/The_Day_We_Called_It_Victory/song.mp3'),
+    (13, 'The Defense of the Watery Dunes', 'Shore ballad', 'Heroic chronicle', 'The story of Paramon''s defenders who stood firm against a corrupted sea guardian and the unnatural tide that threatened their home.', 'knowledge/Faban/songbook/The_Defense_of_the_Watery_Dunes/lyrics.md', 'knowledge/Faban/songbook/The_Defense_of_the_Watery_Dunes/song.mp3'),
+    (14, 'The Fallen Few at Devilspawn Valley', 'Epic heroic ballad', 'Heroic sacrifice', 'The legendary stand of a small band of warriors who held a mountain pass against overwhelming evil so that the realm might survive.', 'knowledge/Faban/songbook/The_Fallen_Few/lyrics.md', 'knowledge/Faban/songbook/The_Fallen_Few/song.mp3'),
+    (15, 'The Lost Miners of Karadum', 'Dwarven lament', 'Tragic ballad', 'A somber remembrance of the miners of Karadum who vanished beneath the mountain they loved and labored within.', 'knowledge/Faban/songbook/The_Lost_Miners_of_Karadum/lyrics.md', 'knowledge/Faban/songbook/The_Lost_Miners_of_Karadum/song.mp3'),
+    (16, 'The Battle of Flintrock', 'Tragic historical ballad', 'War lament', 'A sorrowful tale of two armies from the same people who slaughtered one another at Flintrock for the pride of their kings.', 'knowledge/Faban/songbook/The_Battle_of_Flintrock/lyrics.md', 'knowledge/Faban/songbook/The_Battle_of_Flintrock/song.mp3'),
+    (17, 'The Fate of the Emerald Eel', 'Dark sea shanty', 'Ghost legend', 'A haunting maritime tale of the ship Emerald Eel and her doomed encounter with the cursed phantom vessel known as the Donny Bell.', 'knowledge/Faban/songbook/The_Fate_of_the_Emerald_Eel/lyrics.md', 'knowledge/Faban/songbook/The_Fate_of_the_Emerald_Eel/song.mp3'),
+    (18, 'Ranger Rick and his Mighty Stick', 'Rowdy tavern call-and-response', 'Bawdy Humor', 'A wildly exaggerated tavern tale about the legendary ranger and the remarkable effectiveness of his mighty stick.', 'knowledge/Faban/songbook/Ranger_Rick_and_his_Mighty_Stick/lyrics.md', 'knowledge/Faban/songbook/Ranger_Rick_and_his_Mighty_Stick/song.mp3'),
+    (19, 'Mihira''s Rise (The Ballad of Justice Untamed)', 'Theological epic ballad', 'Divine legend', 'The tale of the goddess Mihira, whose blind justice was forever changed when war and love forced her to see the world she judged.', 'knowledge/Faban/songbook/Mihiras_Rise/lyrics.md', 'knowledge/Faban/songbook/Mihiras_Rise/song.mp3'),
+    (20, 'The Ballad of Mortalkind', 'Epic chronicle', 'Cosmology / history', 'A sweeping history of the ages describing the fall of dragonkind and the rise of mortal civilization and its dangerous ambitions.', 'knowledge/Faban/songbook/The_Ballad_of_Mortalkind/lyrics.md', 'knowledge/Faban/songbook/The_Ballad_of_Mortalkind/song.mp3'),
+    (21, 'The Keeper of the Quiet Key', 'Reflective philosophical ballad', 'Moral allegory', 'A solemn meditation on the burden of guarding dangerous truths and the lonely responsibility of those who choose silence for the sake of others.', 'knowledge/Faban/songbook/The_Keeper_of_the_Quiet_Key/lyrics.md', 'knowledge/Faban/songbook/The_Keeper_of_the_Quiet_Key/song.mp3'),
+    (22, 'Silent Queen of Whisper Vale', 'Lament', 'Leadership / grief', 'The story of Queen Mary of Whisper Vale, whose quiet strength guides her kingdom after the assassination of her beloved king.', 'knowledge/Faban/songbook/Silent_Queen_of_Whisper_Vale/lyrics.md', 'knowledge/Faban/songbook/Silent_Queen_of_Whisper_Vale/song.mp3'),
+    (23, 'The Hand That Did Not Open', 'Reflective bardic ballad', 'Personal Lament', 'A deeply personal song in which the bard recounts a moment of absolute choice, choosing not to wield a hidden power and bearing the quiet cost of that decision alone.', 'knowledge/Faban/songbook/The_Hand_That_Did_Not_Open/lyrics.md', 'knowledge/Faban/songbook/The_Hand_That_Did_Not_Open/song.mp3'),
+    (24, 'The Road We Walk Together', 'Fellowship tavern ballad', 'Companionship song', 'A tribute to the bonds of friendship and loyalty between companions who face hardship and adventure together.', 'knowledge/Faban/songbook/The_Road_We_Walk_Together/lyrics.md', 'knowledge/Faban/songbook/The_Road_We_Walk_Together/song.mp3'),
+    (25, 'The Long Road Home', 'Traveling ballad', 'Journey song', 'A comforting song reminding wanderers that no matter how far they travel, they carry the companionship of others with them.', 'knowledge/Faban/songbook/The_Long_Road_Home/lyrics.md', 'knowledge/Faban/songbook/The_Long_Road_Home/song.mp3'),
+    (26, 'The Lantern in Your Window', 'Romantic wedding ballad', 'Ceremony / love song', 'A beloved love song promising that no matter how long the road or how dark the night, love will always light the way home.', 'knowledge/Faban/songbook/The_Lantern_in_Your_Window/lyrics.md', 'knowledge/Faban/songbook/The_Lantern_in_Your_Window/song.mp3')
+) AS v(song_number, title, song_type, short_description, long_description, lyrics_local_path, mp3_local_path)
+WHERE s.song_number = v.song_number;
+
+INSERT INTO songbook_front_matter (title, foreword_path, notes) VALUES
+    ('The Revealed Songbook of Faban Colon', 'knowledge/Faban/songbook/foreward.md', 'Foreword placeholder for generated songbook documents.');
+
 -- Lore Items
 INSERT INTO lore_item (title, category, description, is_confirmed) VALUES
     ('Six Wells Exist',             'well_knowledge', 'There are exactly 6 Wells of Magic in the world. Confirmed by Khorag.',                             TRUE),
@@ -933,14 +992,18 @@ CREATE VIEW v_faban_inventory AS
 -- Songbook with performance tracking
 CREATE VIEW v_songbook AS
     SELECT s.song_number, s.title, ss.style_name AS style,
-           sc.category_name AS category, s.summary,
+           sc.category_name AS category, s.song_type, s.short_description,
+           s.long_description, s.summary, s.suno_prompt, s.musical_key,
+           s.meter, s.tempo, s.instrumentation,
            COUNT(sp.id) AS times_performed,
-           s.mp3_url, s.lyrics_url
+           s.lyrics_local_path, s.mp3_local_path, s.mp3_url, s.lyrics_url
     FROM song s
     LEFT JOIN song_style ss ON s.style_id = ss.id
     LEFT JOIN song_category sc ON s.category_id = sc.id
     LEFT JOIN song_performance sp ON s.id = sp.song_id
-    GROUP BY s.id, s.song_number, s.title, ss.style_name, sc.category_name, s.summary, s.mp3_url, s.lyrics_url
+    GROUP BY s.id, s.song_number, s.title, ss.style_name, sc.category_name, s.song_type,
+             s.short_description, s.long_description, s.summary, s.suno_prompt, s.musical_key,
+             s.meter, s.tempo, s.instrumentation, s.lyrics_local_path, s.mp3_local_path, s.mp3_url, s.lyrics_url
     ORDER BY s.song_number;
 
 -- Party milestone timeline
