@@ -1,0 +1,214 @@
+session: session11
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: The Journey North
+session_date: '2025-09-29'
+in_game_date: 1832 AS Apollal 21, 1832 AS Namal 1, 1832 AS Namal 4, 1832 AS Namal
+  6
+primary_location: Road to Archaeological Dig Site
+items:
+- id: event-001
+  sequence: 1
+  source_type: diary_event
+  source_text: During the journey north, Corvinas studies a book about the archaeological
+    dig site and learns it played a pivotal role in the ancient transition from the
+    Era of Dragons to the Era of Gods.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Road to Archaeological Dig Site
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-002
+  sequence: 2
+  source_type: diary_event
+  source_text: The caravan travels north for about a week without encounters.
+  decision: accepted
+  canonical_text: ''
+  event_type: travel
+  location: Road to Archaeological Dig Site
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-003
+  sequence: 3
+  source_type: diary_event
+  source_text: After three more quiet days, the party finds the lack of encounters
+    and other travelers unnerving.
+  decision: accepted
+  canonical_text: ''
+  event_type: travel
+  location: Road to Archaeological Dig Site
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-004
+  sequence: 4
+  source_type: diary_event
+  source_text: Roon notices strange shadows moving on their own around the caravan
+    and warns the party.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Road to Archaeological Dig Site
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-005
+  sequence: 5
+  source_type: diary_event
+  source_text: Gildas investigates the moving shadows and senses faint necrotic divination
+    magic from the Abyssal plane before four lights fly away and the magic disappears.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Road to Archaeological Dig Site
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-006
+  sequence: 6
+  source_type: diary_event
+  source_text: Mikani speaks with plants and senses no buildings or constructed structures
+    nearby, but detects fey and undead presence somewhere in the caravan, Abyssal
+    influence all around, and both celestial and fiendish influences within the party.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Road to Archaeological Dig Site
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-007
+  sequence: 7
+  source_type: diary_event
+  source_text: Corvinas speaks with the caravan rangers and observes that they are
+    an archer-heavy force with beautifully crafted longbows, light armor, and a professional,
+    standoffish leader.
+  decision: accepted
+  canonical_text: ''
+  event_type: social
+  location: Road to Archaeological Dig Site
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-008
+  sequence: 8
+  source_type: diary_event
+  source_text: Faban notices Sam, a suspicious man in a rickety carriage at the back
+    of the caravan, and speaks with him about the archaeological dig site.
+  decision: accepted
+  canonical_text: ''
+  event_type: social
+  location: Road to Archaeological Dig Site
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-009
+  sequence: 9
+  source_type: diary_event
+  source_text: Sam warns that if the archaeological site's protection is removed,
+    it may bring death, the return of the arcane, the return of the Wells, and many
+    ancient curses.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Road to Archaeological Dig Site
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-010
+  sequence: 10
+  source_type: diary_event
+  source_text: Sam shows Faban a small green glass ring imbued with strange energy
+    and says he intends to give it to the quartermaster.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Road to Archaeological Dig Site
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-011
+  sequence: 11
+  source_type: diary_event
+  source_text: After two more days of travel, the caravan continues along the road
+    toward the archaeological dig site.
+  decision: accepted
+  canonical_text: ''
+  event_type: travel
+  location: Road to Archaeological Dig Site
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-012
+  sequence: 12
+  source_type: diary_event
+  source_text: Faban researches Sam's green glass ring through his codex of songs
+    and recalls a long-form poem describing it as a powerful protective ring.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Road to Archaeological Dig Site
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-013
+  sequence: 13
+  source_type: diary_event
+  source_text: Faban attempts to steal the protective green glass ring from Sam at
+    the back of the caravan.
+  decision: accepted
+  canonical_text: ''
+  event_type: acquisition
+  location: Road to Archaeological Dig Site
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+added_items: []
+applied_on: '2026-05-05'
