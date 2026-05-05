@@ -3,7 +3,10 @@ __pycache__/
 *.pyc
 
 #Data
-knowledge/
+knowledge/*
+!knowledge/Faban/
+knowledge/Faban/*
+!knowledge/Faban/canon_decisions.yaml
 
 #Temp
 *.log

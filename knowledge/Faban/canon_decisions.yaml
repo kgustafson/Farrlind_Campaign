@@ -1,0 +1,31 @@
+# Canon decisions are user-confirmed campaign facts that resolve ambiguity,
+# preserve review history, or identify corrections still needing DB updates.
+
+session_primary_locations:
+  - session: session20
+    canonical: Coast near Catur
+    aliases:
+      - Catur shoreline
+    decision: Primary location is the coast near Catur, roughly 6 miles away.
+    reason: Session included travel from Balrog, but the endpoint and next prep location are near Catur.
+    decided_from: user
+    decided_on: "2026-05-04"
+    status: needs_db_update
+
+event_review_decisions:
+  - session: session20
+    status: needs_db_update
+    decision_type: missing_primary_event
+    event_type: social
+    significance: 4
+    location: Coast near Catur
+    description: >
+      The party negotiated with local fishermen for a vessel and received warnings
+      about the peoples inhabiting Catur, including merfolk, Locathah, and tritons.
+    canon_notes:
+      - The inhabitants of Catur do not take kindly to strangers.
+      - The party was advised to disguise themselves if possible.
+      - The fish-like people were clarified as Locathah.
+    reason: This is a key setup event for entering Catur and should influence next-session prep.
+    decided_from: user
+    decided_on: "2026-05-04"
