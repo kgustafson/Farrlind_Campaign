@@ -1,5 +1,5 @@
 session: session20
-status: reviewed
+status: applied
 review_instructions:
 - For each item, set decision to accepted, rejected, corrected, or added.
 - For corrected or added items, fill canonical_text and any changed metadata.
@@ -20,12 +20,12 @@ items:
   reason: ''
   decided_by: ''
   decided_on: ''
-  applied_status: pending
-  applied_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
 - id: event-002
   source_type: db_event
   source_text: Four days travel to coast
-  decision: acc
+  decision: accepted
   canonical_text: ''
   event_type: travel
   location: Coast near Catur
@@ -33,12 +33,12 @@ items:
   reason: ''
   decided_by: ''
   decided_on: ''
-  applied_status: pending
-  applied_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
 - id: event-003
   source_type: db_event
   source_text: Arrived at Catur shoreline
-  decision: accepted  
+  decision: accepted
   canonical_text: ''
   event_type: travel
   location: Coast near Catur
@@ -46,8 +46,8 @@ items:
   reason: ''
   decided_by: ''
   decided_on: ''
-  applied_status: pending
-  applied_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
 - id: event-004
   source_type: db_event
   source_text: Met fishermen — boats missing, lights under water, something thought-large
@@ -60,8 +60,8 @@ items:
   reason: ''
   decided_by: ''
   decided_on: ''
-  applied_status: pending
-  applied_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
 - id: event-005
   source_type: db_event
   source_text: Preparing to descend into sunken city
@@ -73,8 +73,8 @@ items:
   reason: ''
   decided_by: ''
   decided_on: ''
-  applied_status: pending
-  applied_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
 - id: event-006
   source_type: db_event
   source_text: Roon continues to survive against all odds
@@ -86,8 +86,8 @@ items:
   reason: ''
   decided_by: ''
   decided_on: ''
-  applied_status: pending
-  applied_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
 - id: event-007
   source_type: db_event
   source_text: The party negotiated with local fishermen for a vessel and received
@@ -101,6 +101,7 @@ items:
   reason: ''
   decided_by: ''
   decided_on: ''
-  applied_status: pending
-  applied_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
 added_items: []
+applied_on: '2026-05-04'

@@ -595,6 +595,27 @@ def review_events_for_session(summary: dict, review: Optional[dict]) -> Optional
     return events
 
 
+def event_identity(description: str, location: str = "") -> tuple[str, str]:
+    description_key = re.sub(r"\s+", " ", description or "").strip().lower()
+    location_key = re.sub(r"\s+", " ", location or "").strip().lower()
+    return description_key, location_key
+
+
+def canon_events_for_load(session_number: int, reviewed_events: Optional[list[dict]], canon_events: dict[int, list[dict]]) -> list[dict]:
+    items = canon_events.get(session_number, []) or []
+    if reviewed_events is None:
+        return items
+
+    reviewed_keys = {
+        event_identity(event.get("description", ""), event.get("location", ""))
+        for event in reviewed_events
+    }
+    return [
+        item for item in items
+        if event_identity(item.get("description", ""), item.get("location", "")) not in reviewed_keys
+    ]
+
+
 def entity_mentioned(entity: str, text: str) -> bool:
     low = text.lower()
 
@@ -928,12 +949,17 @@ def build_sql(summaries: list[dict]) -> str:
         for summary in summaries
     }
     total_events = sum(
-        len(review_events[summary["session_number"]])
-        if review_events[summary["session_number"]] is not None
-        else len(summary["events"])
+        (
+            len(review_events[summary["session_number"]])
+            if review_events[summary["session_number"]] is not None
+            else len(summary["events"])
+        )
+        + len(canon_events_for_load(
+            summary["session_number"],
+            review_events[summary["session_number"]],
+            canon_events,
+        ))
         for summary in summaries
-    ) + sum(
-        len(items) for items in canon_events.values()
     )
     inferred_travel_logs = [
         log
@@ -981,7 +1007,11 @@ def build_sql(summaries: list[dict]) -> str:
             for sequence, event in enumerate(summary["events"], start=1):
                 statements.append(event_sql(summary["session_number"], sequence, event))
             base_count = len(summary["events"])
-        for offset, item in enumerate(canon_events.get(summary["session_number"], []), start=1):
+        for offset, item in enumerate(canon_events_for_load(
+            summary["session_number"],
+            reviewed_events,
+            canon_events,
+        ), start=1):
             statements.append(canon_event_sql(
                 summary["session_number"],
                 base_count + offset,
@@ -1013,13 +1043,15 @@ def write_sql() -> Path:
     summaries = discover_summaries()
     decisions = load_canon_decisions()
     canon_events = canon_event_decisions(decisions)
-    canon_event_count = sum(len(items) for items in canon_events.values())
     reviews = load_review_documents()
-    reviewed_event_count = sum(
-        len(events)
+    review_events = {
+        summary["session_number"]: review_events_for_session(summary, reviews.get(summary["session_number"]))
         for summary in summaries
-        for events in [review_events_for_session(summary, reviews.get(summary["session_number"]))]
-        if events is not None
+    }
+    reviewed_event_count = sum(len(events) for events in review_events.values() if events is not None)
+    canon_event_count = sum(
+        len(canon_events_for_load(summary["session_number"], review_events[summary["session_number"]], canon_events))
+        for summary in summaries
     )
     trusted_travel_logs = load_travel_facts()
     inferred_travel_logs = [
@@ -1038,9 +1070,15 @@ def write_sql() -> Path:
     ])
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     OUT_SQL.write_text(build_sql(summaries), encoding="utf-8")
+    event_count = sum(
+        len(review_events[summary["session_number"]])
+        if review_events[summary["session_number"]] is not None
+        else len(summary["events"])
+        for summary in summaries
+    ) + canon_event_count
     print(f"Wrote {OUT_SQL}")
     print(f"Sessions: {len(summaries)}")
-    print(f"Events: {sum(len(summary['events']) for summary in summaries) + canon_event_count}")
+    print(f"Events: {event_count}")
     if reviewed_event_count:
         print(f"Reviewed events: {reviewed_event_count}")
     if canon_event_count:

@@ -198,6 +198,59 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertNotIn("Draft event to replace", sql)
         self.assertIn("Loaded from session20 review: event-001", sql)
 
+    def test_build_sql_dedupes_canon_events_already_in_review(self):
+        event_text = "The party negotiated with local fishermen for a vessel."
+        summaries = [
+            {
+                "session_number": 20,
+                "physical_date": "2026-04-27",
+                "in_game_date": "1832 AS Namal 20",
+                "title": "Salt, Steel",
+                "summary": "The party arrived near Catur.",
+                "events": ["Draft event to replace"],
+                "source_path": "session20_summary.md",
+                "location": "Coast near Catur",
+            }
+        ]
+        reviews = {
+            20: {
+                "session": "session20",
+                "status": "reviewed",
+                "items": [
+                    {
+                        "id": "event-001",
+                        "decision": "accepted",
+                        "source_text": event_text,
+                        "event_type": "social",
+                        "location": "Coast near Catur",
+                        "significance": 4,
+                    }
+                ],
+                "added_items": [],
+            }
+        }
+        decisions = {
+            "event_review_decisions": [
+                {
+                    "session": "session20",
+                    "decision_type": "missing_primary_event",
+                    "status": "applied",
+                    "description": event_text,
+                    "event_type": "social",
+                    "location": "Coast near Catur",
+                    "significance": 4,
+                }
+            ]
+        }
+
+        with patch("load_summaries.load_canon_decisions", return_value=decisions):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_review_documents", return_value=reviews):
+                    sql = load_summaries.build_sql(summaries)
+
+        self.assertEqual(sql.count(event_text), 1)
+        self.assertNotIn("Loaded from canon_decisions.yaml", sql)
+
 
 if __name__ == "__main__":
     unittest.main()
