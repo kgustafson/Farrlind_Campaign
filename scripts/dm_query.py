@@ -547,6 +547,35 @@ def review_has_pending_decisions(document: dict) -> bool:
     return summary["decisions"]["pending"] > 0
 
 
+def review_next_action(summary: dict) -> tuple[str, str]:
+    decisions = summary["decisions"]
+    applied = summary["applied"]
+    session = summary["session"]
+    status = summary["status"]
+
+    if decisions["pending"] or decisions["other"]:
+        issue_bits = []
+        if decisions["pending"]:
+            issue_bits.append(f"{decisions['pending']} pending")
+        if decisions["other"]:
+            issue_bits.append(f"{decisions['other']} unknown")
+        return "edit", f"Edit {summary['path']} ({', '.join(issue_bits)} decisions)."
+
+    if status in {"reviewed", "complete"} and applied["pending"]:
+        return "apply", f"Run: ./rag-env/bin/python scripts/dm_query.py apply-review {session}"
+
+    if status == "in_review":
+        return "mark-reviewed", f"Set top-level status: reviewed in {summary['path']}."
+
+    if status == "applied" and applied["pending"] == 0 and applied["other"] == 0:
+        return "done", "Review is applied."
+
+    if applied["other"]:
+        return "inspect", f"Inspect applied_status values in {summary['path']}."
+
+    return "inspect", f"Inspect review status '{status}' in {summary['path']}."
+
+
 def mark_review_applied(document: dict, applied_on: str) -> dict:
     document = {**document, "status": "applied", "applied_on": applied_on}
     for section in ["items", "added_items"]:
@@ -841,6 +870,30 @@ def review_status(args):
         )
 
 
+def review_next(args):
+    paths = [review_path(args.session_number)] if args.session_number else discover_review_files()
+    print_section("Review Next")
+    if args.session_number and not paths[0].exists():
+        session = session_key(args.session_number)
+        print(f"{session}: init")
+        print(f"  Run: ./rag-env/bin/python scripts/dm_query.py init-review {session}")
+        return
+    if not paths:
+        print("No review files found.")
+        print("  Run init-review after a session has been loaded into the database.")
+        return
+
+    for path in paths:
+        if not path.exists():
+            continue
+        summary = summarize_review(load_review_file(path), path)
+        action, detail = review_next_action(summary)
+        print(f"{summary['session']}: {action}")
+        if summary["title"]:
+            print(f"  title: {summary['title']}")
+        print(f"  {detail}")
+
+
 def apply_review(args):
     session_number = args.session_number
     path = review_path(session_number)
@@ -944,6 +997,10 @@ def build_parser():
 
     review_status_parser = subparsers.add_parser("review-status", help="Show status counts for YAML session review files.")
     review_status_parser.set_defaults(func=review_status)
+
+    review_next_parser = subparsers.add_parser("review-next", help="Show the next review workflow action.")
+    review_next_parser.add_argument("session_number", nargs="?", type=parse_session_ref, help="Optional session number or name.")
+    review_next_parser.set_defaults(func=review_next)
 
     apply = subparsers.add_parser("apply-review", help="Apply a completed review through the durable DB load path.")
     apply.add_argument("session_number", type=parse_session_ref, help="Session number or name, e.g. 20 or session20.")

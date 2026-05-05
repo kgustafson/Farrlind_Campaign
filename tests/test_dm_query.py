@@ -408,6 +408,55 @@ class DmQueryTest(unittest.TestCase):
         self.assertTrue(dm_query.review_has_pending_decisions({"items": [{"decision": "pending"}]}))
         self.assertFalse(dm_query.review_has_pending_decisions({"items": [{"decision": "accepted"}]}))
 
+    def test_review_next_action_reports_edit_for_pending_or_unknown_decisions(self):
+        summary = dm_query.summarize_review(
+            {
+                "session": "session20",
+                "status": "in_review",
+                "items": [
+                    {"decision": "pending", "applied_status": "pending"},
+                    {"decision": "acc", "applied_status": "pending"},
+                ],
+            },
+            Path("/tmp/session20_review.yaml"),
+        )
+
+        action, detail = dm_query.review_next_action(summary)
+
+        self.assertEqual(action, "edit")
+        self.assertIn("1 pending", detail)
+        self.assertIn("1 unknown", detail)
+
+    def test_review_next_action_reports_apply_for_completed_unapplied_review(self):
+        summary = dm_query.summarize_review(
+            {
+                "session": "session20",
+                "status": "reviewed",
+                "items": [{"decision": "accepted", "applied_status": "pending"}],
+            },
+            Path("/tmp/session20_review.yaml"),
+        )
+
+        action, detail = dm_query.review_next_action(summary)
+
+        self.assertEqual(action, "apply")
+        self.assertIn("apply-review session20", detail)
+
+    def test_review_next_action_reports_done_for_applied_review(self):
+        summary = dm_query.summarize_review(
+            {
+                "session": "session20",
+                "status": "applied",
+                "items": [{"decision": "accepted", "applied_status": "applied"}],
+            },
+            Path("/tmp/session20_review.yaml"),
+        )
+
+        action, detail = dm_query.review_next_action(summary)
+
+        self.assertEqual(action, "done")
+        self.assertIn("applied", detail)
+
     def test_review_status_prints_review_file_counts(self):
         document = {
             "session": "session20",
@@ -435,6 +484,37 @@ class DmQueryTest(unittest.TestCase):
                 dm_query.review_status(args())
 
         self.assertIn("No review files found.", output.getvalue())
+
+    def test_review_next_prints_init_for_missing_session_review(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "session21_review.yaml"
+            with patch("dm_query.review_path", return_value=path):
+                with contextlib.redirect_stdout(io.StringIO()) as output:
+                    dm_query.review_next(args(session_number=21))
+
+        rendered = output.getvalue()
+        self.assertIn("session21: init", rendered)
+        self.assertIn("init-review session21", rendered)
+
+    def test_review_next_prints_actions_for_discovered_reviews(self):
+        document = {
+            "session": "session20",
+            "status": "reviewed",
+            "session_title": "Salt, Steel",
+            "items": [{"decision": "accepted", "applied_status": "pending"}],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "session20_review.yaml"
+            path.write_text(yaml.safe_dump(document), encoding="utf-8")
+            with patch("dm_query.discover_review_files", return_value=[path]):
+                with contextlib.redirect_stdout(io.StringIO()) as output:
+                    dm_query.review_next(args(session_number=None))
+
+        rendered = output.getvalue()
+        self.assertIn("session20: apply", rendered)
+        self.assertIn("Salt, Steel", rendered)
+        self.assertIn("apply-review session20", rendered)
 
     def test_apply_review_refuses_pending_review(self):
         document = {
@@ -557,6 +637,12 @@ class DmQueryTest(unittest.TestCase):
         parser = dm_query.build_parser()
         parsed = parser.parse_args(["review-status"])
         self.assertEqual(parsed.func, dm_query.review_status)
+
+    def test_parser_accepts_review_next_command(self):
+        parser = dm_query.build_parser()
+        parsed = parser.parse_args(["review-next", "session20"])
+        self.assertEqual(parsed.func, dm_query.review_next)
+        self.assertEqual(parsed.session_number, 20)
 
     def test_print_prep_questions_uses_topic_signals(self):
         topic_events = [{"description": "Met fishermen — boats missing, lights under water"}]

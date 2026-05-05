@@ -38,6 +38,7 @@ Create a review file:
 Check review progress:
 
 ```bash
+./rag-env/bin/python scripts/dm_query.py review-next
 ./rag-env/bin/python scripts/dm_query.py review-status
 ```
 
