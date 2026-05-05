@@ -609,6 +609,195 @@ class DmQueryTest(unittest.TestCase):
         self.assertIn("Coast near Catur", rendered)
         self.assertIn("negotiated with fishermen", rendered)
 
+    def test_session_final_prints_reviewed_packet(self):
+        review_data = {
+            "session": {
+                "session_number": "20",
+                "session_date": "2026-04-27",
+                "in_game_date": "1832 AS Namal 20",
+                "title": "Salt, Steel",
+                "location": "Coast near Catur",
+                "summary": "The party arrived near Catur.",
+            },
+            "events": [
+                {
+                    "sequence_order": "1",
+                    "event_type": "travel",
+                    "location": "Coast near Catur",
+                    "description": "Arrived at Catur shoreline",
+                    "significance": "4",
+                }
+            ],
+        }
+        document = {
+            "session": "session20",
+            "status": "applied",
+            "applied_on": "2026-05-04",
+            "items": [
+                {
+                    "decision": "accepted",
+                    "source_text": "Arrived at Catur shoreline",
+                    "event_type": "travel",
+                    "location": "Coast near Catur",
+                },
+                {
+                    "decision": "rejected",
+                    "source_text": "Roon continues to survive against all odds",
+                    "event_type": "discovery",
+                    "location": "Coast near Catur",
+                    "reason": "Not a session event.",
+                },
+            ],
+            "added_items": [],
+        }
+        canon = {
+            "session_primary_locations": [
+                {
+                    "session": "session20",
+                    "canonical": "Coast near Catur",
+                    "status": "applied",
+                    "decision": "Primary location is the coast near Catur.",
+                }
+            ],
+            "event_review_decisions": [],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "session20_review.yaml"
+            path.write_text(yaml.safe_dump(document), encoding="utf-8")
+            with patch("dm_query.query_event_review", return_value=review_data):
+                with patch("dm_query.review_path", return_value=path):
+                    with patch("dm_query.load_canon_decisions", return_value=canon):
+                        with contextlib.redirect_stdout(io.StringIO()) as output:
+                            dm_query.session_final(args(session_number=20))
+
+        rendered = output.getvalue()
+        self.assertIn("Session 20 Final", rendered)
+        self.assertIn("Review status: applied", rendered)
+        self.assertIn("Final DB Events", rendered)
+        self.assertIn("Arrived at Catur shoreline", rendered)
+        self.assertIn("Accepted / Corrected / Added Decisions", rendered)
+        self.assertIn("Rejected Decisions", rendered)
+        self.assertIn("Roon continues", rendered)
+        self.assertIn("Canon Decisions", rendered)
+        self.assertIn("Primary location is the coast near Catur", rendered)
+        self.assertIn("Ingest Draft Summary", rendered)
+
+    def test_session_final_exits_when_session_missing(self):
+        with patch("dm_query.query_event_review", return_value={"session": {}, "events": []}):
+            with self.assertRaises(SystemExit) as raised:
+                dm_query.session_final(args(session_number=20))
+
+        self.assertIn("No session found", str(raised.exception))
+
+    def test_render_final_summary_uses_final_events_and_excluded_items(self):
+        session = {
+            "session_date": "2026-04-27",
+            "in_game_date": "1832 AS Namal 20",
+            "title": "Salt, Steel",
+            "location": "Coast near Catur",
+        }
+        events = [
+            {
+                "event_type": "travel",
+                "location": "Coast near Catur",
+                "description": "Arrived at Catur shoreline",
+            }
+        ]
+        review_document = {
+            "status": "applied",
+            "applied_on": "2026-05-04",
+            "items": [
+                {
+                    "decision": "rejected",
+                    "source_text": "Roon continues to survive against all odds",
+                    "reason": "Not a session event.",
+                }
+            ],
+        }
+        decisions = {
+            "session_primary_locations": [
+                {
+                    "canonical": "Coast near Catur",
+                    "status": "applied",
+                    "decision": "Primary location is the coast near Catur.",
+                }
+            ],
+            "event_review_decisions": [],
+        }
+
+        rendered = dm_query.render_final_summary(session, events, review_document, decisions, 20)
+
+        self.assertIn("# Session 20: Salt, Steel", rendered)
+        self.assertIn("## Canon Events", rendered)
+        self.assertIn("Arrived at Catur shoreline", rendered)
+        self.assertIn("## Excluded Draft Items", rendered)
+        self.assertIn("Roon continues", rendered)
+        self.assertIn("The ingest draft summary is source material, not canon.", rendered)
+
+    def test_write_final_summary_writes_canon_file(self):
+        review_data = {
+            "session": {
+                "session_number": "20",
+                "session_date": "2026-04-27",
+                "in_game_date": "1832 AS Namal 20",
+                "title": "Salt, Steel",
+                "location": "Coast near Catur",
+                "summary": "Draft summary with Roon.",
+            },
+            "events": [
+                {
+                    "sequence_order": "1",
+                    "event_type": "travel",
+                    "location": "Coast near Catur",
+                    "description": "Arrived at Catur shoreline",
+                    "significance": "4",
+                }
+            ],
+        }
+        document = {
+            "session": "session20",
+            "status": "applied",
+            "applied_on": "2026-05-04",
+            "items": [],
+            "added_items": [],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            review_path = Path(tmp) / "session20_review.yaml"
+            output_path = Path(tmp) / "session20_summary.md"
+            review_path.write_text(yaml.safe_dump(document), encoding="utf-8")
+            with patch("dm_query.query_event_review", return_value=review_data):
+                with patch("dm_query.review_path", return_value=review_path):
+                    with patch("dm_query.final_summary_path", return_value=output_path):
+                        with patch("dm_query.load_canon_decisions", return_value={}):
+                            with contextlib.redirect_stdout(io.StringIO()) as output:
+                                dm_query.write_final_summary(args(session_number=20))
+
+            written = output_path.read_text(encoding="utf-8")
+
+        self.assertIn("Wrote", output.getvalue())
+        self.assertIn("Canon Events", written)
+        self.assertIn("Arrived at Catur shoreline", written)
+        self.assertNotIn("Draft summary with Roon", written)
+
+    def test_write_final_summary_requires_applied_review(self):
+        review_data = {
+            "session": {"session_number": "20", "title": "Salt, Steel"},
+            "events": [],
+        }
+        document = {"session": "session20", "status": "reviewed"}
+
+        with tempfile.TemporaryDirectory() as tmp:
+            review_path = Path(tmp) / "session20_review.yaml"
+            review_path.write_text(yaml.safe_dump(document), encoding="utf-8")
+            with patch("dm_query.query_event_review", return_value=review_data):
+                with patch("dm_query.review_path", return_value=review_path):
+                    with self.assertRaises(SystemExit) as raised:
+                        dm_query.write_final_summary(args(session_number=20))
+
+        self.assertIn("Review must be applied", str(raised.exception))
+
     def test_parser_accepts_health_command(self):
         parser = dm_query.build_parser()
         parsed = parser.parse_args(["health"])
@@ -642,6 +831,18 @@ class DmQueryTest(unittest.TestCase):
         parser = dm_query.build_parser()
         parsed = parser.parse_args(["review-next", "session20"])
         self.assertEqual(parsed.func, dm_query.review_next)
+        self.assertEqual(parsed.session_number, 20)
+
+    def test_parser_accepts_session_final_command(self):
+        parser = dm_query.build_parser()
+        parsed = parser.parse_args(["session-final", "session20"])
+        self.assertEqual(parsed.func, dm_query.session_final)
+        self.assertEqual(parsed.session_number, 20)
+
+    def test_parser_accepts_write_final_summary_command(self):
+        parser = dm_query.build_parser()
+        parsed = parser.parse_args(["write-final-summary", "session20"])
+        self.assertEqual(parsed.func, dm_query.write_final_summary)
         self.assertEqual(parsed.session_number, 20)
 
     def test_print_prep_questions_uses_topic_signals(self):

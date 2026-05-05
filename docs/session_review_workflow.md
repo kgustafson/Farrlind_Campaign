@@ -49,6 +49,18 @@ Apply a completed review:
 ./rag-env/bin/python scripts/dm_query.py health
 ```
 
+View the final reviewed session packet:
+
+```bash
+./rag-env/bin/python scripts/dm_query.py session-final sessionXX
+```
+
+Write the canonical session summary:
+
+```bash
+./rag-env/bin/python scripts/dm_query.py write-final-summary sessionXX
+```
+
 Inspect a session beside canon decisions:
 
 ```bash
@@ -128,4 +140,8 @@ added_items:
 
 ## Principle
 
-AI drafts the memory. The user canonizes it. The database changes only after review decisions are recorded.
+AI drafts the memory. The user canonizes it. The ingest `sessionXX_summary.md` file is source material from the audio pipeline, not final truth. After review is applied, the canonical session summary lives in:
+
+```text
+knowledge/Faban/final/sessionXX_summary.md
+```

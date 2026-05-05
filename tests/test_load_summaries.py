@@ -155,6 +155,28 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertEqual(events[1]["event_type"], "social")
         self.assertIn("event-001", events[0]["notes"])
 
+    def test_review_events_for_session_uses_source_text_for_added_item_without_canonical_text(self):
+        review = {
+            "session": "session19",
+            "status": "applied",
+            "items": [
+                {
+                    "id": "event-011",
+                    "decision": "added",
+                    "source_text": 'Faban wrote "The Battle of Balrog Square."',
+                    "canonical_text": "",
+                    "event_type": "acquisition",
+                    "location": "Balrog",
+                    "significance": 4,
+                }
+            ],
+        }
+
+        events = load_summaries.review_events_for_session({"session_number": 19}, review)
+
+        self.assertEqual(events[0]["description"], 'Faban wrote "The Battle of Balrog Square."')
+        self.assertEqual(events[0]["event_type"], "acquisition")
+
     def test_review_events_for_session_ignores_in_review_documents(self):
         self.assertIsNone(load_summaries.review_events_for_session({}, {"status": "in_review"}))
 

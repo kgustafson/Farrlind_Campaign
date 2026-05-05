@@ -1,0 +1,162 @@
+session: session19
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: Of Teeth, Memory, and What Remains
+session_date: '2026-04-12'
+in_game_date: 1832 AS Namal 19 (continued)
+primary_location: Balrog
+items:
+- id: event-001
+  source_type: db_event
+  source_text: Session takes place during the Balrog/Saiffi arc
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Balrog
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-002
+  source_type: db_event
+  source_text: The party located the Balrog town center/tower area and learned cultists
+    were trying to summon a dragon
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Balrog
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-003
+  source_type: db_event
+  source_text: The party decided to help Saiffi and put him in a wineskin
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Balrog
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-004
+  source_type: db_event
+  source_text: Cultists summoned the dragon Orsydon
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Balrog
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-005
+  source_type: db_event
+  source_text: Combat involved Orsydon, cultists, party positioning around cover/pillars,
+    and party members using attacks and spells
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Balrog
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-006
+  source_type: db_event
+  source_text: Orsydon used nightmare breath, dealing psychic damage and causing frightened
+    effects
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Balrog
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-007
+  source_type: db_event
+  source_text: Faban and Lightdelver both used Cloud of Daggers; Faban called it "Cuisenart."
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Balrog
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-008
+  source_type: db_event
+  source_text: The dragon was defeated
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Balrog
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-009
+  source_type: db_event
+  source_text: Lightdelver lost concentration and became unconscious during the fight
+    when Orsydon's dead body fell on him
+  decision: corrected
+  canonical_text: ''
+  event_type: discovery
+  location: Balrog
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-010
+  source_type: db_event
+  source_text: After the combat, the party returned toward the city/tavern and continued
+    planning around the wells, the Wand of Wells, and the cataclysm
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Balrog
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-011
+  source_type: user_added
+  source_text: Faban wrote a song about the fight with Orsydon called "The Battle
+    of Balrog Square"
+  decision: added
+  canonical_text: ''
+  event_type: acquisition
+  location: Balrog
+  significance: 4
+  reason: Adds a new song to Faban's repertoire based on a major campaign event.
+  decided_by: user
+  decided_on: '2026-05-04'
+  applied_status: applied
+  applied_on: '2026-05-04'
+added_items: []
+applied_on: '2026-05-04'

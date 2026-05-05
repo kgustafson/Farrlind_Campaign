@@ -18,6 +18,7 @@ MAX_LIMIT = 1000
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CANON_DECISIONS_PATH = REPO_ROOT / "knowledge" / "Faban" / "canon_decisions.yaml"
 REVIEWS_DIR = REPO_ROOT / "knowledge" / "Faban" / "reviews"
+FINAL_DIR = REPO_ROOT / "knowledge" / "Faban" / "final"
 
 
 def bounded_int(value: str, minimum: int = 1, maximum: int = MAX_LIMIT) -> int:
@@ -494,6 +495,10 @@ def review_path(session_number: int) -> Path:
     return REVIEWS_DIR / f"{session_key(session_number)}_review.yaml"
 
 
+def final_summary_path(session_number: int) -> Path:
+    return FINAL_DIR / f"{session_key(session_number)}_summary.md"
+
+
 def load_review_file(path: Path) -> dict:
     with open(path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
@@ -894,6 +899,209 @@ def review_next(args):
         print(f"  {detail}")
 
 
+def review_decision_text(item: dict) -> str:
+    if item.get("decision") in {"corrected", "added"}:
+        return item.get("canonical_text") or item.get("source_text") or ""
+    return item.get("source_text") or item.get("canonical_text") or ""
+
+
+def print_review_decision_items(title: str, items: list[dict], empty: str):
+    print_section(title)
+    if not items:
+        print(empty)
+        return
+
+    for item in items:
+        decision = item.get("decision") or "pending"
+        location = f" [{item['location']}]" if item.get("location") else ""
+        event_type = f"{item['event_type']}: " if item.get("event_type") else ""
+        print(f"- {decision}: {event_type}{clip(review_decision_text(item), 280)}{location}")
+        if item.get("reason"):
+            print(f"  reason: {clip(item['reason'], 220)}")
+
+
+def print_canon_decision_details(decisions: dict):
+    print_section("Canon Decisions")
+    primary_locations = decisions["session_primary_locations"]
+    event_decisions = decisions["event_review_decisions"]
+    if not primary_locations and not event_decisions:
+        print("No canon decisions recorded for this session.")
+        return
+
+    for item in primary_locations:
+        print(f"- primary location [{item.get('status', 'unknown')}]: {item.get('canonical', 'unknown')}")
+        if item.get("decision"):
+            print(f"  {clip(item['decision'], 260)}")
+    for item in event_decisions:
+        description = item.get("description") or ""
+        event_type = f"{item.get('event_type', 'event')}: "
+        print(f"- {item.get('decision_type', 'event_review')} [{item.get('status', 'unknown')}]: {event_type}{clip(description, 260)}")
+        for note in item.get("canon_notes") or []:
+            print(f"  - {note}")
+
+
+def canon_summary_event_line(event: dict) -> str:
+    event_type = f" ({event['event_type']})" if event.get("event_type") else ""
+    location = f" [{event['location']}]" if event.get("location") else ""
+    return f"- {event.get('description', '').strip()}{location}{event_type}"
+
+
+def render_final_summary(session: dict, events: list[dict], review_document: dict, decisions: dict, session_number: int) -> str:
+    title = session.get("title") or f"Session {session_number:02d}"
+    lines = [
+        f"# Session {session_number:02d}: {title}",
+        "",
+        "## Canon Summary",
+        "",
+    ]
+    if session.get("session_date"):
+        lines.append(f"- Physical date: {session['session_date']}")
+    if session.get("in_game_date"):
+        lines.append(f"- In-game date: {session['in_game_date']}")
+    if session.get("location"):
+        lines.append(f"- Primary location: {session['location']}")
+    if review_document.get("status"):
+        applied = f", applied {review_document['applied_on']}" if review_document.get("applied_on") else ""
+        lines.append(f"- Review status: {review_document['status']}{applied}")
+
+    lines.extend(["", "## Canon Events", ""])
+    if events:
+        lines.extend(canon_summary_event_line(event) for event in events)
+    else:
+        lines.append("No canon events recorded.")
+
+    canon_notes = []
+    for item in decisions["session_primary_locations"]:
+        canon_notes.append(
+            f"- Primary location [{item.get('status', 'unknown')}]: {item.get('canonical', 'unknown')}. "
+            f"{item.get('decision', '')}".rstrip()
+        )
+    for item in decisions["event_review_decisions"]:
+        canon_notes.append(
+            f"- {item.get('decision_type', 'event_review')} [{item.get('status', 'unknown')}]: "
+            f"{item.get('description', '')}".rstrip()
+        )
+        canon_notes.extend(f"  - {note}" for note in item.get("canon_notes") or [])
+    if canon_notes:
+        lines.extend(["", "## Canon Notes", "", *canon_notes])
+
+    rejected = [
+        item for item in [*(review_document.get("items") or []), *(review_document.get("added_items") or [])]
+        if item.get("decision") == "rejected"
+    ]
+    if rejected:
+        lines.extend(["", "## Excluded Draft Items", ""])
+        for item in rejected:
+            reason = f" Reason: {item['reason']}" if item.get("reason") else ""
+            lines.append(f"- {review_decision_text(item)}{reason}")
+
+    lines.extend([
+        "",
+        "## Provenance",
+        "",
+        f"- Built from final database events for session{session_number:02d}.",
+        f"- Review file: knowledge/Faban/reviews/session{session_number:02d}_review.yaml",
+        "- The ingest draft summary is source material, not canon.",
+        "",
+    ])
+    return "\n".join(lines)
+
+
+def session_final(args):
+    session_number = args.session_number
+    review = query_event_review(args, session_number)
+    session = review["session"]
+    if not session:
+        raise SystemExit(f"No session found for session{session_number:02d}")
+
+    path = review_path(session_number)
+    document = load_review_file(path) if path.exists() else {}
+    summary = summarize_review(document, path) if document else {}
+    review_items = [*(document.get("items") or []), *(document.get("added_items") or [])]
+    kept_items = [
+        item for item in review_items
+        if item.get("decision") in {"accepted", "corrected", "added"}
+    ]
+    rejected_items = [
+        item for item in review_items
+        if item.get("decision") == "rejected"
+    ]
+    unresolved_items = [
+        item for item in review_items
+        if (item.get("decision") or "pending") not in {"accepted", "corrected", "added", "rejected"}
+    ]
+    decisions = canon_decisions_for_session(load_canon_decisions(), session_number)
+
+    print_section(f"Session {session_number:02d} Final")
+    print(f"Title: {session.get('title') or 'Untitled'}")
+    if session.get("session_date"):
+        print(f"Physical date: {session['session_date']}")
+    if session.get("in_game_date"):
+        print(f"In-game: {session['in_game_date']}")
+    if session.get("location"):
+        print(f"Primary location: {session['location']}")
+    if summary:
+        print(f"Review status: {summary['status']}")
+        applied_on = document.get("applied_on")
+        if applied_on:
+            print(f"Applied on: {applied_on}")
+    else:
+        print("Review status: no review file")
+    print("")
+
+    print_section("Final DB Events")
+    if not review["events"]:
+        print("No DB events found.")
+    for event in review["events"]:
+        sequence = event.get("sequence_order") or "?"
+        event_type = f"{event['event_type']}: " if event.get("event_type") else ""
+        location = f" [{event['location']}]" if event.get("location") else ""
+        significance = f" significance={event['significance']}" if event.get("significance") else ""
+        print(f"{sequence}. {event_type}{clip(event.get('description'), 320)}{location}{significance}")
+    print("")
+
+    print_review_decision_items("Accepted / Corrected / Added Decisions", kept_items, "No accepted, corrected, or added review decisions.")
+    print("")
+    print_review_decision_items("Rejected Decisions", rejected_items, "No rejected review decisions.")
+    if unresolved_items:
+        print("")
+        print_review_decision_items("Unresolved Decisions", unresolved_items, "No unresolved review decisions.")
+    print("")
+    print_canon_decision_details(decisions)
+    print("")
+
+    final_path = final_summary_path(session_number)
+    if final_path.exists():
+        print_section("Canon Summary File")
+        print(final_path)
+        print("")
+
+    print_section("Ingest Draft Summary")
+    print(textwrap.fill(clip(session.get("summary"), 1200), width=96))
+
+
+def write_final_summary(args):
+    session_number = args.session_number
+    review = query_event_review(args, session_number)
+    session = review["session"]
+    if not session:
+        raise SystemExit(f"No session found for session{session_number:02d}")
+
+    path = review_path(session_number)
+    document = load_review_file(path) if path.exists() else {}
+    if document.get("status") != "applied":
+        raise SystemExit(f"Review must be applied before writing final summary: {path}")
+
+    decisions = canon_decisions_for_session(load_canon_decisions(), session_number)
+    output_path = final_summary_path(session_number)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
+        render_final_summary(session, review["events"], document, decisions, session_number),
+        encoding="utf-8",
+    )
+    print(f"Wrote {output_path}")
+
+
 def apply_review(args):
     session_number = args.session_number
     path = review_path(session_number)
@@ -1001,6 +1209,14 @@ def build_parser():
     review_next_parser = subparsers.add_parser("review-next", help="Show the next review workflow action.")
     review_next_parser.add_argument("session_number", nargs="?", type=parse_session_ref, help="Optional session number or name.")
     review_next_parser.set_defaults(func=review_next)
+
+    final = subparsers.add_parser("session-final", help="Show the final reviewed session packet.")
+    final.add_argument("session_number", type=parse_session_ref, help="Session number or name, e.g. 20 or session20.")
+    final.set_defaults(func=session_final)
+
+    final_summary = subparsers.add_parser("write-final-summary", help="Write the canonical session summary markdown.")
+    final_summary.add_argument("session_number", type=parse_session_ref, help="Session number or name, e.g. 20 or session20.")
+    final_summary.set_defaults(func=write_final_summary)
 
     apply = subparsers.add_parser("apply-review", help="Apply a completed review through the durable DB load path.")
     apply.add_argument("session_number", type=parse_session_ref, help="Session number or name, e.g. 20 or session20.")

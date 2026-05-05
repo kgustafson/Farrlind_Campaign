@@ -567,8 +567,10 @@ def load_review_documents() -> dict[int, dict]:
 
 
 def reviewed_event_text(item: dict) -> str:
-    if item.get("decision") in {"corrected", "added"}:
+    if item.get("decision") == "corrected":
         return (item.get("canonical_text") or "").strip()
+    if item.get("decision") == "added":
+        return (item.get("canonical_text") or item.get("source_text") or "").strip()
     return (item.get("source_text") or "").strip()
 
 
