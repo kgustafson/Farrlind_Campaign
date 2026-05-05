@@ -1,0 +1,132 @@
+session: session09
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: Bellemaine
+session_date: '2025-08-10'
+in_game_date: 1832 AS Apollal 19, 1832 AS Apollal 20, 1832 AS Apollal 21
+primary_location: Bellemaine
+items:
+- id: event-001
+  sequence: 1
+  source_type: db_event
+  source_text: The party researched wells and magic at the library.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Bellemaine
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-002
+  sequence: 2
+  source_type: db_event
+  source_text: Gildas found a book about the Elemental Cataclysm.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Bellemaine
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-003
+  sequence: 3
+  source_type: db_event
+  source_text: Mikani searched for information on dark forces and found a book on
+    primordial chaos.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Bellemaine
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-004
+  sequence: 4
+  source_type: db_event
+  source_text: The party met Aracokin, the quartermaster, who offered to accompany
+    them to survey the site.
+  decision: accepted
+  canonical_text: ''
+  event_type: social
+  location: Bellemaine
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-005
+  sequence: 5
+  source_type: db_event
+  source_text: Thompson, a naturalist quartermaster, provided information about Jen
+    and the druid commune.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Bellemaine
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-006
+  sequence: 6
+  source_type: db_event
+  source_text: Corvinas found a book on devil hierarchy.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Bellemaine
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-007
+  sequence: 7
+  source_type: db_event
+  source_text: Roon arm-wrestled Rebar, losing 5 gp.
+  decision: accepted
+  canonical_text: ''
+  event_type: rest
+  location: Bellemaine
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-008
+  sequence: 8
+  source_type: db_event
+  source_text: The city was attacked by a construct being controlled by an individual.
+  decision: corrected
+  canonical_text: The city was attacked by a construct being controlled by an individual,
+    likely a cultist. He is carrying an orb that seems to be the source of his control
+    over the construct.
+  event_type: combat
+  location: Bellemaine
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+added_items: []
+applied_on: '2026-05-05'
