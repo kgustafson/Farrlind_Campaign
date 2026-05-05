@@ -279,12 +279,23 @@ CANON_NPCS = [
 
 KNOWN_NPCS = [npc["name"] for npc in CANON_NPCS]
 
+CANON_ENEMIES = [
+    {
+        "name": "Fey witch",
+        "enemy_type": "fey_witch",
+        "first_encountered_session": 3,
+        "description": "Unnamed fey witch in Thataways who summoned goblins, nearly killed Faban and Roon, and left behind a satchel containing souls and an ancient necromantic tome.",
+        "status": "dead",
+        "threat_level": "moderate",
+    },
+]
+
 KNOWN_ENEMIES = [
     "Salazar",
     "Orsydon",
     "Ardema",
     "Iron Paw",
-]
+] + [enemy["name"] for enemy in CANON_ENEMIES]
 
 KNOWN_ARTIFACTS = [
     "The Black Blade",
@@ -1189,6 +1200,46 @@ def canon_npc_scrub_sql() -> str:
     return "\n\n".join(canon_npc_sql(npc) for npc in CANON_NPCS)
 
 
+def canon_enemy_sql(enemy: dict) -> str:
+    name = enemy["name"]
+    enemy_type = enemy.get("enemy_type", "")
+    description = enemy.get("description", "")
+    first_encountered_session = enemy.get("first_encountered_session")
+    status = enemy.get("status", "unknown")
+    threat_level = enemy.get("threat_level", "moderate")
+
+    return f"""
+UPDATE enemy
+SET
+    enemy_type = COALESCE(NULLIF({sql_quote(enemy_type)}, ''), enemy.enemy_type),
+    threat_level_id = COALESCE((SELECT id FROM threat_level WHERE level_code = {sql_quote(threat_level)} LIMIT 1), enemy.threat_level_id),
+    entity_status_id = COALESCE((SELECT id FROM entity_status WHERE status_code = {sql_quote(status)} LIMIT 1), enemy.entity_status_id),
+    first_encountered_session = COALESCE((SELECT id FROM session WHERE session_number = {first_encountered_session}), enemy.first_encountered_session),
+    description = COALESCE(NULLIF({sql_quote(description)}, ''), enemy.description),
+    notes = {sql_quote("Updated from reviewed canon enemy scrub.")}
+WHERE name = {sql_quote(name)};
+
+INSERT INTO enemy (
+    name, enemy_type, threat_level_id,
+    entity_status_id, first_encountered_session,
+    description, notes
+)
+SELECT
+    {sql_quote(name)},
+    {sql_quote(enemy_type)},
+    (SELECT id FROM threat_level WHERE level_code = {sql_quote(threat_level)} LIMIT 1),
+    (SELECT id FROM entity_status WHERE status_code = {sql_quote(status)} LIMIT 1),
+    (SELECT id FROM session WHERE session_number = {first_encountered_session}),
+    {sql_quote(description)},
+    {sql_quote("Loaded from reviewed canon enemy scrub.")}
+WHERE NOT EXISTS (SELECT 1 FROM enemy WHERE name = {sql_quote(name)});
+""".strip()
+
+
+def canon_enemy_scrub_sql() -> str:
+    return "\n\n".join(canon_enemy_sql(enemy) for enemy in CANON_ENEMIES)
+
+
 def pipeline_run_sql(session_count: int, event_count: int) -> str:
     return f"""
 INSERT INTO pipeline_run (
@@ -1317,6 +1368,7 @@ def build_sql(summaries: list[dict]) -> str:
         statements.append(session_sql(summary))
 
     statements.append(canon_npc_scrub_sql())
+    statements.append(canon_enemy_scrub_sql())
 
     for summary in summaries:
         statements.append(delete_events_sql(summary["session_number"]))

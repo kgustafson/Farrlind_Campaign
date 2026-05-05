@@ -153,3 +153,7 @@ AI drafts the memory. The user canonizes it. The ingest `sessionXX_summary.md` f
 ```text
 knowledge/Faban/final/sessionXX_summary.md
 ```
+
+## Backlog
+
+- Enemy encounter tracking: add review/database support for generic enemies as well as named or boss enemies. This should answer questions like "how many goblins have we encountered?", "which sessions had giant frogs?", and "what enemies did we defeat versus drive off?" without requiring every creature to become an NPC. Track each enemy appearance with at least enemy name/type, quantity encountered, session, event/location, and outcome/confidence so queries can report how many of each enemy the party encountered, where, and during what session.

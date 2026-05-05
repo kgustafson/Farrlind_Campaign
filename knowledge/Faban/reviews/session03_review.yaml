@@ -1,0 +1,108 @@
+session: session03
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: The Battle of the Fey Witch
+session_date: '2025-03-09'
+in_game_date: 1832 AS Apollal 13
+primary_location: Thataways
+items:
+- id: event-001
+  sequence: 1
+  source_type: db_event
+  source_text: The party engages in combat with a fey witch who summons two goblins.
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-002
+  sequence: 2
+  source_type: db_event
+  source_text: Roon and Corvinas quickly take down one of the goblins.
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-003
+  sequence: 3
+  source_type: db_event
+  source_text: The witch counters with magic missiles and brings the fighter to an
+    inch of death.
+  decision: corrected
+  canonical_text: The witch counters with magic missiles, brings Faban to an inch
+    of death, and then turns invisible.
+  event_type: combat
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-004
+  sequence: 4
+  source_type: db_event
+  source_text: Corvinas brings the fighter back to health using his healing abilities.
+  decision: corrected
+  canonical_text: Gildas casts grease where the witch was last seen, Makani kills
+    the remaining goblin with spiritual weapon, and Corvinas lays hands on Faban to
+    bring him back to health.
+  event_type: combat
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-005
+  sequence: 5
+  source_type: db_event
+  source_text: The party delivers a final blow to the witch, killing her.
+  decision: corrected
+  canonical_text: The witch reappears near Gildas, strikes Roon to death's door, and
+    is killed when Corvinas cleaves her head from her body; her remains turn to dust.
+  event_type: combat
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-006
+  sequence: 6
+  source_type: db_event
+  source_text: A satchel is discovered containing nothing at first, but later reveals
+    ancient-looking tome and souls.
+  decision: corrected
+  canonical_text: The witch leaves behind a satchel that appears empty but radiates
+    illusion and aberration magic; after the party pokes it with a stick and Faban
+    throws in a copper piece, the bag releases souls and an ancient necromantic tome
+    that Gildas examines.
+  event_type: discovery
+  location: Thataways
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+added_items: []
+applied_on: '2026-05-05'
