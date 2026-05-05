@@ -482,6 +482,18 @@ def canon_primary_location_session_numbers(decisions: dict) -> set[int]:
     return sessions
 
 
+def applied_review_session_numbers(paths: Optional[list[Path]] = None) -> set[int]:
+    sessions = set()
+    for path in paths if paths is not None else discover_review_files():
+        try:
+            document = load_review_file(path)
+            if document.get("status") == "applied":
+                sessions.add(parse_session_ref(document.get("session", "")))
+        except (OSError, argparse.ArgumentTypeError, yaml.YAMLError):
+            continue
+    return sessions
+
+
 def note_session_number(note: str) -> Optional[int]:
     match = re.search(r"\bSession\s+(\d+)\b", note or "")
     return int(match.group(1)) if match else None
@@ -625,6 +637,7 @@ def review_item_from_event(event: dict) -> dict:
 
     return {
         "id": f"event-{sequence_number:03d}",
+        "sequence": sequence_number,
         "source_type": "db_event",
         "source_text": event.get("description") or "",
         "decision": "pending",
@@ -648,6 +661,7 @@ def build_review_document(session: dict, events: list[dict]) -> dict:
         "review_instructions": [
             "For each item, set decision to accepted, rejected, corrected, or added.",
             "For corrected or added items, fill canonical_text and any changed metadata.",
+            "Use sequence to keep final events chronological; decimals can insert added items between drafted events.",
             "Leave applied_status as pending until an apply-review step updates the database.",
         ],
         "session_title": session.get("title") or "",
@@ -715,6 +729,7 @@ def health(args):
     canon_decisions = load_canon_decisions()
     canon_notes = format_canon_decisions(canon_decisions)
     canon_primary_sessions = canon_primary_location_session_numbers(canon_decisions)
+    applied_review_sessions = applied_review_session_numbers()
     if not row:
         print("No health data found.")
         if canon_notes:
@@ -745,7 +760,7 @@ def health(args):
         notes.append(f"Song missing prompt: {song}")
     for note in split_notes(row.get("location_mismatch_notes")):
         session_number = note_session_number(note)
-        if session_number in canon_primary_sessions:
+        if session_number in canon_primary_sessions or session_number in applied_review_sessions:
             continue
         notes.append(note)
 

@@ -1,0 +1,161 @@
+session: session16
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: Session 16
+session_date: '2026-01-16'
+in_game_date: 1832 AS Namal 12, 1832 AS Namal 13
+primary_location: Paramon
+items:
+- id: event-001
+  sequence: 1
+  source_type: db_event
+  source_text: Remembrance Day celebration
+  decision: corrected
+  canonical_text: The party attends a Remembrance Day celebration, where they learn
+    about the history of the world and the significance of the day. They also meet
+    some of the other attendees, including a group of adventurers who are also celebrating.
+  event_type: discovery
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-002
+  sequence: 2
+  source_type: db_event
+  source_text: Storytelling and gift-giving
+  decision: corrected
+  canonical_text: The party participates in storytelling and gift-giving, where they
+    share stories of their past adventures and receive gifts from the other attendees.
+  event_type: acquisition
+  location: ''
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-003
+  sequence: 3
+  source_type: db_event
+  source_text: Mikani approaches the mysterious satchel
+  decision: corrected
+  canonical_text: Faban drinks too much and passes out, while Mikani approaches the
+    mysterious satchel and finds strange runes and three lines written on the outside
+    of the satchel.
+  event_type: discovery
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-004
+  sequence: 4
+  source_type: db_event
+  source_text: Gildas casts his spell, which eventually fractures and dissolves into
+    absences
+  decision: corrected
+  canonical_text: Gildas casts detect magic spell on the satchel, which eventually
+    fractures and fails. The party decides to leave the satchel alone.
+  event_type: discovery
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-005
+  sequence: 7
+  source_type: db_event
+  source_text: Iron Paw summons a Wasterlich and three fish-things, attacking us
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: ''
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-006
+  sequence: 8
+  source_type: db_event
+  source_text: Corvinas falls beneath the fish-things
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-007
+  sequence: 99
+  source_type: db_event
+  source_text: Roon and I manage to keep hope alive
+  decision: rejected
+  canonical_text: ''
+  event_type: discovery
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-008
+  sequence: 9
+  source_type: db_event
+  source_text: We defeat Iron Paw
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: ''
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+added_items:
+- id: event-004.2
+  sequence: 5
+  source_type: user_added
+  source_text: Mikani and Roon go to the temple of Namaloa where they realize that
+    Iron Paw - the head priest of the temple is not really a believer in Namaloa
+  decision: added
+  canonical_text: ''
+  event_type: discovery
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-004.3
+  sequence: 6
+  source_type: user_added
+  source_text: The party decides to go confront Iron Paw at the temple of Namaloa
+  decision: added
+  canonical_text: The party decides to go confront Iron Paw at the temple of Namaloa
+  event_type: discovery
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+applied_on: '2026-05-04'

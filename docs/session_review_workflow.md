@@ -84,8 +84,15 @@ status: in_review
 Each drafted event starts as:
 
 ```yaml
+sequence: 1
 decision: pending
 applied_status: pending
+```
+
+Use `sequence` to keep the final session chronology. You can use decimals for inserted facts:
+
+```yaml
+sequence: 4.5
 ```
 
 Change `decision` to one of:
@@ -124,6 +131,7 @@ Use `added_items` for missing events, facts, or other review decisions:
 ```yaml
 added_items:
   - id: added-001
+    sequence: 4.5
     source_type: user_added
     source_text: ''
     decision: added

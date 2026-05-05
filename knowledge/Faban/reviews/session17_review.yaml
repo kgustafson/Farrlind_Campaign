@@ -1,0 +1,178 @@
+session: session17
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: After Iron Paw
+session_date: '2026-02-07'
+in_game_date: 1832 AS Namal 13, 1832 AS Namal 14, 1832 AS Namal 15-17, 1832 AS Namal
+  18
+primary_location: Paramon
+items:
+- id: event-001
+  sequence: 2
+  source_type: db_event
+  source_text: We searched the remains of Iron Paw with reverence and caution.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Paramon
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-002
+  sequence: 3
+  source_type: db_event
+  source_text: Gildas prepared his detection spell to read the echoes clinging to
+    the fallen warlock's tools.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Paramon
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-003
+  sequence: 4
+  source_type: db_event
+  source_text: Roon claimed the great sword with necrotic hunger, while Mikani took
+    an abjuration ring.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Paramon
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-004
+  sequence: 5
+  source_type: db_event
+  source_text: We found a survivor, Erling Rostad, who spoke of primordial forces
+    and the Cataclysm as over-release.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Paramon
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-005
+  sequence: 6
+  source_type: db_event
+  source_text: We obtained twenty potions of borrowed gills and temporary courage
+    from the apothecary.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Paramon
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-006
+  sequence: 8
+  source_type: db_event
+  source_text: We attended the Crossroads Festival, where we encountered revelry without
+    illusion or glamour.
+  decision: accepted
+  canonical_text: ''
+  event_type: travel
+  location: Crossroads
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-007
+  sequence: 9
+  source_type: db_event
+  source_text: I composed a rescue jig on the spot to save Mikani's dignity.
+  decision: corrected
+  canonical_text: I composed a rescue jig on the spot to save Mikani's dignity.  The
+    Off-Key Dragon was born and became an instant hit.
+  event_type: discovery
+  location: Balrog
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-008
+  sequence: 10
+  source_type: db_event
+  source_text: A brawl began in Balrog, but was efficiently ended by a larger dwarf.
+  decision: corrected
+  canonical_text: A brawl began in a tavern called the Severed Thumb in Balrog, but
+    was efficiently ended by a larger dwarf.
+  event_type: discovery
+  location: Balrog
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-009
+  sequence: 11
+  source_type: db_event
+  source_text: I sang of the Wells, the Cataclysm, and power released without restraint,
+    causing Forgebottom to falter at the refrain and ruin a stone.
+  decision: accepted
+  canonical_text: ''
+  event_type: rest
+  location: Balrog
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+added_items:
+- id: added-001
+  sequence: 1
+  source_type: user_added
+  source_text: ''
+  decision: added
+  canonical_text: The party began in Paramon at the temple where they had defeated
+    Iron Paw, then traveled toward Balrog.
+  event_type: travel
+  location: Paramon
+  significance: 4
+  reason: Establishes the session starting point and travel direction.
+  decided_by: user
+  decided_on: '2026-05-04'
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: added-002
+  sequence: 7
+  source_type: user_added
+  source_text: ''
+  decision: added
+  canonical_text: Along the road toward Balrog, the party encountered a fair at the
+    crossroads.
+  event_type: social
+  location: Crossroads
+  significance: 4
+  reason: Important travel encounter during the journey toward Balrog.
+  decided_by: user
+  decided_on: '2026-05-04'
+  applied_status: applied
+  applied_on: '2026-05-04'
+applied_on: '2026-05-04'

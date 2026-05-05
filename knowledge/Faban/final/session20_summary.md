@@ -13,8 +13,8 @@
 - Four days travel to coast [Coast near Catur] (travel)
 - Arrived at Catur shoreline [Coast near Catur] (travel)
 - Met fishermen — boats missing, lights under water, something thought-large beneath [Coast near Catur] (social)
-- Preparing to descend into sunken city [Catur] (discovery)
 - The party negotiated with local fishermen for a vessel and received warnings about the peoples inhabiting Catur, including merfolk, Locathah, and tritons. [Coast near Catur] (social)
+- Preparing to descend into sunken city [Catur] (discovery)
 
 ## Canon Notes
 

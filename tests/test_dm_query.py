@@ -225,8 +225,9 @@ class DmQueryTest(unittest.TestCase):
 
         with patch("dm_query.query_health", return_value=health_row):
             with patch("dm_query.load_canon_decisions", return_value=canon):
-                with contextlib.redirect_stdout(io.StringIO()) as output:
-                    dm_query.health(args())
+                with patch("dm_query.applied_review_session_numbers", return_value=set()):
+                    with contextlib.redirect_stdout(io.StringIO()) as output:
+                        dm_query.health(args())
 
         rendered = output.getvalue()
         self.assertIn("DM Query Health", rendered)
@@ -237,6 +238,31 @@ class DmQueryTest(unittest.TestCase):
         self.assertIn("Canon Decisions", rendered)
         self.assertIn("session20 primary location -> Coast near Catur", rendered)
         self.assertIn("session20 missing_primary_event", rendered)
+
+    def test_health_suppresses_location_mismatch_for_applied_review_sessions(self):
+        health_row = {
+            "sessions_loaded": "21",
+            "sessions_with_summaries": "21",
+            "events_loaded": "140",
+            "songs_loaded": "26",
+            "songs_with_prompts": "23",
+            "songs_missing_prompt_count": "3",
+            "latest_session_number": "20",
+            "latest_session_title": "Salt, Steel",
+            "transcript_sessions": "19, 20",
+            "songs_missing_prompts": "",
+            "location_mismatch_notes": "Session 17 primary location is Paramon, but event locations include Balrog, Crossroads",
+        }
+
+        with patch("dm_query.query_health", return_value=health_row):
+            with patch("dm_query.load_canon_decisions", return_value={}):
+                with patch("dm_query.applied_review_session_numbers", return_value={17}):
+                    with contextlib.redirect_stdout(io.StringIO()) as output:
+                        dm_query.health(args())
+
+        rendered = output.getvalue()
+        self.assertIn("No obvious data notes.", rendered)
+        self.assertNotIn("Session 17 primary location", rendered)
 
     def test_note_session_number_parses_health_notes(self):
         self.assertEqual(
@@ -292,6 +318,15 @@ class DmQueryTest(unittest.TestCase):
         self.assertEqual(filtered["session_primary_locations"][0]["canonical"], "Coast near Catur")
         self.assertEqual(len(filtered["event_review_decisions"]), 1)
 
+    def test_applied_review_session_numbers_reads_applied_reviews(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            applied = Path(tmp) / "session17_review.yaml"
+            draft = Path(tmp) / "session18_review.yaml"
+            applied.write_text(yaml.safe_dump({"session": "session17", "status": "applied"}), encoding="utf-8")
+            draft.write_text(yaml.safe_dump({"session": "session18", "status": "reviewed"}), encoding="utf-8")
+
+            self.assertEqual(dm_query.applied_review_session_numbers([applied, draft]), {17})
+
     def test_build_review_document_uses_pending_decisions(self):
         session = {
             "session_number": "20",
@@ -315,8 +350,10 @@ class DmQueryTest(unittest.TestCase):
         self.assertEqual(document["session"], "session20")
         self.assertEqual(document["status"], "in_review")
         self.assertEqual(document["items"][0]["id"], "event-001")
+        self.assertEqual(document["items"][0]["sequence"], 1)
         self.assertEqual(document["items"][0]["decision"], "pending")
         self.assertEqual(document["items"][0]["applied_status"], "pending")
+        self.assertIn("Use sequence", document["review_instructions"][2])
         self.assertEqual(document["added_items"], [])
 
     def test_init_review_writes_yaml_and_refuses_overwrite(self):
@@ -351,6 +388,7 @@ class DmQueryTest(unittest.TestCase):
 
             written = output_path.read_text(encoding="utf-8")
             self.assertIn("session: session20", written)
+            self.assertIn("sequence: 1", written)
             self.assertIn("decision: pending", written)
             self.assertIn("Wrote", output.getvalue())
 

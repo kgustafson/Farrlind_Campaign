@@ -10,6 +10,7 @@ in_game_date: 1832 AS Namal 19 (continued)
 primary_location: Balrog
 items:
 - id: event-001
+  sequence: 1
   source_type: db_event
   source_text: Session takes place during the Balrog/Saiffi arc
   decision: accepted
@@ -23,6 +24,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-002
+  sequence: 2
   source_type: db_event
   source_text: The party located the Balrog town center/tower area and learned cultists
     were trying to summon a dragon
@@ -37,6 +39,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-003
+  sequence: 3
   source_type: db_event
   source_text: The party decided to help Saiffi and put him in a wineskin
   decision: accepted
@@ -50,6 +53,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-004
+  sequence: 4
   source_type: db_event
   source_text: Cultists summoned the dragon Orsydon
   decision: accepted
@@ -63,6 +67,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-005
+  sequence: 5
   source_type: db_event
   source_text: Combat involved Orsydon, cultists, party positioning around cover/pillars,
     and party members using attacks and spells
@@ -77,6 +82,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-006
+  sequence: 6
   source_type: db_event
   source_text: Orsydon used nightmare breath, dealing psychic damage and causing frightened
     effects
@@ -91,6 +97,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-007
+  sequence: 7
   source_type: db_event
   source_text: Faban and Lightdelver both used Cloud of Daggers; Faban called it "Cuisenart."
   decision: accepted
@@ -104,6 +111,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-008
+  sequence: 8
   source_type: db_event
   source_text: The dragon was defeated
   decision: accepted
@@ -117,6 +125,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-009
+  sequence: 8.5
   source_type: db_event
   source_text: Lightdelver lost concentration and became unconscious during the fight
     when Orsydon's dead body fell on him
@@ -131,6 +140,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-010
+  sequence: 10
   source_type: db_event
   source_text: After the combat, the party returned toward the city/tavern and continued
     planning around the wells, the Wand of Wells, and the cataclysm
@@ -145,6 +155,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-011
+  sequence: 9
   source_type: user_added
   source_text: Faban wrote a song about the fight with Orsydon called "The Battle
     of Balrog Square"

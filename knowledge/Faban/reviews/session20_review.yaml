@@ -10,6 +10,7 @@ in_game_date: 1832 AS Namal 20, 1832 AS Namal 24
 primary_location: Coast near Catur
 items:
 - id: event-001
+  sequence: 1
   source_type: db_event
   source_text: Party departed Balrog with dwarven gifts
   decision: accepted
@@ -23,6 +24,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-002
+  sequence: 2
   source_type: db_event
   source_text: Four days travel to coast
   decision: accepted
@@ -36,6 +38,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-003
+  sequence: 3
   source_type: db_event
   source_text: Arrived at Catur shoreline
   decision: accepted
@@ -49,6 +52,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-004
+  sequence: 4
   source_type: db_event
   source_text: Met fishermen — boats missing, lights under water, something thought-large
     beneath
@@ -63,6 +67,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-005
+  sequence: 6
   source_type: db_event
   source_text: Preparing to descend into sunken city
   decision: accepted
@@ -76,6 +81,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-006
+  sequence: 99
   source_type: db_event
   source_text: Roon continues to survive against all odds
   decision: rejected
@@ -89,6 +95,7 @@ items:
   applied_status: applied
   applied_on: '2026-05-04'
 - id: event-007
+  sequence: 5
   source_type: db_event
   source_text: The party negotiated with local fishermen for a vessel and received
     warnings about the peoples inhabiting Catur, including merfolk, Locathah, and

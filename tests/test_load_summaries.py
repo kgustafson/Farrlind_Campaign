@@ -177,6 +177,29 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertEqual(events[0]["description"], 'Faban wrote "The Battle of Balrog Square."')
         self.assertEqual(events[0]["event_type"], "acquisition")
 
+    def test_review_events_for_session_orders_by_optional_sequence(self):
+        review = {
+            "session": "session17",
+            "status": "applied",
+            "items": [
+                {"id": "event-001", "sequence": 2, "decision": "accepted", "source_text": "Second event"},
+                {"id": "event-002", "sequence": 4, "decision": "accepted", "source_text": "Fourth event"},
+            ],
+            "added_items": [
+                {"id": "added-001", "sequence": 1, "decision": "added", "canonical_text": "First event"},
+                {"id": "added-002", "sequence": 3.5, "decision": "added", "canonical_text": "Between events"},
+            ],
+        }
+
+        events = load_summaries.review_events_for_session({"session_number": 17}, review)
+
+        self.assertEqual([event["description"] for event in events], [
+            "First event",
+            "Second event",
+            "Between events",
+            "Fourth event",
+        ])
+
     def test_review_events_for_session_ignores_in_review_documents(self):
         self.assertIsNone(load_summaries.review_events_for_session({}, {"status": "in_review"}))
 
@@ -188,6 +211,28 @@ class LoadSummariesTest(unittest.TestCase):
         }
 
         self.assertEqual(load_summaries.review_primary_locations(reviews), {18: "Balrog"})
+
+    def test_review_location_names_collects_completed_review_locations(self):
+        reviews = {
+            17: {
+                "status": "reviewed",
+                "primary_location": "Paramon",
+                "items": [
+                    {"decision": "accepted", "location": "Crossroads"},
+                    {"decision": "rejected", "location": "Ignored"},
+                ],
+                "added_items": [
+                    {"decision": "added", "location": "Balrog"},
+                ],
+            },
+            16: {
+                "status": "in_review",
+                "primary_location": "Draft Place",
+                "items": [{"decision": "accepted", "location": "Draft Event Place"}],
+            },
+        }
+
+        self.assertEqual(load_summaries.review_location_names(reviews), {"Paramon", "Crossroads", "Balrog"})
 
     def test_build_sql_uses_reviewed_events_instead_of_summary_events(self):
         summaries = [
@@ -258,6 +303,46 @@ class LoadSummariesTest(unittest.TestCase):
                     sql = load_summaries.build_sql(summaries)
 
         self.assertIn("(SELECT id FROM location WHERE name = 'Balrog' LIMIT 1)", sql)
+
+    def test_build_sql_inserts_review_introduced_locations(self):
+        summaries = [
+            {
+                "session_number": 17,
+                "physical_date": "2026-02-07",
+                "in_game_date": "1832 AS Namal 18",
+                "title": "After Iron Paw",
+                "summary": "The party visited a fair.",
+                "events": ["The party visited a fair."],
+                "source_path": "session17_summary.md",
+                "location": "Paramon",
+            }
+        ]
+        reviews = {
+            17: {
+                "session": "session17",
+                "status": "reviewed",
+                "primary_location": "Paramon",
+                "items": [
+                    {
+                        "id": "event-001",
+                        "decision": "accepted",
+                        "source_text": "The party visited a fair.",
+                        "event_type": "social",
+                        "location": "Crossroads",
+                        "significance": 4,
+                    }
+                ],
+            }
+        }
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_review_documents", return_value=reviews):
+                    sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("'Crossroads'", sql)
+        self.assertIn("Location introduced through session review.", sql)
+        self.assertIn("(SELECT id FROM location WHERE name = 'Crossroads' LIMIT 1)", sql)
 
     def test_build_sql_dedupes_canon_events_already_in_review(self):
         event_text = "The party negotiated with local fishermen for a vessel."

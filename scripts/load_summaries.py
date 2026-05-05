@@ -574,12 +574,26 @@ def reviewed_event_text(item: dict) -> str:
     return (item.get("source_text") or "").strip()
 
 
+def review_sequence_value(item: dict, fallback: float) -> float:
+    try:
+        return float(item.get("sequence"))
+    except (TypeError, ValueError):
+        return fallback
+
+
+def ordered_review_items(review: dict) -> list[dict]:
+    indexed = []
+    for index, item in enumerate([*(review.get("items") or []), *(review.get("added_items") or [])], start=1):
+        indexed.append((review_sequence_value(item, float(index)), index, item))
+    return [item for _sequence, _index, item in sorted(indexed, key=lambda entry: (entry[0], entry[1]))]
+
+
 def review_events_for_session(summary: dict, review: Optional[dict]) -> Optional[list[dict]]:
     if not review or review.get("status") not in {"reviewed", "complete", "applied"}:
         return None
 
     events = []
-    for item in [*(review.get("items") or []), *(review.get("added_items") or [])]:
+    for item in ordered_review_items(review):
         decision = item.get("decision") or "pending"
         if decision in {"pending", "rejected"}:
             continue
@@ -606,6 +620,35 @@ def review_primary_locations(reviews: dict[int, dict]) -> dict[int, str]:
         if location:
             locations[session_number] = location
     return locations
+
+
+def review_location_names(reviews: dict[int, dict]) -> set[str]:
+    locations = set()
+    for review in reviews.values():
+        if review.get("status") not in {"reviewed", "complete", "applied"}:
+            continue
+        for location in [review.get("primary_location") or ""]:
+            if location.strip():
+                locations.add(location.strip())
+        for item in [*(review.get("items") or []), *(review.get("added_items") or [])]:
+            if item.get("decision") in {"pending", "rejected"}:
+                continue
+            location = (item.get("location") or "").strip()
+            if location:
+                locations.add(location)
+    return locations
+
+
+def review_location_sql(name: str) -> str:
+    return f"""
+INSERT INTO location (name, location_type_id, description)
+VALUES (
+    {sql_quote(name)},
+    (SELECT id FROM location_type WHERE type_name = 'wilderness'),
+    {sql_quote("Location introduced through session review.")}
+)
+ON CONFLICT (name) DO NOTHING;
+""".strip()
 
 
 def event_identity(description: str, location: str = "") -> tuple[str, str]:
@@ -958,6 +1001,7 @@ def build_sql(summaries: list[dict]) -> str:
     canon_events = canon_event_decisions(decisions)
     reviews = load_review_documents()
     reviewed_primary_locations = review_primary_locations(reviews)
+    reviewed_locations = review_location_names(reviews)
     review_events = {
         summary["session_number"]: review_events_for_session(summary, reviews.get(summary["session_number"]))
         for summary in summaries
@@ -1003,6 +1047,8 @@ def build_sql(summaries: list[dict]) -> str:
             "Coast near Catur",
             "Coast roughly 6 miles from Catur; party staging point before entering the sunken city.",
         ))
+    for location in sorted(reviewed_locations):
+        statements.append(review_location_sql(location))
 
     for summary in summaries:
         decision = primary_locations.get(summary["session_number"])

@@ -17,8 +17,8 @@
 - Orsydon used nightmare breath, dealing psychic damage and causing frightened effects [Balrog] (combat)
 - Faban and Lightdelver both used Cloud of Daggers; Faban called it "Cuisenart." [Balrog] (discovery)
 - The dragon was defeated [Balrog] (combat)
-- After the combat, the party returned toward the city/tavern and continued planning around the wells, the Wand of Wells, and the cataclysm [Balrog] (combat)
 - Faban wrote a song about the fight with Orsydon called "The Battle of Balrog Square" [Balrog] (acquisition)
+- After the combat, the party returned toward the city/tavern and continued planning around the wells, the Wand of Wells, and the cataclysm [Balrog] (combat)
 
 ## Provenance
 
