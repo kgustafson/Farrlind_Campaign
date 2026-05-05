@@ -14,7 +14,7 @@
     <button type="submit" formaction="/sessions/{{ session_key }}/review/reopen" formmethod="post" {% if not review_locked %}disabled{% endif %}>Reopen Review</button>
     <button type="submit" formaction="/sessions/{{ session_key }}/review/mark-reviewed" formmethod="post" {% if not document or review_locked %}disabled{% endif %}>Mark Reviewed</button>
     <button type="submit" formaction="/sessions/{{ session_key }}/review/apply" formmethod="post" {% if summary.status != "reviewed" %}disabled{% endif %}>Apply to Database</button>
-    <button type="button" disabled>Write Final Summary</button>
+    <button type="submit" formaction="/sessions/{{ session_key }}/review/write-final-summary" formmethod="post" {% if summary.status != "applied" %}disabled{% endif %}>Write Final Summary</button>
   </div>
 </section>
 
@@ -35,6 +35,12 @@
 {% endif %}
 {% if request.query_params.get("apply_failed") %}
   <div class="flash error-flash">Apply failed. Run health or check the server log for details.</div>
+{% endif %}
+{% if request.query_params.get("final_written") %}
+  <div class="flash">Final summary written.</div>
+{% endif %}
+{% if request.query_params.get("final_failed") %}
+  <div class="flash error-flash">Final summary failed. Check the server log for details.</div>
 {% endif %}
 {% if review_locked %}
   <div class="flash muted-flash">Applied review is locked. Use Reopen Review to make YAML edits.</div>

@@ -149,6 +149,30 @@ async def apply_session_review(request: Request, session: str):
     )
 
 
+@app.post("/sessions/{session}/review/write-final-summary")
+async def write_session_final_summary(request: Request, session: str):
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    document = reviews.load_review_document(session_number)
+    if not document:
+        raise HTTPException(status_code=404, detail="Review file has not been initialized.")
+    if document.get("status") != "applied":
+        raise HTTPException(status_code=409, detail="Review must be applied before writing final summary.")
+
+    form = await request.form()
+    result = commands.write_final_summary(session_number)
+    source = form.get("source") or "diary"
+    view = form.get("view") or "raw"
+    flag = "final_written=1" if result.ok else "final_failed=1"
+    return RedirectResponse(
+        url=f"/sessions/{reviews.session_key(session_number)}/review?source={source}&view={view}&{flag}",
+        status_code=303,
+    )
+
+
 @app.get("/api/review-status")
 def api_review_status():
     return [row.__dict__ for row in reviews.dashboard_rows()]

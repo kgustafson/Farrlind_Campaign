@@ -39,3 +39,7 @@ def run_review_command(action: str, session_number: int, timeout: Optional[int] 
 
 def apply_review(session_number: int) -> CommandResult:
     return run_review_command("apply-review", session_number)
+
+
+def write_final_summary(session_number: int) -> CommandResult:
+    return run_review_command("write-final-summary", session_number)

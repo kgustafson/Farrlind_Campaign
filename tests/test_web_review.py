@@ -459,6 +459,23 @@ class CommandServiceTest(unittest.TestCase):
             "session20",
         ])
 
+    def test_write_final_summary_runs_existing_dm_query_command(self):
+        completed = type("Completed", (), {
+            "returncode": 0,
+            "stdout": "wrote final",
+            "stderr": "",
+        })()
+        with patch("web_review.services.commands.subprocess.run", return_value=completed) as run:
+            result = commands.write_final_summary(20)
+
+        self.assertTrue(result.ok)
+        command = run.call_args.args[0]
+        self.assertEqual(command[-3:], [
+            str(reviews.REPO_ROOT / "scripts" / "dm_query.py"),
+            "write-final-summary",
+            "session20",
+        ])
+
     def test_apply_review_route_requires_reviewed_status(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -547,6 +564,95 @@ class CommandServiceTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 303)
         self.assertIn("apply_failed=1", response.headers["location"])
+
+    def test_write_final_summary_route_requires_applied_status(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session01_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "reviewed",
+                "items": [],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final):
+                client = TestClient(app)
+                response = client.post("/sessions/session01/review/write-final-summary", data={
+                    "source": "final",
+                    "view": "print",
+                })
+
+        self.assertEqual(response.status_code, 409)
+
+    def test_write_final_summary_route_runs_command_for_applied_status(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session01_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "applied",
+                "items": [],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final), \
+                 patch("web_review.services.commands.write_final_summary", return_value=commands.CommandResult(0, "ok", "")) as write:
+                client = TestClient(app)
+                response = client.post("/sessions/session01/review/write-final-summary", data={
+                    "source": "final",
+                    "view": "print",
+                }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("final_written=1", response.headers["location"])
+        write.assert_called_once_with(1)
+
+    def test_write_final_summary_route_reports_command_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session01_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "applied",
+                "items": [],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final), \
+                 patch("web_review.services.commands.write_final_summary", return_value=commands.CommandResult(1, "", "boom")):
+                client = TestClient(app)
+                response = client.post("/sessions/session01/review/write-final-summary", data={
+                    "source": "final",
+                    "view": "print",
+                }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("final_failed=1", response.headers["location"])
 
 
 if __name__ == "__main__":
