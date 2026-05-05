@@ -22,7 +22,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-002
   sequence: 2
   source_type: db_event
@@ -36,7 +36,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-003
   sequence: 3
   source_type: db_event
@@ -50,7 +50,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-004
   sequence: 4
   source_type: db_event
@@ -65,7 +65,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-005
   sequence: 6
   source_type: db_event
@@ -79,7 +79,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-006
   sequence: 99
   source_type: db_event
@@ -93,22 +93,24 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-007
   sequence: 5
   source_type: db_event
   source_text: The party negotiated with local fishermen for a vessel and received
     warnings about the peoples inhabiting Catur, including merfolk, Locathah, and
     tritons.
-  decision: accepted
-  canonical_text: ''
+  decision: corrected
+  canonical_text: Alistair gave the party a boat on the coast near Catur, and the
+    party received warnings about the peoples inhabiting Catur, including merfolk,
+    Locathah, and tritons.
   event_type: social
   location: Coast near Catur
   significance: 4
-  reason: ''
+  reason: Named the boat contact.
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 added_items: []
-applied_on: '2026-05-04'
+applied_on: '2026-05-05'
