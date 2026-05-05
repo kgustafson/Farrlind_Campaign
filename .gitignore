@@ -7,6 +7,7 @@ knowledge/*
 !knowledge/Faban/
 knowledge/Faban/*
 !knowledge/Faban/canon_decisions.yaml
+!knowledge/Faban/travel.yaml
 !knowledge/Faban/reviews/
 knowledge/Faban/reviews/*
 !knowledge/Faban/reviews/*_review.yaml

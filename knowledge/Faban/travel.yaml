@@ -1,0 +1,96 @@
+# Trusted campaign travel facts.
+# These rows are human-curated and safe to load into travel_log.
+#
+# Schema:
+# - session: session05
+#   from: Thataways
+#   to: Bentrios
+#   method: foot
+#   duration_days: 2
+#   notes: "Party traveled back to Bentrios."
+
+travel:
+  - session: session02
+    from: Bentrios
+    to: Thataways
+    method: foot
+    duration_days: 1
+    duration_confidence: high
+    duration_basis: "Diary dates span Apollal 12 to Apollal 13; inferred as 1 elapsed calendar day."
+    notes: "Party set out from Bentrios toward the Fey Wilds/Thataways in search of Urgan's Axe."
+
+  - session: session05
+    from: Thataways
+    to: Bentrios
+    method: foot
+    duration_days: 1
+    duration_confidence: high
+    duration_basis: "Diary dates span Apollal 14 to Apollal 15; inferred as 1 elapsed calendar day, though the travel covers parts of both dated days."
+    notes: "Party left the Fey forest/Thataways area and traveled back to Bentrios."
+
+  - session: session06
+    from: Bentrios
+    to: Thataways
+    method: foot
+    duration_days: 1
+    duration_confidence: high
+    duration_basis: "Diary dates span Apollal 16 to Apollal 17; inferred as 1 elapsed calendar day."
+    notes: "Party returned from Bentrios to Thataways/Fey forest to return Urgan's Axe."
+  
+  - session: session08
+    from: Thataways
+    to: Bellemaine
+    method: foot
+    duration_days: 0
+    duration_confidence: medium
+    duration_basis: "Diary date remains Apollal 18; travel appears same-day or partial-day after leaving the spore sanctuary."
+    notes: "Party traveled from Thataways to Bellemaine."
+
+  - session: session10
+    from: Bellemaine
+    to: Camp Site
+    method: foot
+    duration_days: 12
+    duration_confidence: medium
+    duration_basis: "Journey begins on Apollal 22 and the caravan reaches the archaeological dig site in session12 on Namal 6. This is 12 elapsed calendar days, but the exact Camp Site boundary remains ambiguous."
+    notes: "Party traveled from Bellemaine to the northern archaeological dig site."  
+
+  - session: session13
+    from: Camp Site
+    to: Druid Retreat
+    method: foot
+    duration_days: 4
+    duration_confidence: high
+    duration_basis: "Diary dates span Namal 6 to Namal 10; inferred as 4 elapsed calendar days."
+    notes: "Party left the archaeological dig site arc, traveled toward the Druid Retreat, and were led there by Jennifer."
+   
+  - session: session14
+    from: Druid Retreat
+    to: Paramon
+    method: portal
+    duration_days: 0
+    duration_confidence: high
+    duration_basis: "Diary date remains Namal 11 and travel is by portal; inferred as same-day travel."
+    notes: "After the party's encounter at the Druid Retreat, they used a portal to travel to Paramon." 
+
+  - session: session17
+    from: Paramon
+    to: Balrog
+    method: foot
+    duration_days: 5
+    duration_confidence: high
+    duration_basis: "Reviewed date span runs Namal 13 to Namal 18; inferred as 5 elapsed calendar days, including the Crossroads stop."
+    notes: "After obtaining water-breathing supplies, the party set their route for Balrog first, traveled via the Crossroads Festival, and entered Balrog."
+
+  - session: session20
+    from: Balrog
+    to: Coast near Catur
+    method: foot
+    duration_days: 4
+    duration_confidence: high
+    duration_basis: "Reviewed date span runs Namal 20 to Namal 24; inferred as 4 elapsed calendar days."
+    notes: "Party departed Balrog and traveled four days to the coast near Catur; the session ends at the shoreline, not in Catur itself."
+
+  
+# Candidate routes from the diaries that should become rows after those
+# locations are seeded in the canonical location table:
