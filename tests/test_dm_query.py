@@ -195,10 +195,29 @@ class DmQueryTest(unittest.TestCase):
             "songs_missing_prompts": "12. The Day We Called It Victory; 23. The Hand That Did Not Open",
             "location_mismatch_notes": "Session 20 primary location is Balrog, but event locations include Catur",
         }
+        canon = {
+            "session_primary_locations": [
+                {
+                    "session": "session20",
+                    "canonical": "Coast near Catur",
+                    "status": "needs_db_update",
+                    "decision": "Primary location is the coast near Catur.",
+                }
+            ],
+            "event_review_decisions": [
+                {
+                    "session": "session20",
+                    "status": "needs_db_update",
+                    "decision_type": "missing_primary_event",
+                    "description": "The party negotiated with fishermen for a vessel.",
+                }
+            ],
+        }
 
         with patch("dm_query.query_health", return_value=health_row):
-            with contextlib.redirect_stdout(io.StringIO()) as output:
-                dm_query.health(args())
+            with patch("dm_query.load_canon_decisions", return_value=canon):
+                with contextlib.redirect_stdout(io.StringIO()) as output:
+                    dm_query.health(args())
 
         rendered = output.getvalue()
         self.assertIn("DM Query Health", rendered)
@@ -206,6 +225,39 @@ class DmQueryTest(unittest.TestCase):
         self.assertIn("Latest session: 20 - Salt, Steel", rendered)
         self.assertIn("Song missing prompt: 12. The Day We Called It Victory", rendered)
         self.assertIn("Session 20 primary location is Balrog", rendered)
+        self.assertIn("Canon Decisions", rendered)
+        self.assertIn("session20 primary location -> Coast near Catur", rendered)
+        self.assertIn("session20 missing_primary_event", rendered)
+
+    def test_load_canon_decisions_missing_file_returns_empty(self):
+        missing = ROOT / "does-not-exist.yaml"
+        self.assertEqual(dm_query.load_canon_decisions(missing), {})
+
+    def test_format_canon_decisions_handles_known_sections(self):
+        decisions = {
+            "session_primary_locations": [
+                {
+                    "session": "session20",
+                    "canonical": "Coast near Catur",
+                    "status": "needs_db_update",
+                    "decision": "Primary location is the coast near Catur.",
+                }
+            ],
+            "event_review_decisions": [
+                {
+                    "session": "session20",
+                    "status": "needs_db_update",
+                    "decision_type": "missing_primary_event",
+                    "description": "Negotiated with fishermen for a vessel.",
+                }
+            ],
+        }
+
+        notes = dm_query.format_canon_decisions(decisions)
+
+        self.assertEqual(len(notes), 2)
+        self.assertIn("session20 primary location -> Coast near Catur", notes[0])
+        self.assertIn("session20 missing_primary_event", notes[1])
 
     def test_parser_accepts_health_command(self):
         parser = dm_query.build_parser()

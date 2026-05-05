@@ -3,13 +3,18 @@ import csv
 import subprocess
 import sys
 import textwrap
+from pathlib import Path
 from typing import Optional
+
+import yaml
 
 
 DEFAULT_CONTAINER = "farrlind_db"
 DEFAULT_USER = "admin"
 DEFAULT_DATABASE = "farrlind"
 MAX_LIMIT = 1000
+REPO_ROOT = Path(__file__).resolve().parents[1]
+CANON_DECISIONS_PATH = REPO_ROOT / "knowledge" / "Faban" / "canon_decisions.yaml"
 
 
 def bounded_int(value: str, minimum: int = 1, maximum: int = MAX_LIMIT) -> int:
@@ -393,6 +398,34 @@ def split_notes(value: Optional[str]) -> list[str]:
     return [part.strip() for part in (value or "").split(";") if part.strip()]
 
 
+def load_canon_decisions(path: Path = CANON_DECISIONS_PATH) -> dict:
+    if not path.exists():
+        return {}
+
+    with open(path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
+
+
+def format_canon_decisions(decisions: dict) -> list[str]:
+    notes = []
+
+    for item in decisions.get("session_primary_locations", []) or []:
+        session = item.get("session", "unknown session")
+        canonical = item.get("canonical", "unknown location")
+        status = item.get("status", "unknown")
+        decision = item.get("decision") or f"Primary location is {canonical}."
+        notes.append(f"{session} primary location -> {canonical} [{status}]: {decision}")
+
+    for item in decisions.get("event_review_decisions", []) or []:
+        session = item.get("session", "unknown session")
+        status = item.get("status", "unknown")
+        decision_type = item.get("decision_type", "event_review")
+        description = clip(item.get("description"), 180)
+        notes.append(f"{session} {decision_type} [{status}]: {description}")
+
+    return notes
+
+
 def last_session(args):
     rows = query_recent_sessions(args, limit=1)
     print_sessions(rows)
@@ -446,8 +479,14 @@ def songs(args):
 
 def health(args):
     row = query_health(args)
+    canon_notes = format_canon_decisions(load_canon_decisions())
     if not row:
         print("No health data found.")
+        if canon_notes:
+            print("")
+            print_section("Canon Decisions")
+            for note in canon_notes:
+                print(f"- {note}")
         return
 
     print_section("DM Query Health")
@@ -475,6 +514,14 @@ def health(args):
         print("No obvious data notes.")
         return
     for note in notes:
+        print(f"- {note}")
+
+    print("")
+    print_section("Canon Decisions")
+    if not canon_notes:
+        print("No canon decisions recorded.")
+        return
+    for note in canon_notes:
         print(f"- {note}")
 
 
