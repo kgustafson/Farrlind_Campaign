@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from web_review.services import canon, reviews
+from web_review.services import canon, commands, reviews
 
 
 app = FastAPI(title="Farrlind Review Workbench")
@@ -119,6 +119,30 @@ async def mark_session_reviewed(request: Request, session: str):
     source = form.get("source") or "diary"
     view = form.get("view") or "raw"
     flag = "marked=1" if not errors else "mark_failed=1"
+    return RedirectResponse(
+        url=f"/sessions/{reviews.session_key(session_number)}/review?source={source}&view={view}&{flag}",
+        status_code=303,
+    )
+
+
+@app.post("/sessions/{session}/review/apply")
+async def apply_session_review(request: Request, session: str):
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    document = reviews.load_review_document(session_number)
+    if not document:
+        raise HTTPException(status_code=404, detail="Review file has not been initialized.")
+    if document.get("status") != "reviewed":
+        raise HTTPException(status_code=409, detail="Review must be marked reviewed before applying.")
+
+    form = await request.form()
+    result = commands.apply_review(session_number)
+    source = form.get("source") or "diary"
+    view = form.get("view") or "raw"
+    flag = "applied=1" if result.ok else "apply_failed=1"
     return RedirectResponse(
         url=f"/sessions/{reviews.session_key(session_number)}/review?source={source}&view={view}&{flag}",
         status_code=303,

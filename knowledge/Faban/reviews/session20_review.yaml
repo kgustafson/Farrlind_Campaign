@@ -1,5 +1,5 @@
 session: session20
-status: reviewed
+status: applied
 review_instructions:
 - For each item, set decision to accepted, rejected, corrected, or added.
 - For corrected or added items, fill canonical_text and any changed metadata.
@@ -21,8 +21,8 @@ items:
   reason: ''
   decided_by: ''
   decided_on: ''
-  applied_status: pending
-  applied_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
 - id: event-002
   sequence: 2
   source_type: db_event
