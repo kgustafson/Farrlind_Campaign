@@ -706,11 +706,13 @@ def extract_travel_logs(summary: dict) -> list[dict]:
                 "session_number": summary["session_number"],
                 "from_location": from_location,
                 "to_location": to_location,
-                "travel_method": detect_travel_method(notes),
-                "duration_days": pending_duration or detect_duration_days(event),
-                "notes": notes,
-                "source": "summary",
-            })
+            "travel_method": detect_travel_method(notes),
+            "duration_days": pending_duration or detect_duration_days(event),
+            "duration_confidence": "low",
+            "duration_basis": "Inferred from summary event wording.",
+            "notes": notes,
+            "source": "summary",
+        })
             pending_from = ""
             pending_duration = None
             pending_notes = []
@@ -733,6 +735,8 @@ def load_travel_facts() -> list[dict]:
             "to_location": entry.get("to", ""),
             "travel_method": entry.get("method", "foot") or "foot",
             "duration_days": entry.get("duration_days"),
+            "duration_confidence": entry.get("duration_confidence", ""),
+            "duration_basis": entry.get("duration_basis", ""),
             "notes": entry.get("notes", ""),
             "source": "travel_yaml",
         })
@@ -1098,6 +1102,8 @@ VALUES (
 
 def travel_log_sql(log: dict) -> str:
     duration = log["duration_days"] if log["duration_days"] is not None else "NULL"
+    duration_confidence = log.get("duration_confidence", "")
+    duration_basis = log.get("duration_basis", "")
     if log.get("source") == "travel_yaml":
         notes = f"Loaded from travel.yaml: {log['notes']}"
     else:
@@ -1106,7 +1112,8 @@ def travel_log_sql(log: dict) -> str:
     return f"""
 INSERT INTO travel_log (
     session_id, from_location_id, to_location_id,
-    travel_method, duration_days, notes
+    travel_method, duration_days, duration_confidence,
+    duration_basis, notes
 )
 VALUES (
     (SELECT id FROM session WHERE session_number = {log["session_number"]}),
@@ -1114,8 +1121,17 @@ VALUES (
     {location_expr(log["to_location"])},
     {sql_quote(log["travel_method"])},
     {duration},
+    {sql_quote(duration_confidence)},
+    {sql_quote(duration_basis)},
     {sql_quote(notes)}
 );
+""".strip()
+
+
+def travel_log_schema_sql() -> str:
+    return """
+ALTER TABLE travel_log ADD COLUMN IF NOT EXISTS duration_confidence VARCHAR(30);
+ALTER TABLE travel_log ADD COLUMN IF NOT EXISTS duration_basis TEXT;
 """.strip()
 
 
@@ -1369,6 +1385,7 @@ def build_sql(summaries: list[dict]) -> str:
 
     statements.append(canon_npc_scrub_sql())
     statements.append(canon_enemy_scrub_sql())
+    statements.append(travel_log_schema_sql())
 
     for summary in summaries:
         statements.append(delete_events_sql(summary["session_number"]))

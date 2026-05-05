@@ -363,6 +363,8 @@ CREATE TABLE travel_log (
     to_location_id      INT REFERENCES location(id),
     travel_method       VARCHAR(80),                   -- 'foot','horse','ship','portal','magical'
     duration_days       SMALLINT,
+    duration_confidence VARCHAR(30),                    -- 'low','medium','high'
+    duration_basis      TEXT,
     notes               TEXT
 );
 

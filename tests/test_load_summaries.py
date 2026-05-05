@@ -487,6 +487,44 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertIn("status_code = 'dead'", sql)
         self.assertIn("Loaded from reviewed canon enemy scrub.", sql)
 
+    def test_build_sql_includes_travel_confidence_fields(self):
+        summaries = [
+            {
+                "session_number": 5,
+                "physical_date": "2025-03-30",
+                "in_game_date": "1832 AS Apollal 15",
+                "title": "The Return to Bentrios",
+                "summary": "The party traveled back to Bentrios.",
+                "events": ["The party traveled back to Bentrios."],
+                "source_path": "session05_summary.md",
+                "location": "Bentrios",
+            }
+        ]
+        travel_logs = [
+            {
+                "session_number": 5,
+                "from_location": "Thataways",
+                "to_location": "Bentrios",
+                "travel_method": "foot",
+                "duration_days": 1,
+                "duration_confidence": "high",
+                "duration_basis": "Diary dates span Apollal 14 to Apollal 15.",
+                "notes": "Party returned to Bentrios.",
+                "source": "travel_yaml",
+            }
+        ]
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=travel_logs):
+                with patch("load_summaries.load_review_documents", return_value={}):
+                    sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("ALTER TABLE travel_log ADD COLUMN IF NOT EXISTS duration_confidence", sql)
+        self.assertIn("ALTER TABLE travel_log ADD COLUMN IF NOT EXISTS duration_basis", sql)
+        self.assertIn("duration_days, duration_confidence,", sql)
+        self.assertIn("'high'", sql)
+        self.assertIn("'Diary dates span Apollal 14 to Apollal 15.'", sql)
+
     def test_build_sql_scrubs_father_joseph_from_earliest_known_session(self):
         summaries = [
             {
