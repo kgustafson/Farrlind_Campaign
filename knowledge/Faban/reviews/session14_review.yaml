@@ -1,0 +1,200 @@
+session: session14
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: Another Day
+session_date: '2025-11-16'
+in_game_date: 1832 AS Namal 11
+primary_location: Druid Retreat
+items:
+- id: event-001
+  sequence: 1
+  source_type: diary_event
+  source_text: The party wakes to a peaceful vegan meal, and Mikani speaks with Jennifer
+    about the Celestial Isles, Mount Celestia, thunderous disruptions, and the possibility
+    that old Cataclysm-related problems are resurfacing.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: ''
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-002
+  sequence: 2
+  source_type: diary_event
+  source_text: The party discusses the Wells, including Catur and Paramon nearby,
+    Balrog requiring descent, the Monastery of the Open Hand in the Gale, and Henedal
+    across the sea as the birthplace of magic.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: ''
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-003
+  sequence: 3
+  source_type: diary_event
+  source_text: Jennifer explains that fey mushrooms can heal but exact a toll, and
+    Zerzer says he will send word once he finds a plant that could help with breathing
+    beneath the sea near Catur.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: ''
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-004
+  sequence: 4
+  source_type: diary_event
+  source_text: For fifty gold per person, an old man traces sigils near standing stones
+    and opens a portal that takes the party to Paramon by the sea.
+  decision: accepted
+  canonical_text: ''
+  event_type: travel
+  location: Paramon
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-005
+  sequence: 5
+  source_type: diary_event
+  source_text: In Paramon, Mikani communes and senses kuo-toa, humans, scattered others,
+    a portal beneath the guild hall, and a powerful elemental presence offshore near
+    the fishing huts.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Paramon
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-006
+  sequence: 6
+  source_type: diary_event
+  source_text: Mikani and Faban follow the sound of water to the guild hall, find
+    an arcane Well, and meet Ordor, who says danger is imminent and confirms that
+    Salazar used the Wand of Wells with lightning.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Paramon
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-007
+  sequence: 7
+  source_type: diary_event
+  source_text: Biha-Bibir, a mass of seaweed and living current, rises from the water
+    with a summoned water elemental, and cold strikes Roon and Corvinas.
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Paramon
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-008
+  sequence: 8
+  source_type: diary_event
+  source_text: The party fights Biha-Bibir and the water elemental as Mikani calls
+    lightning, Faban turns Biha's mind against itself, Corvinas smites, Brigit strikes
+    from hiding, and Roon presses the assault.
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Paramon
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-009
+  sequence: 9
+  source_type: diary_event
+  source_text: The sea fights back with whelm, whirlpool, and control of weather,
+    briefly wresting control from Mikani and striking Faban down hard.
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Paramon
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-010
+  sequence: 10
+  source_type: diary_event
+  source_text: Roon cuts Biha-Bibir down in a final decisive arc.
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Paramon
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-011
+  sequence: 11
+  source_type: diary_event
+  source_text: Mikani splits the water elemental with her trident, ending the fight.
+  decision: corrected
+  canonical_text: Mikani splits the water elemental in half with her trident, ending
+    the fight.
+  event_type: combat
+  location: Paramon
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-012
+  sequence: 12
+  source_type: diary_event
+  source_text: When the water stills, Ordor is silent and the Well remains disturbed,
+    used, and watching.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Paramon
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+added_items: []
+applied_on: '2026-05-05'
