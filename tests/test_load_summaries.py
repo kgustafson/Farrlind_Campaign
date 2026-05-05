@@ -362,6 +362,21 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertIn("(SELECT id FROM location WHERE name = 'Coast near Catur' LIMIT 1)", sql)
         self.assertNotIn("ON CONFLICT (name)", sql)
 
+    def test_canon_npc_sql_overwrites_first_seen_with_canon_session(self):
+        sql = load_summaries.canon_npc_sql({
+            "name": "Claris",
+            "first_seen_session": 6,
+            "location": "Thataways",
+            "description": "Librarian under the tree.",
+            "status": "alive",
+        })
+
+        self.assertIn(
+            "first_seen_session = COALESCE((SELECT id FROM session WHERE session_number = 6), npc.first_seen_session)",
+            sql,
+        )
+        self.assertNotIn("first_seen_session = COALESCE(npc.first_seen_session", sql)
+
     def test_build_sql_scrubs_reviewed_canon_npcs(self):
         summaries = [
             {

@@ -57,14 +57,14 @@ TRAVEL_LOCATION_ALIASES = {
 CANON_NPCS = [
     {
         "name": "Ardema",
-        "first_seen_session": 7,
+        "first_seen_session": 6,
         "location": "Thataways",
         "description": "Hostile caster fought during the defense of the Tree and the Well of Magic.",
         "status": "fled",
     },
     {
         "name": "Claris",
-        "first_seen_session": 7,
+        "first_seen_session": 6,
         "location": "Thataways",
         "description": "Librarian under the tree in Thataways.",
         "status": "alive",

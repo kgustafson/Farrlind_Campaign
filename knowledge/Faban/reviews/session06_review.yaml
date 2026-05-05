@@ -1,0 +1,133 @@
+session: session06
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: The Day in Bentrios
+session_date: '2025-04-26'
+in_game_date: 1832 AS Apollal 16, 1832 AS Apollal 17
+primary_location: Thataways
+items:
+- id: event-001
+  sequence: 1
+  source_type: db_event
+  source_text: The party attacks a large lizard that is attacking the edge of the
+    Fey forest.
+  decision: corrected
+  canonical_text: The party attacks a large lizard that is attacking the edge of the
+    Fey forest, and Roon is injured in the fight.  The large lizard is a dinosaur
+    that has been terrorizing the area, and the party is able to defeat it after a
+    tough battle.  Roon takes a significant amount of damage, but is able to recover
+    with the help of the party's healer.
+  event_type: combat
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-002
+  sequence: 2
+  source_type: db_event
+  source_text: Roon talks to the military in the tavern about their strategy for protecting
+    Thisaway.
+  decision: corrected
+  canonical_text: Roon talks to an obvious military guard in the tavern about their
+    strategy for protecting Thisaway, and learns that they are planning to fortify
+    the city
+  event_type: social
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-003
+  sequence: 3
+  source_type: db_event
+  source_text: Bells ring out in the street outside, indicating an attack on the city,
+    and Roon goes with the guards to defend the city.
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-004
+  sequence: 4
+  source_type: db_event
+  source_text: The party reunites outside the tree and goes inside, where Cleris asks
+    them to defend the tree.
+  decision: corrected
+  canonical_text: The party reunites outside the tree and goes inside, where Claris
+    asks them to defend the tree.
+  event_type: social
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-005
+  sequence: 5
+  source_type: db_event
+  source_text: Ardema of the seven seals appears, looking somewhat beaten up, with
+    a robe of an archmage and a staff of lightning.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+added_items:
+- id: added-001
+  sequence: 1.5
+  source_type: user_added
+  source_text: The party returned Urgan's Axe at the tree in Thataways.
+  decision: added
+  canonical_text: The party returned Urgan's Axe at the tree in Thataways.
+  event_type: acquisition
+  location: Thataways
+  significance: 4
+  reason: Missing major quest-resolution event.
+  decided_by: user
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-002
+  sequence: 1.7
+  source_type: user_added
+  source_text: The party descended beneath the tree to speak with the Well of Magic.
+  decision: added
+  canonical_text: Claris granted the party access to the Well of Magic beneath the
+    tree in Thataways while Roon went to the tavern; the party descended a spiral
+    staircase into a cave where a mist-formed face spoke from the Well. The Well,
+    named Khorag, said it did not know its siblings well, revealed that one sibling
+    was in the heart of the Gale at a monastery of the Open Hand, said it had five
+    siblings, said all Wells are bound to tell the truth, said it was connected to
+    nature and the divine god of nature, said a Well can be closed with the Wand of
+    Wells, named Jennifer as the last known user of that wand, and warned that one
+    of the party was lying by omission.
+  event_type: discovery
+  location: Thataways
+  significance: 5
+  reason: Missing major Well of Magic discussion from the session 06 diary.
+  decided_by: user
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+applied_on: '2026-05-05'
