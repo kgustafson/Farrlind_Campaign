@@ -40,3 +40,13 @@ Session-specific correction and normalization context lives in:
 knowledge/Faban/sessions/session20_context.yaml
 knowledge/Faban/notes/session20_corrections.md
 ```
+
+## Review Workflow
+
+AI-generated events and summaries are drafts until reviewed.
+
+See [Session Review Workflow](docs/session_review_workflow.md) for the human review loop:
+
+```text
+init-review -> edit review YAML -> review-status -> apply review -> health
+```
