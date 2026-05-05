@@ -19,6 +19,15 @@ travel:
     duration_basis: "Diary dates span Apollal 12 to Apollal 13; inferred as 1 elapsed calendar day."
     notes: "Party set out from Bentrios toward the Fey Woods in search of Urgan's Axe; they do not reach Thataways in this session."
 
+  - session: session04
+    from: Fey Woods
+    to: Thataways
+    method: foot
+    duration_days: 0
+    duration_confidence: high
+    duration_basis: "Session04 begins on Apollal 13, the same in-game date as the fey witch battle; the centaur leads the party from the Fey Woods to Thataways before Apollal 14 events."
+    notes: "After the fey witch battle, the party follows the lake and burned-out tree landmarks, meets a centaur, and is led to the village of Thataways."
+
   - session: session05
     from: Thataways
     to: Bentrios
@@ -39,30 +48,57 @@ travel:
   
   - session: session08
     from: Thataways
+    to: Spore Sanctuary
+    method: foot
+    duration_days: 0
+    duration_confidence: medium
+    duration_basis: "Diary date remains Apollal 18; this appears to be same-day or partial-day travel."
+    notes: "Party travels from Thataways into the southern forest/spore sanctuary area."
+
+  - session: session08
+    from: Spore Sanctuary
     to: Bellemaine
     method: foot
     duration_days: 0
     duration_confidence: medium
     duration_basis: "Diary date remains Apollal 18; travel appears same-day or partial-day after leaving the spore sanctuary."
-    notes: "Party traveled from Thataways to Bellemaine."
+    notes: "Party leaves the spore sanctuary and reaches Bellemaine."
 
   - session: session10
     from: Bellemaine
-    to: Camp Site
-    method: foot
+    to: Road to Archaeological Dig Site
+    method: wagon
+    duration_days: 0
+    duration_confidence: high
+    duration_basis: "Session10 begins the caravan journey on Apollal 22; the party meets Richard and the caravan at the northern gate and receives a carriage."
+    notes: "Party joins the caravan and departs Bellemaine toward the northern archaeological dig site."  
+
+  - session: session12
+    from: Road to Archaeological Dig Site
+    to: Archaeological Dig Site
+    method: wagon
     duration_days: 12
     duration_confidence: medium
-    duration_basis: "Journey begins on Apollal 22 and the caravan reaches the archaeological dig site in session12 on Namal 6. This is 12 elapsed calendar days, but the exact Camp Site boundary remains ambiguous."
-    notes: "Party traveled from Bellemaine to the northern archaeological dig site."  
+    duration_basis: "The caravan journey begins on Apollal 22 and reaches the archaeological dig site on Namal 6, a 12-day elapsed span across sessions10-12."
+    notes: "After the Sam battle and no further incident, the caravan reaches the archaeological dig site."
 
   - session: session13
-    from: Camp Site
+    from: Archaeological Dig Site
+    to: Mountain Road
+    method: foot
+    duration_days: 0
+    duration_confidence: medium
+    duration_basis: "Session13 begins at the archaeological dig site on Namal 6; the party sets out northward into the mountains and takes shelter in a shallow cave."
+    notes: "Party leaves the archaeological dig site and begins the mountain route toward Jennifer's retreat."
+
+  - session: session13
+    from: Mountain Road
     to: Druid Retreat
     method: foot
     duration_days: 4
     duration_confidence: high
     duration_basis: "Diary dates span Namal 6 to Namal 10; inferred as 4 elapsed calendar days."
-    notes: "Party left the archaeological dig site arc, traveled toward the Druid Retreat, and were led there by Jennifer."
+    notes: "Party travels through the mountains toward the Druid Retreat and is led there by Jennifer."
    
   - session: session14
     from: Druid Retreat
@@ -75,12 +111,21 @@ travel:
 
   - session: session17
     from: Paramon
+    to: Crossroads
+    method: foot
+    duration_days: 2
+    duration_confidence: high
+    duration_basis: "Reviewed session17 dates show Paramon on Namal 13-14 and the Crossroads Festival around Namal 15-17."
+    notes: "After obtaining water-breathing supplies, the party sets out from Paramon and reaches the Crossroads Festival."
+
+  - session: session17
+    from: Crossroads
     to: Balrog
     method: foot
-    duration_days: 5
+    duration_days: 3
     duration_confidence: high
-    duration_basis: "Reviewed date span runs Namal 13 to Namal 18; inferred as 5 elapsed calendar days, including the Crossroads stop."
-    notes: "After obtaining water-breathing supplies, the party set their route for Balrog first, traveled via the Crossroads Festival, and entered Balrog."
+    duration_basis: "Reviewed session17 dates place the Crossroads Festival around Namal 15-17 and arrival in Balrog on Namal 18; the combined Paramon-to-Balrog route remains 5 elapsed days."
+    notes: "After the Crossroads Festival stop, the party continues to Balrog and enters the dwarven city."
 
   - session: session20
     from: Balrog

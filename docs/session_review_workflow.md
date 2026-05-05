@@ -156,4 +156,7 @@ knowledge/Faban/final/sessionXX_summary.md
 
 ## Backlog
 
-- Enemy encounter tracking: add review/database support for generic enemies as well as named or boss enemies. This should answer questions like "how many goblins have we encountered?", "which sessions had giant frogs?", and "what enemies did we defeat versus drive off?" without requiring every creature to become an NPC. Track each enemy appearance with at least enemy name/type, quantity encountered, session, event/location, and outcome/confidence so queries can report how many of each enemy the party encountered, where, and during what session.
+1. Whole-campaign travel log: run a full travel log from session00 through the latest reviewed session, compare route legs against canonical session locations and diary dates, and flag ambiguous or missing travel legs for review.
+2. Enemy encounter pass: add review/database support for generic enemies as well as named or boss enemies. Track each enemy appearance with at least enemy name/type, quantity encountered, session, event/location, and outcome/confidence so queries can report how many of each enemy the party encountered, where, and during what session.
+3. Encounter tightening: broaden encounter modeling beyond enemies where useful, including social encounters, hazards, summoned creatures, fled/defeated outcomes, and links from encounters back to reviewed session events.
+4. Web review UI design: begin designing a local web front end for session review so canon decisions can be made through constrained controls instead of direct YAML edits, including accept/reject/correct/add flows and clean creation of new facts/events.

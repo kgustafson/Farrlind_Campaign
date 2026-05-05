@@ -9,7 +9,7 @@ review_instructions:
 session_title: The Battle of the Fey Witch
 session_date: '2025-03-09'
 in_game_date: 1832 AS Apollal 13
-primary_location: Thataways
+primary_location: Fey Woods
 items:
 - id: event-001
   sequence: 1
@@ -18,7 +18,7 @@ items:
   decision: accepted
   canonical_text: ''
   event_type: combat
-  location: Thataways
+  location: Fey Woods
   significance: 3
   reason: ''
   decided_by: ''
@@ -32,7 +32,7 @@ items:
   decision: accepted
   canonical_text: ''
   event_type: combat
-  location: Thataways
+  location: Fey Woods
   significance: 3
   reason: ''
   decided_by: ''
@@ -48,7 +48,7 @@ items:
   canonical_text: The witch counters with magic missiles, brings Faban to an inch
     of death, and then turns invisible.
   event_type: combat
-  location: Thataways
+  location: Fey Woods
   significance: 3
   reason: ''
   decided_by: ''
@@ -64,7 +64,7 @@ items:
     the remaining goblin with spiritual weapon, and Corvinas lays hands on Faban to
     bring him back to health.
   event_type: combat
-  location: Thataways
+  location: Fey Woods
   significance: 3
   reason: ''
   decided_by: ''
@@ -79,7 +79,7 @@ items:
   canonical_text: The witch reappears near Gildas, strikes Roon to death's door, and
     is killed when Corvinas cleaves her head from her body; her remains turn to dust.
   event_type: combat
-  location: Thataways
+  location: Fey Woods
   significance: 3
   reason: ''
   decided_by: ''
@@ -97,7 +97,7 @@ items:
     throws in a copper piece, the bag releases souls and an ancient necromantic tome
     that Gildas examines.
   event_type: discovery
-  location: Thataways
+  location: Fey Woods
   significance: 4
   reason: ''
   decided_by: ''

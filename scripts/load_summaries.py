@@ -304,7 +304,7 @@ CANON_ENEMIES = [
         "name": "Fey witch",
         "enemy_type": "fey_witch",
         "first_encountered_session": 3,
-        "description": "Unnamed fey witch in Thataways who summoned goblins, nearly killed Faban and Roon, and left behind a satchel containing souls and an ancient necromantic tome.",
+        "description": "Unnamed fey witch in the Fey Woods who summoned goblins, nearly killed Faban and Roon, and left behind a satchel containing souls and an ancient necromantic tome.",
         "status": "dead",
         "threat_level": "moderate",
     },
