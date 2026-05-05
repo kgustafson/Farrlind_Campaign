@@ -54,11 +54,192 @@ TRAVEL_LOCATION_ALIASES = {
     "Hanedal Island": ["hanedal", "haunidal", "hanedal island"],
 }
 
-KNOWN_NPCS = [
-    "Baron Wells",
-    "Jennifer",
-    "Sam",
+CANON_NPCS = [
+    {
+        "name": "Ardema",
+        "first_seen_session": 7,
+        "location": "Thataways",
+        "description": "Hostile caster fought during the defense of the Tree and the Well of Magic.",
+        "status": "fled",
+    },
+    {
+        "name": "Claris",
+        "first_seen_session": 7,
+        "location": "Thataways",
+        "description": "Librarian under the tree in Thataways.",
+        "status": "alive",
+    },
+    {
+        "name": "Zakana",
+        "first_seen_session": 8,
+        "location": "Spore Sanctuary",
+        "description": "Giant firbolg in the Spore Sanctuary who helped the party leave and provided healing mushrooms.",
+        "status": "alive",
+    },
+    {
+        "name": "Aracokin",
+        "first_seen_session": 9,
+        "location": "Bellemaine",
+        "description": "Quartermaster who offered to accompany the party to survey the site.",
+        "status": "alive",
+    },
+    {
+        "name": "Thompson",
+        "first_seen_session": 9,
+        "location": "Bellemaine",
+        "description": "Naturalist quartermaster who provided information about Jen/Jennifer and the druid commune.",
+        "status": "alive",
+    },
+    {
+        "name": "Rebar",
+        "first_seen_session": 9,
+        "location": "Bellemaine",
+        "description": "Half-giant who arm-wrestled Roon.",
+        "status": "alive",
+    },
+    {
+        "name": "General Chris",
+        "first_seen_session": 10,
+        "location": "Bellemaine",
+        "description": "General who spoke with the party after the Bellemaine construct and Dao battle.",
+        "status": "alive",
+    },
+    {
+        "name": "Richard",
+        "first_seen_session": 10,
+        "location": "Road to Archaeological Dig Site",
+        "description": "Caravan contact when the party began the journey north.",
+        "status": "alive",
+    },
+    {
+        "name": "Teddy",
+        "first_seen_session": 10,
+        "location": "Road to Archaeological Dig Site",
+        "description": "Caravan member excited that the party joined the group.",
+        "status": "alive",
+    },
+    {
+        "name": "Sam",
+        "first_seen_session": 11,
+        "location": "Road to Archaeological Dig Site",
+        "description": "Suspicious man in a rickety carriage; necrotic agent who infiltrated the caravan.",
+        "status": "dead",
+    },
+    {
+        "name": "Cole",
+        "first_seen_session": 13,
+        "location": "Mountain Road",
+        "description": "Traveler who appeared with a magical deck of cards.",
+        "status": "alive",
+    },
+    {
+        "name": "Jennifer",
+        "first_seen_session": 13,
+        "location": "Druid Retreat",
+        "description": "Ancient elvish archer and druid; confirmed the Wells and the missing Wand of Wells.",
+        "status": "alive",
+    },
+    {
+        "name": "Zerzer",
+        "first_seen_session": 14,
+        "location": "Druid Retreat",
+        "description": "Druid Retreat resident seeking a plant that could help the party breathe beneath the sea near Catur.",
+        "status": "alive",
+    },
+    {
+        "name": "Ordor",
+        "first_seen_session": 14,
+        "location": "Paramon",
+        "description": "Entity or person at Paramon's Well who warned danger was imminent.",
+        "status": "unknown",
+    },
+    {
+        "name": "Biha-Bibir",
+        "first_seen_session": 14,
+        "location": "Paramon",
+        "description": "Seaweed and living-current entity fought at Paramon.",
+        "status": "dead",
+    },
+    {
+        "name": "Black-furred tabaxi",
+        "first_seen_session": 15,
+        "location": "Paramon",
+        "description": "Tabaxi questioned by Faban who spoke of ancient dragonlands, Tiamat, demons, and the Cataclysm.",
+        "status": "fled",
+    },
+    {
+        "name": "Sapphire-eyed stranger",
+        "first_seen_session": 15,
+        "location": "Paramon",
+        "description": "Stranger who spoke with Gildas in a tavern.",
+        "status": "unknown",
+    },
+    {
+        "name": "Iron Paw",
+        "first_seen_session": 15,
+        "location": "Paramon",
+        "description": "Head priest of the Temple of Namaloa in Paramon; revealed as false or hostile and defeated by the party.",
+        "status": "dead",
+    },
+    {
+        "name": "Erling Rostad",
+        "first_seen_session": 17,
+        "location": "Paramon",
+        "description": "Survivor who spoke of primordial forces and the Cataclysm as over-release.",
+        "status": "alive",
+    },
+    {
+        "name": "Apothecary",
+        "first_seen_session": 17,
+        "location": "Paramon",
+        "description": "Apothecary who provided twenty potions of borrowed gills and temporary courage.",
+        "status": "alive",
+    },
+    {
+        "name": "Forgebottom",
+        "first_seen_session": 17,
+        "location": "Balrog",
+        "description": "Balrog listener who faltered at Faban's song about the Wells, Cataclysm, and unrestrained power.",
+        "status": "alive",
+    },
+    {
+        "name": "Lightdelver",
+        "first_seen_session": 18,
+        "location": "Balrog",
+        "description": "Dwarven wizard rescued from a falling tower in Balrog.",
+        "status": "alive",
+    },
+    {
+        "name": "Sleeping dwarven guard",
+        "first_seen_session": 18,
+        "location": "Balrog",
+        "description": "Dwarven guard awakened in the forge and mines of Balrog.",
+        "status": "alive",
+    },
+    {
+        "name": "Saiffi",
+        "first_seen_session": 18,
+        "location": "Balrog",
+        "description": "Well bound to truth in Balrog; described as the weakest but perhaps wisest and most informed Well.",
+        "status": "alive",
+    },
+    {
+        "name": "Orsydon",
+        "first_seen_session": 18,
+        "location": "Balrog",
+        "description": "Dragon summoned by cultists in Balrog and defeated by the party.",
+        "status": "dead",
+    },
+    {
+        "name": "Alistair",
+        "first_seen_session": 20,
+        "location": "Coast near Catur",
+        "description": "Coastal boat contact who gave the party a boat near Catur.",
+        "status": "alive",
+    },
 ]
+
+KNOWN_NPCS = [npc["name"] for npc in CANON_NPCS] + ["Baron Wells"]
 
 KNOWN_ENEMIES = [
     "Salazar",
@@ -931,6 +1112,44 @@ CREATE VIEW v_songbook AS
 """.strip()
 
 
+def canon_npc_sql(npc: dict) -> str:
+    name = npc["name"]
+    description = npc.get("description", "")
+    location = npc.get("location", "")
+    first_seen_session = npc.get("first_seen_session")
+    status = npc.get("status", "unknown")
+
+    return f"""
+UPDATE npc
+SET
+    entity_status_id = COALESCE((SELECT id FROM entity_status WHERE status_code = {sql_quote(status)} LIMIT 1), npc.entity_status_id),
+    last_known_location_id = COALESCE({location_expr(location)}, npc.last_known_location_id),
+    first_seen_session = COALESCE((SELECT id FROM session WHERE session_number = {first_seen_session}), npc.first_seen_session),
+    description = COALESCE(NULLIF({sql_quote(description)}, ''), npc.description),
+    is_named = TRUE,
+    notes = {sql_quote("Updated from reviewed canon NPC scrub.")}
+WHERE name = {sql_quote(name)};
+
+INSERT INTO npc (
+    name, entity_status_id, last_known_location_id,
+    first_seen_session, description, is_named, notes
+)
+SELECT
+    {sql_quote(name)},
+    (SELECT id FROM entity_status WHERE status_code = {sql_quote(status)} LIMIT 1),
+    {location_expr(location)},
+    (SELECT id FROM session WHERE session_number = {first_seen_session}),
+    {sql_quote(description)},
+    TRUE,
+    {sql_quote("Loaded from reviewed canon NPC scrub.")}
+WHERE NOT EXISTS (SELECT 1 FROM npc WHERE name = {sql_quote(name)});
+""".strip()
+
+
+def canon_npc_scrub_sql() -> str:
+    return "\n\n".join(canon_npc_sql(npc) for npc in CANON_NPCS)
+
+
 def pipeline_run_sql(session_count: int, event_count: int) -> str:
     return f"""
 INSERT INTO pipeline_run (
@@ -1057,6 +1276,8 @@ def build_sql(summaries: list[dict]) -> str:
         elif summary["session_number"] in reviewed_primary_locations:
             summary = {**summary, "location": reviewed_primary_locations[summary["session_number"]]}
         statements.append(session_sql(summary))
+
+    statements.append(canon_npc_scrub_sql())
 
     for summary in summaries:
         statements.append(delete_events_sql(summary["session_number"]))

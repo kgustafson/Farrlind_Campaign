@@ -344,6 +344,47 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertIn("Location introduced through session review.", sql)
         self.assertIn("(SELECT id FROM location WHERE name = 'Crossroads' LIMIT 1)", sql)
 
+    def test_canon_npc_sql_updates_then_inserts_without_unique_constraint(self):
+        npc = {
+            "name": "Alistair",
+            "first_seen_session": 20,
+            "location": "Coast near Catur",
+            "description": "Coastal boat contact.",
+            "status": "alive",
+        }
+
+        sql = load_summaries.canon_npc_sql(npc)
+
+        self.assertIn("UPDATE npc", sql)
+        self.assertIn("INSERT INTO npc", sql)
+        self.assertIn("WHERE NOT EXISTS (SELECT 1 FROM npc WHERE name = 'Alistair')", sql)
+        self.assertIn("SELECT id FROM session WHERE session_number = 20", sql)
+        self.assertIn("(SELECT id FROM location WHERE name = 'Coast near Catur' LIMIT 1)", sql)
+        self.assertNotIn("ON CONFLICT (name)", sql)
+
+    def test_build_sql_scrubs_reviewed_canon_npcs(self):
+        summaries = [
+            {
+                "session_number": 20,
+                "physical_date": "2026-04-27",
+                "in_game_date": "1832 AS Namal 20",
+                "title": "Salt, Steel",
+                "summary": "Alistair gave the party a boat.",
+                "events": ["Alistair gave the party a boat."],
+                "source_path": "session20_summary.md",
+                "location": "Coast near Catur",
+            }
+        ]
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_review_documents", return_value={}):
+                    sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("Loaded from reviewed canon NPC scrub.", sql)
+        self.assertIn("Alistair", sql)
+        self.assertIn("Coastal boat contact who gave the party a boat near Catur.", sql)
+
     def test_build_sql_dedupes_canon_events_already_in_review(self):
         event_text = "The party negotiated with local fishermen for a vessel."
         summaries = [
