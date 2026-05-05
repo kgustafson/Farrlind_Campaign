@@ -1,0 +1,146 @@
+session: session08
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: New Journey
+session_date: '2025-08-02'
+in_game_date: 1832 AS Apollal 18
+primary_location: Thataways
+items:
+- id: event-001
+  sequence: 1
+  source_type: db_event
+  source_text: Party wakes up sore from previous encounter
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-002
+  sequence: 2
+  source_type: db_event
+  source_text: Gildas finds map to commune in the north
+  decision: corrected
+  canonical_text: Gildas finds map to commune in the north, which is Jennifer's Druid
+    Retreat
+  event_type: discovery
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-003
+  sequence: 3
+  source_type: db_event
+  source_text: Brigit tries to steal red book, but is caught by Claris
+  decision: corrected
+  canonical_text: Brigit tries to steal red book, but is caught by Claris, who is
+    the librarian under the tree
+  event_type: discovery
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-004
+  sequence: 4
+  source_type: db_event
+  source_text: Corvinas learns about his past encounter with Rage, the demon from
+    the 8th circle of hell
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-005
+  sequence: 5
+  source_type: db_event
+  source_text: Party reunites and sets out to explore the woods south of here
+  decision: corrected
+  canonical_text: Party reunites and sets out to explore the woods south of here,
+    which is the last known sighting of Jennifer
+  event_type: discovery
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-006
+  sequence: 6
+  source_type: db_event
+  source_text: Gildas detects druidic energy and uncovers a hatch
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-007
+  sequence: 7
+  source_type: db_event
+  source_text: We enter the spore sanctuary and meet Zakana, a giant firbolg
+  decision: accepted
+  canonical_text: ''
+  event_type: social
+  location: Spore Sanctuary
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-008
+  sequence: 8
+  source_type: db_event
+  source_text: Zakana helps us leave the sanctuary and provides mushrooms for healing
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Spore Sanctuary
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-009
+  sequence: 9
+  source_type: db_event
+  source_text: The party travels to find Bellemaine, an elven city
+  decision: corrected
+  canonical_text: The party travels to find Bellemaine, an elven city that is rumored
+    to have information about Jennifer's whereabouts
+  event_type: travel
+  location: Bellemaine
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+added_items: []
+applied_on: '2026-05-05'
