@@ -41,6 +41,13 @@ Check review progress:
 ./rag-env/bin/python scripts/dm_query.py review-status
 ```
 
+Apply a completed review:
+
+```bash
+./rag-env/bin/python scripts/dm_query.py apply-review sessionXX
+./rag-env/bin/python scripts/dm_query.py health
+```
+
 Inspect a session beside canon decisions:
 
 ```bash
@@ -53,6 +60,12 @@ Review files live in:
 
 ```text
 knowledge/Faban/reviews/sessionXX_review.yaml
+```
+
+Each review file starts as:
+
+```yaml
+status: in_review
 ```
 
 Each drafted event starts as:
@@ -82,6 +95,14 @@ decided_on: "YYYY-MM-DD"
 ```
 
 Leave `applied_status: pending` until an apply step updates the database.
+
+When every item has a decision and any corrections/additions are filled in, set the top-level review status to:
+
+```yaml
+status: reviewed
+```
+
+`apply-review` refuses reviews with pending decisions. After it successfully reloads the database, it marks the review and its decided items as applied.
 
 ## Added Items
 

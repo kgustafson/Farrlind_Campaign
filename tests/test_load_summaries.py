@@ -96,6 +96,108 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertIn("Loaded from canon_decisions.yaml", sql)
         self.assertIn("(SELECT id FROM location WHERE name = 'Coast near Catur' LIMIT 1)", sql)
 
+    def test_review_events_for_session_respects_review_decisions(self):
+        summary = {
+            "session_number": 20,
+            "events": ["Draft event"],
+        }
+        review = {
+            "session": "session20",
+            "status": "reviewed",
+            "items": [
+                {
+                    "id": "event-001",
+                    "decision": "accepted",
+                    "source_text": "Accepted event",
+                    "event_type": "travel",
+                    "location": "Coast near Catur",
+                    "significance": 4,
+                },
+                {
+                    "id": "event-002",
+                    "decision": "corrected",
+                    "source_text": "Wrong event",
+                    "canonical_text": "Corrected event",
+                    "event_type": "social",
+                    "location": "Coast near Catur",
+                    "significance": 5,
+                },
+                {
+                    "id": "event-003",
+                    "decision": "rejected",
+                    "source_text": "Rejected event",
+                },
+                {
+                    "id": "event-004",
+                    "decision": "pending",
+                    "source_text": "Pending event",
+                },
+            ],
+            "added_items": [
+                {
+                    "id": "added-001",
+                    "decision": "added",
+                    "canonical_text": "Added event",
+                    "event_type": "discovery",
+                    "location": "Catur",
+                    "significance": 4,
+                }
+            ],
+        }
+
+        events = load_summaries.review_events_for_session(summary, review)
+
+        self.assertEqual([event["description"] for event in events], [
+            "Accepted event",
+            "Corrected event",
+            "Added event",
+        ])
+        self.assertEqual(events[1]["event_type"], "social")
+        self.assertIn("event-001", events[0]["notes"])
+
+    def test_review_events_for_session_ignores_in_review_documents(self):
+        self.assertIsNone(load_summaries.review_events_for_session({}, {"status": "in_review"}))
+
+    def test_build_sql_uses_reviewed_events_instead_of_summary_events(self):
+        summaries = [
+            {
+                "session_number": 20,
+                "physical_date": "2026-04-27",
+                "in_game_date": "1832 AS Namal 20",
+                "title": "Salt, Steel",
+                "summary": "The party arrived near Catur.",
+                "events": ["Draft event to replace"],
+                "source_path": "session20_summary.md",
+                "location": "Coast near Catur",
+            }
+        ]
+        reviews = {
+            20: {
+                "session": "session20",
+                "status": "reviewed",
+                "items": [
+                    {
+                        "id": "event-001",
+                        "decision": "accepted",
+                        "source_text": "Reviewed accepted event",
+                        "event_type": "travel",
+                        "location": "Coast near Catur",
+                        "significance": 4,
+                    }
+                ],
+                "added_items": [],
+            }
+        }
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_review_documents", return_value=reviews):
+                    sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("Reviewed accepted event", sql)
+        self.assertNotIn("Draft event to replace", sql)
+        self.assertIn("Loaded from session20 review: event-001", sql)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -28,6 +28,7 @@ OUT_SQL = OUT_DIR / "load_summaries.sql"
 TRAVEL_FACTS_PATH = BASE2 / "knowledge" / "Faban" / "travel.yaml"
 SONG_PROMPTS_PATH = BASE2 / "knowledge" / "Faban" / "songbook" / "prompts.md"
 CANON_DECISIONS_PATH = BASE2 / "knowledge" / "Faban" / "canon_decisions.yaml"
+REVIEWS_DIR = BASE2 / "knowledge" / "Faban" / "reviews"
 
 KNOWN_LOCATIONS = [
     "Bentrios",
@@ -549,6 +550,51 @@ def canon_event_decisions(decisions: dict) -> dict[int, list[dict]]:
     return entries
 
 
+def load_review_documents() -> dict[int, dict]:
+    if not REVIEWS_DIR.exists():
+        return {}
+
+    documents = {}
+    for path in sorted(REVIEWS_DIR.glob("*_review.yaml")):
+        with open(path, "r", encoding="utf-8") as f:
+            document = yaml.safe_load(f) or {}
+        try:
+            session_number = parse_session_ref(document.get("session"))
+        except ValueError:
+            continue
+        documents[session_number] = document
+    return documents
+
+
+def reviewed_event_text(item: dict) -> str:
+    if item.get("decision") in {"corrected", "added"}:
+        return (item.get("canonical_text") or "").strip()
+    return (item.get("source_text") or "").strip()
+
+
+def review_events_for_session(summary: dict, review: Optional[dict]) -> Optional[list[dict]]:
+    if not review or review.get("status") not in {"reviewed", "complete", "applied"}:
+        return None
+
+    events = []
+    for item in [*(review.get("items") or []), *(review.get("added_items") or [])]:
+        decision = item.get("decision") or "pending"
+        if decision in {"pending", "rejected"}:
+            continue
+        text = reviewed_event_text(item)
+        if not text:
+            continue
+        events.append({
+            "description": text,
+            "event_type": item.get("event_type") or classify_event_type(text),
+            "location": item.get("location") or detect_location(text),
+            "significance": item.get("significance") or event_significance(text),
+            "notes": f"Loaded from {review.get('session', 'review')} review: {item.get('id', 'unknown')}",
+        })
+
+    return events
+
+
 def entity_mentioned(entity: str, text: str) -> bool:
     low = text.lower()
 
@@ -725,6 +771,24 @@ VALUES (
 """.strip()
 
 
+def reviewed_event_sql(session_number: int, sequence: int, item: dict) -> str:
+    return f"""
+INSERT INTO session_event (
+    session_id, event_type_id, sequence_order, location_id,
+    description, significance, notes
+)
+VALUES (
+    (SELECT id FROM session WHERE session_number = {session_number}),
+    (SELECT id FROM event_type WHERE type_name = {sql_quote(item.get("event_type", "discovery"))}),
+    {sequence},
+    {location_expr(item.get("location", ""))},
+    {sql_quote(item.get("description", ""))},
+    {item.get("significance", 3)},
+    {sql_quote(item.get("notes", "Loaded from review"))}
+);
+""".strip()
+
+
 def travel_log_sql(log: dict) -> str:
     duration = log["duration_days"] if log["duration_days"] is not None else "NULL"
     if log.get("source") == "travel_yaml":
@@ -858,7 +922,17 @@ def build_sql(summaries: list[dict]) -> str:
     decisions = load_canon_decisions()
     primary_locations = canon_primary_locations(decisions)
     canon_events = canon_event_decisions(decisions)
-    total_events = sum(len(summary["events"]) for summary in summaries) + sum(
+    reviews = load_review_documents()
+    review_events = {
+        summary["session_number"]: review_events_for_session(summary, reviews.get(summary["session_number"]))
+        for summary in summaries
+    }
+    total_events = sum(
+        len(review_events[summary["session_number"]])
+        if review_events[summary["session_number"]] is not None
+        else len(summary["events"])
+        for summary in summaries
+    ) + sum(
         len(items) for items in canon_events.values()
     )
     inferred_travel_logs = [
@@ -898,12 +972,19 @@ def build_sql(summaries: list[dict]) -> str:
 
     for summary in summaries:
         statements.append(delete_events_sql(summary["session_number"]))
-        for sequence, event in enumerate(summary["events"], start=1):
-            statements.append(event_sql(summary["session_number"], sequence, event))
+        reviewed_events = review_events[summary["session_number"]]
+        if reviewed_events is not None:
+            for sequence, item in enumerate(reviewed_events, start=1):
+                statements.append(reviewed_event_sql(summary["session_number"], sequence, item))
+            base_count = len(reviewed_events)
+        else:
+            for sequence, event in enumerate(summary["events"], start=1):
+                statements.append(event_sql(summary["session_number"], sequence, event))
+            base_count = len(summary["events"])
         for offset, item in enumerate(canon_events.get(summary["session_number"], []), start=1):
             statements.append(canon_event_sql(
                 summary["session_number"],
-                len(summary["events"]) + offset,
+                base_count + offset,
                 item,
             ))
 
@@ -933,6 +1014,13 @@ def write_sql() -> Path:
     decisions = load_canon_decisions()
     canon_events = canon_event_decisions(decisions)
     canon_event_count = sum(len(items) for items in canon_events.values())
+    reviews = load_review_documents()
+    reviewed_event_count = sum(
+        len(events)
+        for summary in summaries
+        for events in [review_events_for_session(summary, reviews.get(summary["session_number"]))]
+        if events is not None
+    )
     trusted_travel_logs = load_travel_facts()
     inferred_travel_logs = [
         log
@@ -953,6 +1041,8 @@ def write_sql() -> Path:
     print(f"Wrote {OUT_SQL}")
     print(f"Sessions: {len(summaries)}")
     print(f"Events: {sum(len(summary['events']) for summary in summaries) + canon_event_count}")
+    if reviewed_event_count:
+        print(f"Reviewed events: {reviewed_event_count}")
     if canon_event_count:
         print(f"Canon events: {canon_event_count}")
     print(f"Travel logs: {travel_log_count}")

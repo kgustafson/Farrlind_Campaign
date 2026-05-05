@@ -4,6 +4,7 @@ import re
 import subprocess
 import sys
 import textwrap
+from datetime import date
 from pathlib import Path
 from typing import Optional
 
@@ -541,6 +542,32 @@ def summarize_review(document: dict, path: Optional[Path] = None) -> dict:
     }
 
 
+def review_has_pending_decisions(document: dict) -> bool:
+    summary = summarize_review(document)
+    return summary["decisions"]["pending"] > 0
+
+
+def mark_review_applied(document: dict, applied_on: str) -> dict:
+    document = {**document, "status": "applied", "applied_on": applied_on}
+    for section in ["items", "added_items"]:
+        updated = []
+        for item in document.get(section) or []:
+            item = {**item}
+            if item.get("decision") in {"accepted", "rejected", "corrected", "added"}:
+                item["applied_status"] = "applied"
+                item["applied_on"] = applied_on
+            updated.append(item)
+        document[section] = updated
+    return document
+
+
+def save_review_file(path: Path, document: dict):
+    path.write_text(
+        yaml.safe_dump(document, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+
+
 def canon_decisions_for_session(decisions: dict, session_number: int) -> dict:
     key = session_key(session_number)
     return {
@@ -814,6 +841,30 @@ def review_status(args):
         )
 
 
+def apply_review(args):
+    session_number = args.session_number
+    path = review_path(session_number)
+    if not path.exists():
+        raise SystemExit(f"Review file does not exist: {path}")
+
+    document = load_review_file(path)
+    if review_has_pending_decisions(document):
+        raise SystemExit(f"Review has pending decisions: {path}")
+    if document.get("status") not in {"reviewed", "complete", "applied"}:
+        raise SystemExit(
+            f"Review status must be reviewed, complete, or applied before DB update: {document.get('status')}"
+        )
+
+    command = [sys.executable, "scripts/rag.py", "dbload", "--apply"]
+    result = subprocess.run(command, cwd=REPO_ROOT, check=False, text=True)
+    if result.returncode != 0:
+        raise SystemExit(result.returncode)
+
+    applied_on = args.applied_on or date.today().isoformat()
+    save_review_file(path, mark_review_applied(document, applied_on))
+    print(f"Applied review: {path}")
+
+
 def brief(args):
     topic = args.topic
     print_section(f"{topic.title()} Prep Brief")
@@ -893,6 +944,11 @@ def build_parser():
 
     review_status_parser = subparsers.add_parser("review-status", help="Show status counts for YAML session review files.")
     review_status_parser.set_defaults(func=review_status)
+
+    apply = subparsers.add_parser("apply-review", help="Apply a completed review through the durable DB load path.")
+    apply.add_argument("session_number", type=parse_session_ref, help="Session number or name, e.g. 20 or session20.")
+    apply.add_argument("--applied-on", default="", help="Applied date to record in review YAML, e.g. YYYY-MM-DD.")
+    apply.set_defaults(func=apply_review)
 
     prep = subparsers.add_parser("brief", help="Build a compact prep brief around a topic.")
     prep.add_argument("topic")

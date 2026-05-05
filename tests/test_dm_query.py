@@ -384,6 +384,30 @@ class DmQueryTest(unittest.TestCase):
         self.assertEqual(summary["applied"]["applied"], 1)
         self.assertEqual(summary["applied"]["pending"], 4)
 
+    def test_mark_review_applied_updates_statuses(self):
+        document = {
+            "session": "session20",
+            "status": "reviewed",
+            "items": [
+                {"decision": "accepted", "applied_status": "pending"},
+                {"decision": "rejected", "applied_status": "pending"},
+            ],
+            "added_items": [
+                {"decision": "added", "applied_status": "pending"},
+            ],
+        }
+
+        updated = dm_query.mark_review_applied(document, "2026-05-04")
+
+        self.assertEqual(updated["status"], "applied")
+        self.assertEqual(updated["applied_on"], "2026-05-04")
+        self.assertTrue(all(item["applied_status"] == "applied" for item in updated["items"]))
+        self.assertEqual(updated["added_items"][0]["applied_on"], "2026-05-04")
+
+    def test_review_has_pending_decisions(self):
+        self.assertTrue(dm_query.review_has_pending_decisions({"items": [{"decision": "pending"}]}))
+        self.assertFalse(dm_query.review_has_pending_decisions({"items": [{"decision": "accepted"}]}))
+
     def test_review_status_prints_review_file_counts(self):
         document = {
             "session": "session20",
@@ -411,6 +435,46 @@ class DmQueryTest(unittest.TestCase):
                 dm_query.review_status(args())
 
         self.assertIn("No review files found.", output.getvalue())
+
+    def test_apply_review_refuses_pending_review(self):
+        document = {
+            "session": "session20",
+            "status": "in_review",
+            "items": [{"decision": "pending", "applied_status": "pending"}],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "session20_review.yaml"
+            path.write_text(yaml.safe_dump(document), encoding="utf-8")
+            with patch("dm_query.review_path", return_value=path):
+                with self.assertRaises(SystemExit) as raised:
+                    dm_query.apply_review(args(session_number=20, applied_on="2026-05-04"))
+
+        self.assertIn("pending decisions", str(raised.exception))
+
+    def test_apply_review_runs_dbload_and_marks_applied(self):
+        document = {
+            "session": "session20",
+            "status": "reviewed",
+            "items": [{"decision": "accepted", "applied_status": "pending"}],
+            "added_items": [],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "session20_review.yaml"
+            path.write_text(yaml.safe_dump(document), encoding="utf-8")
+            completed = subprocess.CompletedProcess(args=[], returncode=0)
+            with patch("dm_query.review_path", return_value=path):
+                with patch("dm_query.subprocess.run", return_value=completed) as run:
+                    with contextlib.redirect_stdout(io.StringIO()) as output:
+                        dm_query.apply_review(args(session_number=20, applied_on="2026-05-04"))
+
+            updated = yaml.safe_load(path.read_text(encoding="utf-8"))
+
+        self.assertEqual(updated["status"], "applied")
+        self.assertEqual(updated["items"][0]["applied_status"], "applied")
+        self.assertIn("Applied review", output.getvalue())
+        self.assertEqual(run.call_args.args[0][-2:], ["dbload", "--apply"])
 
     def test_review_events_prints_db_and_pending_canon_decisions(self):
         review_data = {
@@ -481,6 +545,13 @@ class DmQueryTest(unittest.TestCase):
         parsed = parser.parse_args(["init-review", "session20"])
         self.assertEqual(parsed.func, dm_query.init_review)
         self.assertEqual(parsed.session_number, 20)
+
+    def test_parser_accepts_apply_review_command(self):
+        parser = dm_query.build_parser()
+        parsed = parser.parse_args(["apply-review", "session20", "--applied-on", "2026-05-04"])
+        self.assertEqual(parsed.func, dm_query.apply_review)
+        self.assertEqual(parsed.session_number, 20)
+        self.assertEqual(parsed.applied_on, "2026-05-04")
 
     def test_parser_accepts_review_status_command(self):
         parser = dm_query.build_parser()
