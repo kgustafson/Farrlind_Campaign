@@ -1,0 +1,252 @@
+session: session13
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: Aftermath and parting of ways
+session_date: '2025-10-12'
+in_game_date: 1832 AS Namal 6, 1832 AS Namal 7, 1832 AS Namal 8, 1832 AS Namal 9,
+  1832 AS Namal 10
+primary_location: Druid Retreat
+items:
+- id: event-001
+  sequence: 1
+  source_type: diary_event
+  source_text: Gildas shows the obsidian hooked dagger to the archeologists; the blade
+    is made for tearing flesh and has dried black blood on it, and Gildas stores it
+    with the orb fragments and the Bentrios orb.
+  decision: accepted
+  canonical_text: ''
+  event_type: acquisition
+  location: Archaeological Dig Site
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-002
+  sequence: 2
+  source_type: diary_event
+  source_text: The party estimates it will take two to four days to reach the druid
+    retreat, camps near the dig site, and Corvinas tells the party about being the
+    last survivor of Mistrona after a demon attack.
+  decision: accepted
+  canonical_text: ''
+  event_type: social
+  location: Archaeological Dig Site
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-003
+  sequence: 3
+  source_type: diary_event
+  source_text: Corvinas describes the demon claw mark on his forehead; Roon recognizes
+    the crossed-axes symbol as belonging to Polachnicindoya, lord of the seventh level
+    of hell and demon of rage.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Archaeological Dig Site
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-004
+  sequence: 4
+  source_type: diary_event
+  source_text: The party sets out northward into the mountains toward the druid retreat
+    and takes shelter from heavy rain in a shallow cave.
+  decision: accepted
+  canonical_text: ''
+  event_type: travel
+  location: Mountain Road
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-005
+  sequence: 5
+  source_type: diary_event
+  source_text: Faban plays Sally and the Good Day in the cave to lighten the mood
+    during the storm.
+  decision: accepted
+  canonical_text: ''
+  event_type: social
+  location: Mountain Road
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-006
+  sequence: 6
+  source_type: diary_event
+  source_text: Cole appears at the cave with a magical deck of cards; Faban draws
+    The Rogue, which Cole says harbingers betrayal, and Roon draws The Star, which
+    signifies growth and evolution and makes him stronger.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Mountain Road
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-007
+  sequence: 7
+  source_type: diary_event
+  source_text: Mikani communes with nature in the mountains and senses the conspicuous
+    absence of planar influence, no powerful beings influencing the area, traces of
+    amethyst, iron, and obsidian in the earth, and residual evocation magic from spells
+    cast long ago.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Mountain Road
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-008
+  sequence: 8
+  source_type: diary_event
+  source_text: As the party nears an encampment, vines trap Corvinas and an unseen
+    archer fires a warning arrow with a parchment reading, "Those who seek, harm,
+    or burn, shall face the wrath of many here."
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Druid Retreat
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-009
+  sequence: 9
+  source_type: diary_event
+  source_text: Roon hacks at the vine to free Corvinas and is struck by an arrow that
+    drains his strength.
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Druid Retreat
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-010
+  sequence: 10
+  source_type: diary_event
+  source_text: Faban calls out in greeting, and an ancient elvish archer named Jennifer
+    appears, revealing herself as the object of the party's quest.
+  decision: accepted
+  canonical_text: ''
+  event_type: social
+  location: Druid Retreat
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-011
+  sequence: 11
+  source_type: diary_event
+  source_text: Jennifer says she no longer has the Wand of Wells because it was stolen
+    recently amid broader magical failures and unreliable protection spells.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Druid Retreat
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-012
+  sequence: 12
+  source_type: diary_event
+  source_text: 'Jennifer identifies the known Wells: the Monastery of the Open Hand,
+    Thataway, Henedal, the beaches to the east at Paramon, the sunken city of Catur,
+    and the dwarven city of Balrog.'
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Druid Retreat
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-013
+  sequence: 13
+  source_type: diary_event
+  source_text: Jennifer explains that the Wells are kind, do not seek retribution,
+    and are not inherently evil, and that stopping the Cataclysm requires seeking
+    all of the Wells.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Druid Retreat
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-014
+  sequence: 14
+  source_type: diary_event
+  source_text: Jennifer leads the party into the Druid Retreat, also described as
+    her coven, welcomes them to her patch of earth, says the situation is complicated,
+    and notes that although she is over a thousand years old, many in the retreat
+    can help the party.
+  decision: accepted
+  canonical_text: ''
+  event_type: social
+  location: Druid Retreat
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-015
+  sequence: 15
+  source_type: diary_event
+  source_text: Jennifer warns the party not to put full trust in the gods because
+    the gods are flawed much like mortals.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Druid Retreat
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+added_items: []
+applied_on: '2026-05-05'
