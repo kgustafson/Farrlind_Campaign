@@ -1,0 +1,205 @@
+session: session01
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: The Battle
+session_date: '2025-02-16'
+in_game_date: 1832 AS Apollal 10
+primary_location: Bentrios
+items:
+- id: event-001
+  sequence: 2
+  source_type: db_event
+  source_text: The party discovers that the magic source emits from the center of
+    the rubble pile.
+  decision: corrected
+  canonical_text: After the battle, the street is ruined where the creature manifested
+    from the material components of the road, and a nearby nobleman emerges demanding
+    answers.
+  event_type: discovery
+  location: Bentrios
+  significance: 3
+  reason: Captures the immediate aftermath of the construct battle.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-002
+  sequence: 3
+  source_type: db_event
+  source_text: Gildas detects magic and finds a round red orb emitting orange light,
+    which is later determined to be an evocation magic orb.
+  decision: corrected
+  canonical_text: Gildas detects magic in the rubble, Faban retrieves a round red
+    orb glowing orange, and Gildas determines that it was planted, uses long-lost
+    magic, and contains evocation magic.
+  event_type: discovery
+  location: Bentrios
+  significance: 5
+  reason: The orb is a major campaign artifact and source of Demon Lord of Rage lore.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-003
+  sequence: 5
+  source_type: db_event
+  source_text: The party investigates the basement room offered by the nearby building's
+    owners and learns about the Demon Lord of Rage.
+  decision: corrected
+  canonical_text: In a nearby building's basement room, Gildas gazes into the orb,
+    sees a fiery realm resembling the Nine Hells and the Demon Lord of Rage, then
+    breaks contact and drops the orb, cracking it and releasing some of its contents
+    before it is mended.
+  event_type: discovery
+  location: Bentrios
+  significance: 5
+  reason: Establishes the Demon Lord of Rage and the danger contained in the orb.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-004
+  sequence: 6
+  source_type: db_event
+  source_text: Makani senses that the storm is caused by the demon lord of lightning.
+  decision: corrected
+  canonical_text: The party decides to seek Mayor Baron Wells at Bentrios Tower; as
+    a tempest forms, Makani realizes the storm is unnatural and caused by the Demon
+    Lord of Lightning bringing it down on the city.
+  event_type: discovery
+  location: Bentrios
+  significance: 5
+  reason: Introduces the Demon Lord of Lightning threat over Bentrios.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-005
+  sequence: 7
+  source_type: db_event
+  source_text: The party rushes to the mayor's penthouse in the Bentrios Tower, where
+    they find it ajar and overhear the mayor being threatened by an infernal-speaking
+    voice.
+  decision: corrected
+  canonical_text: 'The party reaches the tilted Bentrios Tower, rushes to the mayor''s
+    penthouse, finds the door ajar, and overhears infernal speech: Baron Wells says
+    he has done all he can, while a second voice demands that he has five days to
+    get what is needed.'
+  event_type: discovery
+  location: Bentrios
+  significance: 5
+  reason: Reveals Baron Wells' infernal bargain and the deadline.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-006
+  sequence: 8
+  source_type: db_event
+  source_text: Roon charges into the room, only to be confronted by the demon lord
+    who disappears in a flash.
+  decision: corrected
+  canonical_text: Roon charges into the room, the demon lord calls him a foolish mortal,
+    disappears in a flash, and the ground shifts as Bentrios Tower rights itself.
+  event_type: discovery
+  location: Bentrios
+  significance: 5
+  reason: Confirms the demon lord's direct presence and power in Bentrios.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-007
+  sequence: 9
+  source_type: db_event
+  source_text: The party interrogates the mayor about his connection to the demons
+    and their quest for Urgan's lost great axe. The mayor reveals that the axe is
+    rumored to be infused with Urgan's rage energy and is hidden somewhere in the
+    central plains of the continent. He also provides a map showing an unexplored
+    forest teeming with Fey Wild magic, where the party believes their future lies.
+  decision: corrected
+  canonical_text: The party interrogates Baron Wells, who says demons are collecting
+    items from around the Gale and seek Urgan the Great's lost axe, also known as
+    the Blood Rage Great Axe of Urgan, which is rumored to be infused with Urgan's
+    rage energy and hidden underground.
+  event_type: discovery
+  location: Bentrios
+  significance: 5
+  reason: Establishes the first major quest objective around Urgan's Axe.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+added_items:
+- id: added-001
+  sequence: 1
+  source_type: user_added
+  source_text: ''
+  decision: added
+  canonical_text: The party fights a regenerating construct-like creature in Bentrios;
+    Faban is nearly mortally wounded, Corvinas smites it with Mihira's holy energy,
+    and Bridgit lands the final sneak attack that destroys it.
+  event_type: combat
+  location: Bentrios
+  significance: 5
+  reason: The opening battle is the session's title event and leads directly to the
+    orb discovery.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-002
+  sequence: 4
+  source_type: user_added
+  source_text: ''
+  decision: added
+  canonical_text: Gildas also senses strong protective and concealing magic from Faban's
+    leather satchel, and Faban becomes defensive, insisting that it is his burden
+    to bear.
+  event_type: discovery
+  location: Bentrios
+  significance: 4
+  reason: Early canon clue about Faban's satchel and private burden.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-003
+  sequence: 10
+  source_type: user_added
+  source_text: ''
+  decision: added
+  canonical_text: Faban recalls an ancient ballad saying Urgan's bride, Jennifer Wilbreta,
+    a pale elf of the Fey, traveled south from the northern mountains and buried Urgan's
+    axe somewhere in the central plains.
+  event_type: discovery
+  location: Bentrios
+  significance: 5
+  reason: First mention of Jennifer Wilbreta and the ballad clue to Urgan's Axe.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-004
+  sequence: 11
+  source_type: user_added
+  source_text: ''
+  decision: added
+  canonical_text: Baron Wells is constrained by vows but confirms that the axe is
+    definitely underground and shows the party a map pointing to an unexplored forest
+    teeming with Fey Wild magic.
+  event_type: discovery
+  location: Bentrios
+  significance: 5
+  reason: Points the party toward the Fey Woods while keeping the event location in
+    Bentrios.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+applied_on: '2026-05-05'

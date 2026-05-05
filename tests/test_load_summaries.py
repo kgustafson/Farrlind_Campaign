@@ -491,6 +491,31 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertIn("status_code = 'dead'", sql)
         self.assertIn("Loaded from reviewed canon enemy scrub.", sql)
 
+    def test_build_sql_scrubs_salazar_from_session01(self):
+        summaries = [
+            {
+                "session_number": 1,
+                "physical_date": "2025-02-16",
+                "in_game_date": "1832 AS Apollal 10",
+                "title": "The Battle",
+                "summary": "Salazar threatens Baron Wells in Bentrios Tower.",
+                "events": ["Salazar threatens Baron Wells in Bentrios Tower."],
+                "source_path": "session01_summary.md",
+                "location": "Bentrios",
+            }
+        ]
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_review_documents", return_value={}):
+                    sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("'Salazar'", sql)
+        self.assertIn("'demon_lord'", sql)
+        self.assertIn("SELECT id FROM session WHERE session_number = 1", sql)
+        self.assertIn("Demon Lord of Lightning who threatened Baron Wells", sql)
+        self.assertIn("level_code = 'existential'", sql)
+
     def test_build_sql_includes_travel_confidence_fields(self):
         summaries = [
             {
@@ -575,6 +600,31 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertIn("SELECT id FROM session WHERE session_number = 2", sql)
         self.assertIn("Dryad of the outer Fey Woods", sql)
         self.assertIn("(SELECT id FROM location WHERE name = 'Fey Woods' LIMIT 1)", sql)
+
+    def test_build_sql_preserves_jennifer_full_name_from_session01(self):
+        summaries = [
+            {
+                "session_number": 1,
+                "physical_date": "2025-02-16",
+                "in_game_date": "1832 AS Apollal 10",
+                "title": "The Battle",
+                "summary": "Faban recalls Jennifer Wilbreta.",
+                "events": ["Faban recalls Jennifer Wilbreta."],
+                "source_path": "session01_summary.md",
+                "location": "Bentrios",
+            }
+        ]
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_review_documents", return_value={}):
+                    sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("'Jennifer'", sql)
+        self.assertIn("'Jennifer Wilbreta'", sql)
+        self.assertIn("SELECT id FROM session WHERE session_number = 1", sql)
+        self.assertIn("Urgan''s bride", sql)
+        self.assertIn("buried his axe", sql)
 
     def test_build_sql_dedupes_canon_events_already_in_review(self):
         event_text = "The party negotiated with local fishermen for a vessel."

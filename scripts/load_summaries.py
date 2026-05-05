@@ -183,9 +183,10 @@ CANON_NPCS = [
     },
     {
         "name": "Jennifer",
-        "first_seen_session": 13,
+        "alias": "Jennifer Wilbreta",
+        "first_seen_session": 1,
         "location": "Druid Retreat",
-        "description": "Ancient elvish archer and druid; confirmed the Wells and the missing Wand of Wells.",
+        "description": "Jennifer Wilbreta, ancient pale elf of the Fey, elvish archer, and druid; first mentioned in Faban's ballad as Urgan's bride who buried his axe, later confirmed the Wells and the missing Wand of Wells.",
         "status": "alive",
     },
     {
@@ -292,6 +293,14 @@ KNOWN_NPCS = [npc["name"] for npc in CANON_NPCS]
 
 CANON_ENEMIES = [
     {
+        "name": "Salazar",
+        "enemy_type": "demon_lord",
+        "first_encountered_session": 1,
+        "description": "Demon Lord of Lightning who threatened Baron Wells in Bentrios Tower, brought an unnatural storm down on Bentrios, and demanded the final item tied to Urgan's Axe.",
+        "status": "alive",
+        "threat_level": "existential",
+    },
+    {
         "name": "Fey witch",
         "enemy_type": "fey_witch",
         "first_encountered_session": 3,
@@ -302,7 +311,6 @@ CANON_ENEMIES = [
 ]
 
 KNOWN_ENEMIES = [
-    "Salazar",
     "Orsydon",
     "Ardema",
     "Iron Paw",
@@ -1190,6 +1198,7 @@ CREATE VIEW v_songbook AS
 
 def canon_npc_sql(npc: dict) -> str:
     name = npc["name"]
+    alias = npc.get("alias", "")
     description = npc.get("description", "")
     location = npc.get("location", "")
     first_seen_session = npc.get("first_seen_session")
@@ -1202,17 +1211,19 @@ SET
     entity_status_id = COALESCE((SELECT id FROM entity_status WHERE status_code = {sql_quote(status)} LIMIT 1), npc.entity_status_id),
     last_known_location_id = COALESCE({location_expr(location)}, npc.last_known_location_id),
     first_seen_session = COALESCE((SELECT id FROM session WHERE session_number = {first_seen_session}), npc.first_seen_session),
+    alias = COALESCE(NULLIF({sql_quote(alias)}, ''), npc.alias),
     description = COALESCE(NULLIF({sql_quote(description)}, ''), npc.description),
     is_named = {is_named},
     notes = {sql_quote("Updated from reviewed canon NPC scrub.")}
 WHERE name = {sql_quote(name)};
 
 INSERT INTO npc (
-    name, entity_status_id, last_known_location_id,
+    name, alias, entity_status_id, last_known_location_id,
     first_seen_session, description, is_named, notes
 )
 SELECT
     {sql_quote(name)},
+    {sql_quote(alias)},
     (SELECT id FROM entity_status WHERE status_code = {sql_quote(status)} LIMIT 1),
     {location_expr(location)},
     (SELECT id FROM session WHERE session_number = {first_seen_session}),
