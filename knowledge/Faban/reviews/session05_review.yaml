@@ -1,0 +1,262 @@
+session: session05
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: The Return to Bentrios
+session_date: '2025-03-30'
+in_game_date: 1832 AS Apollal 14, 1832 AS Apollal 15
+primary_location: Bentrios
+items: []
+added_items:
+- id: added-001
+  sequence: 1
+  source_type: diary
+  source_text: The party left the edge of the Fey forest, thanked the centaur escorts
+    from the Messengers of the Queen, and began traveling toward Bentrios.
+  decision: added
+  canonical_text: The party left the edge of the Fey forest, thanked the centaur escorts
+    from the Messengers of the Queen, and began traveling toward Bentrios.
+  event_type: travel
+  location: Thataways
+  significance: 3
+  reason: Seeded from session 05 diary; no DB events existed for this session.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-002
+  sequence: 2
+  source_type: diary
+  source_text: Brigit discovered a leprechaun following the party and trying to steal
+    the axe; Faban gave it a gold piece, learned its intent, and the leprechaun eventually
+    disappeared.
+  decision: added
+  canonical_text: Brigit discovered a leprechaun following the party and trying to
+    steal the axe; Faban gave it a gold piece, learned its intent, and the leprechaun
+    eventually disappeared.
+  event_type: social
+  location: Thataways
+  significance: 3
+  reason: Seeded from session 05 diary; no DB events existed for this session.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-003
+  sequence: 3
+  source_type: diary
+  source_text: The party camped during the return journey and had a quiet night with
+    no encounters.
+  decision: added
+  canonical_text: The party camped during the return journey to Bentrios and had a
+    quiet night with no encounters.
+  event_type: rest
+  location: Road to Bentrios
+  significance: 3
+  reason: Seeded from session 05 diary; no DB events existed for this session.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-004
+  sequence: 4
+  source_type: diary
+  source_text: The party reached Bentrios, where tower renovations were underway,
+    magic shops were affected by world changes, and technological disruption had caused
+    civilized chaos.
+  decision: added
+  canonical_text: The party reached Bentrios, where tower renovations were underway,
+    magic shops were affected by world changes, and technological disruption had caused
+    civilized chaos.
+  event_type: discovery
+  location: Bentrios
+  significance: 4
+  reason: Seeded from session 05 diary; no DB events existed for this session.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-005
+  sequence: 5
+  source_type: diary
+  source_text: At the temple of Siath, Gildas told Father Joseph the party had recovered
+    Urgan's Axe, discussed Salazar and the Demon Lord of Rage, and the party encouraged
+    Father Joseph to take leadership from the corrupt mayor.
+  decision: added
+  canonical_text: At the temple of Siath, Gildas told Father Joseph the party had
+    recovered Urgan's Axe, discussed whether the axe was connected to Salazar or the
+    Demon Lord of Rage, and the party encouraged Father Joseph to take leadership
+    from the corrupt mayor.
+  event_type: social
+  location: Bentrios
+  significance: 4
+  reason: Seeded from session 05 diary; no DB events existed for this session.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-006
+  sequence: 6
+  source_type: diary
+  source_text: At the mayor's office, the party demanded Baron Wells return Urgan's
+    Axe when he was done with it; he said he would try and admitted his political
+    power, economy, military choices, and foreign dealings were failing.
+  decision: added
+  canonical_text: At the mayor's office, the party demanded Baron Wells return Urgan's
+    Axe when he was done with it; he said he would try and admitted his political
+    power, economy, military choices, and foreign dealings were failing.
+  event_type: social
+  location: Bentrios
+  significance: 4
+  reason: Seeded from session 05 diary; no DB events existed for this session.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-007
+  sequence: 7
+  source_type: diary
+  source_text: Lightning struck in the room and Salazar appeared, examined Urgan's
+    Axe, recited an incantation, and revealed he was bound by an infernal contract
+    to fix things for Baron Wells in exchange for access to artifacts including the
+    axe.
+  decision: added
+  canonical_text: Lightning struck in the room and Salazar appeared, examined Urgan's
+    Axe, recited an incantation, and revealed he was bound by an infernal contract
+    to fix things for Baron Wells in exchange for access to artifacts including the
+    axe.
+  event_type: discovery
+  location: Bentrios
+  significance: 5
+  reason: Seeded from session 05 diary; no DB events existed for this session.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-008
+  sequence: 8
+  source_type: diary
+  source_text: Salazar fulfilled the contract by shunting Bentrios back to its most
+    prosperous Age of Discovery state; Alexander's Inn disappeared, the tower collapsed
+    into the old town square, people were confused, warforged vanished, and Salazar
+    disappeared with a wink.
+  decision: added
+  canonical_text: Salazar fulfilled the contract by shunting Bentrios back to its
+    most prosperous Age of Discovery state; Alexander's Inn disappeared, the tower
+    collapsed into the old town square, people were confused, warforged vanished,
+    and Salazar disappeared with a wink.
+  event_type: discovery
+  location: Bentrios
+  significance: 5
+  reason: Seeded from session 05 diary; no DB events existed for this session.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-009
+  sequence: 9
+  source_type: diary
+  source_text: Faban vowed to capture the moment in a ballad titled The Contract of
+    Baron Wells.
+  decision: added
+  canonical_text: Faban vowed to capture the fall and contract of Baron Wells in a
+    ballad titled The Contract of Baron Wells.
+  event_type: acquisition
+  location: Bentrios
+  significance: 4
+  reason: Seeded from session 05 diary; no DB events existed for this session.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-010
+  sequence: 10
+  source_type: diary
+  source_text: Father Joseph explained that Wells of Magic had opened, that similar
+    events were once called the Cataclysm, that the Wells are potent sources of magic,
+    and that the party must learn how to close the Wells from the Wells themselves.
+  decision: added
+  canonical_text: Father Joseph explained that Wells of Magic had opened, that similar
+    events were once called the Cataclysm, that the Wells are potent sources of magic,
+    and that the party must learn how to close the Wells from the Wells themselves.
+  event_type: discovery
+  location: Bentrios
+  significance: 5
+  reason: Seeded from session 05 diary; no DB events existed for this session.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-011
+  sequence: 11
+  source_type: diary
+  source_text: Father Joseph said Hanedal Island has one of the Wells, that there
+    are no known maps to it, and that the Cataclysm forms from natural storms created
+    under unnatural circumstances.
+  decision: added
+  canonical_text: Father Joseph said Hanedal Island has one of the Wells, that there
+    are no known maps to it, and that the Cataclysm forms from natural storms created
+    under unnatural circumstances.
+  event_type: discovery
+  location: Bentrios
+  significance: 4
+  reason: Seeded from session 05 diary; no DB events existed for this session.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-012
+  sequence: 12
+  source_type: diary
+  source_text: Faban connected Joseph's description of unnatural storm-cataclysm to
+    the destruction of the outer Celestial Isles where Makani's people originated.
+  decision: added
+  canonical_text: Faban connected Father Joseph's description of unnatural storm-cataclysm
+    to the destruction of the outer Celestial Isles where Makani's people originated.
+  event_type: discovery
+  location: Bentrios
+  significance: 4
+  reason: Seeded from session 05 diary; no DB events existed for this session.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-013
+  sequence: 13
+  source_type: diary
+  source_text: Father Joseph said the Alliance of Stars is based in Bentrios and is
+    a small adventuring party; Faban sent a query through his underground network
+    for information on the group.
+  decision: added
+  canonical_text: Father Joseph said the Alliance of Stars is based in Bentrios and
+    is a small adventuring party; Faban sent a query through his underground network
+    for information on the group.
+  event_type: discovery
+  location: Bentrios
+  significance: 4
+  reason: Seeded from session 05 diary; no DB events existed for this session.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-014
+  sequence: 14
+  source_type: diary
+  source_text: The party thanked Father Joseph, went to the nearest tavern for the
+    night, and Faban busked for the innkeeper.
+  decision: added
+  canonical_text: The party thanked Father Joseph, went to the nearest tavern for
+    the night, and Faban busked for the innkeeper.
+  event_type: rest
+  location: Bentrios
+  significance: 3
+  reason: Seeded from session 05 diary; no DB events existed for this session.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+applied_on: '2026-05-05'

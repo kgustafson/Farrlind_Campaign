@@ -56,6 +56,20 @@ TRAVEL_LOCATION_ALIASES = {
 
 CANON_NPCS = [
     {
+        "name": "Baron Wells",
+        "first_seen_session": 1,
+        "location": "Bentrios",
+        "description": "Mayor of Bentrios whose infernal contract with Salazar led to the city's Age of Discovery reversion.",
+        "status": "alive",
+    },
+    {
+        "name": "Father Joseph",
+        "first_seen_session": 2,
+        "location": "Bentrios",
+        "description": "Priest or scholar of Siath in Bentrios who advises the party on demonic artifacts, Wells of Magic, and the Cataclysm.",
+        "status": "alive",
+    },
+    {
         "name": "Ardema",
         "first_seen_session": 6,
         "location": "Thataways",
@@ -68,6 +82,14 @@ CANON_NPCS = [
         "location": "Thataways",
         "description": "Librarian under the tree in Thataways.",
         "status": "alive",
+    },
+    {
+        "name": "Leprechaun thief",
+        "first_seen_session": 5,
+        "location": "Thataways",
+        "description": "Unnamed leprechaun who followed the party near the Fey forest and tried to steal Urgan's Axe.",
+        "status": "fled",
+        "is_named": False,
     },
     {
         "name": "Zakana",
@@ -239,7 +261,7 @@ CANON_NPCS = [
     },
 ]
 
-KNOWN_NPCS = [npc["name"] for npc in CANON_NPCS] + ["Baron Wells"]
+KNOWN_NPCS = [npc["name"] for npc in CANON_NPCS]
 
 KNOWN_ENEMIES = [
     "Salazar",
@@ -1118,6 +1140,7 @@ def canon_npc_sql(npc: dict) -> str:
     location = npc.get("location", "")
     first_seen_session = npc.get("first_seen_session")
     status = npc.get("status", "unknown")
+    is_named = "TRUE" if npc.get("is_named", True) else "FALSE"
 
     return f"""
 UPDATE npc
@@ -1126,7 +1149,7 @@ SET
     last_known_location_id = COALESCE({location_expr(location)}, npc.last_known_location_id),
     first_seen_session = COALESCE((SELECT id FROM session WHERE session_number = {first_seen_session}), npc.first_seen_session),
     description = COALESCE(NULLIF({sql_quote(description)}, ''), npc.description),
-    is_named = TRUE,
+    is_named = {is_named},
     notes = {sql_quote("Updated from reviewed canon NPC scrub.")}
 WHERE name = {sql_quote(name)};
 
@@ -1140,7 +1163,7 @@ SELECT
     {location_expr(location)},
     (SELECT id FROM session WHERE session_number = {first_seen_session}),
     {sql_quote(description)},
-    TRUE,
+    {is_named},
     {sql_quote("Loaded from reviewed canon NPC scrub.")}
 WHERE NOT EXISTS (SELECT 1 FROM npc WHERE name = {sql_quote(name)});
 """.strip()

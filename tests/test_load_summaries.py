@@ -377,6 +377,20 @@ class LoadSummariesTest(unittest.TestCase):
         )
         self.assertNotIn("first_seen_session = COALESCE(npc.first_seen_session", sql)
 
+    def test_canon_npc_sql_can_scrub_unnamed_npc_labels(self):
+        sql = load_summaries.canon_npc_sql({
+            "name": "Leprechaun thief",
+            "first_seen_session": 5,
+            "location": "Thataways",
+            "description": "Unnamed leprechaun.",
+            "status": "fled",
+            "is_named": False,
+        })
+
+        self.assertIn("'Leprechaun thief'", sql)
+        self.assertIn("is_named = FALSE", sql)
+        self.assertIn("SELECT id FROM session WHERE session_number = 5", sql)
+
     def test_build_sql_scrubs_reviewed_canon_npcs(self):
         summaries = [
             {
@@ -399,6 +413,53 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertIn("Loaded from reviewed canon NPC scrub.", sql)
         self.assertIn("Alistair", sql)
         self.assertIn("Coastal boat contact who gave the party a boat near Catur.", sql)
+
+    def test_build_sql_scrubs_session05_npcs(self):
+        summaries = [
+            {
+                "session_number": 5,
+                "physical_date": "2025-03-30",
+                "in_game_date": "1832 AS Apollal 15",
+                "title": "The Return to Bentrios",
+                "summary": "Baron Wells and a leprechaun appear.",
+                "events": ["Baron Wells and a leprechaun appear."],
+                "source_path": "session05_summary.md",
+                "location": "Bentrios",
+            }
+        ]
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_review_documents", return_value={}):
+                    sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("'Baron Wells'", sql)
+        self.assertIn("SELECT id FROM session WHERE session_number = 1", sql)
+        self.assertIn("'Leprechaun thief'", sql)
+        self.assertIn("SELECT id FROM session WHERE session_number = 5", sql)
+
+    def test_build_sql_scrubs_father_joseph_from_earliest_known_session(self):
+        summaries = [
+            {
+                "session_number": 5,
+                "physical_date": "2025-03-30",
+                "in_game_date": "1832 AS Apollal 15",
+                "title": "The Return to Bentrios",
+                "summary": "Father Joseph explained the Wells.",
+                "events": ["Father Joseph explained the Wells."],
+                "source_path": "session05_summary.md",
+                "location": "Bentrios",
+            }
+        ]
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_review_documents", return_value={}):
+                    sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("'Father Joseph'", sql)
+        self.assertIn("SELECT id FROM session WHERE session_number = 2", sql)
+        self.assertIn("Priest or scholar of Siath in Bentrios", sql)
 
     def test_build_sql_dedupes_canon_events_already_in_review(self):
         event_text = "The party negotiated with local fishermen for a vessel."
