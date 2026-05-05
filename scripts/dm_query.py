@@ -9,6 +9,21 @@ from typing import Optional
 DEFAULT_CONTAINER = "farrlind_db"
 DEFAULT_USER = "admin"
 DEFAULT_DATABASE = "farrlind"
+MAX_LIMIT = 1000
+
+
+def bounded_int(value: str, minimum: int = 1, maximum: int = MAX_LIMIT) -> int:
+    try:
+        number = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"must be an integer: {value!r}")
+    if number < minimum or number > maximum:
+        raise argparse.ArgumentTypeError(f"must be between {minimum} and {maximum}")
+    return number
+
+
+def positive_int(value: str) -> int:
+    return bounded_int(value)
 
 
 def sql_literal(value: str) -> str:
@@ -50,7 +65,9 @@ def clip(value: Optional[str], width: int = 220) -> str:
     text = " ".join((value or "").split())
     if len(text) <= width:
         return text
-    return text[: width - 1].rstrip() + "..."
+    if width <= 3:
+        return "." * width
+    return text[: width - 3].rstrip() + "..."
 
 
 def print_section(title: str):
@@ -147,7 +164,7 @@ def sessions(args):
         FROM session s
         LEFT JOIN location l ON l.id = s.location_id
         ORDER BY s.session_number DESC
-        LIMIT {int(args.limit)};
+        LIMIT {args.limit};
         """,
     )
     print_sessions(rows)
@@ -226,11 +243,11 @@ def open_threads(args):
         LEFT JOIN location sl ON sl.id = s.location_id
         WHERE ({filters})
           AND s.session_number >= (
-              SELECT GREATEST(COALESCE(MAX(session_number), 0) - {int(args.recent)}, 0)
+              SELECT GREATEST(COALESCE(MAX(session_number), 0) - {args.recent}, 0)
               FROM session
           )
         ORDER BY e.significance DESC NULLS LAST, s.session_number DESC, e.sequence_order NULLS LAST
-        LIMIT {int(args.limit)};
+        LIMIT {args.limit};
         """,
     )
     print_events(rows)
@@ -255,7 +272,7 @@ def songs(args):
         FROM v_songbook
         {topic_filter}
         ORDER BY song_number
-        LIMIT {int(args.limit)};
+        LIMIT {args.limit};
         """,
     )
     print_songs(rows)
@@ -312,7 +329,7 @@ def build_parser():
     last.set_defaults(func=last_session)
 
     recent = subparsers.add_parser("sessions", help="Show recent sessions.")
-    recent.add_argument("--limit", type=int, default=5)
+    recent.add_argument("--limit", type=positive_int, default=5)
     recent.set_defaults(func=sessions)
 
     loc = subparsers.add_parser("location", help="Show events related to a location or place term.")
@@ -324,13 +341,13 @@ def build_parser():
     find.set_defaults(func=search)
 
     threads = subparsers.add_parser("open-threads", help="Heuristic list of recent unresolved hooks.")
-    threads.add_argument("--recent", type=int, default=8, help="How many sessions back to scan.")
-    threads.add_argument("--limit", type=int, default=12)
+    threads.add_argument("--recent", type=positive_int, default=8, help="How many sessions back to scan.")
+    threads.add_argument("--limit", type=positive_int, default=12)
     threads.set_defaults(func=open_threads)
 
     song = subparsers.add_parser("songs", help="Show songbook entries, optionally filtered by topic.")
     song.add_argument("topic", nargs="?")
-    song.add_argument("--limit", type=int, default=10)
+    song.add_argument("--limit", type=positive_int, default=10)
     song.set_defaults(func=songs)
 
     prep = subparsers.add_parser("brief", help="Build a compact prep brief around a topic.")
