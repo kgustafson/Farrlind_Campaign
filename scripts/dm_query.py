@@ -140,23 +140,66 @@ def print_songs(rows: list[dict]):
         print("")
 
 
-def last_session(args):
-    rows = run_query(
-        args,
-        """
-        SELECT s.session_number, s.session_date, s.in_game_date, s.title,
-               s.summary, l.name AS location
-        FROM session s
-        LEFT JOIN location l ON l.id = s.location_id
-        ORDER BY s.session_number DESC
-        LIMIT 1;
-        """,
-    )
-    print_sessions(rows)
+def print_bullets(rows: list[dict], *, empty: str, limit: Optional[int] = None):
+    selected = rows[:limit] if limit is not None else rows
+    if not selected:
+        print(empty)
+        return
+
+    for row in selected:
+        bits = []
+        if row.get("session_number"):
+            bits.append(f"S{row['session_number']}")
+        if row.get("location"):
+            bits.append(row["location"])
+        prefix = f" ({', '.join(bits)})" if bits else ""
+        event_type = f"{row['event_type']}: " if row.get("event_type") else ""
+        print(f"- {event_type}{clip(row.get('description'), 240)}{prefix}")
 
 
-def sessions(args):
-    rows = run_query(
+def print_session_bullets(rows: list[dict], *, empty: str, limit: Optional[int] = None):
+    selected = rows[:limit] if limit is not None else rows
+    if not selected:
+        print(empty)
+        return
+
+    for row in selected:
+        title = row.get("title") or "Untitled"
+        session = row.get("session_number")
+        location = f", {row['location']}" if row.get("location") else ""
+        print(f"- S{session}: {title}{location} -- {clip(row.get('summary'), 280)}")
+
+
+def print_prep_questions(topic: str, topic_events: list[dict], open_thread_rows: list[dict]):
+    print_section("Prep Questions")
+
+    questions = []
+    topic_low = topic.lower()
+    direct_text = " ".join(row.get("description") or "" for row in topic_events).lower()
+    open_text = " ".join(row.get("description") or "" for row in open_thread_rows).lower()
+
+    if any(word in direct_text for word in ["missing", "underwater", "beneath", "descend", "lights"]):
+        questions.append(f"What is the first concrete sign that {topic} is stranger than it looks?")
+    if "well" in open_text or "wand" in open_text:
+        questions.append("How do the wells, Wand of Wells, or cataclysm pressure the next choice?")
+    if topic_low not in open_text and topic_events:
+        questions.append(f"Which existing thread should surface first once the party engages with {topic}?")
+    questions.extend([
+        "What can the party learn without a fight?",
+        "What complication should arrive if they hesitate?",
+        "Which detail should become canon after the next session?",
+    ])
+
+    seen = set()
+    for question in questions:
+        if question in seen:
+            continue
+        seen.add(question)
+        print(f"- {question}")
+
+
+def query_recent_sessions(args, limit: int = 3) -> list[dict]:
+    return run_query(
         args,
         f"""
         SELECT s.session_number, s.session_date, s.in_game_date, s.title,
@@ -164,19 +207,20 @@ def sessions(args):
         FROM session s
         LEFT JOIN location l ON l.id = s.location_id
         ORDER BY s.session_number DESC
-        LIMIT {args.limit};
+        LIMIT {limit};
         """,
     )
-    print_sessions(rows)
 
 
-def location(args):
-    pattern = like_pattern(args.name)
-    rows = run_query(
+def query_topic_events(args, topic: str, *, direct_only: bool = True, limit: Optional[int] = None) -> list[dict]:
+    pattern = like_pattern(topic)
+    summary_clause = "" if direct_only else f" OR s.summary ILIKE {pattern} OR s.title ILIKE {pattern}"
+    limit_clause = f"LIMIT {limit}" if limit is not None else ""
+    return run_query(
         args,
         f"""
         SELECT s.session_number, s.title AS session_title, et.type_name AS event_type,
-               COALESCE(el.name, sl.name) AS location, e.description
+               COALESCE(el.name, sl.name) AS location, e.description, e.significance
         FROM session_event e
         JOIN session s ON s.id = e.session_id
         LEFT JOIN event_type et ON et.id = e.event_type_id
@@ -184,9 +228,103 @@ def location(args):
         LEFT JOIN location sl ON sl.id = s.location_id
         WHERE COALESCE(el.name, sl.name, '') ILIKE {pattern}
            OR e.description ILIKE {pattern}
-        ORDER BY s.session_number, e.sequence_order NULLS LAST, e.id;
+           {summary_clause}
+        ORDER BY s.session_number, e.sequence_order NULLS LAST, e.id
+        {limit_clause};
         """,
     )
+
+
+def query_context_sessions(args, topic: str, limit: int = 8) -> list[dict]:
+    pattern = like_pattern(topic)
+    return run_query(
+        args,
+        f"""
+        SELECT s.session_number, s.session_date, s.in_game_date, s.title,
+               s.summary, l.name AS location
+        FROM session s
+        LEFT JOIN location l ON l.id = s.location_id
+        WHERE s.title ILIKE {pattern}
+           OR s.summary ILIKE {pattern}
+           OR s.in_game_date ILIKE {pattern}
+        ORDER BY s.session_number DESC
+        LIMIT {limit};
+        """,
+    )
+
+
+def query_open_threads(args, recent: int = 8, limit: int = 12) -> list[dict]:
+    keywords = [
+        "open",
+        "unresolved",
+        "mystery",
+        "missing",
+        "unknown",
+        "preparing",
+        "cataclysm",
+        "well",
+        "wand",
+        "beneath",
+        "underwater",
+    ]
+    filters = " OR ".join(f"e.description ILIKE {like_pattern(word)}" for word in keywords)
+    return run_query(
+        args,
+        f"""
+        SELECT s.session_number, s.title AS session_title, et.type_name AS event_type,
+               COALESCE(el.name, sl.name) AS location, e.description, e.significance
+        FROM session_event e
+        JOIN session s ON s.id = e.session_id
+        LEFT JOIN event_type et ON et.id = e.event_type_id
+        LEFT JOIN location el ON el.id = e.location_id
+        LEFT JOIN location sl ON sl.id = s.location_id
+        WHERE ({filters})
+          AND s.session_number >= (
+              SELECT GREATEST(COALESCE(MAX(session_number), 0) - {recent}, 0)
+              FROM session
+          )
+        ORDER BY e.significance DESC NULLS LAST, s.session_number DESC, e.sequence_order NULLS LAST
+        LIMIT {limit};
+        """,
+    )
+
+
+def query_songs(args, topic: Optional[str], limit: int = 10) -> list[dict]:
+    topic_filter = ""
+    if topic:
+        pattern = like_pattern(topic)
+        topic_filter = f"""
+        WHERE title ILIKE {pattern}
+           OR COALESCE(summary, '') ILIKE {pattern}
+           OR COALESCE(suno_prompt, '') ILIKE {pattern}
+           OR COALESCE(category, '') ILIKE {pattern}
+           OR COALESCE(style, '') ILIKE {pattern}
+        """
+    return run_query(
+        args,
+        f"""
+        SELECT song_number, title, style, category, summary, suno_prompt,
+               musical_key, meter, tempo
+        FROM v_songbook
+        {topic_filter}
+        ORDER BY song_number
+        LIMIT {limit};
+        """,
+    )
+
+
+def last_session(args):
+    rows = query_recent_sessions(args, limit=1)
+    print_sessions(rows)
+
+
+def sessions(args):
+    rows = query_recent_sessions(args, limit=args.limit)
+    print_sessions(rows)
+
+
+def location(args):
+    rows = query_topic_events(args, args.name, direct_only=True)
     print_events(rows)
 
 
@@ -217,64 +355,12 @@ def search(args):
 
 
 def open_threads(args):
-    keywords = [
-        "open",
-        "unresolved",
-        "mystery",
-        "missing",
-        "unknown",
-        "preparing",
-        "cataclysm",
-        "well",
-        "wand",
-        "beneath",
-        "underwater",
-    ]
-    filters = " OR ".join(f"e.description ILIKE {like_pattern(word)}" for word in keywords)
-    rows = run_query(
-        args,
-        f"""
-        SELECT s.session_number, s.title AS session_title, et.type_name AS event_type,
-               COALESCE(el.name, sl.name) AS location, e.description
-        FROM session_event e
-        JOIN session s ON s.id = e.session_id
-        LEFT JOIN event_type et ON et.id = e.event_type_id
-        LEFT JOIN location el ON el.id = e.location_id
-        LEFT JOIN location sl ON sl.id = s.location_id
-        WHERE ({filters})
-          AND s.session_number >= (
-              SELECT GREATEST(COALESCE(MAX(session_number), 0) - {args.recent}, 0)
-              FROM session
-          )
-        ORDER BY e.significance DESC NULLS LAST, s.session_number DESC, e.sequence_order NULLS LAST
-        LIMIT {args.limit};
-        """,
-    )
+    rows = query_open_threads(args, recent=args.recent, limit=args.limit)
     print_events(rows)
 
 
 def songs(args):
-    topic_filter = ""
-    if args.topic:
-        pattern = like_pattern(args.topic)
-        topic_filter = f"""
-        WHERE title ILIKE {pattern}
-           OR COALESCE(summary, '') ILIKE {pattern}
-           OR COALESCE(suno_prompt, '') ILIKE {pattern}
-           OR COALESCE(category, '') ILIKE {pattern}
-           OR COALESCE(style, '') ILIKE {pattern}
-        """
-    rows = run_query(
-        args,
-        f"""
-        SELECT song_number, title, style, category, summary, suno_prompt,
-               musical_key, meter, tempo
-        FROM v_songbook
-        {topic_filter}
-        ORDER BY song_number
-        LIMIT {args.limit};
-        """,
-    )
+    rows = query_songs(args, args.topic, limit=args.limit)
     print_songs(rows)
 
 
@@ -283,38 +369,32 @@ def brief(args):
     print_section(f"{topic.title()} Prep Brief")
     print("")
 
-    print_section("Recent Sessions")
-    recent = run_query(
-        args,
-        """
-        SELECT s.session_number, s.session_date, s.in_game_date, s.title,
-               s.summary, l.name AS location
-        FROM session s
-        LEFT JOIN location l ON l.id = s.location_id
-        ORDER BY s.session_number DESC
-        LIMIT 3;
-        """,
-    )
+    recent = query_recent_sessions(args, limit=3)
+    topic_events = query_topic_events(args, topic, direct_only=True)
+    context_sessions = query_context_sessions(args, topic, limit=8)
+    open_thread_rows = query_open_threads(args, recent=8, limit=10)
+    related_songs = query_songs(args, topic, limit=5)
+
+    print_section("Direct Topic Facts")
+    print_bullets(topic_events, empty=f"No direct events found for {topic}.")
+    print("")
+
+    print_section("Recent Campaign Context")
     print_sessions(recent, include_summary=False)
 
-    print_section("Topic Events")
-    topic_args = argparse.Namespace(**vars(args))
-    topic_args.name = topic
-    location(topic_args)
-
+    print_section("Broader Topic Context")
+    print_session_bullets(context_sessions, empty=f"No broader context found for {topic}.", limit=8)
     print("")
-    print_section("Likely Open Threads")
-    thread_args = argparse.Namespace(**vars(args))
-    thread_args.recent = 8
-    thread_args.limit = 10
-    open_threads(thread_args)
 
+    print_section("Open Threads")
+    print_bullets(open_thread_rows, empty="No likely open threads found.", limit=8)
     print("")
+
+    print_prep_questions(topic, topic_events, open_thread_rows)
+    print("")
+
     print_section("Related Songs")
-    song_args = argparse.Namespace(**vars(args))
-    song_args.topic = topic
-    song_args.limit = 5
-    songs(song_args)
+    print_songs(related_songs)
 
 
 def build_parser():

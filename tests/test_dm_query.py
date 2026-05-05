@@ -102,6 +102,35 @@ class DmQueryTest(unittest.TestCase):
         self.assertIn("e.description ILIKE '%Catur%'", sql)
         self.assertNotIn("s.summary ILIKE", sql)
 
+    def test_topic_query_can_include_summary_context(self):
+        captured_sql = []
+
+        def fake_run_query(_args, sql):
+            captured_sql.append(sql)
+            return []
+
+        with patch("dm_query.run_query", side_effect=fake_run_query):
+            dm_query.query_topic_events(args(), "Catur", direct_only=False, limit=12)
+
+        sql = captured_sql[0]
+        self.assertIn("s.summary ILIKE '%Catur%'", sql)
+        self.assertIn("LIMIT 12", sql)
+
+    def test_context_sessions_searches_session_level_fields(self):
+        captured_sql = []
+
+        def fake_run_query(_args, sql):
+            captured_sql.append(sql)
+            return []
+
+        with patch("dm_query.run_query", side_effect=fake_run_query):
+            dm_query.query_context_sessions(args(), "Catur", limit=8)
+
+        sql = captured_sql[0]
+        self.assertIn("FROM session s", sql)
+        self.assertIn("s.summary ILIKE '%Catur%'", sql)
+        self.assertIn("LIMIT 8", sql)
+
     def test_search_query_requires_all_terms(self):
         captured_sql = []
 
@@ -136,6 +165,18 @@ class DmQueryTest(unittest.TestCase):
         self.assertIn("FROM v_songbook", captured_sql[0])
         self.assertNotIn("WHERE title ILIKE", captured_sql[0])
 
+    def test_print_prep_questions_uses_topic_signals(self):
+        topic_events = [{"description": "Met fishermen — boats missing, lights under water"}]
+        open_rows = [{"description": "The Wand of Wells and cataclysm remain unresolved"}]
+
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            dm_query.print_prep_questions("Catur", topic_events, open_rows)
+
+        rendered = output.getvalue()
+        self.assertIn("Prep Questions", rendered)
+        self.assertIn("stranger than it looks", rendered)
+        self.assertIn("Wand of Wells", rendered)
+
     def test_brief_composes_subqueries(self):
         calls = []
 
@@ -147,11 +188,13 @@ class DmQueryTest(unittest.TestCase):
             with contextlib.redirect_stdout(io.StringIO()) as output:
                 dm_query.brief(args(topic="Catur"))
 
-        self.assertEqual(len(calls), 4)
+        self.assertEqual(len(calls), 5)
         rendered = output.getvalue()
         self.assertIn("Catur Prep Brief", rendered)
-        self.assertIn("Topic Events", rendered)
-        self.assertIn("Likely Open Threads", rendered)
+        self.assertIn("Direct Topic Facts", rendered)
+        self.assertIn("Broader Topic Context", rendered)
+        self.assertIn("Open Threads", rendered)
+        self.assertIn("Prep Questions", rendered)
         self.assertIn("Related Songs", rendered)
 
 
