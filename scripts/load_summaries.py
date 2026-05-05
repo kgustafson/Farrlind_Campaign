@@ -597,6 +597,17 @@ def review_events_for_session(summary: dict, review: Optional[dict]) -> Optional
     return events
 
 
+def review_primary_locations(reviews: dict[int, dict]) -> dict[int, str]:
+    locations = {}
+    for session_number, review in reviews.items():
+        if review.get("status") not in {"reviewed", "complete", "applied"}:
+            continue
+        location = (review.get("primary_location") or "").strip()
+        if location:
+            locations[session_number] = location
+    return locations
+
+
 def event_identity(description: str, location: str = "") -> tuple[str, str]:
     description_key = re.sub(r"\s+", " ", description or "").strip().lower()
     location_key = re.sub(r"\s+", " ", location or "").strip().lower()
@@ -946,6 +957,7 @@ def build_sql(summaries: list[dict]) -> str:
     primary_locations = canon_primary_locations(decisions)
     canon_events = canon_event_decisions(decisions)
     reviews = load_review_documents()
+    reviewed_primary_locations = review_primary_locations(reviews)
     review_events = {
         summary["session_number"]: review_events_for_session(summary, reviews.get(summary["session_number"]))
         for summary in summaries
@@ -996,6 +1008,8 @@ def build_sql(summaries: list[dict]) -> str:
         decision = primary_locations.get(summary["session_number"])
         if decision:
             summary = {**summary, "location": decision.get("canonical", summary["location"])}
+        elif summary["session_number"] in reviewed_primary_locations:
+            summary = {**summary, "location": reviewed_primary_locations[summary["session_number"]]}
         statements.append(session_sql(summary))
 
     for summary in summaries:

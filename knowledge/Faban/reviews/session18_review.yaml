@@ -1,0 +1,168 @@
+session: session18
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: The Falling and the Forge
+session_date: '2026-02-22'
+in_game_date: 1832 AS Namal 18 (continued)
+primary_location: Balrog
+items:
+- id: event-001
+  source_type: db_event
+  source_text: Lightdelver falls from a high window in the black tower.
+  decision: corrected
+  canonical_text: A dwarven wizard named Lightdelver falls from a high window in the
+    black tower.
+  event_type: discovery
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-002
+  source_type: db_event
+  source_text: The party uses Dimension Door to teleport away from the falling wizard.
+  decision: corrected
+  canonical_text: Faban uses Dimension Door along with Gildas to teleport under the
+    falling wizard.
+  event_type: discovery
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-003
+  source_type: db_event
+  source_text: Gildas is struck by debris and suffers wounds.
+  decision: corrected
+  canonical_text: Gildas is struck by debris and suffers wounds from the tower that
+    is collapsing.
+  event_type: discovery
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-004
+  source_type: db_event
+  source_text: Mikani improvises and invokes Nameloa to slow Lightdelver's fall.
+  decision: corrected
+  canonical_text: Mikani improvises and invokes Nameloa to slow Lightdelver's fall,
+    but cannot find any standing water to use for the spell.
+  event_type: discovery
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-005
+  source_type: db_event
+  source_text: Levitate anchors to the debris field to suspend Lightdelver in mid-descent.
+  decision: corrected
+  canonical_text: Gildas uses Levitate and anchors to the debris field to suspend
+    Lightdelver in mid-descent. It is an amazing feat of magic and coordination.
+  event_type: discovery
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-006
+  source_type: db_event
+  source_text: The party follows a mithril vein, leading them to Saiffi, a well bound
+    to truth.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: ''
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-007
+  source_type: db_event
+  source_text: Saiffi reveals that dragons are signs of impending doom and that Tiamat's
+    return would be devastation.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: ''
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: event-008
+  source_type: db_event
+  source_text: The party prepares for battle against Orsydon and his cultists.
+  decision: corrected
+  canonical_text: The party prepares for battle against Orsydon and his cultists,
+    who are trying to awaken Tiamat. It was the cultists who summoned Orsydon.
+  event_type: combat
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-04'
+added_items:
+- id: added-001
+  source_type: user_added
+  source_text: ''
+  decision: added
+  canonical_text: Saiffi explained that he is the weakest of the wells, but he is
+    perhaps the wisest and most well-informed. He is a well bound to truth, and he
+    revealed that dragons are signs of impending doom and that Tiamat's return would
+    be devastation.
+  event_type: social
+  location: Balrog
+  significance: 4
+  reason: Missing conversation detail.
+  decided_by: user
+  decided_on: '2026-05-04'
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: added-002
+  source_type: user_added
+  source_text: ''
+  decision: added
+  canonical_text: The party descended into the forge and mines of Balrog where they
+    woke a sleeping dwarven guard.
+  event_type: discovery
+  location: Balrog
+  significance: 4
+  reason: Missing exploration detail.
+  decided_by: user
+  decided_on: '2026-05-04'
+  applied_status: applied
+  applied_on: '2026-05-04'
+- id: added-003
+  source_type: user_added
+  source_text: ''
+  decision: added
+  canonical_text: Roon carried Lightdelver on his back.
+  event_type: social
+  location: Balrog
+  significance: 4
+  reason: Missing character detail.
+  decided_by: user
+  decided_on: '2026-05-04'
+  applied_status: applied
+  applied_on: '2026-05-04'
+applied_on: '2026-05-04'

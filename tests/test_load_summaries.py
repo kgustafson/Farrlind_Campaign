@@ -180,6 +180,15 @@ class LoadSummariesTest(unittest.TestCase):
     def test_review_events_for_session_ignores_in_review_documents(self):
         self.assertIsNone(load_summaries.review_events_for_session({}, {"status": "in_review"}))
 
+    def test_review_primary_locations_uses_completed_review_location(self):
+        reviews = {
+            18: {"status": "applied", "primary_location": "Balrog"},
+            17: {"status": "in_review", "primary_location": "Paramon"},
+            16: {"status": "applied", "primary_location": ""},
+        }
+
+        self.assertEqual(load_summaries.review_primary_locations(reviews), {18: "Balrog"})
+
     def test_build_sql_uses_reviewed_events_instead_of_summary_events(self):
         summaries = [
             {
@@ -219,6 +228,36 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertIn("Reviewed accepted event", sql)
         self.assertNotIn("Draft event to replace", sql)
         self.assertIn("Loaded from session20 review: event-001", sql)
+
+    def test_build_sql_uses_review_primary_location(self):
+        summaries = [
+            {
+                "session_number": 18,
+                "physical_date": "2026-02-22",
+                "in_game_date": "1832 AS Namal 18",
+                "title": "The Falling and the Forge",
+                "summary": "The party met Saiffi.",
+                "events": ["The party met Saiffi"],
+                "source_path": "session18_summary.md",
+                "location": "",
+            }
+        ]
+        reviews = {
+            18: {
+                "session": "session18",
+                "status": "applied",
+                "primary_location": "Balrog",
+                "items": [],
+                "added_items": [],
+            }
+        }
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_review_documents", return_value=reviews):
+                    sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("(SELECT id FROM location WHERE name = 'Balrog' LIMIT 1)", sql)
 
     def test_build_sql_dedupes_canon_events_already_in_review(self):
         event_text = "The party negotiated with local fishermen for a vessel."
