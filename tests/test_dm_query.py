@@ -165,6 +165,53 @@ class DmQueryTest(unittest.TestCase):
         self.assertIn("FROM v_songbook", captured_sql[0])
         self.assertNotIn("WHERE title ILIKE", captured_sql[0])
 
+    def test_health_query_collects_counts_and_notes(self):
+        captured_sql = []
+
+        def fake_run_query(_args, sql):
+            captured_sql.append(sql)
+            return [{"sessions_loaded": "21"}]
+
+        with patch.object(dm_query, "run_query", side_effect=fake_run_query):
+            row = dm_query.query_health(args())
+
+        self.assertEqual(row["sessions_loaded"], "21")
+        sql = captured_sql[0]
+        self.assertIn("sessions_with_transcripts", sql)
+        self.assertIn("songs_missing_prompts", sql)
+        self.assertIn("primary_location_mismatches", sql)
+
+    def test_health_prints_rollup_and_data_notes(self):
+        health_row = {
+            "sessions_loaded": "21",
+            "sessions_with_summaries": "21",
+            "events_loaded": "140",
+            "songs_loaded": "26",
+            "songs_with_prompts": "23",
+            "songs_missing_prompt_count": "3",
+            "latest_session_number": "20",
+            "latest_session_title": "Salt, Steel",
+            "transcript_sessions": "19, 20",
+            "songs_missing_prompts": "12. The Day We Called It Victory; 23. The Hand That Did Not Open",
+            "location_mismatch_notes": "Session 20 primary location is Balrog, but event locations include Catur",
+        }
+
+        with patch("dm_query.query_health", return_value=health_row):
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                dm_query.health(args())
+
+        rendered = output.getvalue()
+        self.assertIn("DM Query Health", rendered)
+        self.assertIn("Sessions loaded: 21", rendered)
+        self.assertIn("Latest session: 20 - Salt, Steel", rendered)
+        self.assertIn("Song missing prompt: 12. The Day We Called It Victory", rendered)
+        self.assertIn("Session 20 primary location is Balrog", rendered)
+
+    def test_parser_accepts_health_command(self):
+        parser = dm_query.build_parser()
+        parsed = parser.parse_args(["health"])
+        self.assertEqual(parsed.func, dm_query.health)
+
     def test_print_prep_questions_uses_topic_signals(self):
         topic_events = [{"description": "Met fishermen — boats missing, lights under water"}]
         open_rows = [{"description": "The Wand of Wells and cataclysm remain unresolved"}]

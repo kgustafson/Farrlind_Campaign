@@ -313,6 +313,86 @@ def query_songs(args, topic: Optional[str], limit: int = 10) -> list[dict]:
     )
 
 
+def query_health(args) -> dict:
+    rows = run_query(
+        args,
+        """
+        WITH latest_session AS (
+            SELECT session_number, title
+            FROM session
+            ORDER BY session_number DESC
+            LIMIT 1
+        ),
+        session_counts AS (
+            SELECT
+                COUNT(*) AS sessions_loaded,
+                COUNT(*) FILTER (WHERE summary IS NOT NULL AND summary <> '') AS sessions_with_summaries,
+                COUNT(*) FILTER (WHERE transcript_path IS NOT NULL AND transcript_path <> '') AS sessions_with_transcripts,
+                STRING_AGG(session_number::TEXT, ', ' ORDER BY session_number)
+                    FILTER (WHERE transcript_path IS NOT NULL AND transcript_path <> '') AS transcript_sessions
+            FROM session
+        ),
+        event_counts AS (
+            SELECT COUNT(*) AS events_loaded
+            FROM session_event
+        ),
+        song_counts AS (
+            SELECT
+                COUNT(*) AS songs_loaded,
+                COUNT(*) FILTER (WHERE suno_prompt IS NOT NULL AND suno_prompt <> '') AS songs_with_prompts
+            FROM song
+        ),
+        missing_song_prompts AS (
+            SELECT STRING_AGG(song_number::TEXT || '. ' || title, '; ' ORDER BY song_number) AS songs_missing_prompts
+            FROM song
+            WHERE suno_prompt IS NULL OR suno_prompt = ''
+        ),
+        primary_location_mismatches AS (
+            SELECT STRING_AGG(
+                'Session ' || s.session_number::TEXT || ' primary location is ' ||
+                COALESCE(sl.name, 'unset') || ', but event locations include ' ||
+                event_locations.event_location_names,
+                '; '
+                ORDER BY s.session_number
+            ) AS notes
+            FROM session s
+            LEFT JOIN location sl ON sl.id = s.location_id
+            JOIN LATERAL (
+                SELECT STRING_AGG(DISTINCT el.name, ', ' ORDER BY el.name) AS event_location_names
+                FROM session_event e
+                JOIN location el ON el.id = e.location_id
+                WHERE e.session_id = s.id
+                  AND (s.location_id IS NULL OR e.location_id <> s.location_id)
+            ) event_locations ON event_locations.event_location_names IS NOT NULL
+        )
+        SELECT
+            session_counts.sessions_loaded,
+            session_counts.sessions_with_summaries,
+            session_counts.sessions_with_transcripts,
+            COALESCE(session_counts.transcript_sessions, '') AS transcript_sessions,
+            event_counts.events_loaded,
+            song_counts.songs_loaded,
+            song_counts.songs_with_prompts,
+            (song_counts.songs_loaded - song_counts.songs_with_prompts) AS songs_missing_prompt_count,
+            COALESCE(missing_song_prompts.songs_missing_prompts, '') AS songs_missing_prompts,
+            latest_session.session_number AS latest_session_number,
+            latest_session.title AS latest_session_title,
+            COALESCE(primary_location_mismatches.notes, '') AS location_mismatch_notes
+        FROM session_counts
+        CROSS JOIN event_counts
+        CROSS JOIN song_counts
+        CROSS JOIN missing_song_prompts
+        CROSS JOIN latest_session
+        CROSS JOIN primary_location_mismatches;
+        """,
+    )
+    return rows[0] if rows else {}
+
+
+def split_notes(value: Optional[str]) -> list[str]:
+    return [part.strip() for part in (value or "").split(";") if part.strip()]
+
+
 def last_session(args):
     rows = query_recent_sessions(args, limit=1)
     print_sessions(rows)
@@ -362,6 +442,40 @@ def open_threads(args):
 def songs(args):
     rows = query_songs(args, args.topic, limit=args.limit)
     print_songs(rows)
+
+
+def health(args):
+    row = query_health(args)
+    if not row:
+        print("No health data found.")
+        return
+
+    print_section("DM Query Health")
+    print(f"Sessions loaded: {row['sessions_loaded']}")
+    print(f"Sessions with summaries: {row['sessions_with_summaries']}")
+    print(f"Events loaded: {row['events_loaded']}")
+    print(f"Songs loaded: {row['songs_loaded']}")
+    print(f"Songs with prompts: {row['songs_with_prompts']}")
+    print(f"Songs missing prompts: {row['songs_missing_prompt_count']}")
+    print(
+        "Latest session: "
+        f"{row['latest_session_number']} - {row.get('latest_session_title') or 'Untitled'}"
+    )
+    transcript_sessions = row.get("transcript_sessions") or "none"
+    print(f"Sessions with transcripts: {transcript_sessions}")
+    print("")
+
+    print_section("Data Notes")
+    notes = []
+    for song in split_notes(row.get("songs_missing_prompts")):
+        notes.append(f"Song missing prompt: {song}")
+    notes.extend(split_notes(row.get("location_mismatch_notes")))
+
+    if not notes:
+        print("No obvious data notes.")
+        return
+    for note in notes:
+        print(f"- {note}")
 
 
 def brief(args):
@@ -429,6 +543,9 @@ def build_parser():
     song.add_argument("topic", nargs="?")
     song.add_argument("--limit", type=positive_int, default=10)
     song.set_defaults(func=songs)
+
+    status = subparsers.add_parser("health", help="Show database loading and data-quality health.")
+    status.set_defaults(func=health)
 
     prep = subparsers.add_parser("brief", help="Build a compact prep brief around a topic.")
     prep.add_argument("topic")
