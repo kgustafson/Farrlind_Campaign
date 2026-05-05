@@ -1,0 +1,134 @@
+session: session07
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: In Defense of the Tree and the Well of Magic
+session_date: '2025-06-28'
+in_game_date: 1832 AS Apollal 17
+primary_location: Thataways
+items:
+- id: event-001
+  sequence: 1
+  source_type: db_event
+  source_text: Battle with Ardema begins
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-002
+  sequence: 2
+  source_type: db_event
+  source_text: Ardema uses eldritch energy bolts against Faban and Makani
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-003
+  sequence: 3
+  source_type: db_event
+  source_text: Gildas deflects attacks with shield, while I conjure many blades of
+    Melkior
+  decision: corrected
+  canonical_text: Gildas deflects attacks with shield, while Faban conjures many blades
+    of daggers
+  event_type: combat
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-004
+  sequence: 4
+  source_type: db_event
+  source_text: Mikani calls upon deity to smite Ardema down
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-005
+  sequence: 5
+  source_type: db_event
+  source_text: Ardema casts Shatter spell, killing Makani and Faban instantly
+  decision: corrected
+  canonical_text: Ardema casts Shatter spell, killing Faban and Makani instantly but
+    they are stabilized by the party and survive
+  event_type: discovery
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-006
+  sequence: 6
+  source_type: db_event
+  source_text: Party continues to attack, but Ardema plane-shifts out of the fray
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+added_items:
+- id: event-007
+  sequence: 7
+  source_type: user_input
+  source_text: After the battle, the party attends to their dead comrades and heals
+    their wounded. During a discussion about what happened earlier, I mention coming
+    up against four individuals, which sparks interest from Claris.
+  decision: added
+  canonical_text: ''
+  event_type: discovery
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-008
+  sequence: 8
+  source_type: user_input
+  source_text: Faban then sings a ballad about these people, causing Mikani and Brigit
+    to roll their eyes. The party eventually makes it back to the inn, where they
+    rest and Faban busks the night away.
+  decision: added
+  canonical_text: ''
+  event_type: discovery
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+applied_on: '2026-05-05'
