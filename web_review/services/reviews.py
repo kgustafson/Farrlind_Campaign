@@ -312,6 +312,30 @@ def reopen_review_document(document: dict[str, Any], reopened_on: Optional[str] 
     return updated
 
 
+def review_readiness_errors(document: dict[str, Any]) -> list[str]:
+    errors = []
+    counts = decision_counts(document)
+    if counts["pending"]:
+        errors.append(f"{counts['pending']} review item(s) still have pending decisions.")
+    if counts["other"]:
+        errors.append(f"{counts['other']} review item(s) have unknown decisions.")
+    for note in validate_review_document(document):
+        if note != "No review validation issues found.":
+            errors.append(note)
+    return errors
+
+
+def mark_reviewed_document(document: dict[str, Any], reviewed_on: Optional[str] = None) -> tuple[dict[str, Any], list[str]]:
+    errors = review_readiness_errors(document)
+    if errors:
+        return document, errors
+
+    updated = dict(document)
+    updated["status"] = "reviewed"
+    updated["reviewed_on"] = reviewed_on or date.today().isoformat()
+    return updated, []
+
+
 def save_review_document(session_number: int, document: dict[str, Any]) -> Path:
     path = review_path(session_number)
     if not path.exists():
@@ -349,6 +373,8 @@ def validate_review_document(document: dict[str, Any]) -> list[str]:
         decision = item.get("decision") or "pending"
         if decision not in VALID_DECISIONS:
             notes.append(f"{item_id or 'Item'} has unknown decision: {decision}.")
+        if decision == "pending":
+            notes.append(f"{item_id or 'Item'} still has a pending decision.")
         if decision in {"corrected", "added"}:
             for field in ["canonical_text", "event_type", "location", "significance", "reason"]:
                 if item.get(field) in {None, ""}:

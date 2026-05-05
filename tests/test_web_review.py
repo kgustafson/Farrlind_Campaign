@@ -173,6 +173,36 @@ class WebReviewServiceTest(unittest.TestCase):
         self.assertEqual(updated["reopened_on"], "2026-05-06")
         self.assertEqual(updated["items"][0]["applied_status"], "applied")
 
+    def test_mark_reviewed_document_requires_no_pending_decisions(self):
+        document = {
+            "session": "session01",
+            "status": "in_review",
+            "items": [
+                {"id": "event-001", "decision": "pending"},
+            ],
+            "added_items": [],
+        }
+        updated, errors = reviews.mark_reviewed_document(document, reviewed_on="2026-05-06")
+
+        self.assertIs(updated, document)
+        self.assertEqual(updated["status"], "in_review")
+        self.assertIn("1 review item(s) still have pending decisions.", errors)
+
+    def test_mark_reviewed_document_sets_status_when_ready(self):
+        document = {
+            "session": "session01",
+            "status": "in_review",
+            "items": [
+                {"id": "event-001", "sequence": 1, "decision": "accepted"},
+            ],
+            "added_items": [],
+        }
+        updated, errors = reviews.mark_reviewed_document(document, reviewed_on="2026-05-06")
+
+        self.assertEqual(errors, [])
+        self.assertEqual(updated["status"], "reviewed")
+        self.assertEqual(updated["reviewed_on"], "2026-05-06")
+
 
     def test_render_markdown_interprets_headings_and_emphasis(self):
         html = reviews.render_markdown("# Title\n\nA **bold** line")
@@ -312,6 +342,92 @@ class WebReviewAppTest(unittest.TestCase):
             saved = yaml.safe_load(path.read_text(encoding="utf-8"))
             self.assertEqual(saved["status"], "in_review")
             self.assertEqual(saved["items"][0]["applied_status"], "applied")
+
+    def test_mark_reviewed_route_saves_form_and_marks_ready_review(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session01_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "in_review",
+                "items": [
+                    {"id": "event-001", "sequence": 1, "decision": "pending", "canonical_text": "", "event_type": "travel", "location": "Road", "significance": 2, "reason": "", "applied_status": "pending"},
+                ],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final):
+                client = TestClient(app)
+                response = client.post("/sessions/session01/review/mark-reviewed", data={
+                    "source": "diary",
+                    "view": "raw",
+                    "item_id": "event-001",
+                    "section": "items",
+                    "sequence": "1",
+                    "decision": "accepted",
+                    "canonical_text": "",
+                    "event_type": "travel",
+                    "location": "Road",
+                    "significance": "2",
+                    "reason": "",
+                }, follow_redirects=False)
+
+            self.assertEqual(response.status_code, 303)
+            self.assertIn("marked=1", response.headers["location"])
+            saved = yaml.safe_load(path.read_text(encoding="utf-8"))
+            self.assertEqual(saved["status"], "reviewed")
+            self.assertEqual(saved["items"][0]["decision"], "accepted")
+
+    def test_mark_reviewed_route_saves_but_does_not_mark_invalid_review(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session01_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "in_review",
+                "items": [
+                    {"id": "event-001", "sequence": 1, "decision": "pending", "applied_status": "pending"},
+                ],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final):
+                client = TestClient(app)
+                response = client.post("/sessions/session01/review/mark-reviewed", data={
+                    "source": "diary",
+                    "view": "raw",
+                    "item_id": "event-001",
+                    "section": "items",
+                    "sequence": "1",
+                    "decision": "pending",
+                    "canonical_text": "",
+                    "event_type": "",
+                    "location": "",
+                    "significance": "",
+                    "reason": "",
+                }, follow_redirects=False)
+
+            self.assertEqual(response.status_code, 303)
+            self.assertIn("mark_failed=1", response.headers["location"])
+            saved = yaml.safe_load(path.read_text(encoding="utf-8"))
+            self.assertEqual(saved["status"], "in_review")
+            self.assertEqual(saved["items"][0]["decision"], "pending")
 
 
 class CanonServiceTest(unittest.TestCase):

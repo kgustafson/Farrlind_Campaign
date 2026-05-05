@@ -148,6 +148,11 @@ button:disabled {
   background: #f7f8f5;
   color: var(--muted);
 }
+.error-flash {
+  border-color: #e4b9b9;
+  background: #fff0f0;
+  color: var(--bad);
+}
 .editable-item input,
 .editable-item select,
 .editable-item textarea {

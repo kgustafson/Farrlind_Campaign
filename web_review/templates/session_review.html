@@ -12,7 +12,7 @@
   <div class="action-strip">
     <button type="submit" {% if not document or review_locked %}disabled{% endif %}>Save Review</button>
     <button type="submit" formaction="/sessions/{{ session_key }}/review/reopen" formmethod="post" {% if not review_locked %}disabled{% endif %}>Reopen Review</button>
-    <button type="button" disabled>Mark Reviewed</button>
+    <button type="submit" formaction="/sessions/{{ session_key }}/review/mark-reviewed" formmethod="post" {% if not document or review_locked %}disabled{% endif %}>Mark Reviewed</button>
     <button type="button" disabled>Apply to Database</button>
     <button type="button" disabled>Write Final Summary</button>
   </div>
@@ -23,6 +23,12 @@
 {% endif %}
 {% if request.query_params.get("reopened") %}
   <div class="flash">Review reopened for editing. Save Review writes YAML only.</div>
+{% endif %}
+{% if request.query_params.get("marked") %}
+  <div class="flash">Review marked reviewed.</div>
+{% endif %}
+{% if request.query_params.get("mark_failed") %}
+  <div class="flash error-flash">Review was saved, but it is not ready to mark reviewed. Check validation.</div>
 {% endif %}
 {% if review_locked %}
   <div class="flash muted-flash">Applied review is locked. Use Reopen Review to make YAML edits.</div>

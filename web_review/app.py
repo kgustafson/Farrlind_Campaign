@@ -94,6 +94,37 @@ async def reopen_session_review(request: Request, session: str):
     )
 
 
+@app.post("/sessions/{session}/review/mark-reviewed")
+async def mark_session_reviewed(request: Request, session: str):
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    document = reviews.load_review_document(session_number)
+    if not document:
+        raise HTTPException(status_code=404, detail="Review file has not been initialized.")
+    if document.get("status") == "applied":
+        raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
+
+    form = await request.form()
+    form_values = {key: form.getlist(key) for key in form.keys()}
+    updated = reviews.update_review_document_from_form(document, form_values)
+    marked, errors = reviews.mark_reviewed_document(updated)
+    try:
+        reviews.save_review_document(session_number, marked)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    source = form.get("source") or "diary"
+    view = form.get("view") or "raw"
+    flag = "marked=1" if not errors else "mark_failed=1"
+    return RedirectResponse(
+        url=f"/sessions/{reviews.session_key(session_number)}/review?source={source}&view={view}&{flag}",
+        status_code=303,
+    )
+
+
 @app.get("/api/review-status")
 def api_review_status():
     return [row.__dict__ for row in reviews.dashboard_rows()]
