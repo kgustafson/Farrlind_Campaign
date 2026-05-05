@@ -9,7 +9,7 @@ review_instructions:
 session_title: Attack Continues and We Begin our Journey North
 session_date: '2025-09-13'
 in_game_date: 1832 AS Apollal 21, 1832 AS Apollal 22
-primary_location: Bentrios
+primary_location: Bellemaine
 items:
 - id: event-001
   sequence: 1
@@ -20,7 +20,7 @@ items:
   decision: accepted
   canonical_text: ''
   event_type: combat
-  location: Bentrios
+  location: Bellemaine
   significance: 4
   reason: ''
   decided_by: ''
@@ -35,7 +35,7 @@ items:
   decision: accepted
   canonical_text: ''
   event_type: combat
-  location: Bentrios
+  location: Bellemaine
   significance: 4
   reason: ''
   decided_by: ''
@@ -50,7 +50,7 @@ items:
   decision: accepted
   canonical_text: ''
   event_type: combat
-  location: Bentrios
+  location: Bellemaine
   significance: 5
   reason: ''
   decided_by: ''
@@ -65,7 +65,7 @@ items:
   decision: accepted
   canonical_text: ''
   event_type: combat
-  location: Bentrios
+  location: Bellemaine
   significance: 5
   reason: ''
   decided_by: ''
@@ -80,7 +80,7 @@ items:
   decision: accepted
   canonical_text: ''
   event_type: combat
-  location: Bentrios
+  location: Bellemaine
   significance: 4
   reason: ''
   decided_by: ''
@@ -95,7 +95,7 @@ items:
   decision: accepted
   canonical_text: ''
   event_type: combat
-  location: Bentrios
+  location: Bellemaine
   significance: 4
   reason: ''
   decided_by: ''
@@ -110,7 +110,7 @@ items:
   decision: accepted
   canonical_text: ''
   event_type: combat
-  location: Bentrios
+  location: Bellemaine
   significance: 5
   reason: ''
   decided_by: ''
@@ -125,7 +125,7 @@ items:
   decision: accepted
   canonical_text: ''
   event_type: social
-  location: Bentrios
+  location: Bellemaine
   significance: 3
   reason: ''
   decided_by: ''
