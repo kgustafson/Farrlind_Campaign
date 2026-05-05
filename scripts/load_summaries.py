@@ -92,6 +92,22 @@ CANON_NPCS = [
         "is_named": False,
     },
     {
+        "name": "Satyr violinist",
+        "first_seen_session": 4,
+        "location": "Thataways",
+        "description": "Unnamed satyr violinist in Thataways who told Faban Urgan's Axe was buried under the tree and later blessed Faban's fiddle with magical runes.",
+        "status": "alive",
+        "is_named": False,
+    },
+    {
+        "name": "Birdfolk wizard",
+        "first_seen_session": 4,
+        "location": "Thataways",
+        "description": "Unnamed birdfolk wizard and tree sage in Thataways who keeps the library, maintains defensive magic, explains infernal item marks, and escorts the party to the sage council.",
+        "status": "alive",
+        "is_named": False,
+    },
+    {
         "name": "Zakana",
         "first_seen_session": 8,
         "location": "Spore Sanctuary",

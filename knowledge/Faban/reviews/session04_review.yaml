@@ -1,0 +1,228 @@
+session: session04
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: The Village of Thataways
+session_date: '2025-03-30'
+in_game_date: 1832 AS Apollal 13, 1832 AS Apollal 14
+primary_location: Thataways
+items:
+- id: event-001
+  sequence: 1
+  source_type: db_event
+  source_text: The party uses Gildas' familiar owl to locate a large bushy tree.
+  decision: corrected
+  canonical_text: Gildas sends his owl familiar to search by the lake and burned-out
+    tree landmarks; the party finds a large bushy tree, meets a centaur, and is led
+    to the fey village of Thataways, where tree-houses, centaurs, satyrs, dryads,
+    an earth elemental, and a blue-energy-infused mother tree dominate the village.
+  event_type: discovery
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-002
+  sequence: 2
+  source_type: db_event
+  source_text: Makani meets with zealous centaurs and receives guidance from Nameloa
+    through running water.
+  decision: corrected
+  canonical_text: Makani visits the temple of Eerol in Thataways, asks zealous centaurs
+    about the centaurs, Jennifer, and Urgan's Axe, is told nature provides all and
+    that she should commune with nature, and hears Nameloa whisper through running
+    water, "A storm is coming."
+  event_type: social
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-003
+  sequence: 3
+  source_type: db_event
+  source_text: Faban and Brigit engage in music and bartering in the entertainment
+    sector of the village.
+  decision: corrected
+  canonical_text: Faban and Brigit visit the music circle, where Faban joins a satyr
+    violinist, plays Stars and the Centaurs, and learns from the satyr that Urgan's
+    Axe is buried under the tree and that the tree is a Well of Magic.
+  event_type: social
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-004
+  sequence: 4
+  source_type: db_event
+  source_text: Gildas and Corvinas meet a busker who provides information about the
+    witches.
+  decision: corrected
+  canonical_text: Gildas and Corvinas explore the barter sector, where Gildas impresses
+    a street magician and learns that one of the five tree sages is a fey elvish witch,
+    three are shape-shifting druids, and one is a birdfolk wizard who keeps the library
+    and much of the village's defensive magic.
+  event_type: social
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-005
+  sequence: 5
+  source_type: db_event
+  source_text: The party visits the central tree and meets with the sages, agreeing
+    to use Urgan's Axe in exchange for taking care of the Allegiance of Stars threat.
+  decision: corrected
+  canonical_text: The party enters the central tree by saying they were sent by the
+    Messengers of the Queen, meets the birdfolk wizard in the library, asks about
+    the hag and nearby coven of witches, inspects the Book of the Infernal, and learns
+    that infernal items leave marks and should be handled with care.
+  event_type: social
+  location: Thataways
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+added_items:
+- id: added-001
+  sequence: 5.5
+  source_type: diary
+  source_text: The birdfolk wizard escorted the party to a partial sage council where
+    the witch sage and centaur druid heard about the hag, gnolls, infernal orb, and
+    Urgan's Axe.
+  decision: added
+  canonical_text: The birdfolk wizard escorted the party to a partial sage council
+    where the witch sage and centaur druid heard about the hag's plan to push gnolls
+    into attacking the village, the demonic god Yongu, the infernal orb, and the party's
+    search for Urgan's Axe.
+  event_type: social
+  location: Thataways
+  significance: 4
+  reason: Missing diary event from the first visit to the tree.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-002
+  sequence: 5.7
+  source_type: diary
+  source_text: The sages identified the Allegiance of Stars as outsiders threatening
+    the village and said the council might allow the party to use Urgan's Axe if the
+    party took care of that threat.
+  decision: added
+  canonical_text: The sages identified the Allegiance of Stars as outsiders threatening
+    Thataways and said the full council might allow the party to use Urgan's Axe if
+    the party took care of that threat.
+  event_type: discovery
+  location: Thataways
+  significance: 4
+  reason: Missing key bargain setup from the diary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-003
+  sequence: 6
+  source_type: diary
+  source_text: Faban busked in the village that night, and Gildas detected magic at
+    the inn, seeing an infernal mark on Corvinas' forehead but no mark on Gildas.
+  decision: added
+  canonical_text: Faban busked in Thataways that night and gave the proceeds to clerics;
+    at the inn, Gildas cast detect magic and saw an infernal mark on Corvinas' forehead
+    but no mark on himself.
+  event_type: discovery
+  location: Thataways
+  significance: 4
+  reason: Missing infernal-mark clue from the diary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-004
+  sequence: 7
+  source_type: diary
+  source_text: The next morning, the full sage council agreed to let the party use
+    Urgan's Axe if they promised to return it and handle the Allegiance of Stars problem.
+  decision: added
+  canonical_text: The next morning, the full sage council agreed to let the party
+    use Urgan's Axe if they promised to return it and handle the Allegiance of Stars
+    problem; the sages produced the leather-wrapped axe from a rune, gave care instructions,
+    and Gildas placed it in the bag of holding.
+  event_type: acquisition
+  location: Thataways
+  significance: 5
+  reason: Missing major acquisition event from the diary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-005
+  sequence: 8
+  source_type: diary
+  source_text: The sages shared lore about the Celestial Isles and Jennifer.
+  decision: added
+  canonical_text: When Makani asked about the Celestial Isles, the sages said the
+    outer rim had been devastated by primordial storms from chaos with no known counter
+    short of god-like power; when asked about Jennifer, they said she is a strong
+    spellcaster, the last of a dead breed, and lives far north in the mountains.
+  event_type: discovery
+  location: Thataways
+  significance: 5
+  reason: Missing Celestial Isles and Jennifer lore from the diary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-006
+  sequence: 9
+  source_type: diary
+  source_text: The sages shared lore about other Wells of Magic and promised access
+    to the Thataways Well when the party returned with the axe.
+  decision: added
+  canonical_text: The sages said there are other Wells of Magic across the world,
+    that the Wells can help explain the current technology failures, and that when
+    the party returned with Urgan's Axe the sages would allow them to speak with the
+    Thataways Well of Magic; the party asked for and received an escort out of the
+    fey wood.
+  event_type: discovery
+  location: Thataways
+  significance: 5
+  reason: Missing Well lore and next-step setup from the diary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-007
+  sequence: 10
+  source_type: diary
+  source_text: The satyr violinist blessed Faban's fiddle with magical runes as a
+    farewell gift.
+  decision: added
+  canonical_text: As the party prepared to leave Thataways, the satyr violinist who
+    had jammed with Faban blessed Faban's fiddle with magical runes, increasing the
+    instrument's quality and brilliance of tone.
+  event_type: acquisition
+  location: Thataways
+  significance: 4
+  reason: Missing magical fiddle gift from the diary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+applied_on: '2026-05-05'

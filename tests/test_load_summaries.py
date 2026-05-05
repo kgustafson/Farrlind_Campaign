@@ -438,6 +438,30 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertIn("'Leprechaun thief'", sql)
         self.assertIn("SELECT id FROM session WHERE session_number = 5", sql)
 
+    def test_build_sql_scrubs_session04_npcs(self):
+        summaries = [
+            {
+                "session_number": 4,
+                "physical_date": "2025-03-30",
+                "in_game_date": "1832 AS Apollal 14",
+                "title": "The Village of Thataways",
+                "summary": "A satyr violinist and birdfolk wizard help the party.",
+                "events": ["A satyr violinist and birdfolk wizard help the party."],
+                "source_path": "session04_summary.md",
+                "location": "Thataways",
+            }
+        ]
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_review_documents", return_value={}):
+                    sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("'Satyr violinist'", sql)
+        self.assertIn("'Birdfolk wizard'", sql)
+        self.assertIn("SELECT id FROM session WHERE session_number = 4", sql)
+        self.assertIn("is_named = FALSE", sql)
+
     def test_build_sql_scrubs_father_joseph_from_earliest_known_session(self):
         summaries = [
             {
