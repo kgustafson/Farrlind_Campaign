@@ -5,7 +5,7 @@
 - Physical date: 2026-01-16
 - In-game date: 1832 AS Namal 12, 1832 AS Namal 13
 - Primary location: Paramon
-- Review status: applied, applied 2026-05-04
+- Review status: applied, applied 2026-05-05
 
 ## Canon Events
 

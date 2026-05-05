@@ -18,13 +18,13 @@ items:
     about the history of the world and the significance of the day. They also meet
     some of the other attendees, including a group of adventurers who are also celebrating.
   event_type: discovery
-  location: ''
+  location: Paramon
   significance: 3
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-002
   sequence: 2
   source_type: db_event
@@ -33,13 +33,13 @@ items:
   canonical_text: The party participates in storytelling and gift-giving, where they
     share stories of their past adventures and receive gifts from the other attendees.
   event_type: acquisition
-  location: ''
+  location: Paramon
   significance: 4
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-003
   sequence: 3
   source_type: db_event
@@ -49,13 +49,13 @@ items:
     mysterious satchel and finds strange runes and three lines written on the outside
     of the satchel.
   event_type: discovery
-  location: ''
+  location: Paramon
   significance: 3
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-004
   sequence: 4
   source_type: db_event
@@ -65,13 +65,13 @@ items:
   canonical_text: Gildas casts detect magic spell on the satchel, which eventually
     fractures and fails. The party decides to leave the satchel alone.
   event_type: discovery
-  location: ''
+  location: Paramon
   significance: 3
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-005
   sequence: 7
   source_type: db_event
@@ -79,13 +79,13 @@ items:
   decision: accepted
   canonical_text: ''
   event_type: combat
-  location: ''
+  location: Paramon
   significance: 5
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-006
   sequence: 8
   source_type: db_event
@@ -93,13 +93,13 @@ items:
   decision: accepted
   canonical_text: ''
   event_type: discovery
-  location: ''
+  location: Paramon
   significance: 3
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-007
   sequence: 99
   source_type: db_event
@@ -107,13 +107,13 @@ items:
   decision: rejected
   canonical_text: ''
   event_type: discovery
-  location: ''
+  location: Paramon
   significance: 3
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-008
   sequence: 9
   source_type: db_event
@@ -121,13 +121,13 @@ items:
   decision: accepted
   canonical_text: ''
   event_type: combat
-  location: ''
+  location: Paramon
   significance: 5
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 added_items:
 - id: event-004.2
   sequence: 5
@@ -137,13 +137,13 @@ added_items:
   decision: added
   canonical_text: ''
   event_type: discovery
-  location: ''
+  location: Paramon
   significance: 3
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-004.3
   sequence: 6
   source_type: user_added
@@ -151,11 +151,11 @@ added_items:
   decision: added
   canonical_text: The party decides to go confront Iron Paw at the temple of Namaloa
   event_type: discovery
-  location: ''
+  location: Paramon
   significance: 3
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
-applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
+applied_on: '2026-05-05'

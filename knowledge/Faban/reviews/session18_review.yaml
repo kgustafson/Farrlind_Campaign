@@ -17,13 +17,13 @@ items:
   canonical_text: A dwarven wizard named Lightdelver falls from a high window in the
     black tower.
   event_type: discovery
-  location: ''
+  location: Balrog
   significance: 3
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-002
   sequence: 2
   source_type: db_event
@@ -32,13 +32,13 @@ items:
   canonical_text: Faban uses Dimension Door along with Gildas to teleport under the
     falling wizard.
   event_type: discovery
-  location: ''
+  location: Balrog
   significance: 3
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-003
   sequence: 3
   source_type: db_event
@@ -47,13 +47,13 @@ items:
   canonical_text: Gildas is struck by debris and suffers wounds from the tower that
     is collapsing.
   event_type: discovery
-  location: ''
+  location: Balrog
   significance: 3
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-004
   sequence: 4
   source_type: db_event
@@ -62,13 +62,13 @@ items:
   canonical_text: Mikani improvises and invokes Nameloa to slow Lightdelver's fall,
     but cannot find any standing water to use for the spell.
   event_type: discovery
-  location: ''
+  location: Balrog
   significance: 3
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-005
   sequence: 5
   source_type: db_event
@@ -77,13 +77,13 @@ items:
   canonical_text: Gildas uses Levitate and anchors to the debris field to suspend
     Lightdelver in mid-descent. It is an amazing feat of magic and coordination.
   event_type: discovery
-  location: ''
+  location: Balrog
   significance: 3
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-006
   sequence: 8
   source_type: db_event
@@ -92,13 +92,13 @@ items:
   decision: accepted
   canonical_text: ''
   event_type: discovery
-  location: ''
+  location: Balrog
   significance: 5
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-007
   sequence: 10
   source_type: db_event
@@ -107,13 +107,13 @@ items:
   decision: accepted
   canonical_text: ''
   event_type: discovery
-  location: ''
+  location: Balrog
   significance: 5
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: event-008
   sequence: 11
   source_type: db_event
@@ -122,13 +122,13 @@ items:
   canonical_text: The party prepares for battle against Orsydon and his cultists,
     who are trying to awaken Tiamat. It was the cultists who summoned Orsydon.
   event_type: combat
-  location: ''
+  location: Balrog
   significance: 3
   reason: ''
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 added_items:
 - id: added-001
   sequence: 9
@@ -146,7 +146,7 @@ added_items:
   decided_by: user
   decided_on: '2026-05-04'
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: added-002
   sequence: 7
   source_type: user_added
@@ -161,7 +161,7 @@ added_items:
   decided_by: user
   decided_on: '2026-05-04'
   applied_status: applied
-  applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
 - id: added-003
   sequence: 6
   source_type: user_added
@@ -175,5 +175,5 @@ added_items:
   decided_by: user
   decided_on: '2026-05-04'
   applied_status: applied
-  applied_on: '2026-05-04'
-applied_on: '2026-05-04'
+  applied_on: '2026-05-05'
+applied_on: '2026-05-05'

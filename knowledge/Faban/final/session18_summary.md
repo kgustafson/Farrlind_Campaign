@@ -5,7 +5,7 @@
 - Physical date: 2026-02-22
 - In-game date: 1832 AS Namal 18 (continued)
 - Primary location: Balrog
-- Review status: applied, applied 2026-05-04
+- Review status: applied, applied 2026-05-05
 
 ## Canon Events
 

@@ -10,8 +10,8 @@
 ## Canon Events
 
 - The party wakes to a peaceful vegan meal, and Mikani speaks with Jennifer about the Celestial Isles, Mount Celestia, thunderous disruptions, and the possibility that old Cataclysm-related problems are resurfacing. [Druid Retreat] (discovery)
-- The party discusses the Wells, including Catur and Paramon nearby, Balrog requiring descent, the Monastery of the Open Hand in the Gale, and Henedal across the sea as the birthplace of magic. [Paramon] (discovery)
-- Jennifer explains that fey mushrooms can heal but exact a toll, and Zerzer says he will send word once he finds a plant that could help with breathing beneath the sea near Catur. [Catur] (discovery)
+- The party discusses the Wells, including Catur and Paramon nearby, Balrog requiring descent, the Monastery of the Open Hand in the Gale, and Henedal across the sea as the birthplace of magic. [Druid Retreat] (discovery)
+- Jennifer explains that fey mushrooms can heal but exact a toll, and Zerzer says he will send word once he finds a plant that could help with breathing beneath the sea near Catur. [Druid Retreat] (discovery)
 - For fifty gold per person, an old man traces sigils near standing stones and opens a portal that takes the party to Paramon by the sea. [Paramon] (travel)
 - In Paramon, Mikani communes and senses kuo-toa, humans, scattered others, a portal beneath the guild hall, and a powerful elemental presence offshore near the fishing huts. [Paramon] (discovery)
 - Mikani and Faban follow the sound of water to the guild hall, find an arcane Well, and meet Ordor, who says danger is imminent and confirms that Salazar used the Wand of Wells with lightning. [Paramon] (discovery)
