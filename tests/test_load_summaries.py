@@ -51,6 +51,10 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertEqual(load_summaries.detect_location("Arrived at Catur shoreline"), "Coast near Catur")
         self.assertEqual(load_summaries.detect_location("Preparing to enter Catur"), "Catur")
 
+    def test_detect_location_distinguishes_fey_woods_from_thataways(self):
+        self.assertEqual(load_summaries.detect_location("The party approaches the Fey Wilds"), "Fey Woods")
+        self.assertEqual(load_summaries.detect_location("The party reaches Thataways"), "Thataways")
+
     def test_build_sql_applies_session20_canon_location_and_event(self):
         summaries = [
             {
@@ -546,7 +550,31 @@ class LoadSummariesTest(unittest.TestCase):
 
         self.assertIn("'Father Joseph'", sql)
         self.assertIn("SELECT id FROM session WHERE session_number = 2", sql)
-        self.assertIn("Priest or scholar of Siath in Bentrios", sql)
+        self.assertIn("Rage, Salazar, the Wells of Magic", sql)
+
+    def test_build_sql_scrubs_oak_from_session02(self):
+        summaries = [
+            {
+                "session_number": 2,
+                "physical_date": "2025-03-02",
+                "in_game_date": "1832 AS Apollal 13",
+                "title": "Visit to the Temple of Knowledge",
+                "summary": "The party meets Oak in the Fey Woods.",
+                "events": ["The party meets Oak in the Fey Woods."],
+                "source_path": "session02_summary.md",
+                "location": "Fey Woods",
+            }
+        ]
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_review_documents", return_value={}):
+                    sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("'Oak'", sql)
+        self.assertIn("SELECT id FROM session WHERE session_number = 2", sql)
+        self.assertIn("Dryad of the outer Fey Woods", sql)
+        self.assertIn("(SELECT id FROM location WHERE name = 'Fey Woods' LIMIT 1)", sql)
 
     def test_build_sql_dedupes_canon_events_already_in_review(self):
         event_text = "The party negotiated with local fishermen for a vessel."

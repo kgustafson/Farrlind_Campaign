@@ -12,12 +12,12 @@
 travel:
   - session: session02
     from: Bentrios
-    to: Thataways
+    to: Fey Woods
     method: foot
     duration_days: 1
     duration_confidence: high
     duration_basis: "Diary dates span Apollal 12 to Apollal 13; inferred as 1 elapsed calendar day."
-    notes: "Party set out from Bentrios toward the Fey Wilds/Thataways in search of Urgan's Axe."
+    notes: "Party set out from Bentrios toward the Fey Woods in search of Urgan's Axe; they do not reach Thataways in this session."
 
   - session: session05
     from: Thataways
