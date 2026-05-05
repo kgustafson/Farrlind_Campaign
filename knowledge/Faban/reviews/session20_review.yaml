@@ -1,0 +1,106 @@
+session: session20
+status: in_review
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: Salt, Steel, and the Distance Between Legends
+session_date: '2026-04-27'
+in_game_date: 1832 AS Namal 20, 1832 AS Namal 24
+primary_location: Coast near Catur
+items:
+- id: event-001
+  source_type: db_event
+  source_text: Party departed Balrog with dwarven gifts
+  decision: pending
+  canonical_text: ''
+  event_type: travel
+  location: Balrog
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-002
+  source_type: db_event
+  source_text: Four days travel to coast
+  decision: pending
+  canonical_text: ''
+  event_type: travel
+  location: Coast near Catur
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-003
+  source_type: db_event
+  source_text: Arrived at Catur shoreline
+  decision: pending
+  canonical_text: ''
+  event_type: travel
+  location: Coast near Catur
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-004
+  source_type: db_event
+  source_text: Met fishermen — boats missing, lights under water, something thought-large
+    beneath
+  decision: pending
+  canonical_text: ''
+  event_type: social
+  location: Coast near Catur
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-005
+  source_type: db_event
+  source_text: Preparing to descend into sunken city
+  decision: pending
+  canonical_text: ''
+  event_type: discovery
+  location: Catur
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-006
+  source_type: db_event
+  source_text: Roon continues to survive against all odds
+  decision: pending
+  canonical_text: ''
+  event_type: discovery
+  location: Coast near Catur
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-007
+  source_type: db_event
+  source_text: The party negotiated with local fishermen for a vessel and received
+    warnings about the peoples inhabiting Catur, including merfolk, Locathah, and
+    tritons.
+  decision: pending
+  canonical_text: ''
+  event_type: social
+  location: Coast near Catur
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+added_items: []

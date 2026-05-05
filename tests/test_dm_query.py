@@ -4,6 +4,7 @@ import importlib.util
 import io
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -289,6 +290,68 @@ class DmQueryTest(unittest.TestCase):
         self.assertEqual(filtered["session_primary_locations"][0]["canonical"], "Coast near Catur")
         self.assertEqual(len(filtered["event_review_decisions"]), 1)
 
+    def test_build_review_document_uses_pending_decisions(self):
+        session = {
+            "session_number": "20",
+            "title": "Salt, Steel",
+            "session_date": "2026-04-27",
+            "in_game_date": "1832 AS Namal 20",
+            "location": "Coast near Catur",
+        }
+        events = [
+            {
+                "sequence_order": "1",
+                "event_type": "travel",
+                "location": "Coast near Catur",
+                "description": "Arrived at Catur shoreline",
+                "significance": "4",
+            }
+        ]
+
+        document = dm_query.build_review_document(session, events)
+
+        self.assertEqual(document["session"], "session20")
+        self.assertEqual(document["status"], "in_review")
+        self.assertEqual(document["items"][0]["id"], "event-001")
+        self.assertEqual(document["items"][0]["decision"], "pending")
+        self.assertEqual(document["items"][0]["applied_status"], "pending")
+        self.assertEqual(document["added_items"], [])
+
+    def test_init_review_writes_yaml_and_refuses_overwrite(self):
+        review_data = {
+            "session": {
+                "session_number": "20",
+                "session_date": "2026-04-27",
+                "in_game_date": "1832 AS Namal 20",
+                "title": "Salt, Steel",
+                "location": "Coast near Catur",
+                "summary": "The party arrived near Catur.",
+            },
+            "events": [
+                {
+                    "sequence_order": "1",
+                    "event_type": "travel",
+                    "location": "Coast near Catur",
+                    "description": "Arrived at Catur shoreline",
+                    "significance": "4",
+                }
+            ],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            output_path = Path(tmp) / "session20_review.yaml"
+            with patch("dm_query.query_event_review", return_value=review_data):
+                with patch("dm_query.review_path", return_value=output_path):
+                    with contextlib.redirect_stdout(io.StringIO()) as output:
+                        dm_query.init_review(args(session_number=20))
+                    with self.assertRaises(SystemExit):
+                        dm_query.init_review(args(session_number=20))
+
+            written = output_path.read_text(encoding="utf-8")
+            self.assertIn("session: session20", written)
+            self.assertIn("decision: pending", written)
+            self.assertIn("Wrote", output.getvalue())
+
     def test_review_events_prints_db_and_pending_canon_decisions(self):
         review_data = {
             "session": {
@@ -351,6 +414,12 @@ class DmQueryTest(unittest.TestCase):
         parser = dm_query.build_parser()
         parsed = parser.parse_args(["review-events", "session20"])
         self.assertEqual(parsed.func, dm_query.review_events)
+        self.assertEqual(parsed.session_number, 20)
+
+    def test_parser_accepts_init_review_command(self):
+        parser = dm_query.build_parser()
+        parsed = parser.parse_args(["init-review", "session20"])
+        self.assertEqual(parsed.func, dm_query.init_review)
         self.assertEqual(parsed.session_number, 20)
 
     def test_print_prep_questions_uses_topic_signals(self):

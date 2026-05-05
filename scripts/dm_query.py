@@ -16,6 +16,7 @@ DEFAULT_DATABASE = "farrlind"
 MAX_LIMIT = 1000
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CANON_DECISIONS_PATH = REPO_ROOT / "knowledge" / "Faban" / "canon_decisions.yaml"
+REVIEWS_DIR = REPO_ROOT / "knowledge" / "Faban" / "reviews"
 
 
 def bounded_int(value: str, minimum: int = 1, maximum: int = MAX_LIMIT) -> int:
@@ -488,6 +489,10 @@ def session_key(session_number: int) -> str:
     return f"session{session_number:02d}"
 
 
+def review_path(session_number: int) -> Path:
+    return REVIEWS_DIR / f"{session_key(session_number)}_review.yaml"
+
+
 def canon_decisions_for_session(decisions: dict, session_number: int) -> dict:
     key = session_key(session_number)
     return {
@@ -499,6 +504,49 @@ def canon_decisions_for_session(decisions: dict, session_number: int) -> dict:
             item for item in decisions.get("event_review_decisions", []) or []
             if item.get("session") == key
         ],
+    }
+
+
+def review_item_from_event(event: dict) -> dict:
+    sequence = event.get("sequence_order") or "0"
+    try:
+        sequence_number = int(sequence)
+    except ValueError:
+        sequence_number = 0
+
+    return {
+        "id": f"event-{sequence_number:03d}",
+        "source_type": "db_event",
+        "source_text": event.get("description") or "",
+        "decision": "pending",
+        "canonical_text": "",
+        "event_type": event.get("event_type") or "",
+        "location": event.get("location") or "",
+        "significance": int(event["significance"]) if event.get("significance") else None,
+        "reason": "",
+        "decided_by": "",
+        "decided_on": "",
+        "applied_status": "pending",
+        "applied_on": "",
+    }
+
+
+def build_review_document(session: dict, events: list[dict]) -> dict:
+    session_number = int(session["session_number"])
+    return {
+        "session": session_key(session_number),
+        "status": "in_review",
+        "review_instructions": [
+            "For each item, set decision to accepted, rejected, corrected, or added.",
+            "For corrected or added items, fill canonical_text and any changed metadata.",
+            "Leave applied_status as pending until an apply-review step updates the database.",
+        ],
+        "session_title": session.get("title") or "",
+        "session_date": str(session.get("session_date") or ""),
+        "in_game_date": session.get("in_game_date") or "",
+        "primary_location": session.get("location") or "",
+        "items": [review_item_from_event(event) for event in events],
+        "added_items": [],
     }
 
 
@@ -664,6 +712,27 @@ def review_events(args):
             print(f"  - {note}")
 
 
+def init_review(args):
+    session_number = args.session_number
+    output_path = review_path(session_number)
+    if output_path.exists():
+        raise SystemExit(f"Review file already exists: {output_path}")
+
+    review = query_event_review(args, session_number)
+    session = review["session"]
+    if not session:
+        raise SystemExit(f"No session found for session{session_number:02d}")
+
+    document = build_review_document(session, review["events"])
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
+        yaml.safe_dump(document, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+    print(f"Wrote {output_path}")
+    print(f"Items: {len(document['items'])}")
+
+
 def brief(args):
     topic = args.topic
     print_section(f"{topic.title()} Prep Brief")
@@ -736,6 +805,10 @@ def build_parser():
     review = subparsers.add_parser("review-events", help="Review DB events and pending canon decisions for a session.")
     review.add_argument("session_number", type=parse_session_ref, help="Session number or name, e.g. 20 or session20.")
     review.set_defaults(func=review_events)
+
+    init = subparsers.add_parser("init-review", help="Create a draft YAML review file for a session.")
+    init.add_argument("session_number", type=parse_session_ref, help="Session number or name, e.g. 20 or session20.")
+    init.set_defaults(func=init_review)
 
     prep = subparsers.add_parser("brief", help="Build a compact prep brief around a topic.")
     prep.add_argument("topic")
