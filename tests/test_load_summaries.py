@@ -554,6 +554,45 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertIn("'high'", sql)
         self.assertIn("'Diary dates span Apollal 14 to Apollal 15.'", sql)
 
+    def test_build_sql_loads_enemy_encounters_with_quantity(self):
+        summaries = [
+            {
+                "session_number": 3,
+                "physical_date": "2025-03-09",
+                "in_game_date": "1832 AS Apollal 13",
+                "title": "The Battle of the Fey Witch",
+                "summary": "The party fights a fey witch.",
+                "events": ["The party engages in combat with a fey witch who summons two goblins."],
+                "source_path": "session03_summary.md",
+                "location": "Fey Woods",
+            }
+        ]
+        enemy_encounters = [
+            {
+                "session_number": 3,
+                "event_sequence": 1,
+                "enemy_name": "Goblin",
+                "enemy_type": "goblin",
+                "quantity": 2,
+                "outcome": "defeated",
+                "confidence": "high",
+                "notes": "Two goblins summoned by the fey witch.",
+            }
+        ]
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_enemy_encounters", return_value=enemy_encounters):
+                    with patch("load_summaries.load_review_documents", return_value={}):
+                        sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("ALTER TABLE event_enemy ADD COLUMN IF NOT EXISTS quantity", sql)
+        self.assertIn("'Goblin'", sql)
+        self.assertIn("'goblin'", sql)
+        self.assertIn("se.sequence_order = 1", sql)
+        self.assertIn("2,", sql)
+        self.assertIn("'defeated'", sql)
+
     def test_build_sql_scrubs_father_joseph_from_earliest_known_session(self):
         summaries = [
             {

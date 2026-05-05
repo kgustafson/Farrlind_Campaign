@@ -316,6 +316,9 @@ CREATE TABLE event_enemy (
     event_id        INT NOT NULL REFERENCES session_event(id),
     enemy_id        INT NOT NULL REFERENCES enemy(id),
     outcome         VARCHAR(50),                       -- 'defeated','fled','escaped','killed_party','summoned'
+    quantity        SMALLINT,
+    confidence      VARCHAR(30),
+    notes           TEXT,
     PRIMARY KEY (event_id, enemy_id)
 );
 

@@ -1,0 +1,184 @@
+# Curated enemy encounter facts.
+# Quantity means how many of that enemy type appeared in that encounter,
+# not how many times the enemy is mentioned across combat rounds.
+
+encounters:
+  - session: session00
+    event_sequence: 10
+    enemy: Regenerating construct
+    enemy_type: construct
+    quantity: 1
+    outcome: defeated
+    confidence: high
+    notes: "Large rock-being/construct-like creature attacks the newly formed party in Bentrios and is destroyed in the session01 continuation."
+
+  - session: session03
+    event_sequence: 1
+    enemy: Fey witch
+    enemy_type: fey_witch
+    quantity: 1
+    outcome: defeated
+    confidence: high
+    notes: "Fey witch fought in the Fey Woods; killed by Corvinas."
+
+  - session: session03
+    event_sequence: 1
+    enemy: Goblin
+    enemy_type: goblin
+    quantity: 2
+    outcome: defeated
+    confidence: high
+    notes: "Two goblins summoned by the fey witch."
+
+  - session: session06
+    event_sequence: 1
+    enemy: Dinosaur
+    enemy_type: beast
+    quantity: 1
+    outcome: defeated
+    confidence: medium
+    notes: "Large lizard/dinosaur terrorizing the edge of the Fey forest."
+
+  - session: session07
+    event_sequence: 1
+    enemy: Ardema
+    enemy_type: warlock
+    quantity: 1
+    outcome: fled
+    confidence: high
+    notes: "Ardema attacks during the defense of Thataways and plane-shifts away."
+
+  - session: session09
+    event_sequence: 8
+    enemy: Bellemaine construct
+    enemy_type: construct
+    quantity: 1
+    outcome: defeated
+    confidence: high
+    notes: "Construct attacking Bellemaine under control of an orb-bearing controller."
+
+  - session: session09
+    event_sequence: 8
+    enemy: Cultist controller
+    enemy_type: cultist
+    quantity: 1
+    outcome: defeated
+    confidence: medium
+    notes: "Orb-bearing individual controlling the Bellemaine construct; likely a cultist."
+
+  - session: session10
+    event_sequence: 4
+    enemy: Dao
+    enemy_type: elemental
+    quantity: 1
+    outcome: defeated
+    confidence: high
+    notes: "Elemental transforms into a Dao after reaching the dropped orb."
+
+  - session: session10
+    event_sequence: 5
+    enemy: Marl
+    enemy_type: elemental
+    quantity: 1
+    outcome: defeated
+    confidence: medium
+    notes: "Dao summons a marl during the Bellemaine battle."
+
+  - session: session12
+    event_sequence: 1
+    enemy: Sam
+    enemy_type: necrotic_agent
+    quantity: 1
+    outcome: defeated
+    confidence: high
+    notes: "Sam attacks Faban at the rear of the caravan and is defeated by the party."
+
+  - session: session12
+    event_sequence: 3
+    enemy: Hostile ranger
+    enemy_type: ranger
+    quantity: 5
+    outcome: defeated_or_fled
+    confidence: high
+    notes: "Five hostile rangers engage the party during the Sam battle."
+
+  - session: session12
+    event_sequence: 6
+    enemy: Frog-like creature
+    enemy_type: summoned_beast
+    quantity: 2
+    outcome: defeated
+    confidence: high
+    notes: "Two large foul-smelling frog-like creatures summoned by Sam's necrotic magic."
+
+  - session: session13
+    event_sequence: 9
+    enemy: Druid Retreat archer
+    enemy_type: archer
+    quantity: 1
+    outcome: encounter_resolved
+    confidence: medium
+    notes: "Unseen archer fires warning arrows and drains Roon's strength before Jennifer reveals herself."
+
+  - session: session14
+    event_sequence: 7
+    enemy: Biha-Bibir
+    enemy_type: sea_entity
+    quantity: 1
+    outcome: defeated
+    confidence: high
+    notes: "Mass of seaweed and living current fought at Paramon."
+
+  - session: session14
+    event_sequence: 7
+    enemy: Water elemental
+    enemy_type: elemental
+    quantity: 1
+    outcome: defeated
+    confidence: high
+    notes: "Water elemental summoned with Biha-Bibir and split by Mikani's trident."
+
+  - session: session16
+    event_sequence: 7
+    enemy: Iron Paw
+    enemy_type: warlock
+    quantity: 1
+    outcome: defeated
+    confidence: high
+    notes: "Iron Paw summons additional creatures and is defeated at Paramon."
+
+  - session: session16
+    event_sequence: 7
+    enemy: Wasterlich
+    enemy_type: undead
+    quantity: 1
+    outcome: defeated
+    confidence: high
+    notes: "Summoned by Iron Paw during the Paramon battle."
+
+  - session: session16
+    event_sequence: 7
+    enemy: Fish-thing
+    enemy_type: aquatic_creature
+    quantity: 3
+    outcome: defeated
+    confidence: high
+    notes: "Three fish-things summoned by Iron Paw."
+
+  - session: session19
+    event_sequence: 4
+    enemy: Orsydon
+    enemy_type: dragon
+    quantity: 1
+    outcome: defeated
+    confidence: high
+    notes: "Dragon summoned by cultists in Balrog and defeated by the party."
+
+  - session: session19
+    event_sequence: 4
+    enemy: Cultist
+    enemy_type: cultist
+    quantity:
+    outcome: defeated
+    confidence: medium
+    notes: "Cultists in Balrog summon Orsydon; exact count should be tightened later from transcript/audio if available."
