@@ -13,6 +13,9 @@ knowledge/Faban/reviews/*
 !knowledge/Faban/final/
 knowledge/Faban/final/*
 !knowledge/Faban/final/session*_summary.md
+!knowledge/Faban/lore/
+knowledge/Faban/lore/*
+!knowledge/Faban/lore/farrlind_ages_and_calendar.md
 
 #Temp
 *.log
