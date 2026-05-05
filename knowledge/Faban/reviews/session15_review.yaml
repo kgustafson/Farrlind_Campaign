@@ -1,0 +1,230 @@
+session: session15
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: Coastal Aftermath
+session_date: '2025-12-21'
+in_game_date: 1832 AS Namal 11
+primary_location: Paramon
+items:
+- id: event-001
+  sequence: 1
+  source_type: diary_event
+  source_text: The party returns to Paramon beneath heavy mist after the shoreline
+    battle, finding the coast partly evacuated and bodies being gathered.
+  decision: accepted
+  canonical_text: ''
+  event_type: travel
+  location: Paramon
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-002
+  sequence: 2
+  source_type: diary_event
+  source_text: Corvinas examines the remnants of the water elemental and concludes
+    that it was likely a guardian bound to place, with something else riding or using
+    it.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Paramon
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-003
+  sequence: 3
+  source_type: diary_event
+  source_text: Faban performs The Defense of the Watery Dunes for the shaken people
+    of Paramon, framing the recent battle as resistance rather than terror, and earns
+    thirteen gold in tips.
+  decision: accepted
+  canonical_text: ''
+  event_type: social
+  location: Paramon
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-004
+  sequence: 4
+  source_type: diary_event
+  source_text: Brigit finds drink and disappears briefly into a local watering hole.
+  decision: accepted
+  canonical_text: ''
+  event_type: social
+  location: Paramon
+  significance: 2
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-005
+  sequence: 5
+  source_type: diary_event
+  source_text: Gildas notices the sigil of a fallen chaos elemental, while Corvinas
+    observes two figures speaking before one disappears.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Paramon
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-006
+  sequence: 6
+  source_type: diary_event
+  source_text: Faban notices the disappearance as a distortion, uses dancing lights
+    and Tasha's cruel laughter to reveal a black-furred tabaxi, and forces him to
+    speak.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Paramon
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-007
+  sequence: 7
+  source_type: diary_event
+  source_text: The tabaxi speaks of ancient dragonlands, Tiamat, and demons preparing
+    for resurrection; he implies the Cataclysm is a requirement rather than merely
+    a consequence.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Paramon
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-008
+  sequence: 8
+  source_type: diary_event
+  source_text: Faban lets the tabaxi go after questioning him and tells the others
+    a simpler story that the tabaxi escaped.
+  decision: accepted
+  canonical_text: ''
+  event_type: social
+  location: Paramon
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-009
+  sequence: 9
+  source_type: diary_event
+  source_text: The party returns to the Well and finds raw arcane force thrumming
+    through the chamber, unshaped and dangerous.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Paramon
+  significance: 4
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-010
+  sequence: 10
+  source_type: diary_event
+  source_text: Corvinas recognizes himself as the conflict within the Well, power
+    surges through him, and a psychic backlash strikes the party before Corvinas remains
+    standing.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Paramon
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-011
+  sequence: 11
+  source_type: diary_event
+  source_text: Mikani and Roon visit the Temple of Namaloa, where Iron Paw reacts
+    angrily to mention of the Celestial Isles, refuses questions about the Well, expels
+    them, and is revealed as wearing borrowed colors rather than being truly Namaloan.
+  decision: accepted
+  canonical_text: ''
+  event_type: discovery
+  location: Paramon
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-012
+  sequence: 12
+  source_type: diary_event
+  source_text: Gildas speaks with a sapphire-eyed stranger in a tavern and mentions
+    the detail only once afterward.
+  decision: accepted
+  canonical_text: ''
+  event_type: social
+  location: Paramon
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-013
+  sequence: 13
+  source_type: diary_event
+  source_text: Faban performs that night, and the innkeeper grants free room and board.
+  decision: accepted
+  canonical_text: ''
+  event_type: social
+  location: Paramon
+  significance: 2
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+added_items:
+- id: event-006.5
+  sequence: 9.5
+  source_type: user_added
+  source_text: The party realizes that the well was unleashed most likely by the wand
+    of wells and that the well is no longer sentinent.
+  decision: added
+  canonical_text: The party realizes that the Well was most likely unleashed by the
+    Wand of Wells and that the Well is no longer sentient.
+  event_type: discovery
+  location: Paramon
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-05'
+applied_on: '2026-05-05'
