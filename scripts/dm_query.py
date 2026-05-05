@@ -493,6 +493,54 @@ def review_path(session_number: int) -> Path:
     return REVIEWS_DIR / f"{session_key(session_number)}_review.yaml"
 
 
+def load_review_file(path: Path) -> dict:
+    with open(path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
+
+
+def discover_review_files(path: Path = REVIEWS_DIR) -> list[Path]:
+    if not path.exists():
+        return []
+    return sorted(path.glob("*_review.yaml"))
+
+
+def summarize_review(document: dict, path: Optional[Path] = None) -> dict:
+    items = list(document.get("items") or [])
+    added_items = list(document.get("added_items") or [])
+    all_items = [*items, *added_items]
+    decisions = {
+        "pending": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "corrected": 0,
+        "added": 0,
+        "other": 0,
+    }
+    applied = {
+        "pending": 0,
+        "applied": 0,
+        "other": 0,
+    }
+
+    for item in all_items:
+        decision = item.get("decision") or "pending"
+        decisions[decision if decision in decisions else "other"] += 1
+        applied_status = item.get("applied_status") or "pending"
+        applied[applied_status if applied_status in applied else "other"] += 1
+
+    return {
+        "session": document.get("session") or (path.stem.replace("_review", "") if path else "unknown"),
+        "status": document.get("status") or "unknown",
+        "title": document.get("session_title") or "",
+        "path": str(path) if path else "",
+        "total_items": len(all_items),
+        "base_items": len(items),
+        "added_items": len(added_items),
+        "decisions": decisions,
+        "applied": applied,
+    }
+
+
 def canon_decisions_for_session(decisions: dict, session_number: int) -> dict:
     key = session_key(session_number)
     return {
@@ -733,6 +781,39 @@ def init_review(args):
     print(f"Items: {len(document['items'])}")
 
 
+def review_status(args):
+    files = discover_review_files()
+    print_section("Review Status")
+    if not files:
+        print("No review files found.")
+        return
+
+    for path in files:
+        summary = summarize_review(load_review_file(path), path)
+        print(f"{summary['session']}: {summary['status']}")
+        if summary["title"]:
+            print(f"  title: {summary['title']}")
+        print(f"  file: {summary['path']}")
+        print(f"  items: {summary['total_items']} ({summary['base_items']} drafted, {summary['added_items']} added)")
+        decisions = summary["decisions"]
+        print(
+            "  decisions: "
+            f"pending={decisions['pending']}, "
+            f"accepted={decisions['accepted']}, "
+            f"rejected={decisions['rejected']}, "
+            f"corrected={decisions['corrected']}, "
+            f"added={decisions['added']}, "
+            f"other={decisions['other']}"
+        )
+        applied = summary["applied"]
+        print(
+            "  applied: "
+            f"pending={applied['pending']}, "
+            f"applied={applied['applied']}, "
+            f"other={applied['other']}"
+        )
+
+
 def brief(args):
     topic = args.topic
     print_section(f"{topic.title()} Prep Brief")
@@ -809,6 +890,9 @@ def build_parser():
     init = subparsers.add_parser("init-review", help="Create a draft YAML review file for a session.")
     init.add_argument("session_number", type=parse_session_ref, help="Session number or name, e.g. 20 or session20.")
     init.set_defaults(func=init_review)
+
+    review_status_parser = subparsers.add_parser("review-status", help="Show status counts for YAML session review files.")
+    review_status_parser.set_defaults(func=review_status)
 
     prep = subparsers.add_parser("brief", help="Build a compact prep brief around a topic.")
     prep.add_argument("topic")

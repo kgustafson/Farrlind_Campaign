@@ -9,6 +9,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+import yaml
+
 
 ROOT = Path(__file__).resolve().parents[1]
 MODULE_PATH = ROOT / "scripts" / "dm_query.py"
@@ -352,6 +354,64 @@ class DmQueryTest(unittest.TestCase):
             self.assertIn("decision: pending", written)
             self.assertIn("Wrote", output.getvalue())
 
+    def test_summarize_review_counts_decisions_and_applied_status(self):
+        document = {
+            "session": "session20",
+            "status": "in_review",
+            "session_title": "Salt, Steel",
+            "items": [
+                {"decision": "pending", "applied_status": "pending"},
+                {"decision": "accepted", "applied_status": "applied"},
+                {"decision": "corrected", "applied_status": "pending"},
+                {"decision": "rejected", "applied_status": "pending"},
+            ],
+            "added_items": [
+                {"decision": "added", "applied_status": "pending"},
+            ],
+        }
+
+        summary = dm_query.summarize_review(document, Path("session20_review.yaml"))
+
+        self.assertEqual(summary["session"], "session20")
+        self.assertEqual(summary["total_items"], 5)
+        self.assertEqual(summary["base_items"], 4)
+        self.assertEqual(summary["added_items"], 1)
+        self.assertEqual(summary["decisions"]["pending"], 1)
+        self.assertEqual(summary["decisions"]["accepted"], 1)
+        self.assertEqual(summary["decisions"]["corrected"], 1)
+        self.assertEqual(summary["decisions"]["rejected"], 1)
+        self.assertEqual(summary["decisions"]["added"], 1)
+        self.assertEqual(summary["applied"]["applied"], 1)
+        self.assertEqual(summary["applied"]["pending"], 4)
+
+    def test_review_status_prints_review_file_counts(self):
+        document = {
+            "session": "session20",
+            "status": "in_review",
+            "session_title": "Salt, Steel",
+            "items": [{"decision": "pending", "applied_status": "pending"}],
+            "added_items": [],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "session20_review.yaml"
+            path.write_text(yaml.safe_dump(document), encoding="utf-8")
+            with patch("dm_query.discover_review_files", return_value=[path]):
+                with contextlib.redirect_stdout(io.StringIO()) as output:
+                    dm_query.review_status(args())
+
+        rendered = output.getvalue()
+        self.assertIn("Review Status", rendered)
+        self.assertIn("session20: in_review", rendered)
+        self.assertIn("pending=1", rendered)
+
+    def test_review_status_handles_no_review_files(self):
+        with patch("dm_query.discover_review_files", return_value=[]):
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                dm_query.review_status(args())
+
+        self.assertIn("No review files found.", output.getvalue())
+
     def test_review_events_prints_db_and_pending_canon_decisions(self):
         review_data = {
             "session": {
@@ -421,6 +481,11 @@ class DmQueryTest(unittest.TestCase):
         parsed = parser.parse_args(["init-review", "session20"])
         self.assertEqual(parsed.func, dm_query.init_review)
         self.assertEqual(parsed.session_number, 20)
+
+    def test_parser_accepts_review_status_command(self):
+        parser = dm_query.build_parser()
+        parsed = parser.parse_args(["review-status"])
+        self.assertEqual(parsed.func, dm_query.review_status)
 
     def test_print_prep_questions_uses_topic_signals(self):
         topic_events = [{"description": "Met fishermen — boats missing, lights under water"}]
