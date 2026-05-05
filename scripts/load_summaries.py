@@ -26,6 +26,7 @@ from raglib.summarize import (
 OUT_DIR = BASE2 / "farrlind" / "out"
 OUT_SQL = OUT_DIR / "load_summaries.sql"
 TRAVEL_FACTS_PATH = BASE2 / "knowledge" / "Faban" / "travel.yaml"
+ENCOUNTERS_PATH = BASE2 / "knowledge" / "Faban" / "encounters.yaml"
 ENEMY_ENCOUNTERS_PATH = BASE2 / "knowledge" / "Faban" / "enemy_encounters.yaml"
 SONG_PROMPTS_PATH = BASE2 / "knowledge" / "Faban" / "songbook" / "prompts.md"
 CANON_DECISIONS_PATH = BASE2 / "knowledge" / "Faban" / "canon_decisions.yaml"
@@ -787,6 +788,31 @@ def load_enemy_encounters() -> list[dict]:
     return encounters
 
 
+def load_encounters() -> list[dict]:
+    if not ENCOUNTERS_PATH.exists():
+        return []
+
+    with open(ENCOUNTERS_PATH, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
+
+    encounters = []
+    for entry in data.get("encounters", []) or []:
+        encounters.append({
+            "session_number": parse_session_ref(entry.get("session")),
+            "event_sequence": entry.get("event_sequence"),
+            "title": entry.get("title", ""),
+            "encounter_type": entry.get("encounter_type", ""),
+            "subtype": entry.get("subtype", ""),
+            "location": entry.get("location", ""),
+            "participants": entry.get("participants", ""),
+            "outcome": entry.get("outcome", ""),
+            "confidence": entry.get("confidence", "medium"),
+            "notes": entry.get("notes", ""),
+        })
+
+    return encounters
+
+
 def load_canon_decisions() -> dict:
     if not CANON_DECISIONS_PATH.exists():
         return {}
@@ -1067,6 +1093,10 @@ ON CONFLICT (session_number) DO UPDATE SET
 
 def delete_events_sql(session_number: int) -> str:
     return f"""
+DELETE FROM encounter
+WHERE session_id = (SELECT id FROM session WHERE session_number = {session_number})
+  AND notes LIKE '%Loaded from encounters.yaml%';
+
 DELETE FROM event_enemy
 WHERE event_id IN (
     SELECT id FROM session_event
@@ -1189,6 +1219,63 @@ def enemy_encounter_schema_sql() -> str:
 ALTER TABLE event_enemy ADD COLUMN IF NOT EXISTS quantity SMALLINT;
 ALTER TABLE event_enemy ADD COLUMN IF NOT EXISTS confidence VARCHAR(30);
 ALTER TABLE event_enemy ADD COLUMN IF NOT EXISTS notes TEXT;
+""".strip()
+
+
+def encounter_schema_sql() -> str:
+    return """
+CREATE TABLE IF NOT EXISTS encounter (
+    id              SERIAL PRIMARY KEY,
+    session_id      INT NOT NULL REFERENCES session(id),
+    event_id        INT REFERENCES session_event(id),
+    encounter_type  VARCHAR(80) NOT NULL,
+    subtype         VARCHAR(100),
+    location_id     INT REFERENCES location(id),
+    title           VARCHAR(200) NOT NULL,
+    participants    TEXT,
+    outcome         VARCHAR(120),
+    confidence      VARCHAR(30),
+    notes           TEXT,
+    UNIQUE (session_id, title)
+);
+""".strip()
+
+
+def encounter_sql(encounter: dict) -> str:
+    session_number = encounter["session_number"]
+    event_sequence = encounter["event_sequence"]
+    notes = f"Loaded from encounters.yaml: {encounter.get('notes', '')}".strip()
+
+    return f"""
+INSERT INTO encounter (
+    session_id, event_id, encounter_type, subtype, location_id,
+    title, participants, outcome, confidence, notes
+)
+SELECT
+    s.id,
+    se.id,
+    {sql_quote(encounter.get("encounter_type", ""))},
+    {sql_quote(encounter.get("subtype", ""))},
+    {location_expr(encounter.get("location", ""))},
+    {sql_quote(encounter.get("title", ""))},
+    {sql_quote(encounter.get("participants", ""))},
+    {sql_quote(encounter.get("outcome", ""))},
+    {sql_quote(encounter.get("confidence", "medium"))},
+    {sql_quote(notes)}
+FROM session s
+LEFT JOIN session_event se
+    ON se.session_id = s.id
+   AND se.sequence_order = {event_sequence}
+WHERE s.session_number = {session_number}
+ON CONFLICT (session_id, title) DO UPDATE SET
+    event_id = EXCLUDED.event_id,
+    encounter_type = EXCLUDED.encounter_type,
+    subtype = EXCLUDED.subtype,
+    location_id = EXCLUDED.location_id,
+    participants = EXCLUDED.participants,
+    outcome = EXCLUDED.outcome,
+    confidence = EXCLUDED.confidence,
+    notes = EXCLUDED.notes;
 """.strip()
 
 
@@ -1464,6 +1551,7 @@ def build_sql(summaries: list[dict]) -> str:
     ]
     trusted_travel_logs = load_travel_facts()
     enemy_encounters = load_enemy_encounters()
+    encounters = load_encounters()
     trusted_keys = {
         (log["session_number"], log["from_location"], log["to_location"])
         for log in trusted_travel_logs
@@ -1500,6 +1588,7 @@ def build_sql(summaries: list[dict]) -> str:
     statements.append(canon_npc_scrub_sql())
     statements.append(canon_enemy_scrub_sql())
     statements.append(travel_log_schema_sql())
+    statements.append(encounter_schema_sql())
     statements.append(enemy_encounter_schema_sql())
 
     for summary in summaries:
@@ -1532,6 +1621,9 @@ def build_sql(summaries: list[dict]) -> str:
 
     for encounter in enemy_encounters:
         statements.append(enemy_encounter_sql(encounter))
+
+    for encounter in encounters:
+        statements.append(encounter_sql(encounter))
 
     statements.append(first_seen_sql(summaries))
     statements.append(pipeline_run_sql(len(summaries), total_events + len(travel_logs)))

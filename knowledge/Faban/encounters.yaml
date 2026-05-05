@@ -1,0 +1,268 @@
+# Curated encounter-scene facts.
+# These rows index important encounter scenes and link back to reviewed events.
+# Enemy quantities live in enemy_encounters.yaml.
+
+encounters:
+  - session: session00
+    event_sequence: 9
+    title: Party forms at Alexander's Inn
+    encounter_type: social
+    subtype: party_formation
+    location: Alexander's Inn
+    participants: Faban, Bridgit, Roon, Corvinas, Makani, Gildas, city watch guard
+    outcome: party_forms
+    confidence: high
+    notes: "Roon enlists the gathered future party to help with the city crisis."
+
+  - session: session00
+    event_sequence: 10
+    title: Rock-being street attack
+    encounter_type: combat
+    subtype: construct_attack
+    location: Bentrios
+    participants: Party, regenerating construct
+    outcome: continues_into_session01
+    confidence: high
+    notes: "The newly formed party rushes into the streets and is attacked."
+
+  - session: session01
+    event_sequence: 7
+    title: Baron Wells and Salazar in Bentrios Tower
+    encounter_type: social
+    subtype: infernal_bargain
+    location: Bentrios
+    participants: Party, Baron Wells, Salazar
+    outcome: deadline_revealed
+    confidence: high
+    notes: "The party overhears Salazar threaten Baron Wells and learns of the five-day deadline."
+
+  - session: session02
+    event_sequence: 1
+    title: Father Joseph consultation
+    encounter_type: social
+    subtype: lore_consultation
+    location: Bentrios
+    participants: Party, Father Joseph
+    outcome: lore_gained
+    confidence: high
+    notes: "Father Joseph explains infernal artifacts, Rage, Salazar, constructs, and the search for Urgan's Axe."
+
+  - session: session02
+    event_sequence: 7
+    title: Oak in the outer Fey Woods
+    encounter_type: social
+    subtype: fey_guidance
+    location: Fey Woods
+    participants: Party, Oak
+    outcome: guidance_gained
+    confidence: high
+    notes: "Oak warns the party about hostile fey and directs them toward the centaur lake."
+
+  - session: session02
+    event_sequence: 10
+    title: Blue-skinned fey bargain refused
+    encounter_type: social
+    subtype: hostile_bargain
+    location: Fey Woods
+    participants: Party, blue-skinned fey creature
+    outcome: combat_triggered
+    confidence: high
+    notes: "The fey asks the party to lead gnolls to the Satyr camp in exchange for axe information; the party refuses."
+
+  - session: session03
+    event_sequence: 1
+    title: Fey witch battle
+    encounter_type: combat
+    subtype: fey_witch
+    location: Fey Woods
+    participants: Party, fey witch, goblins
+    outcome: enemies_defeated
+    confidence: high
+    notes: "The party defeats the fey witch and her summoned goblins."
+
+  - session: session04
+    event_sequence: 1
+    title: Arrival at Thataways
+    encounter_type: social
+    subtype: settlement_arrival
+    location: Thataways
+    participants: Party, centaur guide, Thataways residents
+    outcome: settlement_reached
+    confidence: high
+    notes: "A centaur leads the party to the fey village of Thataways."
+
+  - session: session04
+    event_sequence: 6
+    title: Partial sage council
+    encounter_type: social
+    subtype: council
+    location: Thataways
+    participants: Party, birdfolk wizard, witch sage, centaur druid
+    outcome: quest_terms_discussed
+    confidence: high
+    notes: "The council hears about the hag, gnolls, infernal orb, and search for Urgan's Axe."
+
+  - session: session04
+    event_sequence: 9
+    title: Full sage council grants Urgan's Axe
+    encounter_type: social
+    subtype: council_acquisition
+    location: Thataways
+    participants: Party, full sage council
+    outcome: artifact_granted
+    confidence: high
+    notes: "The sages let the party use Urgan's Axe after the party promises to return it."
+
+  - session: session06
+    event_sequence: 1
+    title: Dinosaur at the Fey forest edge
+    encounter_type: combat
+    subtype: beast_attack
+    location: Thataways
+    participants: Party, dinosaur
+    outcome: enemy_defeated
+    confidence: medium
+    notes: "The creature is described as a large lizard/dinosaur."
+
+  - session: session07
+    event_sequence: 1
+    title: Defense of Thataways against Ardema
+    encounter_type: combat
+    subtype: settlement_defense
+    location: Thataways
+    participants: Party, Ardema
+    outcome: enemy_fled
+    confidence: high
+    notes: "Ardema attacks during the defense of the Tree and Well of Magic."
+
+  - session: session08
+    event_sequence: 4
+    title: Spore Sanctuary passage
+    encounter_type: hazard
+    subtype: environmental_traversal
+    location: Spore Sanctuary
+    participants: Party, Zakana
+    outcome: party_exits_sanctuary
+    confidence: medium
+    notes: "The party leaves the spore sanctuary with help and healing mushrooms."
+
+  - session: session09
+    event_sequence: 8
+    title: Bellemaine construct attack
+    encounter_type: combat
+    subtype: construct_controller
+    location: Bellemaine
+    participants: Party, Bellemaine construct, cultist controller
+    outcome: continues_into_session10
+    confidence: high
+    notes: "A construct controlled by an orb-bearing individual attacks Bellemaine."
+
+  - session: session10
+    event_sequence: 4
+    title: Dao transformation battle
+    encounter_type: combat
+    subtype: elemental_battle
+    location: Bellemaine
+    participants: Party, Dao, Marl
+    outcome: enemies_defeated
+    confidence: high
+    notes: "The elemental reaches the orb, transforms into a Dao, summons a marl, and is defeated."
+
+  - session: session11
+    event_sequence: 8
+    title: Faban questions Sam
+    encounter_type: social
+    subtype: suspicious_contact
+    location: Road to Archaeological Dig Site
+    participants: Faban, Sam
+    outcome: warning_and_ring_revealed
+    confidence: high
+    notes: "Sam warns about the dig site's protection and shows Faban a green glass ring."
+
+  - session: session12
+    event_sequence: 3
+    title: Sam caravan battle
+    encounter_type: combat
+    subtype: ambush
+    location: Road to Archaeological Dig Site
+    participants: Party, Sam, hostile rangers, frog-like creatures
+    outcome: enemies_defeated_or_fled
+    confidence: high
+    notes: "Sam, hostile rangers, and summoned frog-like creatures attack at the rear of the caravan."
+
+  - session: session13
+    event_sequence: 6
+    title: Cole's magical deck
+    encounter_type: social
+    subtype: magical_card_reading
+    location: Mountain Road
+    participants: Party, Cole
+    outcome: cards_drawn
+    confidence: high
+    notes: "Cole appears in the cave and offers a magical deck of cards."
+
+  - session: session13
+    event_sequence: 10
+    title: Jennifer reveals herself
+    encounter_type: social
+    subtype: quest_contact
+    location: Druid Retreat
+    participants: Party, Jennifer
+    outcome: quest_contact_found
+    confidence: high
+    notes: "Jennifer appears after the retreat's defensive warning and reveals herself as the object of the party's quest."
+
+  - session: session14
+    event_sequence: 7
+    title: Biha-Bibir battle at Paramon
+    encounter_type: combat
+    subtype: elemental_sea_battle
+    location: Paramon
+    participants: Party, Biha-Bibir, water elemental
+    outcome: enemies_defeated
+    confidence: high
+    notes: "Biha-Bibir rises from the water with a water elemental and is defeated."
+
+  - session: session16
+    event_sequence: 7
+    title: Iron Paw summons Wasterlich and fish-things
+    encounter_type: combat
+    subtype: temple_battle
+    location: Paramon
+    participants: Party, Iron Paw, Wasterlich, fish-things
+    outcome: enemies_defeated
+    confidence: high
+    notes: "Iron Paw summons a Wasterlich and three fish-things before being defeated."
+
+  - session: session17
+    event_sequence: 3
+    title: Crossroads Festival
+    encounter_type: social
+    subtype: festival
+    location: Crossroads
+    participants: Party, Jebediah Galloway, festival revelers
+    outcome: festival_accepted
+    confidence: high
+    notes: "The party encounters a real festival without illusion or glamour."
+
+  - session: session19
+    event_sequence: 4
+    title: Orsydon summoned in Balrog
+    encounter_type: combat
+    subtype: dragon_summoning
+    location: Balrog
+    participants: Party, Orsydon, cultists
+    outcome: dragon_defeated
+    confidence: high
+    notes: "Cultists summon Orsydon in Balrog; the party defeats the dragon."
+
+  - session: session20
+    event_sequence: 3
+    title: Negotiation for a vessel
+    encounter_type: social
+    subtype: travel_negotiation
+    location: Coast near Catur
+    participants: Party, Alistair, coastal fishermen
+    outcome: boat_obtained
+    confidence: high
+    notes: "The party receives a boat and warnings about merfolk, Locathah, and tritons near Catur."

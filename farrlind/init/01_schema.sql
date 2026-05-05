@@ -322,6 +322,21 @@ CREATE TABLE event_enemy (
     PRIMARY KEY (event_id, enemy_id)
 );
 
+CREATE TABLE encounter (
+    id              SERIAL PRIMARY KEY,
+    session_id      INT NOT NULL REFERENCES session(id),
+    event_id        INT REFERENCES session_event(id),
+    encounter_type  VARCHAR(80) NOT NULL,              -- 'combat','social','hazard','travel','discovery'
+    subtype         VARCHAR(100),
+    location_id     INT REFERENCES location(id),
+    title           VARCHAR(200) NOT NULL,
+    participants    TEXT,
+    outcome         VARCHAR(120),
+    confidence      VARCHAR(30),
+    notes           TEXT,
+    UNIQUE (session_id, title)
+);
+
 -- M:M — events involve artifacts
 CREATE TABLE event_artifact (
     event_id        INT NOT NULL REFERENCES session_event(id),

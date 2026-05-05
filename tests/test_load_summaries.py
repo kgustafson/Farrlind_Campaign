@@ -593,6 +593,47 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertIn("2,", sql)
         self.assertIn("'defeated'", sql)
 
+    def test_build_sql_loads_general_encounters(self):
+        summaries = [
+            {
+                "session_number": 2,
+                "physical_date": "2025-03-02",
+                "in_game_date": "1832 AS Apollal 13",
+                "title": "Visit to the Temple of Knowledge",
+                "summary": "The party consults Father Joseph.",
+                "events": ["The party visits Father Joseph."],
+                "source_path": "session02_summary.md",
+                "location": "Bentrios",
+            }
+        ]
+        encounters = [
+            {
+                "session_number": 2,
+                "event_sequence": 1,
+                "title": "Father Joseph consultation",
+                "encounter_type": "social",
+                "subtype": "lore_consultation",
+                "location": "Bentrios",
+                "participants": "Party, Father Joseph",
+                "outcome": "lore_gained",
+                "confidence": "high",
+                "notes": "Father Joseph explains infernal artifacts.",
+            }
+        ]
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_enemy_encounters", return_value=[]):
+                    with patch("load_summaries.load_encounters", return_value=encounters):
+                        with patch("load_summaries.load_review_documents", return_value={}):
+                            sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("CREATE TABLE IF NOT EXISTS encounter", sql)
+        self.assertIn("'Father Joseph consultation'", sql)
+        self.assertIn("'lore_consultation'", sql)
+        self.assertIn("'Party, Father Joseph'", sql)
+        self.assertIn("se.sequence_order = 1", sql)
+
     def test_build_sql_scrubs_father_joseph_from_earliest_known_session(self):
         summaries = [
             {
