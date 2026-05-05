@@ -1,0 +1,177 @@
+session: session00
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: The Party forms
+session_date: '2025-02-02'
+in_game_date: 1832 AS Apollal 10
+primary_location: Bentrios
+items:
+- id: event-001
+  sequence: 3
+  source_type: db_event
+  source_text: Bridgit, a halfling, enters the tavern and ignores the entertainment.
+  decision: corrected
+  canonical_text: Bridgit, a halfling with the obvious bearing of a thief, enters
+    Alexander's Inn, takes a seat at the bar, ignores Faban's entertainment, and nurses
+    her ale.
+  event_type: social
+  location: Alexander's Inn
+  significance: 4
+  reason: Introduces Bridgit at the place where the party forms.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-002
+  sequence: 4
+  source_type: db_event
+  source_text: Roon, a fighter, arrives and attempts to recruit the narrator into
+    the watch.
+  decision: corrected
+  canonical_text: Roon, a half-orc fighter and drinking companion of Faban, enters
+    Alexander's Inn, renews his effort to recruit Faban into the city watch, and buys
+    him an ale while Faban switches to one of Roon's favorite songs, Urgan the Brave.
+  event_type: social
+  location: Alexander's Inn
+  significance: 4
+  reason: Introduces Roon and his city-watch connection.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-003
+  sequence: 5
+  source_type: db_event
+  source_text: Corvinas, a human paladin of Mihira, and Makani, a blue dragonborn,
+    enter the tavern.
+  decision: corrected
+  canonical_text: Corvinas, an obvious paladin of Mihira, enters Alexander's Inn,
+    and Makani, a blue dragonborn, quietly drinks at the bar while Faban performs
+    the ballad of Urgan slaying Ryjax.
+  event_type: social
+  location: Alexander's Inn
+  significance: 4
+  reason: Introduces Corvinas and Makani before the party is drawn into crisis.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-004
+  sequence: 6
+  source_type: db_event
+  source_text: Gildas, an elf wizard, arrives, seeking an artifact.
+  decision: corrected
+  canonical_text: Gildas, a frustrated-looking elf wizard, enters Alexander's Inn,
+    orders fish tacos and ale, and is later understood to be searching for an artifact.
+  event_type: social
+  location: Alexander's Inn
+  significance: 4
+  reason: Introduces Gildas and his artifact-seeking motive.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-005
+  sequence: 7
+  source_type: db_event
+  source_text: The warforged waiter glitches and fails.
+  decision: corrected
+  canonical_text: A warforged waiter in Alexander's Inn glitches and fails; Gildas
+    and Corvinas investigate and learn similar failures have been happening across
+    the land for months, and Faban's own card sorter promptly fails and burns cards
+    he won from the Duke of Westerbrook.
+  event_type: discovery
+  location: Alexander's Inn
+  significance: 5
+  reason: Establishes the technology failure crisis before the party enters the streets.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: event-006
+  sequence: 8
+  source_type: db_event
+  source_text: Roon receives a message from the watch, seeking his assistance at headquarters.
+  decision: corrected
+  canonical_text: A city watch guard rushes in looking for Roon, reporting issues
+    throughout Bentrios and urgent need at headquarters; Roon quickly enlists Faban,
+    Corvinas, Bridgit, Makani, and Gildas to help.
+  event_type: social
+  location: Alexander's Inn
+  significance: 5
+  reason: This is the moment the party formally forms and accepts the crisis.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+added_items:
+- id: added-001
+  sequence: 1
+  source_type: user_added
+  source_text: ''
+  decision: added
+  canonical_text: The campaign opens on Farrlind, a continent bordered by northern
+    mountains, the Gale to the south, desert wastelands east and west, and nearby
+    Kippo Archipelago to the northeast with the war-torn city of Nahundra.
+  event_type: discovery
+  location: Bentrios
+  significance: 3
+  reason: Establishes the campaign geography given in the session zero background.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-002
+  sequence: 2
+  source_type: user_added
+  source_text: ''
+  decision: added
+  canonical_text: Bentrios City is introduced as a thriving technological city where
+    warforged entities work for their masters, and Alexander's Inn in Bentrios is
+    a focal point of activity created by Alexander Venrid's tavern chain.
+  event_type: discovery
+  location: Bentrios
+  significance: 4
+  reason: Establishes Bentrios, warforged presence, and Alexander's Inn.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-003
+  sequence: 2.5
+  source_type: user_added
+  source_text: ''
+  decision: added
+  canonical_text: Faban has been in Bentrios for three days, is growing restless,
+    and is busking at Alexander's Inn with The One-Legged Lass when the future party
+    begins to gather.
+  event_type: social
+  location: Alexander's Inn
+  significance: 3
+  reason: Establishes Faban's starting point and first documented performance.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+- id: added-004
+  sequence: 9
+  source_type: user_added
+  source_text: ''
+  decision: added
+  canonical_text: The newly formed party rushes into the streets of Bentrios with
+    Roon to help, and a large rock-being attacks them, beginning the battle that continues
+    into session 01.
+  event_type: combat
+  location: Bentrios
+  significance: 5
+  reason: Connects session 00 directly into the opening battle of session 01.
+  decided_by: codex
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
+applied_on: '2026-05-05'
