@@ -10,11 +10,12 @@ session_primary_locations:
     reason: Session included travel from Balrog, but the endpoint and next prep location are near Catur.
     decided_from: user
     decided_on: "2026-05-04"
-    status: needs_db_update
+    status: applied
+    applied_on: "2026-05-04"
 
 event_review_decisions:
   - session: session20
-    status: needs_db_update
+    status: applied
     decision_type: missing_primary_event
     event_type: social
     significance: 4
@@ -29,3 +30,4 @@ event_review_decisions:
     reason: This is a key setup event for entering Catur and should influence next-session prep.
     decided_from: user
     decided_on: "2026-05-04"
+    applied_on: "2026-05-04"

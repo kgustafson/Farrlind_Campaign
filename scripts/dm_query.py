@@ -1,5 +1,6 @@
 import argparse
 import csv
+import re
 import subprocess
 import sys
 import textwrap
@@ -29,6 +30,15 @@ def bounded_int(value: str, minimum: int = 1, maximum: int = MAX_LIMIT) -> int:
 
 def positive_int(value: str) -> int:
     return bounded_int(value)
+
+
+def parse_session_ref(value: str) -> int:
+    match = None
+    if value:
+        match = re.search(r"(\d+)$", value.strip())
+    if not match:
+        raise argparse.ArgumentTypeError(f"could not parse session reference: {value!r}")
+    return int(match.group(1))
 
 
 def sql_literal(value: str) -> str:
@@ -394,6 +404,39 @@ def query_health(args) -> dict:
     return rows[0] if rows else {}
 
 
+def query_event_review(args, session_number: int) -> dict:
+    sessions = run_query(
+        args,
+        f"""
+        SELECT s.session_number, s.session_date, s.in_game_date, s.title,
+               s.summary, l.name AS location
+        FROM session s
+        LEFT JOIN location l ON l.id = s.location_id
+        WHERE s.session_number = {session_number}
+        LIMIT 1;
+        """,
+    )
+    events = run_query(
+        args,
+        f"""
+        SELECT s.session_number, s.title AS session_title, et.type_name AS event_type,
+               COALESCE(el.name, sl.name) AS location, e.sequence_order,
+               e.description, e.significance
+        FROM session_event e
+        JOIN session s ON s.id = e.session_id
+        LEFT JOIN event_type et ON et.id = e.event_type_id
+        LEFT JOIN location el ON el.id = e.location_id
+        LEFT JOIN location sl ON sl.id = s.location_id
+        WHERE s.session_number = {session_number}
+        ORDER BY e.sequence_order NULLS LAST, e.id;
+        """,
+    )
+    return {
+        "session": sessions[0] if sessions else {},
+        "events": events,
+    }
+
+
 def split_notes(value: Optional[str]) -> list[str]:
     return [part.strip() for part in (value or "").split(";") if part.strip()]
 
@@ -424,6 +467,39 @@ def format_canon_decisions(decisions: dict) -> list[str]:
         notes.append(f"{session} {decision_type} [{status}]: {description}")
 
     return notes
+
+
+def canon_primary_location_session_numbers(decisions: dict) -> set[int]:
+    sessions = set()
+    for item in decisions.get("session_primary_locations", []) or []:
+        try:
+            sessions.add(parse_session_ref(item.get("session", "")))
+        except argparse.ArgumentTypeError:
+            continue
+    return sessions
+
+
+def note_session_number(note: str) -> Optional[int]:
+    match = re.search(r"\bSession\s+(\d+)\b", note or "")
+    return int(match.group(1)) if match else None
+
+
+def session_key(session_number: int) -> str:
+    return f"session{session_number:02d}"
+
+
+def canon_decisions_for_session(decisions: dict, session_number: int) -> dict:
+    key = session_key(session_number)
+    return {
+        "session_primary_locations": [
+            item for item in decisions.get("session_primary_locations", []) or []
+            if item.get("session") == key
+        ],
+        "event_review_decisions": [
+            item for item in decisions.get("event_review_decisions", []) or []
+            if item.get("session") == key
+        ],
+    }
 
 
 def last_session(args):
@@ -479,7 +555,9 @@ def songs(args):
 
 def health(args):
     row = query_health(args)
-    canon_notes = format_canon_decisions(load_canon_decisions())
+    canon_decisions = load_canon_decisions()
+    canon_notes = format_canon_decisions(canon_decisions)
+    canon_primary_sessions = canon_primary_location_session_numbers(canon_decisions)
     if not row:
         print("No health data found.")
         if canon_notes:
@@ -508,7 +586,11 @@ def health(args):
     notes = []
     for song in split_notes(row.get("songs_missing_prompts")):
         notes.append(f"Song missing prompt: {song}")
-    notes.extend(split_notes(row.get("location_mismatch_notes")))
+    for note in split_notes(row.get("location_mismatch_notes")):
+        session_number = note_session_number(note)
+        if session_number in canon_primary_sessions:
+            continue
+        notes.append(note)
 
     if not notes:
         print("No obvious data notes.")
@@ -523,6 +605,63 @@ def health(args):
         return
     for note in canon_notes:
         print(f"- {note}")
+
+
+def review_events(args):
+    session_number = args.session_number
+    review = query_event_review(args, session_number)
+    session = review["session"]
+    decisions = canon_decisions_for_session(load_canon_decisions(), session_number)
+
+    print_section(f"Session {session_number:02d} Event Review")
+    if not session:
+        print("No session found.")
+        return
+
+    title = session.get("title") or "Untitled"
+    print(f"Title: {title}")
+    if session.get("session_date"):
+        print(f"Physical date: {session['session_date']}")
+    if session.get("in_game_date"):
+        print(f"In-game: {session['in_game_date']}")
+    if session.get("location"):
+        print(f"Primary location: {session['location']}")
+    print("")
+
+    print_section("Source Summary")
+    print(textwrap.fill(clip(session.get("summary"), 1200), width=96))
+    print("")
+
+    print_section("Current DB Events")
+    if not review["events"]:
+        print("No DB events found.")
+    else:
+        for event in review["events"]:
+            sequence = event.get("sequence_order") or "?"
+            event_type = f"{event['event_type']}: " if event.get("event_type") else ""
+            location = f" [{event['location']}]" if event.get("location") else ""
+            significance = f" significance={event['significance']}" if event.get("significance") else ""
+            print(f"{sequence}. {event_type}{clip(event.get('description'), 320)}{location}{significance}")
+    print("")
+
+    print_section("Canon Location Decisions")
+    primary_locations = decisions["session_primary_locations"]
+    if not primary_locations:
+        print("No location decisions recorded for this session.")
+    for item in primary_locations:
+        print(f"- {item.get('canonical', 'unknown location')} [{item.get('status', 'unknown')}]: {item.get('decision', '')}")
+    print("")
+
+    print_section("Canon Event Decisions")
+    event_decisions = decisions["event_review_decisions"]
+    if not event_decisions:
+        print("No event decisions recorded for this session.")
+    for item in event_decisions:
+        print(f"- {item.get('event_type', 'event')} significance={item.get('significance', '?')} [{item.get('status', 'unknown')}]")
+        print(textwrap.fill(item.get("description", ""), width=96, initial_indent="  ", subsequent_indent="  "))
+        notes = item.get("canon_notes") or []
+        for note in notes:
+            print(f"  - {note}")
 
 
 def brief(args):
@@ -593,6 +732,10 @@ def build_parser():
 
     status = subparsers.add_parser("health", help="Show database loading and data-quality health.")
     status.set_defaults(func=health)
+
+    review = subparsers.add_parser("review-events", help="Review DB events and pending canon decisions for a session.")
+    review.add_argument("session_number", type=parse_session_ref, help="Session number or name, e.g. 20 or session20.")
+    review.set_defaults(func=review_events)
 
     prep = subparsers.add_parser("brief", help="Build a compact prep brief around a topic.")
     prep.add_argument("topic")

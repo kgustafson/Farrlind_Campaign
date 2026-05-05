@@ -48,6 +48,12 @@ class DmQueryTest(unittest.TestCase):
         with self.assertRaises(argparse.ArgumentTypeError):
             dm_query.positive_int("nope")
 
+    def test_parse_session_ref_accepts_name_or_number(self):
+        self.assertEqual(dm_query.parse_session_ref("20"), 20)
+        self.assertEqual(dm_query.parse_session_ref("session20"), 20)
+        with self.assertRaises(argparse.ArgumentTypeError):
+            dm_query.parse_session_ref("session")
+
     def test_parser_rejects_invalid_limits(self):
         parser = dm_query.build_parser()
         with contextlib.redirect_stderr(io.StringIO()):
@@ -224,10 +230,17 @@ class DmQueryTest(unittest.TestCase):
         self.assertIn("Sessions loaded: 21", rendered)
         self.assertIn("Latest session: 20 - Salt, Steel", rendered)
         self.assertIn("Song missing prompt: 12. The Day We Called It Victory", rendered)
-        self.assertIn("Session 20 primary location is Balrog", rendered)
+        self.assertNotIn("Session 20 primary location is Balrog", rendered)
         self.assertIn("Canon Decisions", rendered)
         self.assertIn("session20 primary location -> Coast near Catur", rendered)
         self.assertIn("session20 missing_primary_event", rendered)
+
+    def test_note_session_number_parses_health_notes(self):
+        self.assertEqual(
+            dm_query.note_session_number("Session 20 primary location is Coast near Catur"),
+            20,
+        )
+        self.assertIsNone(dm_query.note_session_number("Song missing prompt: 12. Title"))
 
     def test_load_canon_decisions_missing_file_returns_empty(self):
         missing = ROOT / "does-not-exist.yaml"
@@ -259,10 +272,86 @@ class DmQueryTest(unittest.TestCase):
         self.assertIn("session20 primary location -> Coast near Catur", notes[0])
         self.assertIn("session20 missing_primary_event", notes[1])
 
+    def test_canon_decisions_for_session_filters_by_session_key(self):
+        decisions = {
+            "session_primary_locations": [
+                {"session": "session19", "canonical": "Balrog"},
+                {"session": "session20", "canonical": "Coast near Catur"},
+            ],
+            "event_review_decisions": [
+                {"session": "session20", "description": "Missing event"},
+            ],
+        }
+
+        filtered = dm_query.canon_decisions_for_session(decisions, 20)
+
+        self.assertEqual(len(filtered["session_primary_locations"]), 1)
+        self.assertEqual(filtered["session_primary_locations"][0]["canonical"], "Coast near Catur")
+        self.assertEqual(len(filtered["event_review_decisions"]), 1)
+
+    def test_review_events_prints_db_and_pending_canon_decisions(self):
+        review_data = {
+            "session": {
+                "session_number": "20",
+                "session_date": "2026-04-27",
+                "in_game_date": "1832 AS Namal 20",
+                "title": "Salt, Steel",
+                "location": "Balrog",
+                "summary": "The party arrived near Catur.",
+            },
+            "events": [
+                {
+                    "sequence_order": "1",
+                    "event_type": "travel",
+                    "location": "Catur",
+                    "description": "Arrived at Catur shoreline",
+                    "significance": "4",
+                }
+            ],
+        }
+        canon = {
+            "session_primary_locations": [
+                {
+                    "session": "session20",
+                    "canonical": "Coast near Catur",
+                    "status": "needs_db_update",
+                    "decision": "Primary location is the coast near Catur.",
+                }
+            ],
+            "event_review_decisions": [
+                {
+                    "session": "session20",
+                    "event_type": "social",
+                    "significance": 4,
+                    "status": "needs_db_update",
+                    "description": "The party negotiated with fishermen for a vessel.",
+                    "canon_notes": ["Locathah were mentioned."],
+                }
+            ],
+        }
+
+        with patch("dm_query.query_event_review", return_value=review_data):
+            with patch("dm_query.load_canon_decisions", return_value=canon):
+                with contextlib.redirect_stdout(io.StringIO()) as output:
+                    dm_query.review_events(args(session_number=20))
+
+        rendered = output.getvalue()
+        self.assertIn("Session 20 Event Review", rendered)
+        self.assertIn("Current DB Events", rendered)
+        self.assertIn("Arrived at Catur shoreline", rendered)
+        self.assertIn("Coast near Catur", rendered)
+        self.assertIn("negotiated with fishermen", rendered)
+
     def test_parser_accepts_health_command(self):
         parser = dm_query.build_parser()
         parsed = parser.parse_args(["health"])
         self.assertEqual(parsed.func, dm_query.health)
+
+    def test_parser_accepts_review_events_command(self):
+        parser = dm_query.build_parser()
+        parsed = parser.parse_args(["review-events", "session20"])
+        self.assertEqual(parsed.func, dm_query.review_events)
+        self.assertEqual(parsed.session_number, 20)
 
     def test_print_prep_questions_uses_topic_signals(self):
         topic_events = [{"description": "Met fishermen — boats missing, lights under water"}]

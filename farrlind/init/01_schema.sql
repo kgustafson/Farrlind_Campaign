@@ -737,6 +737,7 @@ INSERT INTO location (name, location_type_id, description) VALUES
     ('Paramon',           (SELECT id FROM location_type WHERE type_name='coastal'),      'Coastal city; Ordor Well disturbed here by Salazar'),
     ('Balrog',            (SELECT id FROM location_type WHERE type_name='dwarven_hold'), 'Dwarven hold; location of Saiffi Well; site of black dragon attack'),
     ('Catur',             (SELECT id FROM location_type WHERE type_name='underwater'),   'Sunken city beneath the coast; location of Catur Well'),
+    ('Coast near Catur',  (SELECT id FROM location_type WHERE type_name='coastal'),      'Coast roughly 6 miles from Catur; party staging point before entering the sunken city'),
     ('Gale Monastery',    (SELECT id FROM location_type WHERE type_name='monastery'),    'Monastery of Open Hand; location of Open Hand Well'),
     ('Hanedal Island',    (SELECT id FROM location_type WHERE type_name='island'),       'Tiefling island; location of Hanedal Well'),
     ('Alexander''s Inn',  (SELECT id FROM location_type WHERE type_name='inn'),          'Starting point; where the party formed in Bentrios');

@@ -27,6 +27,7 @@ OUT_DIR = BASE2 / "farrlind" / "out"
 OUT_SQL = OUT_DIR / "load_summaries.sql"
 TRAVEL_FACTS_PATH = BASE2 / "knowledge" / "Faban" / "travel.yaml"
 SONG_PROMPTS_PATH = BASE2 / "knowledge" / "Faban" / "songbook" / "prompts.md"
+CANON_DECISIONS_PATH = BASE2 / "knowledge" / "Faban" / "canon_decisions.yaml"
 
 KNOWN_LOCATIONS = [
     "Bentrios",
@@ -34,6 +35,7 @@ KNOWN_LOCATIONS = [
     "Thataways",
     "Paramon",
     "Balrog",
+    "Coast near Catur",
     "Catur",
     "Gale Monastery",
     "Hanedal Island",
@@ -46,6 +48,7 @@ TRAVEL_LOCATION_ALIASES = {
     "Paramon": ["paramon"],
     "Balrog": ["balrog"],
     "Catur": ["catur", "sunken city", "catur shoreline"],
+    "Coast near Catur": ["coast near catur", "catur shoreline", "shoreline near catur"],
     "Gale Monastery": ["gale monastery"],
     "Hanedal Island": ["hanedal", "haunidal", "hanedal island"],
 }
@@ -353,7 +356,8 @@ def parse_prose_summary(text: str) -> str:
 def detect_location(text: str) -> str:
     low = text.lower()
     for location in KNOWN_LOCATIONS:
-        if location.lower() in low:
+        aliases = TRAVEL_LOCATION_ALIASES.get(location, [location])
+        if any(alias.lower() in low for alias in aliases):
             return location
     return ""
 
@@ -505,6 +509,46 @@ def load_travel_facts() -> list[dict]:
     return logs
 
 
+def load_canon_decisions() -> dict:
+    if not CANON_DECISIONS_PATH.exists():
+        return {}
+
+    with open(CANON_DECISIONS_PATH, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
+
+
+def canon_session_number(item: dict) -> Optional[int]:
+    try:
+        return parse_session_ref(item.get("session"))
+    except ValueError:
+        return None
+
+
+def canon_primary_locations(decisions: dict) -> dict[int, dict]:
+    entries = {}
+    for item in decisions.get("session_primary_locations", []) or []:
+        session_number = canon_session_number(item)
+        if session_number is None:
+            continue
+        if item.get("status") in {"needs_db_update", "active", "applied"}:
+            entries[session_number] = item
+    return entries
+
+
+def canon_event_decisions(decisions: dict) -> dict[int, list[dict]]:
+    entries: dict[int, list[dict]] = {}
+    for item in decisions.get("event_review_decisions", []) or []:
+        if item.get("decision_type") != "missing_primary_event":
+            continue
+        if item.get("status") not in {"needs_db_update", "active", "applied"}:
+            continue
+        session_number = canon_session_number(item)
+        if session_number is None:
+            continue
+        entries.setdefault(session_number, []).append(item)
+    return entries
+
+
 def entity_mentioned(entity: str, text: str) -> bool:
     low = text.lower()
 
@@ -574,6 +618,20 @@ def location_expr(location: str) -> str:
     return f"(SELECT id FROM location WHERE name = {sql_quote(location)} LIMIT 1)"
 
 
+def canon_location_sql(name: str, description: str = "") -> str:
+    return f"""
+INSERT INTO location (name, location_type_id, description)
+VALUES (
+    {sql_quote(name)},
+    (SELECT id FROM location_type WHERE type_name = 'coastal'),
+    {sql_quote(description)}
+)
+ON CONFLICT (name) DO UPDATE SET
+    location_type_id = COALESCE(location.location_type_id, EXCLUDED.location_type_id),
+    description = COALESCE(NULLIF(location.description, ''), EXCLUDED.description);
+""".strip()
+
+
 def session_sql(session: dict) -> str:
     number = session["session_number"]
     audio_path = BASE2 / "audio" / f"session{number:02d}.wav"
@@ -639,6 +697,30 @@ VALUES (
     {sql_quote(event)},
     {event_significance(event)},
     {sql_quote("Loaded from summary key event")}
+);
+""".strip()
+
+
+def canon_event_sql(session_number: int, sequence: int, item: dict) -> str:
+    description = item.get("description", "").strip()
+    event_type = item.get("event_type", "discovery")
+    location = item.get("location", "")
+    significance = item.get("significance", 4)
+    notes = item.get("reason") or "Loaded from canon_decisions.yaml"
+
+    return f"""
+INSERT INTO session_event (
+    session_id, event_type_id, sequence_order, location_id,
+    description, significance, notes
+)
+VALUES (
+    (SELECT id FROM session WHERE session_number = {session_number}),
+    (SELECT id FROM event_type WHERE type_name = {sql_quote(event_type)}),
+    {sequence},
+    {location_expr(location)},
+    {sql_quote(description)},
+    {significance},
+    {sql_quote("Loaded from canon_decisions.yaml: " + notes)}
 );
 """.strip()
 
@@ -773,7 +855,12 @@ def first_seen_sql(summaries: list[dict]) -> str:
 
 
 def build_sql(summaries: list[dict]) -> str:
-    total_events = sum(len(summary["events"]) for summary in summaries)
+    decisions = load_canon_decisions()
+    primary_locations = canon_primary_locations(decisions)
+    canon_events = canon_event_decisions(decisions)
+    total_events = sum(len(summary["events"]) for summary in summaries) + sum(
+        len(items) for items in canon_events.values()
+    )
     inferred_travel_logs = [
         log
         for summary in summaries
@@ -797,13 +884,28 @@ def build_sql(summaries: list[dict]) -> str:
         "BEGIN;",
     ]
 
+    if any(item.get("canonical") == "Coast near Catur" for item in primary_locations.values()):
+        statements.append(canon_location_sql(
+            "Coast near Catur",
+            "Coast roughly 6 miles from Catur; party staging point before entering the sunken city.",
+        ))
+
     for summary in summaries:
+        decision = primary_locations.get(summary["session_number"])
+        if decision:
+            summary = {**summary, "location": decision.get("canonical", summary["location"])}
         statements.append(session_sql(summary))
 
     for summary in summaries:
         statements.append(delete_events_sql(summary["session_number"]))
         for sequence, event in enumerate(summary["events"], start=1):
             statements.append(event_sql(summary["session_number"], sequence, event))
+        for offset, item in enumerate(canon_events.get(summary["session_number"], []), start=1):
+            statements.append(canon_event_sql(
+                summary["session_number"],
+                len(summary["events"]) + offset,
+                item,
+            ))
 
     for summary in summaries:
         statements.append(delete_travel_logs_sql(summary["session_number"]))
@@ -828,6 +930,9 @@ def discover_summaries() -> list[dict]:
 
 def write_sql() -> Path:
     summaries = discover_summaries()
+    decisions = load_canon_decisions()
+    canon_events = canon_event_decisions(decisions)
+    canon_event_count = sum(len(items) for items in canon_events.values())
     trusted_travel_logs = load_travel_facts()
     inferred_travel_logs = [
         log
@@ -847,7 +952,9 @@ def write_sql() -> Path:
     OUT_SQL.write_text(build_sql(summaries), encoding="utf-8")
     print(f"Wrote {OUT_SQL}")
     print(f"Sessions: {len(summaries)}")
-    print(f"Events: {sum(len(summary['events']) for summary in summaries)}")
+    print(f"Events: {sum(len(summary['events']) for summary in summaries) + canon_event_count}")
+    if canon_event_count:
+        print(f"Canon events: {canon_event_count}")
     print(f"Travel logs: {travel_log_count}")
     return OUT_SQL
 
