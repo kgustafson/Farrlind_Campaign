@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Review Dashboard{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <h1>Review Dashboard</h1>
+    <p>Campaign canon review status across loaded sessions.</p>
+  </div>
+</section>
+
+<section class="table-wrap">
+  <table class="status-table">
+    <thead>
+      <tr>
+        <th>Session</th>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Pending</th>
+        <th>Unapplied</th>
+        <th>Final</th>
+        <th>Next</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td class="session-cell">{{ row.session }}</td>
+        <td>{{ row.title or Untitled }}</td>
+        <td><span class="badge status-{{ row.status }}">{{ row.status }}</span></td>
+        <td>{{ row.pending_decisions }}</td>
+        <td>{{ row.unapplied_items }}</td>
+        <td>{% if row.final_exists %}<span class="ok">yes</span>{% else %}<span class="muted">no</span>{% endif %}</td>
+        <td><span class="badge next">{{ row.next_action }}</span></td>
+        <td><a class="icon-link" title="Open review" href="/sessions/{{ row.session }}/review">Open</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

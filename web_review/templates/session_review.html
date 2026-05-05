@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}{{ session_key }} Review{% endblock %}
+{% block content %}
+<form method="post" action="/sessions/{{ session_key }}/review/save" class="review-form">
+<input type="hidden" name="source" value="{{ source }}">
+<input type="hidden" name="view" value="{{ source_view }}">
+<section class="workspace-head">
+  <div>
+    <h1>{{ session_key }} Review</h1>
+    <p>{{ document.session_title or "Untitled" }}</p>
+  </div>
+  <div class="action-strip">
+    <button type="submit" {% if not document or review_locked %}disabled{% endif %}>Save Review</button>
+    <button type="submit" formaction="/sessions/{{ session_key }}/review/reopen" formmethod="post" {% if not review_locked %}disabled{% endif %}>Reopen Review</button>
+    <button type="button" disabled>Mark Reviewed</button>
+    <button type="button" disabled>Apply to Database</button>
+    <button type="button" disabled>Write Final Summary</button>
+  </div>
+</section>
+
+{% if request.query_params.get("saved") %}
+  <div class="flash">Review YAML saved.</div>
+{% endif %}
+{% if request.query_params.get("reopened") %}
+  <div class="flash">Review reopened for editing. Save Review writes YAML only.</div>
+{% endif %}
+{% if review_locked %}
+  <div class="flash muted-flash">Applied review is locked. Use Reopen Review to make YAML edits.</div>
+{% endif %}
+
+<section class="workspace-grid">
+  <aside class="source-pane">
+    <div class="segmented" aria-label="Source selector">
+      <a class="{% if source == "diary" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=diary&view={{ source_view }}">Diary</a>
+      <a class="{% if source == "draft" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=draft&view={{ source_view }}">Draft Summary</a>
+      <a class="{% if source == "final" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=final&view={{ source_view }}">Final Summary</a>
+    </div>
+    <div class="source-toolbar">
+      <h2>{{ source_label }}</h2>
+      <div class="segmented compact" aria-label="Source view selector">
+        <a class="{% if source_view == "raw" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source={{ source }}&view=raw">Source</a>
+        <a class="{% if source_view == "print" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source={{ source }}&view=print">Print</a>
+      </div>
+    </div>
+    {% if source_view == "print" %}
+      <article class="source-rendered">{{ source_html | safe }}</article>
+    {% else %}
+      <pre class="source-text">{{ source_text }}</pre>
+    {% endif %}
+  </aside>
+
+  <section class="review-list">
+    {% if not document %}
+      <div class="empty-state">Review file has not been initialized.</div>
+    {% endif %}
+    {% for item in items %}
+    <article class="review-item editable-item">
+      <input type="hidden" name="item_id" value="{{ item.id }}">
+      <input type="hidden" name="section" value="{{ item.section }}">
+      <div class="item-topline">
+        <span class="item-id">{{ item.id }}</span>
+        <label class="compact-field sequence-field">
+          <span>Seq</span>
+          <input name="sequence" value="{{ item.sequence }}" inputmode="decimal" {% if review_locked %}disabled{% endif %}>
+        </label>
+        <label class="compact-field decision-field">
+          <span>Decision</span>
+          <select name="decision" {% if review_locked %}disabled{% endif %}>
+            {% for decision in ["pending", "accepted", "rejected", "corrected", "added"] %}
+              <option value="{{ decision }}" {% if item.decision == decision %}selected{% endif %}>{{ decision }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <span class="badge applied-{{ item.applied_status }}">{{ item.applied_status }}</span>
+      </div>
+
+      <p class="source-snippet">{{ item.source_text or item.canonical_text }}</p>
+
+      <label class="field-block">
+        <span>Canonical Text</span>
+        <textarea name="canonical_text" rows="3" {% if review_locked %}disabled{% endif %}>{{ item.canonical_text or "" }}</textarea>
+      </label>
+
+      <div class="edit-grid">
+        <label>
+          <span>Type</span>
+          <select name="event_type" {% if review_locked %}disabled{% endif %}>
+            <option value="">unset</option>
+            {% for event_type in event_types %}
+              <option value="{{ event_type }}" {% if item.event_type == event_type %}selected{% endif %}>{{ event_type }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span>Location</span>
+          <input name="location" list="location-options" value="{{ item.location or "" }}" {% if review_locked %}disabled{% endif %}>
+        </label>
+        <label>
+          <span>Significance</span>
+          <input name="significance" type="number" min="1" max="5" value="{{ item.significance or "" }}" {% if review_locked %}disabled{% endif %}>
+        </label>
+      </div>
+
+      <label class="field-block">
+        <span>Reason</span>
+        <input name="reason" value="{{ item.reason or "" }}" {% if review_locked %}disabled{% endif %}>
+      </label>
+    </article>
+    {% endfor %}
+  </section>
+
+  <aside class="meta-pane">
+    <section>
+      <h2>Session</h2>
+      <dl class="meta-list">
+        <div><dt>Status</dt><dd>{{ summary.status }}</dd></div>
+        <div><dt>Date</dt><dd>{{ document.session_date or "unknown" }}</dd></div>
+        <div><dt>In Game</dt><dd>{{ document.in_game_date or "unknown" }}</dd></div>
+        <div><dt>Location</dt><dd>{{ document.primary_location or "unknown" }}</dd></div>
+        <div><dt>Items</dt><dd>{{ summary.total_items }}</dd></div>
+      </dl>
+    </section>
+    <section>
+      <h2>Validation</h2>
+      <ul class="validation-list">
+        {% for note in validation %}<li>{{ note }}</li>{% endfor %}
+      </ul>
+    </section>
+  </aside>
+</section>
+<datalist id="location-options">
+  {% for location in locations %}<option value="{{ location }}"></option>{% endfor %}
+</datalist>
+</form>
+{% endblock %}
