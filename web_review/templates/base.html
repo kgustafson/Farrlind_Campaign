@@ -13,8 +13,27 @@
       <a href="/">Dashboard</a>
     </nav>
   </header>
-  <main>
-    {% block content %}{% endblock %}
-  </main>
+  <div class="app-shell">
+    <aside class="archive-sidebar" aria-label="Campaign archive navigation">
+      <div class="sidebar-title">
+        <span>Codex Index</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="sidebar-link active" href="/">Dashboard</a>
+        <span class="sidebar-link disabled" aria-disabled="true">Sessions</span>
+        <span class="sidebar-link disabled" aria-disabled="true">Wells of Magic</span>
+        <span class="sidebar-link disabled" aria-disabled="true">NPC Registry</span>
+        <span class="sidebar-link disabled" aria-disabled="true">Locations</span>
+        <span class="sidebar-link disabled" aria-disabled="true">Artifacts</span>
+        <span class="sidebar-link disabled" aria-disabled="true">Open Threads</span>
+        <span class="sidebar-link disabled" aria-disabled="true">Faban&rsquo;s Songbook</span>
+        <span class="sidebar-link disabled" aria-disabled="true">Validation Queue</span>
+        <span class="sidebar-link disabled" aria-disabled="true">Campaign Timeline</span>
+      </nav>
+    </aside>
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+  </div>
 </body>
 </html>
