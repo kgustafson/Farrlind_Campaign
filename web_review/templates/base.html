@@ -6,9 +6,9 @@
   <title>{% block title %}Farrlind Review{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', path='review.css') }}">
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
   <header class="app-header">
-    <a class="brand" href="/">Farrlind Review</a>
+    <a class="brand" href="/">The Farrlind Archivum</a>
     <nav class="top-nav">
       <a href="/">Dashboard</a>
     </nav>

@@ -1,15 +1,18 @@
 {% extends "base.html" %}
-{% block title %}Review Dashboard{% endblock %}
+{% block title %}The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
 {% block content %}
-<section class="page-head">
+<section class="page-head archive-hero">
   <div>
-    <h1>Review Dashboard</h1>
-    <p>Campaign canon review status across loaded sessions.</p>
+    <p class="eyebrow">Campaign Canon Ledger</p>
+    <h1>The Farrlind Archivum</h1>
+    <p>Reviewed sessions, pending decisions, and final canon records preserved in one working archive.</p>
   </div>
 </section>
 
-<section class="table-wrap">
+<section class="table-wrap archive-ledger" aria-label="Session review ledger">
   <table class="status-table">
+    <caption>Session Review Ledger</caption>
     <thead>
       <tr>
         <th>Session</th>
@@ -25,14 +28,14 @@
     <tbody>
       {% for row in rows %}
       <tr>
-        <td class="session-cell">{{ row.session }}</td>
-        <td>{{ row.title or Untitled }}</td>
-        <td><span class="badge status-{{ row.status }}">{{ row.status }}</span></td>
-        <td>{{ row.pending_decisions }}</td>
-        <td>{{ row.unapplied_items }}</td>
-        <td>{% if row.final_exists %}<span class="ok">yes</span>{% else %}<span class="muted">no</span>{% endif %}</td>
-        <td><span class="badge next">{{ row.next_action }}</span></td>
-        <td><a class="icon-link" title="Open review" href="/sessions/{{ row.session }}/review">Open</a></td>
+        <td class="session-cell" data-label="Session">{{ row.session }}</td>
+        <td data-label="Title">{{ row.title or "Untitled" }}</td>
+        <td data-label="Status"><span class="badge status-{{ row.status }}">{{ row.status }}</span></td>
+        <td data-label="Pending">{{ row.pending_decisions }}</td>
+        <td data-label="Unapplied">{{ row.unapplied_items }}</td>
+        <td data-label="Final">{% if row.final_exists %}<span class="ok">yes</span>{% else %}<span class="muted">no</span>{% endif %}</td>
+        <td data-label="Next"><span class="badge next">{{ row.next_action }}</span></td>
+        <td data-label="Open"><a class="icon-link" title="Open review" href="/sessions/{{ row.session }}/review">Open</a></td>
       </tr>
       {% endfor %}
     </tbody>
