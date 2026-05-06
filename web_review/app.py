@@ -94,6 +94,44 @@ async def reopen_session_review(request: Request, session: str):
     )
 
 
+@app.post("/sessions/{session}/review/add-item")
+async def add_session_review_item(request: Request, session: str):
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    document = reviews.load_review_document(session_number)
+    if not document:
+        raise HTTPException(status_code=404, detail="Review file has not been initialized.")
+    if document.get("status") == "applied":
+        raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
+
+    form = await request.form()
+    item_values = {
+        "sequence": form.get("new_sequence") or "",
+        "canonical_text": form.get("new_canonical_text") or "",
+        "event_type": form.get("new_event_type") or "",
+        "location": form.get("new_location") or "",
+        "significance": form.get("new_significance") or "",
+        "reason": form.get("new_reason") or "",
+    }
+    updated, errors = reviews.add_review_item(document, item_values)
+    if not errors:
+        try:
+            reviews.save_review_document(session_number, updated)
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=str(exc))
+
+    source = form.get("source") or "diary"
+    view = form.get("view") or "raw"
+    flag = "item_added=1" if not errors else "item_add_failed=1"
+    return RedirectResponse(
+        url=f"/sessions/{reviews.session_key(session_number)}/review?source={source}&view={view}&{flag}",
+        status_code=303,
+    )
+
+
 @app.post("/sessions/{session}/review/mark-reviewed")
 async def mark_session_reviewed(request: Request, session: str):
     try:

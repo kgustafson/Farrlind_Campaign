@@ -194,6 +194,18 @@ button:disabled {
   gap: 10px;
   margin-top: 12px;
 }
+.edit-grid.two-col {
+  grid-template-columns: minmax(180px, 1fr) minmax(220px, 1.2fr);
+}
+.add-item-panel {
+  border-style: dashed;
+  background: #fbfcfa;
+}
+.panel-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
 .field-block input,
 .field-block textarea,
 .edit-grid input,

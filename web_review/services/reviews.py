@@ -268,6 +268,48 @@ def _first(values: dict[str, list[str]], key: str, index: int, default: str = ""
     return items[index]
 
 
+def next_added_item_id(document: dict[str, Any]) -> str:
+    highest = 0
+    for item in document.get("added_items") or []:
+        match = re.search(r"added-(\d+)$", str(item.get("id") or ""))
+        if match:
+            highest = max(highest, int(match.group(1)))
+    return f"added-{highest + 1:03d}"
+
+
+def build_added_item(document: dict[str, Any], values: dict[str, Any], added_on: Optional[str] = None) -> dict[str, Any]:
+    return {
+        "id": next_added_item_id(document),
+        "sequence": _coerce_sequence(values.get("sequence")),
+        "source_type": "user_added",
+        "source_text": "",
+        "decision": "added",
+        "canonical_text": str(values.get("canonical_text") or "").strip(),
+        "event_type": str(values.get("event_type") or "").strip(),
+        "location": str(values.get("location") or "").strip(),
+        "significance": _coerce_significance(values.get("significance")),
+        "reason": str(values.get("reason") or "").strip(),
+        "decided_by": "user",
+        "decided_on": added_on or date.today().isoformat(),
+        "applied_status": "pending",
+        "applied_on": "",
+    }
+
+
+def add_review_item(document: dict[str, Any], values: dict[str, Any], added_on: Optional[str] = None) -> tuple[dict[str, Any], list[str]]:
+    item = build_added_item(document, values, added_on)
+    errors = []
+    for field in ["sequence", "canonical_text", "event_type", "location", "significance", "reason"]:
+        if item.get(field) in {None, ""}:
+            errors.append(f"Added item is missing {field}.")
+    if errors:
+        return document, errors
+
+    updated = dict(document)
+    updated["added_items"] = [*(updated.get("added_items") or []), item]
+    return updated, []
+
+
 def update_review_document_from_form(document: dict[str, Any], form_values: dict[str, list[str]]) -> dict[str, Any]:
     updated = dict(document)
     item_ids = form_values.get("item_id") or []

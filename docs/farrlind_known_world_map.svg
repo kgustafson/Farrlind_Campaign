@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="980" viewBox="0 0 1500 980" role="img" aria-labelledby="title desc">
+  <title id="title">Farrlind Known World Map - Canon Draft</title>
+  <desc id="desc">A schematic campaign travel map from Bentrios through the Fey Woods, Thataways, Bellemaine, the Archaeological Dig Site, Druid Retreat, Paramon, Balrog, and the Coast near Catur.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5f5144"/>
+    </marker>
+    <marker id="arrow-dim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b8f8c"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#4d3f31" flood-opacity="0.22"/>
+    </filter>
+    <style>
+      .bg { fill: #f4ecd5; }
+      .sea { fill: #bdd6dc; opacity: 0.55; }
+      .coast { fill: none; stroke: #7ca6ad; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 10 10; opacity: 0.8; }
+      .mountain { fill: #d5d0c1; stroke: #8a8170; stroke-width: 2; }
+      .forest { fill: #c9ddb8; stroke: #6f8e5f; stroke-width: 2; opacity: 0.85; }
+      .road { fill: none; stroke: #5f5144; stroke-width: 4; stroke-linecap: round; marker-end: url(#arrow); }
+      .road-medium { fill: none; stroke: #8b8f8c; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 12 10; marker-end: url(#arrow-dim); }
+      .portal { fill: none; stroke: #5b6e9b; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 6 8; marker-end: url(#arrow); }
+      .nearby { fill: none; stroke: #8b8f8c; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 6 8; marker-end: url(#arrow-dim); }
+      .label { font-family: ui-serif, Georgia, serif; fill: #2d281f; font-size: 20px; font-weight: 700; }
+      .small { font-family: ui-sans-serif, system-ui, sans-serif; fill: #4d463b; font-size: 13px; }
+      .tiny { font-family: ui-sans-serif, system-ui, sans-serif; fill: #5d554a; font-size: 12px; }
+      .route-label { font-family: ui-sans-serif, system-ui, sans-serif; fill: #3f382f; font-size: 12px; font-weight: 650; }
+      .unknown { font-family: ui-sans-serif, system-ui, sans-serif; fill: #766c5f; font-size: 14px; font-style: italic; }
+      .city { fill: #f9f3df; stroke: #7b633d; stroke-width: 3; }
+      .wild { fill: #e4f0df; stroke: #4d7c59; stroke-width: 3; }
+      .danger { fill: #f3e1df; stroke: #9a4d48; stroke-width: 3; }
+      .roadnode { fill: #eef1f4; stroke: #687382; stroke-width: 3; }
+      .badge { fill: #fffaf0; stroke: #c8b98e; stroke-width: 1.5; }
+      .title { font-family: ui-serif, Georgia, serif; fill: #2d281f; font-size: 38px; font-weight: 800; }
+      .subtitle { font-family: ui-sans-serif, system-ui, sans-serif; fill: #5d554a; font-size: 16px; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1500" height="980"/>
+  <path class="sea" d="M1160,0 C1120,120 1190,210 1160,330 C1128,458 1228,548 1198,682 C1172,800 1228,900 1210,980 L1500,980 L1500,0 Z"/>
+  <path class="coast" d="M1135,25 C1094,119 1157,210 1127,325 C1092,455 1185,548 1152,675 C1126,770 1166,864 1150,950"/>
+
+  <ellipse class="forest" cx="342" cy="310" rx="230" ry="150"/>
+  <ellipse class="forest" cx="565" cy="375" rx="140" ry="90"/>
+  <path class="mountain" d="M790,405 l44,-86 l46,86 z"/>
+  <path class="mountain" d="M858,415 l52,-110 l58,110 z"/>
+  <path class="mountain" d="M930,430 l43,-82 l50,82 z"/>
+  <path class="mountain" d="M858,520 l46,-91 l52,91 z"/>
+
+  <text class="title" x="70" y="72">Farrlind Known World</text>
+  <text class="subtitle" x="72" y="100">Canon travel schematic through Session 20. Geography is approximate; routes are reviewed campaign truth.</text>
+
+  <!-- Routes -->
+  <path class="road" d="M185,510 C205,430 228,365 268,314"/>
+  <path class="road" d="M343,281 C384,246 438,238 486,258"/>
+  <path class="road" d="M486,306 C392,392 276,462 198,512"/>
+  <path class="road" d="M205,545 C290,495 413,427 492,318"/>
+  <path class="road-medium" d="M552,301 C590,308 622,326 646,355"/>
+  <path class="road-medium" d="M688,384 C724,408 760,438 804,485"/>
+  <path class="road" d="M854,511 C880,568 882,632 866,700"/>
+  <path class="road-medium" d="M889,732 C942,726 985,698 1015,642"/>
+  <path class="road-medium" d="M1028,596 C1014,545 991,500 960,462"/>
+  <path class="road" d="M930,424 C911,379 896,337 886,294"/>
+  <path class="portal" d="M909,250 C995,258 1064,285 1112,334"/>
+  <path class="road" d="M1145,392 C1096,466 1050,534 1000,605"/>
+  <path class="road" d="M990,650 C1024,724 1084,780 1168,818"/>
+  <path class="road" d="M1219,814 C1276,779 1315,715 1340,642"/>
+  <path class="nearby" d="M1362,604 C1393,569 1410,523 1408,475"/>
+
+  <!-- Nodes -->
+  <g filter="url(#shadow)">
+    <circle class="city" cx="170" cy="540" r="46"/>
+    <circle class="wild" cx="300" cy="280" r="48"/>
+    <circle class="wild" cx="520" cy="280" r="50"/>
+    <circle class="wild" cx="676" cy="380" r="44"/>
+    <circle class="city" cx="830" cy="510" r="48"/>
+    <circle class="roadnode" cx="860" cy="740" r="54"/>
+    <circle class="danger" cx="1040" cy="625" r="50"/>
+    <circle class="roadnode" cx="940" cy="430" r="46"/>
+    <circle class="wild" cx="875" cy="250" r="50"/>
+    <circle class="city" cx="1135" cy="370" r="52"/>
+    <circle class="roadnode" cx="970" cy="640" r="42"/>
+    <circle class="city" cx="1210" cy="835" r="54"/>
+    <circle class="roadnode" cx="1350" cy="620" r="48"/>
+    <circle class="danger" cx="1410" cy="440" r="44"/>
+  </g>
+
+  <!-- Node labels -->
+  <text class="label" x="120" y="535">Bentrios</text>
+  <text class="small" x="114" y="558">start, tower, first battle</text>
+  <text class="label" x="247" y="276">Fey Woods</text>
+  <text class="small" x="248" y="300">Oak, witch, visions</text>
+  <text class="label" x="469" y="276">Thataways</text>
+  <text class="small" x="458" y="300">fey village, Well Khorag</text>
+  <text class="label" x="614" y="378">Spore</text>
+  <text class="small" x="614" y="400">sanctuary</text>
+  <text class="label" x="775" y="507">Bellemaine</text>
+  <text class="small" x="762" y="530">library, Dao attack</text>
+  <text class="label" x="803" y="735">Caravan Road</text>
+  <text class="small" x="789" y="758">toward dig site</text>
+  <text class="label" x="990" y="618">Dig Site</text>
+  <text class="small" x="984" y="642">abyssal history</text>
+  <text class="label" x="886" y="425">Mountain Road</text>
+  <text class="small" x="884" y="448">storm cave, Cole</text>
+  <text class="label" x="816" y="244">Druid Retreat</text>
+  <text class="small" x="815" y="268">Jennifer / coven</text>
+  <text class="label" x="1090" y="365">Paramon</text>
+  <text class="small" x="1074" y="388">coast, Well, temple</text>
+  <text class="label" x="923" y="637">Crossroads</text>
+  <text class="small" x="922" y="660">festival</text>
+  <text class="label" x="1174" y="831">Balrog</text>
+  <text class="small" x="1149" y="854">dwarven city, Orsydon</text>
+  <text class="label" x="1299" y="616">Coast</text>
+  <text class="small" x="1280" y="640">near Catur</text>
+  <text class="label" x="1374" y="435">Catur</text>
+  <text class="small" x="1364" y="458">sunken city</text>
+
+  <!-- Route labels -->
+  <rect class="badge" x="206" y="402" width="92" height="22" rx="6"/>
+  <text class="route-label" x="216" y="418">S02 1 day</text>
+  <rect class="badge" x="376" y="228" width="104" height="22" rx="6"/>
+  <text class="route-label" x="386" y="244">S04 same day</text>
+  <rect class="badge" x="286" y="422" width="92" height="22" rx="6"/>
+  <text class="route-label" x="296" y="438">S05 1 day</text>
+  <rect class="badge" x="358" y="478" width="92" height="22" rx="6"/>
+  <text class="route-label" x="368" y="494">S06 1 day</text>
+  <rect class="badge" x="602" y="316" width="122" height="22" rx="6"/>
+  <text class="route-label" x="612" y="332">S08 medium</text>
+  <rect class="badge" x="890" y="668" width="128" height="22" rx="6"/>
+  <text class="route-label" x="900" y="684">S12 12 days</text>
+  <rect class="badge" x="920" y="338" width="118" height="22" rx="6"/>
+  <text class="route-label" x="930" y="354">S13 4 days</text>
+  <rect class="badge" x="1002" y="256" width="104" height="22" rx="6"/>
+  <text class="route-label" x="1012" y="272">S14 portal</text>
+  <rect class="badge" x="1070" y="482" width="92" height="22" rx="6"/>
+  <text class="route-label" x="1080" y="498">S17 2d</text>
+  <rect class="badge" x="1066" y="734" width="92" height="22" rx="6"/>
+  <text class="route-label" x="1076" y="750">S17 3d</text>
+  <rect class="badge" x="1286" y="726" width="92" height="22" rx="6"/>
+  <text class="route-label" x="1296" y="742">S20 4d</text>
+
+  <!-- Known but unplaced -->
+  <rect x="70" y="790" width="460" height="130" rx="12" fill="#fff8e6" stroke="#c8b98e" stroke-width="2"/>
+  <text class="label" x="92" y="825">Known but not yet placed</text>
+  <text class="unknown" x="94" y="852">Henedal - across the sea, birthplace of magic</text>
+  <text class="unknown" x="94" y="876">Monastery of the Open Hand - in the Gale</text>
+  <text class="unknown" x="94" y="900">Celestial Isles - devastated outer rim</text>
+
+  <rect x="1035" y="78" width="390" height="112" rx="12" fill="#fff8e6" stroke="#c8b98e" stroke-width="2"/>
+  <text class="label" x="1058" y="112">Legend</text>
+  <line x1="1062" y1="136" x2="1130" y2="136" class="road"/>
+  <text class="small" x="1148" y="141">high-confidence route</text>
+  <line x1="1062" y1="164" x2="1130" y2="164" class="road-medium"/>
+  <text class="small" x="1148" y="169">medium-confidence route</text>
+</svg>

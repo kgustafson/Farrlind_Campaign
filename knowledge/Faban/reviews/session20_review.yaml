@@ -112,7 +112,21 @@ items:
   decided_on: ''
   applied_status: applied
   applied_on: '2026-05-05'
-added_items: []
+added_items:
+- id: added-001
+  sequence: 7
+  source_type: user_added
+  source_text: ''
+  decision: rejected
+  canonical_text: This is test
+  event_type: lore
+  location: Coast near Catur
+  significance: 4
+  reason: Testing
+  decided_by: user
+  decided_on: '2026-05-05'
+  applied_status: applied
+  applied_on: '2026-05-05'
 applied_on: '2026-05-05'
 reopened_on: '2026-05-05'
 reviewed_on: '2026-05-05'

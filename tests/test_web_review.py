@@ -157,6 +157,60 @@ class WebReviewServiceTest(unittest.TestCase):
         self.assertEqual(item["applied_status"], "pending")
         self.assertEqual(item["applied_on"], "")
 
+    def test_add_review_item_appends_valid_added_item(self):
+        document = {
+            "session": "session01",
+            "status": "in_review",
+            "items": [],
+            "added_items": [
+                {"id": "added-001", "decision": "added"},
+            ],
+        }
+        updated, errors = reviews.add_review_item(document, {
+            "sequence": "2.5",
+            "canonical_text": "The party learned a missing truth.",
+            "event_type": "discovery",
+            "location": "Bentrios",
+            "significance": "4",
+            "reason": "Missing from draft.",
+        }, added_on="2026-05-06")
+
+        self.assertEqual(errors, [])
+        item = updated["added_items"][1]
+        self.assertEqual(item["id"], "added-002")
+        self.assertEqual(item["sequence"], 2.5)
+        self.assertEqual(item["source_type"], "user_added")
+        self.assertEqual(item["decision"], "added")
+        self.assertEqual(item["canonical_text"], "The party learned a missing truth.")
+        self.assertEqual(item["event_type"], "discovery")
+        self.assertEqual(item["location"], "Bentrios")
+        self.assertEqual(item["significance"], 4)
+        self.assertEqual(item["reason"], "Missing from draft.")
+        self.assertEqual(item["decided_by"], "user")
+        self.assertEqual(item["decided_on"], "2026-05-06")
+        self.assertEqual(item["applied_status"], "pending")
+
+    def test_add_review_item_reports_missing_required_fields(self):
+        document = {
+            "session": "session01",
+            "status": "in_review",
+            "items": [],
+            "added_items": [],
+        }
+        updated, errors = reviews.add_review_item(document, {
+            "sequence": "",
+            "canonical_text": "",
+            "event_type": "social",
+            "location": "",
+            "significance": "",
+            "reason": "",
+        })
+
+        self.assertIs(updated, document)
+        self.assertIn("Added item is missing sequence.", errors)
+        self.assertIn("Added item is missing canonical_text.", errors)
+        self.assertIn("Added item is missing location.", errors)
+
     def test_reopen_review_document_unlocks_without_dirtying_items(self):
         document = {
             "session": "session01",
@@ -428,6 +482,81 @@ class WebReviewAppTest(unittest.TestCase):
             saved = yaml.safe_load(path.read_text(encoding="utf-8"))
             self.assertEqual(saved["status"], "in_review")
             self.assertEqual(saved["items"][0]["decision"], "pending")
+
+    def test_add_item_route_appends_added_item_and_redirects(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session01_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "in_review",
+                "items": [],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final):
+                client = TestClient(app)
+                response = client.post("/sessions/session01/review/add-item", data={
+                    "source": "diary",
+                    "view": "raw",
+                    "new_sequence": "3.5",
+                    "new_canonical_text": "The party added a missing event.",
+                    "new_event_type": "social",
+                    "new_location": "Bentrios",
+                    "new_significance": "3",
+                    "new_reason": "User remembered it.",
+                }, follow_redirects=False)
+
+            self.assertEqual(response.status_code, 303)
+            self.assertIn("item_added=1", response.headers["location"])
+            saved = yaml.safe_load(path.read_text(encoding="utf-8"))
+            self.assertEqual(saved["added_items"][0]["id"], "added-001")
+            self.assertEqual(saved["added_items"][0]["canonical_text"], "The party added a missing event.")
+
+    def test_add_item_route_does_not_save_invalid_item(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session01_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "in_review",
+                "items": [],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final):
+                client = TestClient(app)
+                response = client.post("/sessions/session01/review/add-item", data={
+                    "source": "diary",
+                    "view": "raw",
+                    "new_sequence": "",
+                    "new_canonical_text": "",
+                    "new_event_type": "social",
+                    "new_location": "",
+                    "new_significance": "",
+                    "new_reason": "",
+                }, follow_redirects=False)
+
+            self.assertEqual(response.status_code, 303)
+            self.assertIn("item_add_failed=1", response.headers["location"])
+            saved = yaml.safe_load(path.read_text(encoding="utf-8"))
+            self.assertEqual(saved["added_items"], [])
 
 
 class CanonServiceTest(unittest.TestCase):
