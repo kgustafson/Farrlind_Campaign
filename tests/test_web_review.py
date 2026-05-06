@@ -808,9 +808,144 @@ class CanonServiceTest(unittest.TestCase):
             self.assertEqual(canon.locations(), ["Balrog", "Catur"])
         self.assertIn("FROM location", fetch.call_args.args[0])
 
+    def test_location_rows_returns_full_location_ledger(self):
+        rows = [{
+            "id": 1,
+            "name": "Bentrios",
+            "location_type": "city",
+            "parent_location": None,
+            "description": "Starting city",
+            "is_underwater": False,
+            "is_feywild": False,
+            "first_visited_session": 0,
+            "notes": "",
+        }]
+        with patch("web_review.db.fetch_all", return_value=rows) as fetch:
+            self.assertEqual(canon.location_rows(), rows)
+        self.assertIn("LEFT JOIN location_type", fetch.call_args.args[0])
+
+    def test_location_crud_services_run_expected_statements(self):
+        values = {
+            "name": "New Place",
+            "location_type_id": 1,
+            "parent_location_id": None,
+            "description": "A new place.",
+            "is_underwater": False,
+            "is_feywild": False,
+            "first_visited_session": None,
+            "notes": "",
+        }
+        with patch("web_review.db.execute") as execute:
+            canon.create_location(values)
+            canon.update_location(12, values)
+            canon.delete_location(12)
+
+        self.assertIn("INSERT INTO location", execute.call_args_list[0].args[0])
+        self.assertIn("UPDATE location", execute.call_args_list[1].args[0])
+        self.assertIn("DELETE FROM location", execute.call_args_list[2].args[0])
+
     def test_event_types_returns_ordered_names_from_db_rows(self):
         with patch("web_review.db.fetch_all", return_value=[{"type_name": "combat"}, {"type_name": "social"}]):
             self.assertEqual(canon.event_types(), ["combat", "social"])
+
+
+class LocationRouteTest(unittest.TestCase):
+    def location_rows(self):
+        return [{
+            "id": 1,
+            "name": "Bentrios",
+            "location_type": "city",
+            "parent_location": None,
+            "description": "Starting city.",
+            "is_underwater": False,
+            "is_feywild": False,
+            "first_visited_session": 0,
+            "notes": "",
+        }]
+
+    def test_locations_page_renders_sidebar_and_ledger(self):
+        with patch("web_review.services.canon.location_rows", return_value=self.location_rows()), \
+             patch("web_review.services.canon.location_types", return_value=[{"id": 1, "type_name": "city"}]):
+            client = TestClient(app)
+            response = client.get("/locations")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Locations", response.text)
+        self.assertIn("Bentrios", response.text)
+        self.assertIn('href="/locations"', response.text)
+
+    def test_create_location_route_writes_form_values(self):
+        with patch("web_review.services.canon.create_location") as create:
+            client = TestClient(app)
+            response = client.post("/locations", data={
+                "name": "Road to Balrog",
+                "location_type_id": "9",
+                "parent_location_id": "",
+                "description": "A mountain road.",
+                "is_underwater": "",
+                "is_feywild": "on",
+                "first_visited_session": "16",
+                "notes": "Cold and dangerous.",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("created=1", response.headers["location"])
+        create.assert_called_once()
+        values = create.call_args.args[0]
+        self.assertEqual(values["name"], "Road to Balrog")
+        self.assertEqual(values["location_type_id"], 9)
+        self.assertTrue(values["is_feywild"])
+        self.assertEqual(values["first_visited_session"], 16)
+
+    def test_edit_location_page_loads_location(self):
+        detail = {
+            "id": 1,
+            "name": "Bentrios",
+            "location_type_id": 1,
+            "parent_location_id": None,
+            "description": "Starting city.",
+            "is_underwater": False,
+            "is_feywild": False,
+            "first_visited_session": 0,
+            "notes": "",
+        }
+        with patch("web_review.services.canon.location_rows", return_value=self.location_rows()), \
+             patch("web_review.services.canon.location_types", return_value=[{"id": 1, "type_name": "city"}]), \
+             patch("web_review.services.canon.location_detail", return_value=detail):
+            client = TestClient(app)
+            response = client.get("/locations/1/edit")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Edit Location", response.text)
+        self.assertIn("Starting city.", response.text)
+
+    def test_update_location_route_writes_form_values(self):
+        with patch("web_review.services.canon.update_location") as update:
+            client = TestClient(app)
+            response = client.post("/locations/3", data={
+                "name": "Catur",
+                "location_type_id": "5",
+                "parent_location_id": "",
+                "description": "Sunken city.",
+                "is_underwater": "on",
+                "first_visited_session": "20",
+                "notes": "",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("updated=1", response.headers["location"])
+        update.assert_called_once()
+        self.assertEqual(update.call_args.args[0], 3)
+        self.assertTrue(update.call_args.args[1]["is_underwater"])
+
+    def test_delete_location_route_runs_delete(self):
+        with patch("web_review.services.canon.delete_location") as delete:
+            client = TestClient(app)
+            response = client.post("/locations/4/delete", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("deleted=1", response.headers["location"])
+        delete.assert_called_once_with(4)
 
 
 class CommandServiceTest(unittest.TestCase):

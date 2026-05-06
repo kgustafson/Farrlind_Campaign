@@ -1,4 +1,5 @@
 from uuid import uuid4
+from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
@@ -44,6 +45,28 @@ def location_confirmation_failed(form_values: dict[str, list[str]], form, known_
     if form.get("confirm_new_locations"):
         return False
     return bool(reviews.unknown_locations(reviews.form_locations(form_values), known_locations))
+
+
+def optional_int(value: Optional[str]) -> Optional[int]:
+    value = (value or "").strip()
+    return int(value) if value else None
+
+
+def checkbox_value(value: Optional[str]) -> bool:
+    return value in {"1", "true", "on", "yes"}
+
+
+def location_form_values(form) -> dict:
+    return {
+        "name": (form.get("name") or "").strip(),
+        "location_type_id": optional_int(form.get("location_type_id")),
+        "parent_location_id": optional_int(form.get("parent_location_id")),
+        "description": (form.get("description") or "").strip(),
+        "is_underwater": checkbox_value(form.get("is_underwater")),
+        "is_feywild": checkbox_value(form.get("is_feywild")),
+        "first_visited_session": optional_int(form.get("first_visited_session")),
+        "notes": (form.get("notes") or "").strip(),
+    }
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -279,6 +302,82 @@ async def run_session_health(request: Request, session: str):
     flag = "health_ok=1" if result.ok else "health_failed=1"
     token = store_command_result("Run Health", result)
     return redirect_to_review(session_number, source, view, f"{flag}&command_result={token}")
+
+
+@app.get("/locations", response_class=HTMLResponse)
+def locations_index(request: Request):
+    try:
+        rows = canon.location_rows()
+        location_types = canon.location_types()
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    return templates.TemplateResponse(
+        request,
+        "locations.html",
+        {
+            "locations": rows,
+            "location_types": location_types,
+            "all_locations": rows,
+            "editing": None,
+        },
+    )
+
+
+@app.post("/locations")
+async def create_location(request: Request):
+    form = await request.form()
+    values = location_form_values(form)
+    if not values["name"]:
+        return RedirectResponse(url="/locations?create_failed=1", status_code=303)
+    try:
+        canon.create_location(values)
+    except canon.CanonWriteError:
+        return RedirectResponse(url="/locations?create_failed=1", status_code=303)
+    return RedirectResponse(url="/locations?created=1", status_code=303)
+
+
+@app.get("/locations/{location_id}/edit", response_class=HTMLResponse)
+def edit_location(request: Request, location_id: int):
+    try:
+        rows = canon.location_rows()
+        location_types = canon.location_types()
+        editing = canon.location_detail(location_id)
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    if not editing:
+        raise HTTPException(status_code=404, detail="Location not found.")
+    return templates.TemplateResponse(
+        request,
+        "locations.html",
+        {
+            "locations": rows,
+            "location_types": location_types,
+            "all_locations": [row for row in rows if row["id"] != location_id],
+            "editing": editing,
+        },
+    )
+
+
+@app.post("/locations/{location_id}")
+async def update_location(request: Request, location_id: int):
+    form = await request.form()
+    values = location_form_values(form)
+    if not values["name"]:
+        return RedirectResponse(url=f"/locations/{location_id}/edit?update_failed=1", status_code=303)
+    try:
+        canon.update_location(location_id, values)
+    except canon.CanonWriteError:
+        return RedirectResponse(url=f"/locations/{location_id}/edit?update_failed=1", status_code=303)
+    return RedirectResponse(url="/locations?updated=1", status_code=303)
+
+
+@app.post("/locations/{location_id}/delete")
+async def delete_location(location_id: int):
+    try:
+        canon.delete_location(location_id)
+    except canon.CanonWriteError:
+        return RedirectResponse(url="/locations?delete_failed=1", status_code=303)
+    return RedirectResponse(url="/locations?deleted=1", status_code=303)
 
 
 @app.get("/api/review-status")

@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Locations | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div>
+    <p class="eyebrow">Campaign Gazetteer</p>
+    <h1>Locations</h1>
+    <p>Known places, regions, roads, sanctuaries, cities, and strange corners of Farrlind.</p>
+  </div>
+</section>
+
+{% if request.query_params.get("created") %}
+  <div class="flash">Location added.</div>
+{% endif %}
+{% if request.query_params.get("updated") %}
+  <div class="flash">Location updated.</div>
+{% endif %}
+{% if request.query_params.get("deleted") %}
+  <div class="flash">Location deleted.</div>
+{% endif %}
+{% if request.query_params.get("create_failed") %}
+  <div class="flash error-flash">Location was not added. Name must be unique and filled in.</div>
+{% endif %}
+{% if request.query_params.get("update_failed") %}
+  <div class="flash error-flash">Location was not updated. Check the name and related fields.</div>
+{% endif %}
+{% if request.query_params.get("delete_failed") %}
+  <div class="flash error-flash">Location was not deleted. It may still be referenced by sessions, events, NPCs, wells, or travel.</div>
+{% endif %}
+
+<section class="locations-layout">
+  <section class="table-wrap archive-ledger" aria-label="Locations ledger">
+    <table class="status-table location-table">
+      <caption>Location Ledger</caption>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Parent</th>
+          <th>Flags</th>
+          <th>First</th>
+          <th>Description</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for location in locations %}
+        <tr>
+          <td class="session-cell" data-label="Name">{{ location.name }}</td>
+          <td data-label="Type">{{ location.location_type or "unknown" }}</td>
+          <td data-label="Parent">{{ location.parent_location or "—" }}</td>
+          <td data-label="Flags">
+            {% if location.is_underwater %}<span class="badge next">underwater</span>{% endif %}
+            {% if location.is_feywild %}<span class="badge status-reviewed">feywild</span>{% endif %}
+            {% if not location.is_underwater and not location.is_feywild %}<span class="muted">—</span>{% endif %}
+          </td>
+          <td data-label="First">{% if location.first_visited_session is not none %}{{ location.first_visited_session }}{% else %}<span class="muted">—</span>{% endif %}</td>
+          <td data-label="Description">{{ location.description or "—" }}</td>
+          <td data-label="Actions">
+            <div class="row-actions">
+              <a class="icon-link" href="/locations/{{ location.id }}/edit">Edit</a>
+              <form method="post" action="/locations/{{ location.id }}/delete">
+                <button class="danger-button" type="submit">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <aside class="location-form-card">
+    <h2>{% if editing %}Edit Location{% else %}Add Location{% endif %}</h2>
+    <form method="post" action="{% if editing %}/locations/{{ editing.id }}{% else %}/locations{% endif %}">
+      <label class="field-block">
+        <span>Name</span>
+        <input name="name" required value="{{ editing.name if editing else '' }}">
+      </label>
+      <label class="field-block">
+        <span>Type</span>
+        <select name="location_type_id">
+          <option value="">unknown</option>
+          {% for location_type in location_types %}
+            <option value="{{ location_type.id }}" {% if editing and editing.location_type_id == location_type.id %}selected{% endif %}>{{ location_type.type_name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field-block">
+        <span>Parent Location</span>
+        <select name="parent_location_id">
+          <option value="">none</option>
+          {% for location in all_locations %}
+            <option value="{{ location.id }}" {% if editing and editing.parent_location_id == location.id %}selected{% endif %}>{{ location.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field-block">
+        <span>First Visited Session</span>
+        <input name="first_visited_session" inputmode="numeric" value="{{ editing.first_visited_session if editing and editing.first_visited_session is not none else '' }}">
+      </label>
+      <label class="field-block">
+        <span>Description</span>
+        <textarea name="description">{{ editing.description if editing else '' }}</textarea>
+      </label>
+      <label class="field-block">
+        <span>Notes</span>
+        <textarea name="notes">{{ editing.notes if editing else '' }}</textarea>
+      </label>
+      <div class="location-checks">
+        <label class="check-row">
+          <input type="checkbox" name="is_underwater" {% if editing and editing.is_underwater %}checked{% endif %}>
+          <span>Underwater</span>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" name="is_feywild" {% if editing and editing.is_feywild %}checked{% endif %}>
+          <span>Feywild</span>
+        </label>
+      </div>
+      <div class="panel-actions split-actions">
+        {% if editing %}<a class="icon-link secondary-link" href="/locations">Cancel</a>{% endif %}
+        <button type="submit">{% if editing %}Save Location{% else %}Add Location{% endif %}</button>
+      </div>
+    </form>
+  </aside>
+</section>
+{% endblock %}
