@@ -848,6 +848,22 @@ class CommandServiceTest(unittest.TestCase):
             "session20",
         ])
 
+    def test_run_health_runs_existing_dm_query_command(self):
+        completed = type("Completed", (), {
+            "returncode": 0,
+            "stdout": "healthy",
+            "stderr": "",
+        })()
+        with patch("web_review.services.commands.subprocess.run", return_value=completed) as run:
+            result = commands.run_health()
+
+        self.assertTrue(result.ok)
+        command = run.call_args.args[0]
+        self.assertEqual(command[-2:], [
+            str(reviews.REPO_ROOT / "scripts" / "dm_query.py"),
+            "health",
+        ])
+
     def test_apply_review_route_requires_reviewed_status(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -1028,6 +1044,69 @@ class CommandServiceTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 303)
         self.assertIn("final_failed=1", response.headers["location"])
+        self.assertIn("command_result=", response.headers["location"])
+
+    def test_run_health_route_runs_command_and_reports_output(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session01_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "in_review",
+                "items": [],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final), \
+                 patch("web_review.services.commands.run_health", return_value=commands.CommandResult(0, "healthy", "")) as health:
+                client = TestClient(app)
+                response = client.post("/sessions/session01/review/health", data={
+                    "source": "final",
+                    "view": "print",
+                }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("health_ok=1", response.headers["location"])
+        self.assertIn("command_result=", response.headers["location"])
+        health.assert_called_once_with()
+
+    def test_run_health_route_reports_command_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session01_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "applied",
+                "items": [],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final), \
+                 patch("web_review.services.commands.run_health", return_value=commands.CommandResult(1, "", "needs attention")):
+                client = TestClient(app)
+                response = client.post("/sessions/session01/review/health", data={
+                    "source": "diary",
+                    "view": "raw",
+                }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("health_failed=1", response.headers["location"])
         self.assertIn("command_result=", response.headers["location"])
 
 

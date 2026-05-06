@@ -265,6 +265,22 @@ async def write_session_final_summary(request: Request, session: str):
     return redirect_to_review(session_number, source, view, f"{flag}&command_result={token}")
 
 
+@app.post("/sessions/{session}/review/health")
+async def run_session_health(request: Request, session: str):
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    form = await request.form()
+    result = commands.run_health()
+    source = form.get("source") or "diary"
+    view = form.get("view") or "raw"
+    flag = "health_ok=1" if result.ok else "health_failed=1"
+    token = store_command_result("Run Health", result)
+    return redirect_to_review(session_number, source, view, f"{flag}&command_result={token}")
+
+
 @app.get("/api/review-status")
 def api_review_status():
     return [row.__dict__ for row in reviews.dashboard_rows()]

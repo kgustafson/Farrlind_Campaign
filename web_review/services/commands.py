@@ -37,6 +37,23 @@ def run_review_command(action: str, session_number: int, timeout: Optional[int] 
     return CommandResult(completed.returncode, completed.stdout, completed.stderr)
 
 
+def run_health(timeout: Optional[int] = 120) -> CommandResult:
+    command = [
+        str(reviews.REPO_ROOT / "rag-env" / "bin" / "python"),
+        str(reviews.REPO_ROOT / "scripts" / "dm_query.py"),
+        "health",
+    ]
+    completed = subprocess.run(
+        command,
+        cwd=str(reviews.REPO_ROOT),
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+    )
+    return CommandResult(completed.returncode, completed.stdout, completed.stderr)
+
+
 def apply_review(session_number: int) -> CommandResult:
     return run_review_command("apply-review", session_number)
 
