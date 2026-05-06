@@ -51,6 +51,12 @@
 {% if request.query_params.get("item_add_failed") %}
   <div class="flash error-flash">Item was not added. Fill every Add Item field.</div>
 {% endif %}
+{% if request.query_params.get("item_removed") %}
+  <div class="flash">Removed added item.</div>
+{% endif %}
+{% if request.query_params.get("item_remove_failed") %}
+  <div class="flash error-flash">Added item was not removed.</div>
+{% endif %}
 
 <section class="workspace-grid">
   <aside class="source-pane">
@@ -129,6 +135,11 @@
         <span>Reason</span>
         <input name="reason" value="{{ item.reason or "" }}" {% if review_locked %}disabled{% endif %}>
       </label>
+      {% if item.section == "added_items" %}
+      <div class="panel-actions">
+        <button type="submit" formaction="/sessions/{{ session_key }}/review/remove-added-item" formmethod="post" name="remove_item_id" value="{{ item.id }}" {% if review_locked %}disabled{% endif %}>Remove Added Item</button>
+      </div>
+      {% endif %}
     </article>
     {% endfor %}
 

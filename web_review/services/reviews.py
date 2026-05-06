@@ -310,6 +310,26 @@ def add_review_item(document: dict[str, Any], values: dict[str, Any], added_on: 
     return updated, []
 
 
+def remove_added_item(document: dict[str, Any], item_id: str) -> tuple[dict[str, Any], list[str]]:
+    if not item_id:
+        return document, ["Missing added item id."]
+
+    removed = False
+    kept = []
+    for item in document.get("added_items") or []:
+        if item.get("id") == item_id:
+            removed = True
+            continue
+        kept.append(item)
+
+    if not removed:
+        return document, [f"Added item not found: {item_id}."]
+
+    updated = dict(document)
+    updated["added_items"] = kept
+    return updated, []
+
+
 def update_review_document_from_form(document: dict[str, Any], form_values: dict[str, list[str]]) -> dict[str, Any]:
     updated = dict(document)
     item_ids = form_values.get("item_id") or []

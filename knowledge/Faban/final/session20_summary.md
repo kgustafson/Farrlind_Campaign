@@ -27,7 +27,6 @@
 ## Excluded Draft Items
 
 - Roon continues to survive against all odds
-- This is test Reason: Testing
 
 ## Provenance
 

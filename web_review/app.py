@@ -132,6 +132,36 @@ async def add_session_review_item(request: Request, session: str):
     )
 
 
+@app.post("/sessions/{session}/review/remove-added-item")
+async def remove_session_added_item(request: Request, session: str):
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    document = reviews.load_review_document(session_number)
+    if not document:
+        raise HTTPException(status_code=404, detail="Review file has not been initialized.")
+    if document.get("status") == "applied":
+        raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
+
+    form = await request.form()
+    updated, errors = reviews.remove_added_item(document, form.get("remove_item_id") or "")
+    if not errors:
+        try:
+            reviews.save_review_document(session_number, updated)
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=str(exc))
+
+    source = form.get("source") or "diary"
+    view = form.get("view") or "raw"
+    flag = "item_removed=1" if not errors else "item_remove_failed=1"
+    return RedirectResponse(
+        url=f"/sessions/{reviews.session_key(session_number)}/review?source={source}&view={view}&{flag}",
+        status_code=303,
+    )
+
+
 @app.post("/sessions/{session}/review/mark-reviewed")
 async def mark_session_reviewed(request: Request, session: str):
     try:

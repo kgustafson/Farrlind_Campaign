@@ -211,6 +211,38 @@ class WebReviewServiceTest(unittest.TestCase):
         self.assertIn("Added item is missing canonical_text.", errors)
         self.assertIn("Added item is missing location.", errors)
 
+    def test_remove_added_item_removes_only_matching_added_item(self):
+        document = {
+            "session": "session01",
+            "status": "in_review",
+            "items": [
+                {"id": "event-001", "decision": "accepted"},
+            ],
+            "added_items": [
+                {"id": "added-001", "decision": "added"},
+                {"id": "added-002", "decision": "added"},
+            ],
+        }
+        updated, errors = reviews.remove_added_item(document, "added-001")
+
+        self.assertEqual(errors, [])
+        self.assertEqual([item["id"] for item in updated["items"]], ["event-001"])
+        self.assertEqual([item["id"] for item in updated["added_items"]], ["added-002"])
+
+    def test_remove_added_item_reports_missing_item(self):
+        document = {
+            "session": "session01",
+            "status": "in_review",
+            "items": [
+                {"id": "event-001", "decision": "accepted"},
+            ],
+            "added_items": [],
+        }
+        updated, errors = reviews.remove_added_item(document, "event-001")
+
+        self.assertIs(updated, document)
+        self.assertEqual(errors, ["Added item not found: event-001."])
+
     def test_reopen_review_document_unlocks_without_dirtying_items(self):
         document = {
             "session": "session01",
@@ -555,6 +587,106 @@ class WebReviewAppTest(unittest.TestCase):
 
             self.assertEqual(response.status_code, 303)
             self.assertIn("item_add_failed=1", response.headers["location"])
+            saved = yaml.safe_load(path.read_text(encoding="utf-8"))
+            self.assertEqual(saved["added_items"], [])
+
+    def test_remove_added_item_route_removes_item_and_redirects(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session01_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "in_review",
+                "items": [],
+                "added_items": [
+                    {"id": "added-001", "decision": "added"},
+                    {"id": "added-002", "decision": "added"},
+                ],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final):
+                client = TestClient(app)
+                response = client.post("/sessions/session01/review/remove-added-item", data={
+                    "source": "diary",
+                    "view": "raw",
+                    "remove_item_id": "added-001",
+                }, follow_redirects=False)
+
+            self.assertEqual(response.status_code, 303)
+            self.assertIn("item_removed=1", response.headers["location"])
+            saved = yaml.safe_load(path.read_text(encoding="utf-8"))
+            self.assertEqual([item["id"] for item in saved["added_items"]], ["added-002"])
+
+    def test_remove_added_item_route_rejects_applied_review_until_reopened(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session01_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "applied",
+                "items": [],
+                "added_items": [
+                    {"id": "added-001", "decision": "added", "applied_status": "applied"},
+                ],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final):
+                client = TestClient(app)
+                response = client.post("/sessions/session01/review/remove-added-item", data={
+                    "source": "diary",
+                    "view": "raw",
+                    "remove_item_id": "added-001",
+                })
+
+        self.assertEqual(response.status_code, 409)
+
+    def test_remove_added_item_route_allows_reopened_applied_review(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session01_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "in_review",
+                "reopened_on": "2026-05-06",
+                "items": [],
+                "added_items": [
+                    {"id": "added-001", "decision": "added", "applied_status": "applied"},
+                ],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final):
+                client = TestClient(app)
+                response = client.post("/sessions/session01/review/remove-added-item", data={
+                    "source": "diary",
+                    "view": "raw",
+                    "remove_item_id": "added-001",
+                }, follow_redirects=False)
+
+            self.assertEqual(response.status_code, 303)
             saved = yaml.safe_load(path.read_text(encoding="utf-8"))
             self.assertEqual(saved["added_items"], [])
 
