@@ -8,6 +8,7 @@
     <h1>Locations</h1>
     <p>Known places, regions, roads, sanctuaries, cities, and strange corners of Farrlind.</p>
   </div>
+  <a class="icon-link add-new-link" href="/locations?modal=add">Add New</a>
 </section>
 
 {% if request.query_params.get("created") %}
@@ -29,50 +30,54 @@
   <div class="flash error-flash">Location was not deleted. It may still be referenced by sessions, events, NPCs, wells, or travel.</div>
 {% endif %}
 
-<section class="locations-layout">
-  <section class="table-wrap archive-ledger" aria-label="Locations ledger">
-    <table class="status-table location-table">
-      <caption>Location Ledger</caption>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Parent</th>
-          <th>Flags</th>
-          <th>First</th>
-          <th>Description</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for location in locations %}
-        <tr>
-          <td class="session-cell" data-label="Name">{{ location.name }}</td>
-          <td data-label="Type">{{ location.location_type or "unknown" }}</td>
-          <td data-label="Parent">{{ location.parent_location or "—" }}</td>
-          <td data-label="Flags">
-            {% if location.is_underwater %}<span class="badge next">underwater</span>{% endif %}
-            {% if location.is_feywild %}<span class="badge status-reviewed">feywild</span>{% endif %}
-            {% if not location.is_underwater and not location.is_feywild %}<span class="muted">—</span>{% endif %}
-          </td>
-          <td data-label="First">{% if location.first_visited_session is not none %}{{ location.first_visited_session }}{% else %}<span class="muted">—</span>{% endif %}</td>
-          <td data-label="Description">{{ location.description or "—" }}</td>
-          <td data-label="Actions">
-            <div class="row-actions">
-              <a class="icon-link" href="/locations/{{ location.id }}/edit">Edit</a>
-              <form method="post" action="/locations/{{ location.id }}/delete">
-                <button class="danger-button" type="submit">Delete</button>
-              </form>
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </section>
+<section class="table-wrap archive-ledger" aria-label="Locations ledger">
+  <table class="status-table location-table">
+    <caption>Location Ledger</caption>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Parent</th>
+        <th>Flags</th>
+        <th>First</th>
+        <th>Description</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for location in locations %}
+      <tr>
+        <td class="session-cell" data-label="Name">{{ location.name }}</td>
+        <td data-label="Type">{{ location.location_type or "unknown" }}</td>
+        <td data-label="Parent">{{ location.parent_location or "—" }}</td>
+        <td data-label="Flags">
+          {% if location.is_underwater %}<span class="badge next">underwater</span>{% endif %}
+          {% if location.is_feywild %}<span class="badge status-reviewed">feywild</span>{% endif %}
+          {% if not location.is_underwater and not location.is_feywild %}<span class="muted">—</span>{% endif %}
+        </td>
+        <td data-label="First">{% if location.first_visited_session is not none %}{{ location.first_visited_session }}{% else %}<span class="muted">—</span>{% endif %}</td>
+        <td data-label="Description">{{ location.description or "—" }}</td>
+        <td data-label="Actions">
+          <div class="row-actions">
+            <a class="icon-link" href="/locations/{{ location.id }}/edit">Edit</a>
+            <form method="post" action="/locations/{{ location.id }}/delete">
+              <button class="danger-button" type="submit">Delete</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
 
-  <aside class="location-form-card">
-    <h2>{% if editing %}Edit Location{% else %}Add Location{% endif %}</h2>
+{% if show_location_modal %}
+<section class="modal-backdrop" role="presentation">
+  <div class="location-modal" role="dialog" aria-modal="true" aria-labelledby="location-modal-title">
+    <div class="modal-head">
+      <h2 id="location-modal-title">{% if editing %}Edit Location{% else %}Add Location{% endif %}</h2>
+      <a class="modal-close" href="/locations" aria-label="Close location form">×</a>
+    </div>
     <form method="post" action="{% if editing %}/locations/{{ editing.id }}{% else %}/locations{% endif %}">
       <label class="field-block">
         <span>Name</span>
@@ -119,10 +124,11 @@
         </label>
       </div>
       <div class="panel-actions split-actions">
-        {% if editing %}<a class="icon-link secondary-link" href="/locations">Cancel</a>{% endif %}
+        <a class="icon-link secondary-link" href="/locations">Cancel</a>
         <button type="submit">{% if editing %}Save Location{% else %}Add Location{% endif %}</button>
       </div>
     </form>
-  </aside>
+  </div>
 </section>
+{% endif %}
 {% endblock %}

@@ -305,7 +305,7 @@ async def run_session_health(request: Request, session: str):
 
 
 @app.get("/locations", response_class=HTMLResponse)
-def locations_index(request: Request):
+def locations_index(request: Request, modal: str = ""):
     try:
         rows = canon.location_rows()
         location_types = canon.location_types()
@@ -319,6 +319,7 @@ def locations_index(request: Request):
             "location_types": location_types,
             "all_locations": rows,
             "editing": None,
+            "show_location_modal": modal == "add",
         },
     )
 
@@ -354,6 +355,7 @@ def edit_location(request: Request, location_id: int):
             "location_types": location_types,
             "all_locations": [row for row in rows if row["id"] != location_id],
             "editing": editing,
+            "show_location_modal": True,
         },
     )
 

@@ -708,25 +708,55 @@ dd { margin: 0; }
 .archive-section-head h1 {
   font-size: 34px;
 }
-.locations-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 18px;
-  align-items: start;
+.add-new-link {
+  flex: 0 0 auto;
 }
-.location-form-card {
-  position: sticky;
-  top: 82px;
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(29, 23, 18, .58);
+  backdrop-filter: blur(2px);
+}
+.location-modal {
+  width: min(640px, 100%);
+  max-height: calc(100vh - 44px);
+  overflow: auto;
   padding: 16px;
   border: 1px solid rgba(139, 95, 39, .5);
   border-radius: 8px;
   background:
     linear-gradient(180deg, rgba(255, 250, 226, .76), rgba(221, 190, 125, .3)),
     var(--parchment);
-  box-shadow: 0 14px 34px rgba(52, 35, 19, .14);
+  box-shadow: 0 22px 70px rgba(18, 10, 5, .45);
 }
-.location-form-card h2 {
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(110, 67, 24, .24);
+}
+.location-modal h2 {
+  margin: 0;
   color: var(--brass-dark);
+}
+.modal-close {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(110, 67, 24, .35);
+  border-radius: 50%;
+  background: rgba(255, 247, 223, .7);
+  color: var(--ink);
+  font-size: 24px;
+  line-height: 1;
+  text-decoration: none;
 }
 .field-block input,
 .field-block select,
@@ -789,12 +819,6 @@ dd { margin: 0; }
   .sidebar-link {
     flex: 0 0 auto;
   }
-  .locations-layout {
-    grid-template-columns: 1fr;
-  }
-  .location-form-card {
-    position: static;
-  }
 }
 @media (max-width: 760px) {
   .app-header {
@@ -827,6 +851,13 @@ dd { margin: 0; }
   .archive-hero {
     min-height: 0;
     padding: 22px;
+  }
+  .archive-section-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .add-new-link {
+    align-self: flex-start;
   }
   .archive-hero::after {
     inset: 0;

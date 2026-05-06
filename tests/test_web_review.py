@@ -872,7 +872,20 @@ class LocationRouteTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Locations", response.text)
         self.assertIn("Bentrios", response.text)
+        self.assertIn("Add New", response.text)
+        self.assertNotIn("Add Location</h2>", response.text)
         self.assertIn('href="/locations"', response.text)
+
+    def test_locations_add_modal_renders_form(self):
+        with patch("web_review.services.canon.location_rows", return_value=self.location_rows()), \
+             patch("web_review.services.canon.location_types", return_value=[{"id": 1, "type_name": "city"}]):
+            client = TestClient(app)
+            response = client.get("/locations?modal=add")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Add Location", response.text)
+        self.assertIn('role="dialog"', response.text)
+        self.assertIn('action="/locations"', response.text)
 
     def test_create_location_route_writes_form_values(self):
         with patch("web_review.services.canon.create_location") as create:
@@ -917,6 +930,7 @@ class LocationRouteTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Edit Location", response.text)
+        self.assertIn('role="dialog"', response.text)
         self.assertIn("Starting city.", response.text)
 
     def test_update_location_route_writes_form_values(self):
