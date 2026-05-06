@@ -310,6 +310,24 @@ def add_review_item(document: dict[str, Any], values: dict[str, Any], added_on: 
     return updated, []
 
 
+def unknown_locations(values: list[str], known_locations: list[str]) -> list[str]:
+    known = {name.strip().casefold() for name in known_locations if name.strip()}
+    unknown = []
+    seen = set()
+    for value in values:
+        location = str(value or "").strip()
+        key = location.casefold()
+        if not location or key in known or key in seen:
+            continue
+        seen.add(key)
+        unknown.append(location)
+    return unknown
+
+
+def form_locations(form_values: dict[str, list[str]]) -> list[str]:
+    return [*(form_values.get("location") or []), *(form_values.get("new_location") or [])]
+
+
 def remove_added_item(document: dict[str, Any], item_id: str) -> tuple[dict[str, Any], list[str]]:
     if not item_id:
         return document, ["Missing added item id."]

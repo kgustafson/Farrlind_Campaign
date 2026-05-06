@@ -6,7 +6,7 @@ from unittest.mock import patch
 import yaml
 
 from web_review.services import canon, commands, reviews
-from web_review.app import app
+from web_review.app import COMMAND_RESULTS, app
 from fastapi.testclient import TestClient
 
 
@@ -211,6 +211,14 @@ class WebReviewServiceTest(unittest.TestCase):
         self.assertIn("Added item is missing canonical_text.", errors)
         self.assertIn("Added item is missing location.", errors)
 
+    def test_unknown_locations_compares_case_insensitively_and_dedupes(self):
+        unknown = reviews.unknown_locations(
+            ["Bentrios", "bentrios", "New Place", "new place", "", "Catur"],
+            ["Bentrios", "Catur"],
+        )
+
+        self.assertEqual(unknown, ["New Place"])
+
     def test_remove_added_item_removes_only_matching_added_item(self):
         document = {
             "session": "session01",
@@ -306,6 +314,25 @@ class WebReviewAppTest(unittest.TestCase):
         self.assertIn("Source</a>", response.text)
         self.assertIn("Print</a>", response.text)
 
+    def test_session_review_renders_command_result(self):
+        COMMAND_RESULTS["abc"] = {
+            "action": "Apply to Database",
+            "returncode": 1,
+            "stdout": "some output",
+            "stderr": "some error",
+            "ok": False,
+        }
+        try:
+            client = TestClient(app)
+            response = client.get("/sessions/session20/review?source=final&view=raw&command_result=abc")
+        finally:
+            COMMAND_RESULTS.pop("abc", None)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Apply to Database", response.text)
+        self.assertIn("some output", response.text)
+        self.assertIn("some error", response.text)
+
     def test_raw_view_preserves_source_markdown(self):
         client = TestClient(app)
         response = client.get("/sessions/session20/review?source=final&view=raw")
@@ -350,6 +377,7 @@ class WebReviewAppTest(unittest.TestCase):
                     "location": "Fey Woods",
                     "significance": "3",
                     "reason": "Looks right.",
+                    "confirm_new_locations": "1",
                 }, follow_redirects=False)
 
             self.assertEqual(response.status_code, 303)
@@ -362,6 +390,49 @@ class WebReviewAppTest(unittest.TestCase):
             self.assertEqual(item["location"], "Fey Woods")
             self.assertEqual(item["significance"], 3)
             self.assertEqual(item["reason"], "Looks right.")
+
+    def test_save_review_route_requires_confirmation_for_unknown_location(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session01_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "in_review",
+                "items": [
+                    {"id": "event-001", "sequence": 1, "decision": "pending", "location": "Bentrios", "applied_status": "pending"},
+                ],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final), \
+                 patch("web_review.services.canon.locations", return_value=["Bentrios"]):
+                client = TestClient(app)
+                response = client.post("/sessions/session01/review/save", data={
+                    "source": "diary",
+                    "view": "raw",
+                    "item_id": "event-001",
+                    "section": "items",
+                    "sequence": "1",
+                    "decision": "accepted",
+                    "canonical_text": "",
+                    "event_type": "travel",
+                    "location": "New Place",
+                    "significance": "2",
+                    "reason": "",
+                }, follow_redirects=False)
+
+            self.assertEqual(response.status_code, 303)
+            self.assertIn("location_confirm_failed=1", response.headers["location"])
+            saved = yaml.safe_load(path.read_text(encoding="utf-8"))
+            self.assertEqual(saved["items"][0]["location"], "Bentrios")
 
     def test_save_review_route_rejects_applied_review(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -464,6 +535,7 @@ class WebReviewAppTest(unittest.TestCase):
                     "location": "Road",
                     "significance": "2",
                     "reason": "",
+                    "confirm_new_locations": "1",
                 }, follow_redirects=False)
 
             self.assertEqual(response.status_code, 303)
@@ -545,6 +617,7 @@ class WebReviewAppTest(unittest.TestCase):
                     "new_location": "Bentrios",
                     "new_significance": "3",
                     "new_reason": "User remembered it.",
+                    "confirm_new_locations": "1",
                 }, follow_redirects=False)
 
             self.assertEqual(response.status_code, 303)
@@ -552,6 +625,44 @@ class WebReviewAppTest(unittest.TestCase):
             saved = yaml.safe_load(path.read_text(encoding="utf-8"))
             self.assertEqual(saved["added_items"][0]["id"], "added-001")
             self.assertEqual(saved["added_items"][0]["canonical_text"], "The party added a missing event.")
+
+    def test_add_item_route_requires_confirmation_for_unknown_location(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session01_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "in_review",
+                "items": [],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final), \
+                 patch("web_review.services.canon.locations", return_value=["Bentrios"]):
+                client = TestClient(app)
+                response = client.post("/sessions/session01/review/add-item", data={
+                    "source": "diary",
+                    "view": "raw",
+                    "new_sequence": "2",
+                    "new_canonical_text": "The party found somewhere new.",
+                    "new_event_type": "discovery",
+                    "new_location": "New Place",
+                    "new_significance": "3",
+                    "new_reason": "New canon location.",
+                }, follow_redirects=False)
+
+            self.assertEqual(response.status_code, 303)
+            self.assertIn("location_confirm_failed=1", response.headers["location"])
+            saved = yaml.safe_load(path.read_text(encoding="utf-8"))
+            self.assertEqual(saved["added_items"], [])
 
     def test_add_item_route_does_not_save_invalid_item(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -794,6 +905,7 @@ class CommandServiceTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 303)
         self.assertIn("applied=1", response.headers["location"])
+        self.assertIn("command_result=", response.headers["location"])
         apply.assert_called_once_with(1)
 
     def test_apply_review_route_reports_command_failure(self):
@@ -825,6 +937,7 @@ class CommandServiceTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 303)
         self.assertIn("apply_failed=1", response.headers["location"])
+        self.assertIn("command_result=", response.headers["location"])
 
     def test_write_final_summary_route_requires_applied_status(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -883,6 +996,7 @@ class CommandServiceTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 303)
         self.assertIn("final_written=1", response.headers["location"])
+        self.assertIn("command_result=", response.headers["location"])
         write.assert_called_once_with(1)
 
     def test_write_final_summary_route_reports_command_failure(self):
@@ -914,6 +1028,7 @@ class CommandServiceTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 303)
         self.assertIn("final_failed=1", response.headers["location"])
+        self.assertIn("command_result=", response.headers["location"])
 
 
 if __name__ == "__main__":

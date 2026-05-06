@@ -57,6 +57,25 @@
 {% if request.query_params.get("item_remove_failed") %}
   <div class="flash error-flash">Added item was not removed.</div>
 {% endif %}
+{% if request.query_params.get("location_confirm_failed") %}
+  <div class="flash error-flash">New location detected. Check "Confirm newly typed locations" before saving.</div>
+{% endif %}
+{% if command_result %}
+  <section class="command-log">
+    <div class="command-log-head">
+      <h2>{{ command_result.action }}</h2>
+      <span class="badge {% if command_result.ok %}applied-applied{% else %}decision-rejected{% endif %}">exit {{ command_result.returncode }}</span>
+    </div>
+    {% if command_result.stdout %}
+      <h3>stdout</h3>
+      <pre>{{ command_result.stdout }}</pre>
+    {% endif %}
+    {% if command_result.stderr %}
+      <h3>stderr</h3>
+      <pre>{{ command_result.stderr }}</pre>
+    {% endif %}
+  </section>
+{% endif %}
 
 <section class="workspace-grid">
   <aside class="source-pane">
@@ -209,6 +228,13 @@
       <ul class="validation-list">
         {% for note in validation %}<li>{{ note }}</li>{% endfor %}
       </ul>
+    </section>
+    <section>
+      <h2>Locations</h2>
+      <label class="check-row">
+        <input type="checkbox" name="confirm_new_locations" value="1" {% if review_locked %}disabled{% endif %}>
+        <span>Confirm newly typed locations</span>
+      </label>
     </section>
   </aside>
 </section>

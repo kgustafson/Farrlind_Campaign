@@ -153,6 +153,41 @@ button:disabled {
   background: #fff0f0;
   color: var(--bad);
 }
+.command-log {
+  margin: 0 0 16px;
+  padding: 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.command-log-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.command-log h2,
+.command-log h3 {
+  margin: 0 0 8px;
+}
+.command-log h3 {
+  margin-top: 10px;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.command-log pre {
+  margin: 0;
+  max-height: 220px;
+  overflow: auto;
+  padding: 10px;
+  border-radius: 6px;
+  background: #202423;
+  color: #f4f7f2;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  white-space: pre-wrap;
+}
 .editable-item input,
 .editable-item select,
 .editable-item textarea {
@@ -364,6 +399,16 @@ dd { margin: 0; }
 .validation-list {
   margin: 0;
   padding-left: 18px;
+}
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+}
+.check-row input {
+  width: 16px;
+  height: 16px;
 }
 .empty-state {
   padding: 16px;
