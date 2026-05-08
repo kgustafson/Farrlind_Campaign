@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 
 #Data
+audio/*.wav
 knowledge/*
 !knowledge/Faban/
 knowledge/Faban/*
