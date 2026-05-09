@@ -20,6 +20,23 @@ filter -> classify -> normalize -> merge -> validate -> summarize
 
 Use `status` before rerunning a session to see which artifacts already exist.
 
+## Web Review App
+
+Run the database, Adminer, and the Farrlind review UI with Docker Compose:
+
+```bash
+cd farrlind
+docker compose up --build -d
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8000
+```
+
+The web container bind-mounts the repo into `/app`, so review and canon files written by the UI persist in the working tree.
+
 ## Artifact Flow
 
 ```text

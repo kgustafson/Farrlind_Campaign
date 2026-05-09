@@ -1,5 +1,6 @@
 
 import subprocess
+import sys
 from dataclasses import dataclass
 from typing import Optional
 
@@ -21,7 +22,7 @@ def run_review_command(action: str, session_number: int, timeout: Optional[int] 
     if action not in {"apply-review", "write-final-summary"}:
         raise ValueError(f"Unsupported review command: {action}")
     command = [
-        str(reviews.REPO_ROOT / "rag-env" / "bin" / "python"),
+        sys.executable,
         str(reviews.REPO_ROOT / "scripts" / "dm_query.py"),
         action,
         reviews.session_key(session_number),
@@ -39,7 +40,7 @@ def run_review_command(action: str, session_number: int, timeout: Optional[int] 
 
 def run_health(timeout: Optional[int] = 120) -> CommandResult:
     command = [
-        str(reviews.REPO_ROOT / "rag-env" / "bin" / "python"),
+        sys.executable,
         str(reviews.REPO_ROOT / "scripts" / "dm_query.py"),
         "health",
     ]
