@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.1.1 - 5/9/2026
+
+Displayed the Farrlind Campaign app version in the archive UI.
+
+- App: Added a small footer to the app layout that reads the current version from `version.md`.
+- App: Added route coverage so the dashboard verifies the displayed version.
+- Docs: Bumped the current version to `v0.1.1` and recorded the revision.
+
 ## v0.1.0 - 5/9/2026
 
 Established the Farrlind Campaign app baseline for versioned development.

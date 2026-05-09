@@ -688,6 +688,14 @@ dd { margin: 0; }
   border-radius: 8px;
   color: var(--muted);
 }
+.app-version {
+  margin: 26px 0 4px;
+  color: rgba(78, 50, 24, .58);
+  font-size: 11px;
+  font-style: italic;
+  letter-spacing: .04em;
+  text-align: center;
+}
 .archive-section-head {
   padding: 18px 20px;
   border: 1px solid rgba(139, 95, 39, .45);

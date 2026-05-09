@@ -305,6 +305,14 @@ class WebReviewServiceTest(unittest.TestCase):
 
 
 class WebReviewAppTest(unittest.TestCase):
+    def test_dashboard_renders_current_app_version(self):
+        with patch.object(reviews, "dashboard_rows", return_value=[]):
+            client = TestClient(app)
+            response = client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Farrlind Campaign v0.1.1", response.text)
+
     def test_print_view_renders_source_markdown(self):
         client = TestClient(app)
         response = client.get("/sessions/session20/review?source=final&view=print")

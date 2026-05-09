@@ -1,6 +1,6 @@
 # Version
 
-v0.1.0
+v0.1.1
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.1.0` establishes the initial Farrlind Campaign app baseline for versioned development.
+`v0.1.1` adds a small in-app version footer and keeps the Git tag, version file, and revision log aligned.

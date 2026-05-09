@@ -15,6 +15,21 @@ templates = Jinja2Templates(directory=str(reviews.REPO_ROOT / "web_review" / "te
 COMMAND_RESULTS = {}
 
 
+def app_version() -> str:
+    version_path = reviews.REPO_ROOT / "version.md"
+    try:
+        for line in version_path.read_text(encoding="utf-8").splitlines():
+            value = line.strip()
+            if value.startswith("v"):
+                return value
+    except FileNotFoundError:
+        return "unversioned"
+    return "unversioned"
+
+
+templates.env.globals["app_version"] = app_version
+
+
 def store_command_result(action: str, result: commands.CommandResult) -> str:
     token = uuid4().hex
     COMMAND_RESULTS[token] = {
