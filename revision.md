@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.1.3 - 5/9/2026
+
+Added a canonical workflow document for Phase 2 planning.
+
+- Docs: Added `docs/farrlind_workflow.md` as the end-to-end workflow reference.
+- Docs: Consolidated pipeline stages, review gates, artifact paths, canon safety rules, and future workflow-state needs.
+- Docs: Updated `README.md` and `docs/session_review_workflow.md` to point back to the canonical workflow reference.
+
 ## v0.1.2 - 5/9/2026
 
 Closed Phase 1 and cleaned up the project roadmap structure.

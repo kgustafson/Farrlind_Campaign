@@ -1,5 +1,9 @@
 # Session Review Workflow
 
+This is the focused operator guide for the human review portion of the campaign pipeline.
+
+For the full end-to-end workflow, stage definitions, artifact map, and Phase 2 workflow-state planning, see [Farrlind Campaign Workflow](farrlind_workflow.md).
+
 The campaign database should treat AI output as a draft, not canon.
 
 Use this workflow after a session has been transcribed and run through the RAG pipeline.

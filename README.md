@@ -1,6 +1,8 @@
 # AI RAG Campaign Workflow
 
-Local pipeline for turning session audio/transcripts into cleaned campaign artifacts.
+Local pipeline for turning Farrlind source material into reviewed, queryable campaign canon.
+
+The canonical workflow reference is [Farrlind Campaign Workflow](docs/farrlind_workflow.md).
 
 ## Common Commands
 
@@ -39,6 +41,8 @@ The web container bind-mounts the repo into `/app`, so review and canon files wr
 
 ## Artifact Flow
 
+The full artifact map and canon safety rules live in [Farrlind Campaign Workflow](docs/farrlind_workflow.md).
+
 ```text
 audio/session20.wav
   -> knowledge/Faban/raw/session20_transcript.txt
@@ -62,7 +66,7 @@ knowledge/Faban/notes/session20_corrections.md
 
 AI-generated events and summaries are drafts until reviewed.
 
-See [Session Review Workflow](docs/session_review_workflow.md) for the human review loop:
+See [Farrlind Campaign Workflow](docs/farrlind_workflow.md) for the end-to-end workflow and [Session Review Workflow](docs/session_review_workflow.md) for the focused human review guide:
 
 ```text
 init-review -> edit review YAML -> review-status -> apply review -> health

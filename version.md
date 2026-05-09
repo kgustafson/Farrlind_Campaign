@@ -1,6 +1,6 @@
 # Version
 
-v0.1.2
+v0.1.3
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.1.2` closes Phase 1 as complete and reorganizes the project roadmap into management sections.
+`v0.1.3` adds the canonical Farrlind workflow reference and links supporting docs back to it.
