@@ -31,20 +31,26 @@ audio/transcript
 - Reruns may only affect canon after explicit human review and approval.
 - Which steps can run automatically versus require user approval will be decided over time.
 
-## Phase 1: Version Control Best Practices
+## Project Management
 
-- Introduce best-practice version control for campaign canon and workflow changes.
-- Define and document version rules using:
+### Phase 1: Version Control Best Practices - Complete
+
+- Introduced best-practice version control for campaign canon and workflow changes.
+- Defined and documented version rules using:
   - major
   - minor
   - revision
-- Decide what kind of change increments each level.
-- Include database/schema versioning rules.
-- Include canon/content versioning rules.
-- Include workflow graph versioning rules.
-- Review how versioning is handled in the Jubilaires membership project and adapt the useful parts here.
+- Decided what kind of change increments each level.
+- Included database/schema versioning rules.
+- Included canon/content versioning rules.
+- Included workflow graph versioning rules.
+- Reviewed how versioning is handled in the Jubilaires membership project and adapted the useful parts here.
+- Added app-visible version display.
+- Established matching Git tags for versioned commits.
 
-## Phase 2: Define The Workflow Graph
+## Workflow Management
+
+### Phase 2: Define The Workflow Graph
 
 - Create a plain YAML or Python workflow definition for the Farrlind session pipeline.
 - Persist workflow state in database tables rather than YAML state files.
@@ -59,7 +65,7 @@ audio/transcript
 - Keep this deterministic and inspectable.
 - Avoid introducing LangGraph or another orchestration framework until the shape of the workflow is clearer.
 
-## Phase 3: Show Workflow State In The Web UI
+### Phase 3: Show Workflow State In The Web UI
 
 - Add a read-only workflow/status view to the local web app.
 - Show each session's progress through the graph.
@@ -68,7 +74,7 @@ audio/transcript
 - Link workflow steps back to existing review/session pages where useful.
 - Focus on per-session workflow state first.
 
-## Phase 4: Wire Existing Commands To Workflow Actions
+### Phase 4: Wire Existing Commands To Workflow Actions
 
 - Add buttons for safe existing commands, such as:
   - initialize review
@@ -82,7 +88,7 @@ audio/transcript
 - Capture command output in the same command-result style already used by the review UI.
 - Prefer "Run next step" only after the graph status rules are trustworthy.
 
-## Phase 5: Consider LangGraph Or Similar Orchestration
+### Phase 5: Consider LangGraph Or Similar Orchestration
 
 - Revisit LangGraph only if the workflow needs:
   - branching
@@ -94,7 +100,7 @@ audio/transcript
 - If adopted, use LangGraph as the execution/state layer, not as a replacement for the explicit workflow definition.
 - Keep the web UI as the main operator surface.
 
-## Phase 6: Audio Ingestion
+### Phase 6: Audio Ingestion
 
 - Add audio ingestion to the workflow graph after the session review and canon workflow is stable.
 - Model audio-specific steps separately, such as:
@@ -105,7 +111,7 @@ audio/transcript
 - Keep audio ingestion upstream from canon review.
 - Do not allow audio reprocessing to overwrite reviewed/applied canon without explicit human review.
 
-## Later: Campaign-Level Maintenance
+### Later: Campaign-Level Maintenance
 
 - Add campaign-level workflow graphs after per-session workflows are stable.
 - Candidate maintenance workflows:
@@ -116,6 +122,23 @@ audio/transcript
   - open thread review
   - Wells of Magic status review
   - songbook prompt/repertoire review
+
+## Web Interface Improvements
+
+### Minor Release Upgrade Candidates
+
+- Develop NPC Registry.
+- Develop Artifact Listing.
+- Develop Well of Magic Lore Section.
+- Develop Faban Songbook.
+- Develop Campaign Timeline.
+
+## Data Management
+
+- Define database/schema versioning rules in practice.
+- Define backup and restore expectations for local development.
+- Track seed/reference data that should be treated as managed project data.
+- Strengthen canon integrity checks as the review workflow grows.
 
 ## Resolved Questions
 

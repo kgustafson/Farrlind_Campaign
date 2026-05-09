@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.1.2 - 5/9/2026
+
+Closed Phase 1 and cleaned up the project roadmap structure.
+
+- Docs: Marked Version Control Best Practices as complete in `todo.md`.
+- Docs: Organized roadmap work into Project Management, Workflow Management, Web Interface Improvements, and Data Management.
+- Docs: Added minor-release candidates for NPC Registry, Artifact Listing, Well of Magic lore, Faban Songbook, and Campaign Timeline.
+
 ## v0.1.1 - 5/9/2026
 
 Displayed the Farrlind Campaign app version in the archive UI.
