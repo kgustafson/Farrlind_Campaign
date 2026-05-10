@@ -14,6 +14,11 @@ Generated transcripts, extracted events, draft summaries, and validation notes a
 
 ```text
 source material
+  -> plain worker skeleton, for audio sources
+       -> split
+       -> transcribe_parallel placeholder
+       -> stitch
+       -> validate placeholder
   -> transcript or diary source
   -> extract
   -> filter
@@ -31,6 +36,45 @@ source material
 
 Audio ingestion is intentionally upstream and later-phase work. The current stable workflow starts once a transcript, diary entry, or other source artifact exists.
 
+## Plain Worker Skeleton
+
+`v0.2.0` introduced a plain Python worker skeleton under:
+
+```text
+src/farrlind_pipeline/
+```
+
+This is a deterministic worker pipeline, not a LangGraph implementation. It exists to prove the worker boundaries, structured data contracts, and intermediate file layout before adding heavier orchestration.
+
+The current skeleton runs:
+
+```text
+split -> transcribe_parallel placeholder -> stitch -> validate placeholder
+```
+
+Run it from the repo root with:
+
+```bash
+PYTHONPATH=src ./rag-env/bin/python -m farrlind_pipeline.pipeline.simple_runner audio/sessionXX.wav --session-id sessionXX --work-dir data/outputs/sessionXX
+```
+
+Current worker modules:
+
+| Worker | Module | Purpose | Output |
+| --- | --- | --- | --- |
+| split | `farrlind_pipeline.audio.split` | Builds chunk metadata for an audio file. WAV duration is detected when possible. | `chunks/chunk_manifest.json` |
+| transcribe_parallel placeholder | `farrlind_pipeline.transcription.transcribe_parallel` | Writes deterministic placeholder transcript JSON per chunk using a worker pool. | `transcripts/chunk-XXXX.json` |
+| stitch | `farrlind_pipeline.transcription.stitch` | Sorts chunk transcripts, detects missing/duplicate chunks, and writes stitched transcript artifacts. | `stitched/stitched_transcript.md`, `stitched/stitched_transcript.json` |
+| validate placeholder | `farrlind_pipeline.validation.validate` | Writes a placeholder quality report and marks placeholder transcripts as needing review. | `validation/validation_report.json`, `validation/validation_report.md` |
+
+Shared Pydantic schemas live in:
+
+```text
+src/farrlind_pipeline/models/schemas.py
+```
+
+The skeleton produces structured intermediate JSON and Markdown so failed chunks can later become retryable without rerunning the entire pipeline.
+
 ## Canon Safety Rules
 
 - AI-generated output is draft material.
@@ -44,6 +88,7 @@ Audio ingestion is intentionally upstream and later-phase work. The current stab
 
 | Stage | Command | Input | Output | Canon Impact | Gate |
 | --- | --- | --- | --- | --- | --- |
+| worker skeleton | `PYTHONPATH=src ./rag-env/bin/python -m farrlind_pipeline.pipeline.simple_runner ...` | source audio | chunk manifest, placeholder chunk transcripts, stitched transcript, validation report | draft only | experimental, safe to rerun |
 | status | `scripts/rag.py status sessionXX` | expected artifact paths | artifact presence report | none | safe anytime |
 | extract | `scripts/rag.py extract sessionXX` | transcript | `clean/sessionXX_events.md` | draft only | rerun with care |
 | filter | `scripts/rag.py filter sessionXX` | extracted events | `clean/sessionXX_filtered.md` | draft only | rerun with care |
@@ -69,6 +114,20 @@ filter -> classify -> normalize -> merge -> validate -> summarize
 ```
 
 ## Artifact Map
+
+Plain worker skeleton artifacts:
+
+```text
+audio/sessionXX.wav
+  -> data/outputs/sessionXX/chunks/chunk_manifest.json
+  -> data/outputs/sessionXX/transcripts/chunk-XXXX.json
+  -> data/outputs/sessionXX/stitched/stitched_transcript.md
+  -> data/outputs/sessionXX/stitched/stitched_transcript.json
+  -> data/outputs/sessionXX/validation/validation_report.json
+  -> data/outputs/sessionXX/validation/validation_report.md
+```
+
+Existing RAG and canon artifacts:
 
 ```text
 audio/sessionXX.wav
@@ -150,6 +209,7 @@ Workflow state should live in the database. YAML and Markdown files remain sourc
 
 ## Current Operator Surfaces
 
+- Plain Python worker skeleton: `src/farrlind_pipeline/pipeline/simple_runner.py`
 - CLI pipeline: `scripts/rag.py`
 - CLI canon/review commands: `scripts/dm_query.py`
 - Web review app: FastAPI/Jinja app in `web_review/`
@@ -163,9 +223,10 @@ Phase 2 is not greenfield. It should formalize the existing workflow into a mach
 
 Near-term tasks:
 
-1. Create a canonical workflow definition from the stage table above.
-2. Decide whether the definition should be YAML, Python data, database seed data, or a combination.
-3. Map each workflow step to command, inputs, outputs, dependencies, and gate rules.
-4. Define database persistence for per-session workflow state.
-5. Keep `scripts/rag.py` and the workflow definition from drifting.
-6. Update the web UI only after the workflow rules are explicit enough to display.
+1. Extend the plain Python worker skeleton from placeholders to real transcription workers.
+2. Create a canonical workflow definition from the stage table above.
+3. Decide whether the definition should be YAML, Python data, database seed data, or a combination.
+4. Map each workflow step to command, inputs, outputs, dependencies, and gate rules.
+5. Define database persistence for per-session workflow state.
+6. Keep `scripts/rag.py`, `src/farrlind_pipeline/`, and the workflow definition from drifting.
+7. Update the web UI only after the workflow rules are explicit enough to display.

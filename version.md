@@ -1,6 +1,6 @@
 # Version
 
-v0.2.0
+v0.2.1
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.2.0` introduces the initial plain Python worker pipeline skeleton.
+`v0.2.1` updates the canonical workflow documentation for the plain Python worker skeleton.

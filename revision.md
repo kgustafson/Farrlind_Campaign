@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.2.1 - 5/10/2026
+
+Updated the canonical workflow reference for the plain Python worker skeleton.
+
+- Docs: Added the `split -> transcribe_parallel placeholder -> stitch -> validate placeholder` worker flow to `docs/farrlind_workflow.md`.
+- Docs: Documented the new `src/farrlind_pipeline/` worker modules, Pydantic schema location, runner command, and output artifacts.
+- Docs: Updated Phase 2 next tasks to include evolving placeholders into real transcription workers and keeping `scripts/rag.py`, `src/farrlind_pipeline/`, and workflow definitions aligned.
+
 ## v0.2.0 - 5/10/2026
 
 Introduced the initial plain Python worker pipeline skeleton.
