@@ -21,6 +21,7 @@ from raglib.summarize import (
     parse_diary_physical_date,
     parse_diary_title,
 )
+from raglib.workflow_state import workflow_state_schema_sql
 
 
 OUT_DIR = BASE2 / "farrlind" / "out"
@@ -1587,6 +1588,7 @@ def build_sql(summaries: list[dict]) -> str:
 
     statements.append(canon_npc_scrub_sql())
     statements.append(canon_enemy_scrub_sql())
+    statements.append(workflow_state_schema_sql())
     statements.append(travel_log_schema_sql())
     statements.append(encounter_schema_sql())
     statements.append(enemy_encounter_schema_sql())

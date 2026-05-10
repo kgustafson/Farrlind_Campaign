@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.2.15 - 5/10/2026
+
+Added database-backed session workflow state initialization.
+
+- Schema: Added `workflow_run` and `workflow_step_state` tables for per-session workflow state, ordered step tracking, timestamps, comments, JSONB inputs/outputs, dependencies, commands, gates, rerun policy, status rules, and metadata.
+- Workflow: Added `rag.py workflow-init sessionXX --apply` to seed a session workflow from `workflows/session_workflow.yaml`.
+- Workflow: Kept YAML as the source of step definition/order while preserving runtime status, timestamps, and comments in the database.
+- Tests: Added workflow-state coverage for session parsing, recursive session path rendering, schema fields, and generated initialization SQL.
+- Docs: Updated the workflow reference and TODO plan to reflect the YAML-definition plus database-state model.
+
 ## v0.2.14 - 5/10/2026
 
 Added the first machine-readable session workflow definition.

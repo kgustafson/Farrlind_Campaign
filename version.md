@@ -1,6 +1,6 @@
 # Version
 
-v0.2.14
+v0.2.15
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.2.14` adds the first machine-readable session workflow definition.
+`v0.2.15` adds database-backed session workflow state initialization.

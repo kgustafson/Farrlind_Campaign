@@ -612,6 +612,49 @@ CREATE TABLE extraction_confidence (
 
 
 -- =============================================================================
+-- WORKFLOW STATE  (per-session operational progress)
+-- =============================================================================
+
+CREATE TABLE workflow_run (
+    id                  SERIAL PRIMARY KEY,
+    session_id          INT NOT NULL REFERENCES session(id),
+    workflow_id         VARCHAR(120) NOT NULL,
+    workflow_version    INT NOT NULL,
+    workflow_name       TEXT,
+    status              VARCHAR(30) NOT NULL DEFAULT 'initialized',
+    initiated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    started_at          TIMESTAMPTZ,
+    completed_at        TIMESTAMPTZ,
+    summary_comment     TEXT,
+    metadata            JSONB NOT NULL DEFAULT '{}'::jsonb,
+    UNIQUE(session_id, workflow_id, workflow_version)
+);
+
+CREATE TABLE workflow_step_state (
+    id                  SERIAL PRIMARY KEY,
+    workflow_run_id     INT NOT NULL REFERENCES workflow_run(id) ON DELETE CASCADE,
+    step_id             VARCHAR(120) NOT NULL,
+    step_order          INT NOT NULL,
+    display_name        TEXT NOT NULL,
+    lane                VARCHAR(80),
+    status              VARCHAR(30) NOT NULL DEFAULT 'pending',
+    started_at          TIMESTAMPTZ,
+    completed_at        TIMESTAMPTZ,
+    summary_comment     TEXT,
+    inputs              JSONB NOT NULL DEFAULT '[]'::jsonb,
+    outputs             JSONB NOT NULL DEFAULT '[]'::jsonb,
+    dependencies        JSONB NOT NULL DEFAULT '[]'::jsonb,
+    gate                VARCHAR(80),
+    rerun_policy        VARCHAR(80),
+    canon_impact        VARCHAR(80),
+    command             TEXT,
+    status_rules        JSONB NOT NULL DEFAULT '{}'::jsonb,
+    metadata            JSONB NOT NULL DEFAULT '{}'::jsonb,
+    UNIQUE(workflow_run_id, step_id)
+);
+
+
+-- =============================================================================
 -- INDEXES
 -- =============================================================================
 
@@ -650,6 +693,13 @@ CREATE INDEX idx_diary_character          ON diary_entry(character_id);
 CREATE INDEX idx_pipeline_session         ON pipeline_run(session_id);
 CREATE INDEX idx_pipeline_stage           ON pipeline_run(pipeline_stage);
 CREATE INDEX idx_extraction_needs_review  ON extraction_confidence(needs_review) WHERE needs_review = TRUE;
+
+-- workflow state
+CREATE INDEX idx_workflow_run_session     ON workflow_run(session_id);
+CREATE INDEX idx_workflow_run_identity    ON workflow_run(workflow_id, workflow_version);
+CREATE INDEX idx_workflow_run_status      ON workflow_run(status);
+CREATE INDEX idx_workflow_step_run_order  ON workflow_step_state(workflow_run_id, step_order);
+CREATE INDEX idx_workflow_step_status     ON workflow_step_state(status);
 
 -- knowledge visibility
 CREATE INDEX idx_entity_knowledge_entity  ON entity_knowledge(entity_type, entity_id);

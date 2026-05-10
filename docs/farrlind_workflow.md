@@ -279,23 +279,24 @@ The current schema already contains pipeline metadata tables:
 - `pipeline_run`
 - `extraction_confidence`
 
-Phase 2 should decide whether these are enough or whether the app also needs explicit workflow-state tables for per-session step status.
+Phase 2 adds explicit workflow-state tables for per-session step status:
 
-Likely workflow-state needs:
+- `workflow_run`
+- `workflow_step_state`
 
-- session id
-- workflow id/version
-- step id
-- step status
-- started/completed timestamps
-- input artifact paths
-- output artifact paths
-- command result summary
-- stale/missing artifact flags
-- human gate status
-- rerun eligibility
+`workflow_run` records the session, workflow id/version, workflow name, overall status, initiated timestamp, optional started/completed timestamps, a summary comment, and metadata.
 
-Workflow state should live in the database. YAML and Markdown files remain source/canon artifacts, not the primary state machine.
+`workflow_step_state` records one row per YAML-defined step, preserving the YAML order in `step_order`. Each step tracks status, started/completed timestamps, a summary comment, JSONB inputs and outputs, dependencies, gate, rerun policy, canon impact, command, status rules, and metadata.
+
+Workflow state should live in the database. YAML defines the steps and their order; Markdown/YAML canon files remain source/canon artifacts, not the primary state machine.
+
+To initialize a session workflow:
+
+```bash
+./rag-env/bin/python scripts/rag.py workflow-init session21 --apply
+```
+
+This creates the session row if needed, creates or updates the per-session workflow run, and creates or refreshes the step-state rows without overwriting runtime status, timestamps, or comments.
 
 ## Current Operator Surfaces
 
@@ -326,8 +327,8 @@ Near-term tasks:
 
 1. Extend the plain Python worker skeleton from placeholders to real transcription workers.
 2. Done - create a canonical workflow definition from the stage table above.
-3. Decide whether the definition should be YAML, Python data, database seed data, or a combination.
-4. Map each workflow step to command, inputs, outputs, dependencies, and gate rules.
-5. Define database persistence for per-session workflow state.
+3. Done - use YAML as the canonical step definition, with database rows as runtime state.
+4. Done - map each workflow step to command, inputs, outputs, dependencies, and gate rules.
+5. Done - define database persistence for per-session workflow state.
 6. Keep `scripts/rag.py`, `src/farrlind_pipeline/`, and the workflow definition from drifting.
 7. Update the web UI only after the workflow rules are explicit enough to display.

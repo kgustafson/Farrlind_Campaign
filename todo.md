@@ -53,8 +53,8 @@ audio/transcript
 ### Phase 2: Define The Workflow Graph
 
 - Done - Create a plain YAML workflow definition for the Farrlind session pipeline.
-- Persist workflow state in database tables rather than YAML state files.
-- Model each step with:
+- Done - Persist workflow state in database tables rather than YAML state files.
+- Done - Model each step with:
   - stable step id
   - display name
   - dependencies
@@ -62,6 +62,7 @@ audio/transcript
   - expected inputs
   - expected outputs
   - status rules
+- Done - Add a session workflow initialization command that seeds `workflow_run` and ordered `workflow_step_state` rows from the YAML definition.
 - Keep this deterministic and inspectable.
 - Avoid introducing LangGraph or another orchestration framework until the shape of the workflow is clearer.
 
@@ -145,6 +146,8 @@ audio/transcript
 
 - Workflow state should live in the database.
 - The first workflow graph should be per-session.
+- YAML is the canonical step definition and determines step order.
+- Database rows are the runtime state for session workflows and step progress.
 - Campaign-level maintenance workflows come later.
 - Reruns must not overwrite reviewed/applied canon automatically.
 - Audio/transcript ingestion comes later as Phase 6.
@@ -152,6 +155,5 @@ audio/transcript
 ## Open Questions
 
 - Which steps are safe to run automatically, and which must always require user confirmation?
-- What should the first database schema for workflow state look like?
-- Should workflow state be stored as normalized rows, JSONB snapshots, or both?
+- Which workflow status values should the web UI expose first?
 - How should the UI distinguish stale artifacts from missing artifacts?

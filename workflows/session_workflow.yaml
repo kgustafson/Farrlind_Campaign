@@ -420,7 +420,7 @@ steps:
     lane: verification
     dependencies:
       - run_health
-    command: ./rag-env/bin/python -m unittest tests/test_web_review.py tests/test_dm_query.py tests/test_load_summaries.py tests/test_farrlind_pipeline.py tests/test_transcription_benchmark.py tests/test_parallel_transcription.py tests/test_workflow_definition.py
+    command: ./rag-env/bin/python -m unittest tests/test_web_review.py tests/test_dm_query.py tests/test_load_summaries.py tests/test_farrlind_pipeline.py tests/test_transcription_benchmark.py tests/test_parallel_transcription.py tests/test_workflow_definition.py tests/test_workflow_state.py
     expected_inputs:
       - source code
       - workflow definition

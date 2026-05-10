@@ -18,6 +18,7 @@ from scripts.load_summaries import apply_sql, write_sql
 from scripts.load_songbook import apply_sql as apply_songbook_sql
 from scripts.load_songbook import write_songbook_sql
 from scripts.transcribe_parallel import default_audio_path, default_output_path, run_transcription
+from raglib.workflow_state import write_workflow_init_sql
 
 
 STAGES = {
@@ -77,7 +78,15 @@ def parse_args():
     )
     parser.add_argument(
         "command",
-        choices=[*STAGES.keys(), "transcribe", "postextract", "status", "dbload", "songbook-load"],
+        choices=[
+            *STAGES.keys(),
+            "transcribe",
+            "postextract",
+            "status",
+            "dbload",
+            "songbook-load",
+            "workflow-init",
+        ],
         help="Workflow command to run.",
     )
     parser.add_argument("session_name", nargs="?", help="Session name, e.g. session20.")
@@ -108,6 +117,14 @@ def main():
         sql_path, _report_path, _prompts, _warnings = write_songbook_sql()
         if args.apply:
             apply_songbook_sql(sql_path, args.container, args.user, args.database)
+        return
+
+    if args.command == "workflow-init":
+        if not args.session_name:
+            raise SystemExit("workflow-init requires a session name, e.g. session21")
+        sql_path = write_workflow_init_sql(args.session_name)
+        if args.apply:
+            apply_sql(sql_path, args.container, args.user, args.database)
         return
 
     if not args.session_name:
