@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.2.16 - 5/10/2026
+
+Added historical workflow-state seeding for sessions 00 through 20.
+
+- Workflow: Added `rag.py workflow-seed-history --start-session 0 --end-session 20 --apply`.
+- Workflow: Seeded historical step statuses, estimated start/end timestamps, summary comments, and evidence metadata from existing audio, transcript, draft, review, final summary, and Git history artifacts.
+- Workflow: Marked unpreserved older diary-session audio/transcription/draft stages as `not_applicable` rather than pretending those artifacts existed.
+- Tests: Extended workflow-state tests for session 00 handling and historical seed generation.
+- Docs: Documented the historical seeding command and timestamp-estimate metadata.
+
 ## v0.2.15 - 5/10/2026
 
 Added database-backed session workflow state initialization.

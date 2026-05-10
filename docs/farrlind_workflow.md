@@ -298,6 +298,14 @@ To initialize a session workflow:
 
 This creates the session row if needed, creates or updates the per-session workflow run, and creates or refreshes the step-state rows without overwriting runtime status, timestamps, or comments.
 
+To seed historical workflow state for already-reviewed sessions:
+
+```bash
+./rag-env/bin/python scripts/rag.py workflow-seed-history --start-session 0 --end-session 20 --apply
+```
+
+Historical seeding uses the workflow YAML for step order, then estimates step timestamps from Git history and existing artifacts. Seeded rows are marked with `metadata.seeded_history = true` and `metadata.timestamp_estimate = true`. Older diary-led sessions may mark audio/transcription and unpreserved draft-generation steps as `not_applicable`, while reviewed/applied/final-summary and project-closure steps are marked complete when those artifacts exist.
+
 ## Current Operator Surfaces
 
 - Plain Python worker skeleton: `src/farrlind_pipeline/pipeline/simple_runner.py`

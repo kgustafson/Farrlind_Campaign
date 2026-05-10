@@ -63,6 +63,7 @@ audio/transcript
   - expected outputs
   - status rules
 - Done - Add a session workflow initialization command that seeds `workflow_run` and ordered `workflow_step_state` rows from the YAML definition.
+- Done - Add a historical workflow seeding command for sessions 00 through 20, with estimated timestamps and evidence comments.
 - Keep this deterministic and inspectable.
 - Avoid introducing LangGraph or another orchestration framework until the shape of the workflow is clearer.
 

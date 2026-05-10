@@ -1,6 +1,6 @@
 # Version
 
-v0.2.15
+v0.2.16
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.2.15` adds database-backed session workflow state initialization.
+`v0.2.16` adds historical workflow-state seeding for sessions 00 through 20.

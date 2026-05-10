@@ -18,7 +18,7 @@ from scripts.load_summaries import apply_sql, write_sql
 from scripts.load_songbook import apply_sql as apply_songbook_sql
 from scripts.load_songbook import write_songbook_sql
 from scripts.transcribe_parallel import default_audio_path, default_output_path, run_transcription
-from raglib.workflow_state import write_workflow_init_sql
+from raglib.workflow_state import write_historical_workflow_seed_sql, write_workflow_init_sql
 
 
 STAGES = {
@@ -86,6 +86,7 @@ def parse_args():
             "dbload",
             "songbook-load",
             "workflow-init",
+            "workflow-seed-history",
         ],
         help="Workflow command to run.",
     )
@@ -101,6 +102,8 @@ def parse_args():
     parser.add_argument("--max-workers", type=int, default=None, help="Transcribe command worker count. Defaults to 2.")
     parser.add_argument("--work-dir", type=Path, default=None, help="Optional transcribe command artifact directory.")
     parser.add_argument("--limit-seconds", type=float, default=None, help="Optional transcribe smoke-test limit.")
+    parser.add_argument("--start-session", type=int, default=0, help="workflow-seed-history first session number.")
+    parser.add_argument("--end-session", type=int, default=20, help="workflow-seed-history final session number.")
     return parser.parse_args()
 
 
@@ -123,6 +126,12 @@ def main():
         if not args.session_name:
             raise SystemExit("workflow-init requires a session name, e.g. session21")
         sql_path = write_workflow_init_sql(args.session_name)
+        if args.apply:
+            apply_sql(sql_path, args.container, args.user, args.database)
+        return
+
+    if args.command == "workflow-seed-history":
+        sql_path = write_historical_workflow_seed_sql(args.start_session, args.end_session)
         if args.apply:
             apply_sql(sql_path, args.container, args.user, args.database)
         return

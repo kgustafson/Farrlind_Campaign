@@ -1,6 +1,8 @@
 import unittest
 
 from raglib.workflow_state import (
+    historical_step_state,
+    historical_workflow_seed_sql,
     initialize_workflow_sql,
     load_workflow_definition,
     parse_session_number,
@@ -17,9 +19,11 @@ class WorkflowStateTest(unittest.TestCase):
         cls.sql = initialize_workflow_sql("session21", cls.definition)
 
     def test_session_references_parse_to_numbers(self):
+        self.assertEqual(parse_session_number("session00"), 0)
         self.assertEqual(parse_session_number("session21"), 21)
         self.assertEqual(parse_session_number("session021"), 21)
         self.assertEqual(parse_session_number("21"), 21)
+        self.assertEqual(session_name(0), "session00")
         self.assertEqual(session_name(21), "session21")
 
     def test_rejects_invalid_session_reference(self):
@@ -74,6 +78,25 @@ class WorkflowStateTest(unittest.TestCase):
         expected_rows = len(self.definition["steps"])
         actual_rows = self.sql.count("::jsonb")
         self.assertGreaterEqual(actual_rows, expected_rows * 4)
+
+    def test_historical_seed_sql_marks_range_and_estimates_history(self):
+        sql = historical_workflow_seed_sql(0, 1, self.definition)
+        self.assertIn("Historical timestamps are estimated", sql)
+        self.assertIn("session_number = 0", sql)
+        self.assertIn("session_number = 1", sql)
+        self.assertIn("timestamp_estimate", sql)
+        self.assertIn("workflow_step_state", sql)
+
+    def test_historical_seed_marks_older_missing_audio_as_not_applicable(self):
+        source_step = next(step for step in self.definition["steps"] if step["id"] == "source_audio_registered")
+        state = historical_step_state(0, source_step)
+        self.assertEqual(state["status"], "not_applicable")
+        self.assertIn("No preserved audio", state["comment"])
+
+    def test_historical_seed_marks_existing_review_as_complete(self):
+        review_step = next(step for step in self.definition["steps"] if step["id"] == "apply_review")
+        state = historical_step_state(20, review_step)
+        self.assertEqual(state["status"], "complete")
 
 
 if __name__ == "__main__":
