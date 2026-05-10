@@ -156,6 +156,16 @@ Artifact canon is partly maintained through the reviewed-canon load path and par
 - Current holder is read from the latest `artifact_custody` row when available.
 - Durable artifact canon should eventually be promoted into reviewed summaries, a reviewed artifact scrub list, or explicit custody records so future reloads preserve manual edits.
 
+## Wells of Magic Lore Flow
+
+The Wells of Magic lore section is a single editable Markdown canon note:
+
+```text
+knowledge/Faban/lore/wells_of_magic.md
+```
+
+The web page at `/wells` edits that file directly. Use it for consolidated Well lore, rules, open questions, and current understanding that cuts across sessions.
+
 ## Stage Definitions
 
 | Stage | Command | Input | Output | Canon Impact | Gate |

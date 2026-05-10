@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import yaml
 
-from web_review.services import canon, commands, reviews
+from web_review.services import canon, commands, lore, reviews
 from web_review.app import COMMAND_RESULTS, app, app_version
 from fastapi.testclient import TestClient
 
@@ -89,6 +89,13 @@ class WebReviewServiceTest(unittest.TestCase):
         self.assertTrue(workspace["review_locked"])
         self.assertEqual([item["id"] for item in workspace["items"]], ["event-001", "added-001", "event-002"])
         self.assertEqual(workspace["validation"], ["No review validation issues found."])
+
+    def test_wells_lore_write_creates_parent_and_trims_trailing_blank_lines(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "lore" / "wells_of_magic.md"
+            lore.write_wells_of_magic("The Wells remember.\n\n", path=path)
+
+            self.assertEqual(path.read_text(encoding="utf-8"), "The Wells remember.\n")
 
     def test_validate_review_document_reports_required_corrected_fields(self):
         notes = reviews.validate_review_document({
@@ -1307,6 +1314,30 @@ class ArtifactRouteTest(unittest.TestCase):
         self.assertEqual(response.status_code, 303)
         self.assertIn("deleted=1", response.headers["location"])
         delete.assert_called_once_with(4)
+
+
+class WellsLoreRouteTest(unittest.TestCase):
+    def test_wells_page_renders_single_lore_editor(self):
+        with patch("web_review.services.lore.read_wells_of_magic", return_value="Six Wells Exist"):
+            client = TestClient(app)
+            response = client.get("/wells")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Wells of Magic", response.text)
+        self.assertIn("Six Wells Exist", response.text)
+        self.assertIn('name="lore_text"', response.text)
+        self.assertIn('href="/wells"', response.text)
+
+    def test_save_wells_lore_writes_text(self):
+        with patch("web_review.services.lore.write_wells_of_magic") as write_lore:
+            client = TestClient(app)
+            response = client.post("/wells", data={
+                "lore_text": "The Wells never lie.",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("saved=1", response.headers["location"])
+        write_lore.assert_called_once_with("The Wells never lie.")
 
 
 class CommandServiceTest(unittest.TestCase):

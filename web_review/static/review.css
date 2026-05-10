@@ -719,6 +719,22 @@ dd { margin: 0; }
 .add-new-link {
   flex: 0 0 auto;
 }
+.archive-editor-panel {
+  padding: 16px;
+  border: 1px solid rgba(139, 95, 39, .45);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 226, .72), rgba(221, 190, 125, .22)),
+    var(--parchment);
+  box-shadow: 0 14px 34px rgba(52, 35, 19, .14);
+}
+.lore-field {
+  margin-top: 0;
+}
+.lore-textarea {
+  min-height: min(62vh, 720px);
+  line-height: 1.5;
+}
 .modal-backdrop {
   position: fixed;
   inset: 0;

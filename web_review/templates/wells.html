@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Wells of Magic | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div>
+    <p class="eyebrow">World Lore</p>
+    <h1>Wells of Magic</h1>
+    <p>Single-source lore notes for the Wells, their rules, locations, status, and unresolved questions.</p>
+  </div>
+</section>
+
+{% if request.query_params.get("saved") %}
+  <div class="flash">Well lore saved.</div>
+{% endif %}
+
+<section class="archive-editor-panel">
+  <form method="post" action="/wells">
+    <label class="field-block lore-field">
+      <span>Wells of Magic Lore</span>
+      <textarea name="lore_text" class="lore-textarea">{{ lore_text }}</textarea>
+    </label>
+    <div class="panel-actions">
+      <button type="submit">Save Lore</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

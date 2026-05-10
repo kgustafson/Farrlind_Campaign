@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from web_review.services import canon, commands, reviews
+from web_review.services import canon, commands, lore, reviews
 
 
 app = FastAPI(title="Farrlind Review Workbench")
@@ -583,6 +583,25 @@ async def delete_artifact(artifact_id: int):
     except canon.CanonWriteError:
         return RedirectResponse(url="/artifacts?delete_failed=1", status_code=303)
     return RedirectResponse(url="/artifacts?deleted=1", status_code=303)
+
+
+@app.get("/wells", response_class=HTMLResponse)
+def wells_lore(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "wells.html",
+        {"lore_text": lore.read_wells_of_magic()},
+    )
+
+
+@app.post("/wells")
+async def save_wells_lore(request: Request):
+    form = await request.form()
+    try:
+        lore.write_wells_of_magic(form.get("lore_text") or "")
+    except OSError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    return RedirectResponse(url="/wells?saved=1", status_code=303)
 
 
 @app.get("/api/review-status")

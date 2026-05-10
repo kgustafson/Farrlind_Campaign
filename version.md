@@ -1,6 +1,6 @@
 # Version
 
-v0.2.12
+v0.2.13
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.2.12` adds hover notes to artifact names in the Artifact Registry.
+`v0.2.13` adds the Wells of Magic lore editor.

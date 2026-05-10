@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.2.13 - 5/10/2026
+
+Added the Wells of Magic lore editor.
+
+- App: Wired Wells of Magic into the left archive menu.
+- App: Added a single large editable Markdown text field backed by `knowledge/Faban/lore/wells_of_magic.md`.
+- Canon: Seeded the Wells lore file with current campaign knowledge and open questions.
+- Tests: Added service and route coverage for reading and saving Well lore.
+
 ## v0.2.12 - 5/10/2026
 
 Added hover notes to artifact names.
