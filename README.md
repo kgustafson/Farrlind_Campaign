@@ -10,6 +10,7 @@ Run commands from the repo root:
 
 ```bash
 ./rag-env/bin/python scripts/rag.py status session20
+./rag-env/bin/python scripts/rag.py transcribe session20
 ./rag-env/bin/python scripts/rag.py extract session20
 ./rag-env/bin/python scripts/rag.py postextract session20
 ```
@@ -20,7 +21,16 @@ Run commands from the repo root:
 filter -> classify -> normalize -> merge -> validate -> summarize
 ```
 
-Use `status` before rerunning a session to see which artifacts already exist.
+Use `status` before rerunning a session to see which artifacts already exist. The `transcribe` command uses the production parallel transcription path with two workers by default.
+
+Parallel transcription defaults:
+
+```text
+audio/sessionXX.wav -> knowledge/Faban/raw/sessionXX_transcript.txt
+model: large-v3
+chunk size: 180 seconds
+workers: 2
+```
 
 ## Plain Worker Pipeline Skeleton
 
@@ -40,7 +50,7 @@ This is intentionally plain Python. LangGraph is not implemented yet.
 
 ## Transcription Architecture Benchmark
 
-Use the isolated benchmark harness to compare the current sequential transcription path against the experimental parallel worker path without touching campaign outputs:
+Use the isolated benchmark harness to compare the older sequential transcription path against the production parallel worker path without touching campaign outputs:
 
 ```bash
 ./rag-env/bin/python scripts/benchmark_transcription_architectures.py audio/session20.wav --session-id session20 --architecture both --model large-v3 --chunk-seconds 180 --max-workers 2

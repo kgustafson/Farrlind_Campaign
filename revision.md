@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.2.9 - 5/10/2026
+
+Promoted parallel transcription into the campaign workflow.
+
+- Workflow: Added `rag.py transcribe sessionXX` to produce `knowledge/Faban/raw/sessionXX_transcript.txt` from `audio/sessionXX.wav`.
+- Workflow: Added a production parallel transcription module with `large-v3`, `180` second chunks, and two workers as defaults.
+- Workflow: Pointed the benchmark parallel path at the production implementation to avoid drift.
+- Tests: Added focused coverage for worker caps, chunk planning, transcript stitching output format, and default campaign paths.
+- Docs: Updated README, workflow docs, and benchmark notes to identify two-worker parallel transcription as the normal path.
+
 ## v0.2.8 - 5/10/2026
 
 Recorded the two-worker transcription recommendation.

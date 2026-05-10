@@ -1,6 +1,6 @@
 # Version
 
-v0.2.8
+v0.2.9
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.2.8` records two workers as the recommended default local transcription benchmark setting.
+`v0.2.9` promotes two-worker parallel transcription into the campaign workflow.

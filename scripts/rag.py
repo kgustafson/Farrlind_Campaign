@@ -17,6 +17,7 @@ from raglib.summarize import summarize_session
 from scripts.load_summaries import apply_sql, write_sql
 from scripts.load_songbook import apply_sql as apply_songbook_sql
 from scripts.load_songbook import write_songbook_sql
+from scripts.transcribe_parallel import default_audio_path, default_output_path, run_transcription
 
 
 STAGES = {
@@ -39,6 +40,7 @@ POSTEXTRACT_STAGES = [
 ]
 
 STATUS_FILES = [
+    ("audio", REPO_ROOT / "audio", "{session}.wav"),
     ("diary", CLEAN, "{session}_diary.md"),
     ("transcript", RAW, "{session}_transcript.txt"),
     ("context", SESSIONS, "{session}_context.yaml"),
@@ -75,7 +77,7 @@ def parse_args():
     )
     parser.add_argument(
         "command",
-        choices=[*STAGES.keys(), "postextract", "status", "dbload", "songbook-load"],
+        choices=[*STAGES.keys(), "transcribe", "postextract", "status", "dbload", "songbook-load"],
         help="Workflow command to run.",
     )
     parser.add_argument("session_name", nargs="?", help="Session name, e.g. session20.")
@@ -83,6 +85,13 @@ def parse_args():
     parser.add_argument("--container", default="farrlind_db", help="Postgres Docker container name.")
     parser.add_argument("--user", default="admin", help="Postgres user.")
     parser.add_argument("--database", default="farrlind", help="Postgres database.")
+    parser.add_argument("--audio-file", type=Path, default=None, help="Transcribe command input. Defaults to audio/<session>.wav.")
+    parser.add_argument("--output", type=Path, default=None, help="Transcribe command output. Defaults to raw/<session>_transcript.txt.")
+    parser.add_argument("--model", default=None, help="Transcribe command Whisper model. Defaults to large-v3.")
+    parser.add_argument("--chunk-seconds", type=int, default=None, help="Transcribe command chunk size. Defaults to 180.")
+    parser.add_argument("--max-workers", type=int, default=None, help="Transcribe command worker count. Defaults to 2.")
+    parser.add_argument("--work-dir", type=Path, default=None, help="Optional transcribe command artifact directory.")
+    parser.add_argument("--limit-seconds", type=float, default=None, help="Optional transcribe smoke-test limit.")
     return parser.parse_args()
 
 
@@ -106,6 +115,15 @@ def main():
 
     if args.command == "status":
         print_status(args.session_name)
+    elif args.command == "transcribe":
+        from raglib.parallel_transcription import DEFAULT_CHUNK_SECONDS, DEFAULT_MAX_WORKERS, DEFAULT_MODEL_SIZE
+
+        args.audio_file = args.audio_file or default_audio_path(args.session_name)
+        args.output = args.output or default_output_path(args.session_name)
+        args.model = args.model or DEFAULT_MODEL_SIZE
+        args.chunk_seconds = args.chunk_seconds or DEFAULT_CHUNK_SECONDS
+        args.max_workers = args.max_workers or DEFAULT_MAX_WORKERS
+        run_transcription(args)
     elif args.command == "postextract":
         run_stages(args.session_name, POSTEXTRACT_STAGES)
     else:

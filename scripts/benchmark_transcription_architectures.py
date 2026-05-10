@@ -20,13 +20,14 @@ if str(SRC_ROOT) not in sys.path:
 
 from faster_whisper import WhisperModel
 
+from raglib import parallel_transcription as production_transcription
 from scripts.transcribe import extract_chunk, fmt_time, get_duration_seconds
 
 
-DEFAULT_MODEL_SIZE = "large-v3"
-DEFAULT_CHUNK_SECONDS = 180
-DEFAULT_MAX_WORKERS = 2
-MAX_PARALLEL_WORKERS = 3
+DEFAULT_MODEL_SIZE = production_transcription.DEFAULT_MODEL_SIZE
+DEFAULT_CHUNK_SECONDS = production_transcription.DEFAULT_CHUNK_SECONDS
+DEFAULT_MAX_WORKERS = production_transcription.DEFAULT_MAX_WORKERS
+MAX_PARALLEL_WORKERS = production_transcription.MAX_PARALLEL_WORKERS
 
 
 @dataclass(frozen=True)
@@ -224,40 +225,15 @@ def transcribe_parallel_workers(
     max_workers: int,
     limit_seconds: float | None,
 ) -> dict:
-    chunks_dir = output_dir / "chunks"
-    chunk_json_dir = output_dir / "chunk_json"
-    transcript_path = output_dir / "parallel_transcript.txt"
-    specs = build_chunk_specs(audio_file, chunks_dir, chunk_seconds, limit_seconds)
-    manifest = [asdict(spec) for spec in specs]
-    write_json(output_dir / "chunk_manifest.json", manifest)
-
-    progress(f"start parallel_workers model={model_size} workers={max_workers} chunks={len(specs)}")
-    split_elapsed = materialize_chunks(audio_file, specs)
-    started = time.perf_counter()
-    results = []
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        futures = [executor.submit(transcribe_parallel_chunk, asdict(spec), model_size) for spec in specs]
-        for future in as_completed(futures):
-            result = future.result()
-            results.append(result)
-            progress(f"parallel done {result['chunk_id']} elapsed={result['elapsed_seconds']:.2f}s")
-    transcribe_elapsed = time.perf_counter() - started
-    write_parallel_outputs(results, transcript_path, chunk_json_dir)
-
-    total_elapsed = split_elapsed + transcribe_elapsed
-    progress(f"done parallel_workers elapsed={total_elapsed:.2f}s")
-    audio_seconds = sum(spec.duration_seconds for spec in specs)
-    return {
-        "architecture": "parallel_workers",
-        "elapsed_seconds": total_elapsed,
-        "split_elapsed_seconds": split_elapsed,
-        "transcribe_elapsed_seconds": transcribe_elapsed,
-        "audio_seconds": audio_seconds,
-        "speed_factor": audio_seconds / total_elapsed if total_elapsed else None,
-        "max_workers": max_workers,
-        "output_path": str(transcript_path),
-        "chunks": sorted(results, key=lambda row: row["start_seconds"]),
-    }
+    return production_transcription.transcribe_parallel_audio(
+        audio_file=audio_file,
+        output_path=output_dir / "parallel_transcript.txt",
+        work_dir=output_dir,
+        model_size=model_size,
+        chunk_seconds=chunk_seconds,
+        max_workers=max_workers,
+        limit_seconds=limit_seconds,
+    )
 
 
 def write_report(run_dir: Path, summary: dict) -> None:
@@ -284,7 +260,7 @@ def write_report(run_dir: Path, summary: dict) -> None:
 
 
 def capped_worker_count(requested_workers: int) -> int:
-    return max(1, min(requested_workers, MAX_PARALLEL_WORKERS))
+    return production_transcription.capped_worker_count(requested_workers)
 
 
 def parse_args() -> argparse.Namespace:

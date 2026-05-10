@@ -49,6 +49,7 @@ Shared transcript stats:
 
 - Benchmark artifacts are intentionally ignored by Git under `benchmarks/`.
 - This file preserves the summary metrics we want to keep from the ignored benchmark runs.
+- The production `rag.py transcribe sessionXX` command now uses the two-worker parallel architecture by default.
 - Existing sequential and two-worker parallel metrics came from `benchmarks/transcription/session20/20260510-124624/report.md`.
 - Three-worker parallel metrics came from `benchmarks/transcription/session20/20260510-150026/report.md`.
 - Transcript equivalence was checked with `wc`, `shasum -a 256`, and `cmp`.

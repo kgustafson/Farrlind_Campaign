@@ -14,11 +14,12 @@ Generated transcripts, extracted events, draft summaries, and validation notes a
 
 ```text
 source material
-  -> plain worker skeleton, for audio sources
-       -> split
-       -> transcribe_parallel placeholder
-       -> stitch
-       -> validate placeholder
+  -> production parallel transcription, for recorded session audio
+       -> split audio into chunks
+       -> transcribe chunks with two faster-whisper workers
+       -> stitch transcript text
+       -> write raw transcript
+  -> plain worker skeleton, for future structured audio orchestration
   -> transcript or diary source
   -> extract
   -> filter
@@ -34,7 +35,7 @@ source material
   -> database/canon health
 ```
 
-Audio ingestion is intentionally upstream and later-phase work. The current stable workflow starts once a transcript, diary entry, or other source artifact exists.
+Audio ingestion now has a production parallel transcription command. The broader workflow still treats generated transcripts as source material that must be reviewed downstream.
 
 ## Plain Worker Skeleton
 
@@ -79,6 +80,26 @@ The skeleton produces structured intermediate JSON and Markdown so failed chunks
 
 `v0.2.3` added an isolated benchmark harness for comparing transcription architecture choices without touching campaign outputs.
 
+`v0.2.9` promoted the two-worker parallel path into the normal campaign workflow:
+
+```bash
+./rag-env/bin/python scripts/rag.py transcribe sessionXX
+```
+
+By default this reads:
+
+```text
+audio/sessionXX.wav
+```
+
+and writes:
+
+```text
+knowledge/Faban/raw/sessionXX_transcript.txt
+```
+
+The production defaults are `large-v3`, `180` second chunks, and `2` workers.
+
 Run the full session20 benchmark from the repo root with:
 
 ```bash
@@ -88,7 +109,7 @@ Run the full session20 benchmark from the repo root with:
 The benchmark compares:
 
 - `existing_sequential`: the current `scripts/transcribe.py` style, using one model instance and sequential chunks.
-- `parallel_workers`: an experimental worker strategy that materializes chunks in an isolated directory and transcribes chunks with a process worker pool.
+- `parallel_workers`: the production worker strategy that materializes chunks in an isolated directory and transcribes chunks with a process worker pool.
 
 Benchmark outputs are written under ignored paths:
 
@@ -122,6 +143,7 @@ For the current large-v3 CPU benchmark, the parallel architecture defaults to tw
 | --- | --- | --- | --- | --- | --- |
 | worker skeleton | `PYTHONPATH=src ./rag-env/bin/python -m farrlind_pipeline.pipeline.simple_runner ...` | source audio | chunk manifest, placeholder chunk transcripts, stitched transcript, validation report | draft only | experimental, safe to rerun |
 | status | `scripts/rag.py status sessionXX` | expected artifact paths | artifact presence report | none | safe anytime |
+| transcribe | `scripts/rag.py transcribe sessionXX` | audio | `raw/sessionXX_transcript.txt` | source material | rerun before review |
 | extract | `scripts/rag.py extract sessionXX` | transcript | `clean/sessionXX_events.md` | draft only | rerun with care |
 | filter | `scripts/rag.py filter sessionXX` | extracted events | `clean/sessionXX_filtered.md` | draft only | rerun with care |
 | classify | `scripts/rag.py classify sessionXX` | filtered events | `clean/sessionXX_classified.md` | draft only | rerun with care |
@@ -157,6 +179,13 @@ audio/sessionXX.wav
   -> data/outputs/sessionXX/stitched/stitched_transcript.json
   -> data/outputs/sessionXX/validation/validation_report.json
   -> data/outputs/sessionXX/validation/validation_report.md
+```
+
+Production transcription artifacts:
+
+```text
+audio/sessionXX.wav
+  -> knowledge/Faban/raw/sessionXX_transcript.txt
 ```
 
 Existing RAG and canon artifacts:
