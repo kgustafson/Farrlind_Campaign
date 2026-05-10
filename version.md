@@ -1,6 +1,6 @@
 # Version
 
-v0.2.16
+v0.2.17
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.2.16` adds historical workflow-state seeding for sessions 00 through 20.
+`v0.2.17` closes Phase 2 and moves LangGraph to a future workflow item.

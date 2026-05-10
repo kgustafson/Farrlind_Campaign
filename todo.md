@@ -50,7 +50,7 @@ audio/transcript
 
 ## Workflow Management
 
-### Phase 2: Define The Workflow Graph
+### Phase 2: Define The Workflow Graph - Complete
 
 - Done - Create a plain YAML workflow definition for the Farrlind session pipeline.
 - Done - Persist workflow state in database tables rather than YAML state files.
@@ -64,8 +64,7 @@ audio/transcript
   - status rules
 - Done - Add a session workflow initialization command that seeds `workflow_run` and ordered `workflow_step_state` rows from the YAML definition.
 - Done - Add a historical workflow seeding command for sessions 00 through 20, with estimated timestamps and evidence comments.
-- Keep this deterministic and inspectable.
-- Avoid introducing LangGraph or another orchestration framework until the shape of the workflow is clearer.
+- Done - Kept the first workflow graph deterministic, inspectable, YAML-defined, and database-backed.
 
 ### Phase 3: Show Workflow State In The Web UI
 
@@ -90,19 +89,7 @@ audio/transcript
 - Capture command output in the same command-result style already used by the review UI.
 - Prefer "Run next step" only after the graph status rules are trustworthy.
 
-### Phase 5: Consider LangGraph Or Similar Orchestration
-
-- Revisit LangGraph only if the workflow needs:
-  - branching
-  - retries
-  - resumable state
-  - human-in-the-loop checkpoints
-  - agentic extraction/revision loops
-  - richer step memory than simple status files or DB rows
-- If adopted, use LangGraph as the execution/state layer, not as a replacement for the explicit workflow definition.
-- Keep the web UI as the main operator surface.
-
-### Phase 6: Audio Ingestion
+### Phase 5: Audio Ingestion
 
 - Add audio ingestion to the workflow graph after the session review and canon workflow is stable.
 - Model audio-specific steps separately, such as:
@@ -112,6 +99,20 @@ audio/transcript
   - source artifact validation
 - Keep audio ingestion upstream from canon review.
 - Do not allow audio reprocessing to overwrite reviewed/applied canon without explicit human review.
+
+### Future: Consider LangGraph Or Similar Orchestration
+
+- Introduce LangGraph as a future workflow enhancement if the plain Python/YAML/database model starts needing more orchestration power.
+- Revisit LangGraph only if the workflow needs:
+  - branching
+  - retries
+  - resumable state
+  - human-in-the-loop checkpoints
+  - agentic extraction/revision loops
+  - richer step memory than simple status files or DB rows
+- If adopted, use LangGraph as the execution/state layer, not as a replacement for the explicit workflow definition.
+- Keep the web UI as the main operator surface.
+- This item is intentionally not phased yet.
 
 ### Later: Campaign-Level Maintenance
 

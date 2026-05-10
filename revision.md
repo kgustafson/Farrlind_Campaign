@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.2.17 - 5/10/2026
+
+Closed Phase 2 and moved LangGraph to a future workflow item.
+
+- Docs: Marked Phase 2 workflow graph definition as complete.
+- Docs: Moved LangGraph out of the numbered phase plan and into an unphased future orchestration candidate.
+- Docs: Renumbered audio ingestion as the next workflow-management phase.
+
 ## v0.2.16 - 5/10/2026
 
 Added historical workflow-state seeding for sessions 00 through 20.
