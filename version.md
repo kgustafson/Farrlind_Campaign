@@ -1,6 +1,6 @@
 # Version
 
-v0.1.3
+v0.2.0
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.1.3` adds the canonical Farrlind workflow reference and links supporting docs back to it.
+`v0.2.0` introduces the initial plain Python worker pipeline skeleton.

@@ -6,7 +6,7 @@ from unittest.mock import patch
 import yaml
 
 from web_review.services import canon, commands, reviews
-from web_review.app import COMMAND_RESULTS, app
+from web_review.app import COMMAND_RESULTS, app, app_version
 from fastapi.testclient import TestClient
 
 
@@ -311,7 +311,7 @@ class WebReviewAppTest(unittest.TestCase):
             response = client.get("/")
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Farrlind Campaign v0.1.1", response.text)
+        self.assertIn(f"Farrlind Campaign {app_version()}", response.text)
 
     def test_print_view_renders_source_markdown(self):
         client = TestClient(app)

@@ -22,6 +22,22 @@ filter -> classify -> normalize -> merge -> validate -> summarize
 
 Use `status` before rerunning a session to see which artifacts already exist.
 
+## Plain Worker Pipeline Skeleton
+
+The initial deterministic worker skeleton runs:
+
+```text
+split -> transcribe_parallel placeholder -> stitch -> validate placeholder
+```
+
+Run it from the repo root with:
+
+```bash
+PYTHONPATH=src ./rag-env/bin/python -m farrlind_pipeline.pipeline.simple_runner audio/sessionXX.wav --session-id sessionXX --work-dir data/outputs/sessionXX
+```
+
+This is intentionally plain Python. LangGraph is not implemented yet.
+
 ## Web Review App
 
 Run the database, Adminer, and the Farrlind review UI with Docker Compose:

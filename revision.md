@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.2.0 - 5/10/2026
+
+Introduced the initial plain Python worker pipeline skeleton.
+
+- Workflow: Added `src/farrlind_pipeline/` with deterministic worker modules for split, placeholder parallel transcription, stitch, and placeholder validation.
+- Workflow: Added Pydantic schemas for manifests, transcript chunks, stitched transcripts, validation reports, and pipeline run results.
+- Workflow: Added `simple_runner.py` to execute `split -> transcribe_parallel placeholder -> stitch -> validate placeholder` without LangGraph.
+- Docs: Added the plain worker skeleton command to `README.md`.
+- Tests: Added focused unit coverage for chunk manifest creation and the placeholder runner outputs.
+
 ## v0.1.3 - 5/9/2026
 
 Added a canonical workflow document for Phase 2 planning.
