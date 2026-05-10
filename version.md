@@ -1,6 +1,6 @@
 # Version
 
-v0.2.2
+v0.2.3
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.2.2` adds the Python 3.11 virtual environment migration check to the roadmap.
+`v0.2.3` adds an isolated transcription architecture benchmark harness.

@@ -75,6 +75,36 @@ src/farrlind_pipeline/models/schemas.py
 
 The skeleton produces structured intermediate JSON and Markdown so failed chunks can later become retryable without rerunning the entire pipeline.
 
+## Transcription Architecture Benchmark
+
+`v0.2.3` added an isolated benchmark harness for comparing transcription architecture choices without touching campaign outputs.
+
+Run the full session20 benchmark from the repo root with:
+
+```bash
+./rag-env/bin/python scripts/benchmark_transcription_architectures.py audio/session20.wav --session-id session20 --architecture both --model large-v3 --chunk-seconds 180 --max-workers 2
+```
+
+The benchmark compares:
+
+- `existing_sequential`: the current `scripts/transcribe.py` style, using one model instance and sequential chunks.
+- `parallel_workers`: an experimental worker strategy that materializes chunks in an isolated directory and transcribes chunks with a process worker pool.
+
+Benchmark outputs are written under ignored paths:
+
+```text
+benchmarks/transcription/sessionXX/<timestamp>/
+  -> existing/existing_transcript.txt
+  -> parallel/chunk_manifest.json
+  -> parallel/chunks/chunk-XXXX.wav
+  -> parallel/chunk_json/chunk-XXXX.json
+  -> parallel/parallel_transcript.txt
+  -> summary.json
+  -> report.md
+```
+
+Use `--dry-run` to plan the run without writing output files. Use `--limit-seconds` for shorter smoke tests.
+
 ## Canon Safety Rules
 
 - AI-generated output is draft material.
@@ -210,6 +240,7 @@ Workflow state should live in the database. YAML and Markdown files remain sourc
 ## Current Operator Surfaces
 
 - Plain Python worker skeleton: `src/farrlind_pipeline/pipeline/simple_runner.py`
+- Transcription architecture benchmark: `scripts/benchmark_transcription_architectures.py`
 - CLI pipeline: `scripts/rag.py`
 - CLI canon/review commands: `scripts/dm_query.py`
 - Web review app: FastAPI/Jinja app in `web_review/`

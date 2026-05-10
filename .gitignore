@@ -25,6 +25,7 @@ knowledge/Faban/lore/*
 *.log
 *.tmp
 farrlind/out/
+benchmarks/
 
 #OS
 .DS_Store

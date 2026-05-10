@@ -38,6 +38,16 @@ PYTHONPATH=src ./rag-env/bin/python -m farrlind_pipeline.pipeline.simple_runner 
 
 This is intentionally plain Python. LangGraph is not implemented yet.
 
+## Transcription Architecture Benchmark
+
+Use the isolated benchmark harness to compare the current sequential transcription path against the experimental parallel worker path without touching campaign outputs:
+
+```bash
+./rag-env/bin/python scripts/benchmark_transcription_architectures.py audio/session20.wav --session-id session20 --architecture both --model large-v3 --chunk-seconds 180 --max-workers 2
+```
+
+Benchmark artifacts are written under ignored `benchmarks/transcription/` directories.
+
 ## Web Review App
 
 Run the database, Adminer, and the Farrlind review UI with Docker Compose:

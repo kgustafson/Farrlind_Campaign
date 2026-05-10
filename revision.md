@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.2.3 - 5/10/2026
+
+Added an isolated benchmark harness for transcription architecture testing.
+
+- Workflow: Added `scripts/benchmark_transcription_architectures.py` to compare the existing sequential transcription path with an experimental parallel worker path.
+- Workflow: Benchmark outputs are isolated under ignored `benchmarks/transcription/` directories so normal campaign transcripts and canon artifacts are not touched.
+- Docs: Added the benchmark command to `README.md`.
+- Docs: Added the benchmark path and output layout to `docs/farrlind_workflow.md`.
+
 ## v0.2.2 - 5/10/2026
 
 Added Python 3.11 virtual environment migration to the roadmap.
