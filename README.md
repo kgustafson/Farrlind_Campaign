@@ -48,7 +48,7 @@ Use the isolated benchmark harness to compare the current sequential transcripti
 
 Benchmark artifacts are written under ignored `benchmarks/transcription/` directories.
 
-For the current large-v3 CPU benchmark, the parallel architecture is capped at two workers.
+The benchmark defaults to two parallel workers and currently caps explicit worker sweeps at three workers.
 
 ## Web Review App
 

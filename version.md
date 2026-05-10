@@ -1,6 +1,6 @@
 # Version
 
-v0.2.5
+v0.2.6
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.2.5` adds progress logging for long transcription benchmark runs.
+`v0.2.6` preserves session20 benchmark metrics and allows a three-worker benchmark sweep.

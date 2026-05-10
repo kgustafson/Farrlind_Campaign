@@ -26,7 +26,7 @@ from scripts.transcribe import extract_chunk, fmt_time, get_duration_seconds
 DEFAULT_MODEL_SIZE = "large-v3"
 DEFAULT_CHUNK_SECONDS = 180
 DEFAULT_MAX_WORKERS = 2
-MAX_PARALLEL_WORKERS = 2
+MAX_PARALLEL_WORKERS = 3
 
 
 @dataclass(frozen=True)

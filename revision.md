@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.2.6 - 5/10/2026
+
+Preserved session20 transcription benchmark metrics and opened a three-worker benchmark sweep.
+
+- Workflow: Raised the transcription benchmark worker cap from two to three for explicit parallel-worker comparison.
+- Docs: Added `docs/transcription_benchmark_session20.md` to preserve benchmark metrics from ignored output artifacts, including existing sequential, two-worker parallel, and three-worker parallel results.
+- Docs: Updated benchmark worker-cap language in `README.md` and `docs/farrlind_workflow.md`.
+- Tests: Updated worker-cap coverage for the three-worker ceiling.
+
 ## v0.2.5 - 5/10/2026
 
 Added progress logging for long transcription benchmark runs.
