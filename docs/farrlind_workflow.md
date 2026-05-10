@@ -105,6 +105,8 @@ benchmarks/transcription/sessionXX/<timestamp>/
 
 Use `--dry-run` to plan the run without writing output files. Use `--limit-seconds` for shorter smoke tests.
 
+For the current large-v3 CPU benchmark, the parallel architecture is capped at two workers to avoid overcommitting memory with multiple model instances.
+
 ## Canon Safety Rules
 
 - AI-generated output is draft material.

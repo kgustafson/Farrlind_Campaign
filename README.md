@@ -48,6 +48,8 @@ Use the isolated benchmark harness to compare the current sequential transcripti
 
 Benchmark artifacts are written under ignored `benchmarks/transcription/` directories.
 
+For the current large-v3 CPU benchmark, the parallel architecture is capped at two workers.
+
 ## Web Review App
 
 Run the database, Adminer, and the Farrlind review UI with Docker Compose:

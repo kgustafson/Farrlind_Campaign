@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.2.4 - 5/10/2026
+
+Capped the transcription architecture benchmark at two parallel workers.
+
+- Workflow: Added a benchmark worker-count cap so accidental higher values resolve to two workers for the large-v3 CPU comparison.
+- Tests: Added coverage for the worker-count cap.
+- Docs: Documented the two-worker cap in `README.md` and `docs/farrlind_workflow.md`.
+
 ## v0.2.3 - 5/10/2026
 
 Added an isolated benchmark harness for transcription architecture testing.

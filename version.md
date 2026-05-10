@@ -1,6 +1,6 @@
 # Version
 
-v0.2.3
+v0.2.4
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.2.3` adds an isolated transcription architecture benchmark harness.
+`v0.2.4` caps the transcription benchmark parallel worker count at two.

@@ -26,6 +26,7 @@ from scripts.transcribe import extract_chunk, fmt_time, get_duration_seconds
 DEFAULT_MODEL_SIZE = "large-v3"
 DEFAULT_CHUNK_SECONDS = 180
 DEFAULT_MAX_WORKERS = 2
+MAX_PARALLEL_WORKERS = 2
 
 
 @dataclass(frozen=True)
@@ -269,6 +270,10 @@ def write_report(run_dir: Path, summary: dict) -> None:
     (run_dir / "report.md").write_text("\n".join(lines), encoding="utf-8")
 
 
+def capped_worker_count(requested_workers: int) -> int:
+    return max(1, min(requested_workers, MAX_PARALLEL_WORKERS))
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Benchmark existing and parallel transcription architectures in isolation.")
     parser.add_argument("audio_file", type=Path)
@@ -280,7 +285,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-workers", type=int, default=DEFAULT_MAX_WORKERS)
     parser.add_argument("--limit-seconds", type=float, default=None)
     parser.add_argument("--dry-run", action="store_true")
-    return parser.parse_args()
+    args = parser.parse_args()
+    args.max_workers = capped_worker_count(args.max_workers)
+    return args
 
 
 def main() -> None:
