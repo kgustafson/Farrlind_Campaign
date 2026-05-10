@@ -308,6 +308,16 @@ Workflow state should live in the database. YAML and Markdown files remain sourc
 
 The web app should become the main operator surface over time, but the workflow definition should remain explicit, deterministic, and inspectable.
 
+## Workflow Definition
+
+The first machine-readable workflow definition lives at:
+
+```text
+workflows/session_workflow.yaml
+```
+
+It models the per-session workflow from source intake through draft generation, human review, canonization, verification, and versioned project history. It also includes cross-session lore/registry touchpoints such as Wells of Magic lore updates, automated tests, web smoke checks, and Git commit/tag/push closure after reviewed canon changes.
+
 ## Phase 2 Work
 
 Phase 2 is not greenfield. It should formalize the existing workflow into a machine-readable definition that can power the web UI.
@@ -315,7 +325,7 @@ Phase 2 is not greenfield. It should formalize the existing workflow into a mach
 Near-term tasks:
 
 1. Extend the plain Python worker skeleton from placeholders to real transcription workers.
-2. Create a canonical workflow definition from the stage table above.
+2. Done - create a canonical workflow definition from the stage table above.
 3. Decide whether the definition should be YAML, Python data, database seed data, or a combination.
 4. Map each workflow step to command, inputs, outputs, dependencies, and gate rules.
 5. Define database persistence for per-session workflow state.

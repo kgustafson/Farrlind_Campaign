@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.2.14 - 5/10/2026
+
+Added the first machine-readable session workflow definition.
+
+- Workflow: Added `workflows/session_workflow.yaml` with per-session intake, draft generation, human review, canonization, verification, and version-control steps.
+- Workflow: Included newer lore/registry, testing, web smoke verification, version update, commit, tag, and push closure steps.
+- Tests: Added workflow definition validation for required fields, unique step ids, dependency integrity, lane references, and coverage of current pipeline steps.
+- Docs: Linked the workflow definition from `docs/farrlind_workflow.md` and marked the definition task complete in `todo.md`.
+
 ## v0.2.13 - 5/10/2026
 
 Added the Wells of Magic lore editor.

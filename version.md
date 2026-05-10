@@ -1,6 +1,6 @@
 # Version
 
-v0.2.13
+v0.2.14
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.2.13` adds the Wells of Magic lore editor.
+`v0.2.14` adds the first machine-readable session workflow definition.

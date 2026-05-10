@@ -1,0 +1,546 @@
+workflow:
+  id: farrlind_session_canon
+  version: 1
+  display_name: Farrlind Session Canon Workflow
+  scope: per_session
+  description: >
+    Deterministic workflow for moving a Farrlind session from source material
+    through draft extraction, human review, database load, canon outputs,
+    verification, and versioned project history.
+  state_persistence: database
+  definition_format: yaml
+  default_session_ref: sessionXX
+  safety_rules:
+    - AI-generated transcript, extraction, summary, and validation artifacts are draft/source material.
+    - Reviewed or applied canon must never be overwritten automatically.
+    - Any rerun that changes canon must pass through human review before it is applied.
+    - Human gates must stay explicit in the web UI and CLI.
+    - Versioned project changes should update version.md, revision.md, receive a matching Git tag, and be pushed.
+
+steps:
+  - id: source_audio_registered
+    display_name: Source Audio Registered
+    lane: intake
+    dependencies: []
+    command: null
+    expected_inputs:
+      - audio/sessionXX.wav
+    expected_outputs:
+      - audio/sessionXX.wav
+    status_rules:
+      complete_when:
+        - audio/sessionXX.wav exists
+      blocked_when:
+        - audio file is missing and no transcript/diary-only fallback is declared
+    gate: operator_supplied
+    rerun_policy: safe
+    canon_impact: none
+    notes: Optional for older reviewed sessions that only have diary/source text.
+
+  - id: transcribe_audio
+    display_name: Transcribe Audio
+    lane: intake
+    dependencies:
+      - source_audio_registered
+    command: ./rag-env/bin/python scripts/rag.py transcribe sessionXX
+    expected_inputs:
+      - audio/sessionXX.wav
+    expected_outputs:
+      - knowledge/Faban/raw/sessionXX_transcript.txt
+    status_rules:
+      complete_when:
+        - raw transcript exists
+      stale_when:
+        - audio mtime is newer than transcript mtime
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: source_material
+    notes: Uses production two-worker parallel transcription by default.
+
+  - id: diary_source_available
+    display_name: Diary Source Available
+    lane: intake
+    dependencies: []
+    command: null
+    expected_inputs:
+      - knowledge/Faban/clean/sessionXX_diary.md
+    expected_outputs:
+      - knowledge/Faban/clean/sessionXX_diary.md
+    status_rules:
+      complete_when:
+        - diary source exists
+      optional_when:
+        - transcript exists and no diary source exists
+    gate: operator_supplied
+    rerun_policy: safe
+    canon_impact: source_material
+    notes: Older sessions may rely primarily on diary source.
+
+  - id: source_status_check
+    display_name: Source Status Check
+    lane: intake
+    dependencies:
+      - transcribe_audio
+      - diary_source_available
+    dependency_mode: any
+    command: ./rag-env/bin/python scripts/rag.py status sessionXX
+    expected_inputs:
+      - audio/sessionXX.wav
+      - knowledge/Faban/raw/sessionXX_transcript.txt
+      - knowledge/Faban/clean/sessionXX_diary.md
+    expected_outputs:
+      - operator status report
+    status_rules:
+      complete_when:
+        - at least one usable source artifact exists
+    gate: safe_diagnostic
+    rerun_policy: safe
+    canon_impact: none
+
+  - id: extract_events
+    display_name: Extract Events
+    lane: draft_generation
+    dependencies:
+      - source_status_check
+    command: ./rag-env/bin/python scripts/rag.py extract sessionXX
+    expected_inputs:
+      - knowledge/Faban/raw/sessionXX_transcript.txt
+      - knowledge/Faban/clean/sessionXX_diary.md
+    expected_outputs:
+      - knowledge/Faban/clean/sessionXX_events.md
+    status_rules:
+      complete_when:
+        - events draft exists
+      stale_when:
+        - source artifact mtime is newer than events draft mtime
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+
+  - id: filter_events
+    display_name: Filter Events
+    lane: draft_generation
+    dependencies:
+      - extract_events
+    command: ./rag-env/bin/python scripts/rag.py filter sessionXX
+    expected_inputs:
+      - knowledge/Faban/clean/sessionXX_events.md
+    expected_outputs:
+      - knowledge/Faban/clean/sessionXX_filtered.md
+    status_rules:
+      complete_when:
+        - filtered draft exists
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+
+  - id: classify_events
+    display_name: Classify Events
+    lane: draft_generation
+    dependencies:
+      - filter_events
+    command: ./rag-env/bin/python scripts/rag.py classify sessionXX
+    expected_inputs:
+      - knowledge/Faban/clean/sessionXX_filtered.md
+    expected_outputs:
+      - knowledge/Faban/clean/sessionXX_classified.md
+    status_rules:
+      complete_when:
+        - classified draft exists
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+
+  - id: normalize_events
+    display_name: Normalize Events
+    lane: draft_generation
+    dependencies:
+      - classify_events
+    command: ./rag-env/bin/python scripts/rag.py normalize sessionXX
+    expected_inputs:
+      - knowledge/Faban/clean/sessionXX_classified.md
+      - knowledge/Faban/sessions/sessionXX_context.yaml
+    expected_outputs:
+      - knowledge/Faban/clean/sessionXX_normalized.md
+    status_rules:
+      complete_when:
+        - normalized draft exists
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+
+  - id: merge_events
+    display_name: Merge Events
+    lane: draft_generation
+    dependencies:
+      - normalize_events
+    command: ./rag-env/bin/python scripts/rag.py merge sessionXX
+    expected_inputs:
+      - knowledge/Faban/clean/sessionXX_normalized.md
+    expected_outputs:
+      - knowledge/Faban/clean/sessionXX_merged.md
+    status_rules:
+      complete_when:
+        - merged draft exists
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+
+  - id: validate_draft
+    display_name: Validate Draft
+    lane: draft_generation
+    dependencies:
+      - merge_events
+    command: ./rag-env/bin/python scripts/rag.py validate sessionXX
+    expected_inputs:
+      - knowledge/Faban/clean/sessionXX_merged.md
+    expected_outputs:
+      - knowledge/Faban/clean/sessionXX_validation.md
+    status_rules:
+      complete_when:
+        - validation draft exists
+    gate: safe_diagnostic
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+
+  - id: summarize_draft
+    display_name: Summarize Draft
+    lane: draft_generation
+    dependencies:
+      - validate_draft
+    command: ./rag-env/bin/python scripts/rag.py summarize sessionXX
+    expected_inputs:
+      - knowledge/Faban/clean/sessionXX_merged.md
+      - knowledge/Faban/clean/sessionXX_diary.md
+      - knowledge/Faban/notes/sessionXX_corrections.md
+    expected_outputs:
+      - knowledge/Faban/clean/sessionXX_summary.md
+    status_rules:
+      complete_when:
+        - draft ingest summary exists
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+
+  - id: postextract_shortcut
+    display_name: Postextract Shortcut
+    lane: draft_generation
+    dependencies:
+      - extract_events
+    command: ./rag-env/bin/python scripts/rag.py postextract sessionXX
+    expected_inputs:
+      - knowledge/Faban/clean/sessionXX_events.md
+    expected_outputs:
+      - knowledge/Faban/clean/sessionXX_filtered.md
+      - knowledge/Faban/clean/sessionXX_classified.md
+      - knowledge/Faban/clean/sessionXX_normalized.md
+      - knowledge/Faban/clean/sessionXX_merged.md
+      - knowledge/Faban/clean/sessionXX_validation.md
+      - knowledge/Faban/clean/sessionXX_summary.md
+    status_rules:
+      complete_when:
+        - all postextract outputs exist
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+    notes: Shortcut for filter, classify, normalize, merge, validate, and summarize.
+
+  - id: initialize_review
+    display_name: Initialize Human Review
+    lane: human_review
+    dependencies:
+      - summarize_draft
+    command: ./rag-env/bin/python scripts/dm_query.py init-review sessionXX
+    expected_inputs:
+      - knowledge/Faban/clean/sessionXX_summary.md
+      - knowledge/Faban/clean/sessionXX_events.md
+    expected_outputs:
+      - knowledge/Faban/reviews/sessionXX_review.yaml
+    status_rules:
+      complete_when:
+        - review YAML exists
+      blocked_when:
+        - review YAML already exists unless operator confirms overwrite/reopen path
+    gate: human_initiated
+    rerun_policy: protected
+    canon_impact: none
+
+  - id: edit_review_decisions
+    display_name: Edit Review Decisions
+    lane: human_review
+    dependencies:
+      - initialize_review
+    command: web_review session review page
+    expected_inputs:
+      - knowledge/Faban/reviews/sessionXX_review.yaml
+      - source artifacts and draft outputs
+    expected_outputs:
+      - knowledge/Faban/reviews/sessionXX_review.yaml
+    status_rules:
+      complete_when:
+        - every review item has accepted, rejected, corrected, or added decision
+        - corrected and added items include canonical text, event type, location, significance, and reason
+    gate: human_required
+    rerun_policy: edit_until_reviewed
+    canon_impact: review_record
+
+  - id: mark_reviewed
+    display_name: Mark Review Reviewed
+    lane: human_review
+    dependencies:
+      - edit_review_decisions
+    command: web_review mark reviewed action
+    expected_inputs:
+      - knowledge/Faban/reviews/sessionXX_review.yaml
+    expected_outputs:
+      - knowledge/Faban/reviews/sessionXX_review.yaml
+    status_rules:
+      complete_when:
+        - review status is reviewed
+      blocked_when:
+        - any item is pending or missing required corrected/added fields
+    gate: human_required
+    rerun_policy: safe_if_not_applied
+    canon_impact: review_record
+
+  - id: apply_review
+    display_name: Apply Review To Database
+    lane: canonization
+    dependencies:
+      - mark_reviewed
+    command: ./rag-env/bin/python scripts/dm_query.py apply-review sessionXX
+    expected_inputs:
+      - knowledge/Faban/reviews/sessionXX_review.yaml
+      - knowledge/Faban/final/session*_summary.md
+      - knowledge/Faban/travel.yaml
+      - knowledge/Faban/encounters.yaml
+      - knowledge/Faban/enemy_encounters.yaml
+      - knowledge/Faban/lore/*.md
+    expected_outputs:
+      - farrlind/out/load_summaries.sql
+      - database rows
+      - review YAML marked applied
+    status_rules:
+      complete_when:
+        - review status is applied
+        - database load succeeds
+      blocked_when:
+        - review status is not reviewed
+    gate: human_required
+    rerun_policy: canon_affecting_requires_confirmation
+    canon_impact: database_canon
+
+  - id: write_final_summary
+    display_name: Write Final Summary
+    lane: canonization
+    dependencies:
+      - apply_review
+    command: ./rag-env/bin/python scripts/dm_query.py write-final-summary sessionXX
+    expected_inputs:
+      - applied review state
+      - database session and event rows
+    expected_outputs:
+      - knowledge/Faban/final/sessionXX_summary.md
+    status_rules:
+      complete_when:
+        - final summary exists
+      blocked_when:
+        - review has not been applied
+    gate: human_required
+    rerun_policy: canon_affecting_requires_confirmation
+    canon_impact: canon_file
+
+  - id: update_lore_sections
+    display_name: Update Cross-Session Lore Sections
+    lane: canonization
+    dependencies:
+      - write_final_summary
+    command: web_review lore and registry pages
+    expected_inputs:
+      - knowledge/Faban/final/sessionXX_summary.md
+      - reviewed decisions
+      - database canon rows
+    expected_outputs:
+      - knowledge/Faban/lore/wells_of_magic.md
+      - registry database edits for NPCs, locations, artifacts, and future lore sections
+    status_rules:
+      complete_when:
+        - operator confirms relevant lore/registry edits are complete or not needed
+    gate: human_required
+    rerun_policy: canon_affecting_requires_confirmation
+    canon_impact: canon_file_or_database_canon
+    notes: Includes committing lore after review when lore files change.
+
+  - id: dbload_refresh
+    display_name: Refresh Canon Database Load
+    lane: verification
+    dependencies:
+      - write_final_summary
+      - update_lore_sections
+    dependency_mode: all_completed_or_not_applicable
+    command: ./rag-env/bin/python scripts/rag.py dbload --apply
+    expected_inputs:
+      - knowledge/Faban/final/session*_summary.md
+      - knowledge/Faban/travel.yaml
+      - knowledge/Faban/encounters.yaml
+      - knowledge/Faban/enemy_encounters.yaml
+      - knowledge/Faban/lore/*.md
+    expected_outputs:
+      - farrlind/out/load_summaries.sql
+      - database rows
+    status_rules:
+      complete_when:
+        - command exits zero
+        - generated SQL is current enough for operator needs
+    gate: human_initiated
+    rerun_policy: canon_affecting_requires_confirmation
+    canon_impact: database_canon
+
+  - id: run_health
+    display_name: Run Canon Health
+    lane: verification
+    dependencies:
+      - dbload_refresh
+    command: ./rag-env/bin/python scripts/dm_query.py health
+    expected_inputs:
+      - database rows
+      - reviewed canon files
+    expected_outputs:
+      - health report
+    status_rules:
+      complete_when:
+        - command exits zero
+        - no blocking health notes remain
+    gate: safe_diagnostic
+    rerun_policy: safe
+    canon_impact: none
+
+  - id: run_tests
+    display_name: Run Automated Tests
+    lane: verification
+    dependencies:
+      - run_health
+    command: ./rag-env/bin/python -m unittest tests/test_web_review.py tests/test_dm_query.py tests/test_load_summaries.py tests/test_farrlind_pipeline.py tests/test_transcription_benchmark.py tests/test_parallel_transcription.py tests/test_workflow_definition.py
+    expected_inputs:
+      - source code
+      - workflow definition
+      - test fixtures
+    expected_outputs:
+      - test result report
+    status_rules:
+      complete_when:
+        - full relevant test suite exits zero
+    gate: safe_diagnostic
+    rerun_policy: safe
+    canon_impact: none
+
+  - id: web_smoke_check
+    display_name: Web App Smoke Check
+    lane: verification
+    dependencies:
+      - run_tests
+    command: docker compose up --build -d web && curl local web routes
+    expected_inputs:
+      - web_review app
+      - farrlind/docker-compose.yml
+    expected_outputs:
+      - local route checks return HTTP 200
+    status_rules:
+      complete_when:
+        - dashboard, review, registry, lore, and relevant API routes return expected status codes
+    gate: safe_diagnostic
+    rerun_policy: safe
+    canon_impact: none
+
+  - id: version_revision_update
+    display_name: Update Version And Revision Notes
+    lane: version_control
+    dependencies:
+      - run_tests
+      - web_smoke_check
+    dependency_mode: all_completed_or_not_applicable
+    command: edit version.md and revision.md
+    expected_inputs:
+      - completed code/canon/workflow changes
+    expected_outputs:
+      - version.md
+      - revision.md
+    status_rules:
+      complete_when:
+        - version.md matches latest revision entry
+        - revision.md describes the change
+    gate: human_or_agent_required
+    rerun_policy: safe
+    canon_impact: project_metadata
+
+  - id: git_commit
+    display_name: Commit Project Changes
+    lane: version_control
+    dependencies:
+      - version_revision_update
+    command: git add ... && git commit -m "..."
+    expected_inputs:
+      - verified working tree changes
+      - version.md
+      - revision.md
+      - changed canon/lore/code/docs files
+    expected_outputs:
+      - git commit
+    status_rules:
+      complete_when:
+        - git commit succeeds
+        - working tree contains no uncommitted intended changes
+    gate: human_or_agent_required
+    rerun_policy: safe_if_not_duplicate
+    canon_impact: versioned_project_history
+
+  - id: git_tag
+    display_name: Tag Project Version
+    lane: version_control
+    dependencies:
+      - git_commit
+    command: git tag vMAJOR.MINOR.REVISION
+    expected_inputs:
+      - git commit containing matching version.md and revision.md updates
+    expected_outputs:
+      - git tag
+    status_rules:
+      complete_when:
+        - matching git tag exists and points at the versioned commit
+    gate: human_or_agent_required
+    rerun_policy: safe_if_tag_missing
+    canon_impact: versioned_project_history
+
+  - id: git_push
+    display_name: Push Commit And Tag
+    lane: version_control
+    dependencies:
+      - git_tag
+    command: git push && git push origin vMAJOR.MINOR.REVISION
+    expected_inputs:
+      - local commit
+      - local tag
+    expected_outputs:
+      - GitHub main branch updated
+      - GitHub tag pushed
+    status_rules:
+      complete_when:
+        - branch push succeeds
+        - tag push succeeds
+    gate: human_or_agent_required
+    rerun_policy: safe_if_remote_missing
+    canon_impact: versioned_project_history
+
+lanes:
+  - id: intake
+    display_name: Source Intake
+  - id: draft_generation
+    display_name: Draft Generation
+  - id: human_review
+    display_name: Human Review
+  - id: canonization
+    display_name: Canonization
+  - id: verification
+    display_name: Testing And Verification
+  - id: version_control
+    display_name: Version Control

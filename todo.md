@@ -52,7 +52,7 @@ audio/transcript
 
 ### Phase 2: Define The Workflow Graph
 
-- Create a plain YAML or Python workflow definition for the Farrlind session pipeline.
+- Done - Create a plain YAML workflow definition for the Farrlind session pipeline.
 - Persist workflow state in database tables rather than YAML state files.
 - Model each step with:
   - stable step id
