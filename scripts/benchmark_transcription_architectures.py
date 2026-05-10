@@ -59,6 +59,10 @@ def write_json(path: Path, payload) -> None:
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
+def progress(message: str) -> None:
+    print(f"[{datetime.now().isoformat(timespec='seconds')}] {message}", flush=True)
+
+
 def build_chunk_specs(
     audio_file: Path,
     chunks_dir: Path,
@@ -91,6 +95,7 @@ def build_chunk_specs(
 def materialize_chunks(audio_file: Path, specs: list[ChunkSpec]) -> float:
     start = time.perf_counter()
     for spec in specs:
+        progress(f"materialize {spec.chunk_id} {fmt_time(spec.start_seconds)}-{fmt_time(spec.end_seconds)}")
         Path(spec.audio_path).parent.mkdir(parents=True, exist_ok=True)
         extract_chunk(str(audio_file), spec.start_seconds, spec.duration_seconds, spec.audio_path)
     return time.perf_counter() - start
@@ -111,6 +116,7 @@ def transcribe_existing_sequential(
 
     chunk_timings = []
     started = time.perf_counter()
+    progress(f"start existing_sequential model={model_size} audio={audio_file}")
     with output_path.open("w", encoding="utf-8") as out:
         chunk_start = 0.0
         index = 1
@@ -118,6 +124,7 @@ def transcribe_existing_sequential(
             chunk_len = min(chunk_seconds, total_duration - chunk_start)
             chunk_timer = time.perf_counter()
             tmp_path = output_path.parent / f"_existing_chunk_{index:04d}.wav"
+            progress(f"existing start chunk-{index:04d} {fmt_time(chunk_start)}-{fmt_time(chunk_start + chunk_len)}")
             try:
                 extract_chunk(str(audio_file), chunk_start, chunk_len, str(tmp_path))
                 segments, _info = model.transcribe(
@@ -146,10 +153,12 @@ def transcribe_existing_sequential(
                     "elapsed_seconds": time.perf_counter() - chunk_timer,
                 }
             )
+            progress(f"existing done chunk-{index:04d} elapsed={chunk_timings[-1]['elapsed_seconds']:.2f}s")
             chunk_start += chunk_seconds
             index += 1
 
     elapsed = time.perf_counter() - started
+    progress(f"done existing_sequential elapsed={elapsed:.2f}s")
     return {
         "architecture": "existing_sequential",
         "elapsed_seconds": elapsed,
@@ -222,17 +231,21 @@ def transcribe_parallel_workers(
     manifest = [asdict(spec) for spec in specs]
     write_json(output_dir / "chunk_manifest.json", manifest)
 
+    progress(f"start parallel_workers model={model_size} workers={max_workers} chunks={len(specs)}")
     split_elapsed = materialize_chunks(audio_file, specs)
     started = time.perf_counter()
     results = []
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         futures = [executor.submit(transcribe_parallel_chunk, asdict(spec), model_size) for spec in specs]
         for future in as_completed(futures):
-            results.append(future.result())
+            result = future.result()
+            results.append(result)
+            progress(f"parallel done {result['chunk_id']} elapsed={result['elapsed_seconds']:.2f}s")
     transcribe_elapsed = time.perf_counter() - started
     write_parallel_outputs(results, transcript_path, chunk_json_dir)
 
     total_elapsed = split_elapsed + transcribe_elapsed
+    progress(f"done parallel_workers elapsed={total_elapsed:.2f}s")
     audio_seconds = sum(spec.duration_seconds for spec in specs)
     return {
         "architecture": "parallel_workers",
@@ -312,6 +325,7 @@ def main() -> None:
         return
 
     run_dir.mkdir(parents=True, exist_ok=True)
+    progress(f"benchmark output directory: {run_dir}")
     results = []
     if args.architecture in {"existing", "both"}:
         results.append(

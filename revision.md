@@ -1,5 +1,12 @@
 # Revision History
 
+## v0.2.5 - 5/10/2026
+
+Added progress logging for long transcription benchmark runs.
+
+- Workflow: Benchmark logs now show architecture start/end, chunk materialization, and per-chunk completion progress.
+- Workflow: Progress messages flush immediately so detached runs can be monitored from their log files.
+
 ## v0.2.4 - 5/10/2026
 
 Capped the transcription architecture benchmark at two parallel workers.
