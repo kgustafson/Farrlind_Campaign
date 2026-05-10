@@ -25,9 +25,29 @@ Audio duration: `6932.67s` (`01:55:32`)
 - Three-worker parallel was `190.83s` faster than two-worker parallel, reducing wall-clock time by about `7.0%`.
 - Three workers won this benchmark, but the gain over two workers was modest and some individual chunks slowed down, suggesting the machine may be close to contention.
 
+## Transcript Equivalence
+
+All three transcript outputs are byte-for-byte identical.
+
+| Pair | Result |
+| --- | --- |
+| existing sequential vs two-worker parallel | identical |
+| existing sequential vs three-worker parallel | identical |
+| two-worker parallel vs three-worker parallel | identical |
+
+Shared transcript stats:
+
+| Metric | Value |
+| --- | ---: |
+| Lines | `2579` |
+| Words | `23107` |
+| Bytes | `133473` |
+| SHA-256 | `a48d0d9923bb85fe882a1726094f07f75bfd4b4f4ef1a916965a6a8d2f99eb24` |
+
 ## Notes
 
 - Benchmark artifacts are intentionally ignored by Git under `benchmarks/`.
 - This file preserves the summary metrics we want to keep from the ignored benchmark runs.
 - Existing sequential and two-worker parallel metrics came from `benchmarks/transcription/session20/20260510-124624/report.md`.
 - Three-worker parallel metrics came from `benchmarks/transcription/session20/20260510-150026/report.md`.
+- Transcript equivalence was checked with `wc`, `shasum -a 256`, and `cmp`.

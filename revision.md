@@ -1,5 +1,12 @@
 # Revision History
 
+## v0.2.7 - 5/10/2026
+
+Recorded transcript equivalence for the session20 benchmark sweep.
+
+- Docs: Added byte-for-byte transcript comparison results to `docs/transcription_benchmark_session20.md`.
+- Docs: Preserved shared line, word, byte, and SHA-256 metrics for the existing sequential, two-worker parallel, and three-worker parallel outputs.
+
 ## v0.2.6 - 5/10/2026
 
 Preserved session20 transcription benchmark metrics and opened a three-worker benchmark sweep.
