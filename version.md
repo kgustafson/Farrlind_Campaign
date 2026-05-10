@@ -1,6 +1,6 @@
 # Version
 
-v0.2.7
+v0.2.8
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.2.7` records transcript equivalence for the session20 benchmark sweep.
+`v0.2.8` records two workers as the recommended default local transcription benchmark setting.

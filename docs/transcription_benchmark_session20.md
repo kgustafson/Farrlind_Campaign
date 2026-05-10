@@ -24,6 +24,7 @@ Audio duration: `6932.67s` (`01:55:32`)
 - Three-worker parallel was `1669.41s` faster than existing sequential, reducing wall-clock time by about `39.7%`.
 - Three-worker parallel was `190.83s` faster than two-worker parallel, reducing wall-clock time by about `7.0%`.
 - Three workers won this benchmark, but the gain over two workers was modest and some individual chunks slowed down, suggesting the machine may be close to contention.
+- Recommendation: use two workers as the default local transcription setting. Keep three workers for explicit comparison or time-sensitive runs only.
 
 ## Transcript Equivalence
 

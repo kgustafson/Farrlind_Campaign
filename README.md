@@ -48,7 +48,7 @@ Use the isolated benchmark harness to compare the current sequential transcripti
 
 Benchmark artifacts are written under ignored `benchmarks/transcription/` directories.
 
-The benchmark defaults to two parallel workers and currently caps explicit worker sweeps at three workers.
+The benchmark defaults to two parallel workers. Treat two workers as the normal local default for `large-v3`; three workers remains available for explicit comparison runs, but is not the recommended default.
 
 ## Web Review App
 

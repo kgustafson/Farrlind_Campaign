@@ -105,7 +105,7 @@ benchmarks/transcription/sessionXX/<timestamp>/
 
 Use `--dry-run` to plan the run without writing output files. Use `--limit-seconds` for shorter smoke tests.
 
-For the current large-v3 CPU benchmark, the parallel architecture defaults to two workers and caps explicit worker sweeps at three workers to avoid overcommitting memory with multiple model instances.
+For the current large-v3 CPU benchmark, the parallel architecture defaults to two workers. Treat two workers as the normal local default because it captured most of the speedup without pushing as close to contention. Three workers remains available for explicit comparison runs, but is not the recommended default.
 
 ## Canon Safety Rules
 

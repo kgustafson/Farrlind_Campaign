@@ -1,5 +1,12 @@
 # Revision History
 
+## v0.2.8 - 5/10/2026
+
+Recorded the two-worker transcription recommendation.
+
+- Docs: Clarified that two workers are the recommended default local `large-v3` transcription setting.
+- Docs: Kept three workers available as an explicit comparison or time-sensitive option, not the default path.
+
 ## v0.2.7 - 5/10/2026
 
 Recorded transcript equivalence for the session20 benchmark sweep.
