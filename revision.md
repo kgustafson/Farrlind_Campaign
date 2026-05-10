@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.3.0 - 5/10/2026
+
+Started Phase 3 with a read-only workflow status web view.
+
+- App: Added `/workflow` with a session workflow ledger and ordered per-session step detail panel.
+- App: Added `/api/workflow` and `/api/workflow/sessions/{session}` for workflow state inspection.
+- App: Wired Workflow Status into the archive sidebar and styled progress/status states in the parchment archive theme.
+- Workflow: Marked the first Phase 3 web status tasks complete in `todo.md`.
+- Tests: Added workflow service and route coverage for the new page and APIs.
+
 ## v0.2.17 - 5/10/2026
 
 Closed Phase 2 and moved LangGraph to a future workflow item.

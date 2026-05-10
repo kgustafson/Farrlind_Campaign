@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from web_review.services import canon, commands, lore, reviews
+from web_review.services import canon, commands, lore, reviews, workflow
 
 
 app = FastAPI(title="Farrlind Review Workbench")
@@ -118,6 +118,25 @@ def dashboard(request: Request):
         request,
         "dashboard.html",
         {"rows": reviews.dashboard_rows()},
+    )
+
+
+@app.get("/workflow", response_class=HTMLResponse)
+def workflow_index(request: Request, session: Optional[int] = None):
+    try:
+        rows = workflow.workflow_rows()
+        selected_session = session or (rows[0]["session_number"] if rows else None)
+        detail = workflow.workflow_detail(selected_session) if selected_session is not None else None
+    except workflow.WorkflowReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    return templates.TemplateResponse(
+        request,
+        "workflow.html",
+        {
+            "rows": rows,
+            "selected_session": selected_session,
+            "detail": detail,
+        },
     )
 
 
@@ -607,6 +626,29 @@ async def save_wells_lore(request: Request):
 @app.get("/api/review-status")
 def api_review_status():
     return [row.__dict__ for row in reviews.dashboard_rows()]
+
+
+@app.get("/api/workflow")
+def api_workflow():
+    try:
+        return workflow.workflow_rows()
+    except workflow.WorkflowReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+
+@app.get("/api/workflow/sessions/{session}")
+def api_workflow_session(session: str):
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    try:
+        detail = workflow.workflow_detail(session_number)
+    except workflow.WorkflowReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    if detail is None:
+        raise HTTPException(status_code=404, detail="Workflow state not found.")
+    return detail
 
 
 @app.get("/api/sessions/{session}/review")

@@ -406,6 +406,169 @@ button:disabled {
   background: #5a371b;
 }
 
+.workflow-layout {
+  display: grid;
+  grid-template-columns: minmax(520px, 1fr) minmax(360px, 460px);
+  gap: 18px;
+  align-items: start;
+}
+.workflow-session-table .selected-row {
+  background: rgba(216, 190, 124, .38);
+  box-shadow: inset 4px 0 0 var(--brass);
+}
+.progress-strip {
+  position: relative;
+  overflow: hidden;
+  width: min(170px, 100%);
+  height: 10px;
+  border: 1px solid rgba(110, 67, 24, .35);
+  border-radius: 999px;
+  background: rgba(61, 40, 22, .14);
+}
+.progress-strip span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--brass));
+}
+.progress-label {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.workflow-detail-panel {
+  position: sticky;
+  top: 82px;
+  max-height: calc(100vh - 106px);
+  overflow: auto;
+  padding: 18px;
+  border: 1px solid rgba(139, 95, 39, .55);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 226, .78), rgba(226, 199, 141, .35)),
+    var(--parchment);
+  box-shadow: 0 14px 34px rgba(52, 35, 19, .16);
+}
+.workflow-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(110, 67, 24, .22);
+  padding-bottom: 12px;
+}
+.workflow-detail-head h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 18px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.timeline-note {
+  margin-top: 10px;
+  padding: 9px 10px;
+  border: 1px solid rgba(184, 137, 53, .38);
+  border-radius: 6px;
+  background: rgba(255, 247, 223, .58);
+  color: var(--warn);
+  font-size: 13px;
+}
+.workflow-step-list {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  margin: 16px 0 0;
+  padding: 0;
+}
+.workflow-step {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(139, 95, 39, .28);
+  border-radius: 8px;
+  background: rgba(255, 249, 226, .5);
+}
+.workflow-step-marker {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(110, 67, 24, .4);
+  background: #3a2919;
+  color: #f8e6b6;
+  font-size: 12px;
+  font-weight: 700;
+}
+.workflow-step-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #452b15;
+  font-weight: 700;
+}
+.workflow-step p {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.workflow-step-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 0 0;
+}
+.workflow-step-meta div {
+  min-width: 0;
+}
+.workflow-step-meta dt {
+  color: var(--brass-dark);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.workflow-step-meta dd {
+  margin: 2px 0 0;
+  color: var(--ink);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.workflow-command {
+  display: block;
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  background: rgba(58, 41, 25, .9);
+  color: #f8e6b6;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.workflow-completed,
+.workflow-complete {
+  color: var(--ok);
+  background: #dfe8cf;
+}
+.workflow-not_applicable {
+  color: var(--muted);
+  background: #e8ddbd;
+}
+.workflow-pending,
+.workflow-partially_completed {
+  color: var(--warn);
+  background: #f0dfaf;
+}
+.workflow-blocked,
+.workflow-stale {
+  color: var(--bad);
+  background: #ead0c2;
+}
+
 .review-form { margin: 0; }
 .flash {
   margin: 0 0 16px;
@@ -868,6 +1031,14 @@ dd { margin: 0; }
   .app-shell {
     grid-template-columns: 1fr;
   }
+  .workflow-layout {
+    grid-template-columns: 1fr;
+  }
+  .workflow-detail-panel {
+    position: relative;
+    top: auto;
+    max-height: none;
+  }
   .archive-sidebar {
     position: relative;
     top: auto;
@@ -976,6 +1147,13 @@ dd { margin: 0; }
   }
   .status-table .icon-link {
     justify-self: start;
+  }
+  .workflow-step-meta {
+    grid-template-columns: 1fr;
+  }
+  .workflow-step-title {
+    align-items: flex-start;
+    flex-direction: column;
   }
   .form-grid.two-col,
   .form-grid.three-col {

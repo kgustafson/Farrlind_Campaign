@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import yaml
 
-from web_review.services import canon, commands, lore, reviews
+from web_review.services import canon, commands, lore, reviews, workflow
 from web_review.app import COMMAND_RESULTS, app, app_version
 from fastapi.testclient import TestClient
 
@@ -1338,6 +1338,164 @@ class WellsLoreRouteTest(unittest.TestCase):
         self.assertEqual(response.status_code, 303)
         self.assertIn("saved=1", response.headers["location"])
         write_lore.assert_called_once_with("The Wells never lie.")
+
+
+class WorkflowServiceTest(unittest.TestCase):
+    def test_workflow_rows_reads_aggregate_progress(self):
+        rows = [{
+            "session_number": 20,
+            "session_title": "Salt, Steel",
+            "workflow_id": "farrlind_session_canon",
+            "workflow_version": 1,
+            "status": "completed",
+            "started_at": None,
+            "completed_at": None,
+            "summary_comment": "Seeded.",
+            "total_steps": 26,
+            "complete_steps": 26,
+            "not_applicable_steps": 0,
+            "pending_steps": 0,
+            "blocked_steps": 0,
+            "stale_steps": 0,
+            "progress_percent": 100,
+            "next_step_name": None,
+            "next_step_status": None,
+        }]
+        with patch("web_review.db.fetch_all", return_value=rows) as fetch:
+            loaded = workflow.workflow_rows()
+
+        self.assertEqual(loaded[0]["session_number"], 20)
+        self.assertEqual(loaded[0]["progress_percent"], 100)
+        self.assertIn("workflow_run", fetch.call_args.args[0])
+        self.assertIn("workflow_step_state", fetch.call_args.args[0])
+
+    def test_workflow_detail_reads_run_and_ordered_steps(self):
+        run = {
+            "id": 9,
+            "session_number": 20,
+            "session_title": "Salt, Steel",
+            "workflow_id": "farrlind_session_canon",
+            "workflow_version": 1,
+            "workflow_name": "Farrlind Session Canon Workflow",
+            "status": "completed",
+            "initiated_at": None,
+            "started_at": None,
+            "completed_at": None,
+            "summary_comment": "Seeded.",
+            "metadata": {"seeded_history": True},
+        }
+        steps = [{
+            "step_order": 1,
+            "step_id": "source_audio_registered",
+            "display_name": "Source Audio Registered",
+            "lane": "intake",
+            "status": "complete",
+            "started_at": None,
+            "completed_at": None,
+            "summary_comment": "Audio exists.",
+            "inputs": ["audio/session20.wav"],
+            "outputs": ["audio/session20.wav"],
+            "dependencies": [],
+            "gate": "operator_supplied",
+            "rerun_policy": "safe",
+            "canon_impact": "none",
+            "command": None,
+            "status_rules": {},
+            "metadata": {},
+        }]
+        with patch("web_review.db.fetch_all", side_effect=[[run], steps]):
+            loaded = workflow.workflow_detail(20)
+
+        self.assertEqual(loaded["session_number"], 20)
+        self.assertEqual(loaded["steps"][0]["step_id"], "source_audio_registered")
+
+
+class WorkflowRouteTest(unittest.TestCase):
+    def workflow_rows(self):
+        return [{
+            "session_number": 20,
+            "session_title": "Salt, Steel",
+            "workflow_id": "farrlind_session_canon",
+            "workflow_version": 1,
+            "status": "completed",
+            "started_at": None,
+            "completed_at": None,
+            "summary_comment": "Seeded.",
+            "total_steps": 26,
+            "complete_steps": 26,
+            "not_applicable_steps": 0,
+            "pending_steps": 0,
+            "blocked_steps": 0,
+            "stale_steps": 0,
+            "progress_percent": 100,
+            "next_step_name": None,
+            "next_step_status": None,
+        }]
+
+    def workflow_detail(self):
+        return {
+            "id": 9,
+            "session_number": 20,
+            "session_title": "Salt, Steel",
+            "workflow_id": "farrlind_session_canon",
+            "workflow_version": 1,
+            "workflow_name": "Farrlind Session Canon Workflow",
+            "status": "completed",
+            "initiated_at": None,
+            "started_at": None,
+            "completed_at": None,
+            "summary_comment": "Seeded from historical chat workflow.",
+            "metadata": {"seeded_history": True, "timestamp_estimate": True},
+            "steps": [{
+                "step_order": 1,
+                "step_id": "source_audio_registered",
+                "display_name": "Source Audio Registered",
+                "lane": "intake",
+                "status": "complete",
+                "started_at": None,
+                "completed_at": None,
+                "summary_comment": "Audio exists.",
+                "inputs": ["audio/session20.wav"],
+                "outputs": ["audio/session20.wav"],
+                "dependencies": [],
+                "gate": "operator_supplied",
+                "rerun_policy": "safe",
+                "canon_impact": "none",
+                "command": None,
+                "status_rules": {},
+                "metadata": {},
+            }],
+        }
+
+    def test_workflow_page_renders_ledger_and_detail(self):
+        with patch("web_review.services.workflow.workflow_rows", return_value=self.workflow_rows()), \
+             patch("web_review.services.workflow.workflow_detail", return_value=self.workflow_detail()):
+            client = TestClient(app)
+            response = client.get("/workflow")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Workflow Status", response.text)
+        self.assertIn("Session Workflow Ledger", response.text)
+        self.assertIn("Session 20", response.text)
+        self.assertIn("Source Audio Registered", response.text)
+        self.assertIn("Historical timestamps are estimated", response.text)
+        self.assertIn('href="/workflow"', response.text)
+
+    def test_workflow_api_returns_rows(self):
+        with patch("web_review.services.workflow.workflow_rows", return_value=self.workflow_rows()):
+            client = TestClient(app)
+            response = client.get("/api/workflow")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()[0]["session_number"], 20)
+
+    def test_workflow_session_api_returns_detail(self):
+        with patch("web_review.services.workflow.workflow_detail", return_value=self.workflow_detail()):
+            client = TestClient(app)
+            response = client.get("/api/workflow/sessions/session20")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["steps"][0]["step_id"], "source_audio_registered")
 
 
 class CommandServiceTest(unittest.TestCase):

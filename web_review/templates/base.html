@@ -21,6 +21,7 @@
       <nav class="sidebar-nav">
         <a class="sidebar-link {% if request.url.path == '/' %}active{% endif %}" href="/">Dashboard</a>
         <span class="sidebar-link disabled" aria-disabled="true">Sessions</span>
+        <a class="sidebar-link {% if request.url.path.startswith('/workflow') %}active{% endif %}" href="/workflow">Workflow Status</a>
         <a class="sidebar-link {% if request.url.path.startswith('/wells') %}active{% endif %}" href="/wells">Wells of Magic</a>
         <a class="sidebar-link {% if request.url.path.startswith('/npcs') %}active{% endif %}" href="/npcs">NPC Registry</a>
         <a class="sidebar-link {% if request.url.path.startswith('/locations') %}active{% endif %}" href="/locations">Locations</a>

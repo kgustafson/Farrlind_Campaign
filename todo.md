@@ -68,9 +68,9 @@ audio/transcript
 
 ### Phase 3: Show Workflow State In The Web UI
 
-- Add a read-only workflow/status view to the local web app.
-- Show each session's progress through the graph.
-- Make incomplete, blocked, stale, and complete steps visually distinct.
+- Done - Add a read-only workflow/status view to the local web app.
+- Done - Show each session's progress through the graph.
+- Done - Make incomplete, blocked, stale, complete, and not-applicable steps visually distinct.
 - Surface missing artifacts and validation problems.
 - Link workflow steps back to existing review/session pages where useful.
 - Focus on per-session workflow state first.

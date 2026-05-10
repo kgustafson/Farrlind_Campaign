@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Workflow Status | The Farrlind Archivum{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div>
+    <p class="eyebrow">Workflow Management</p>
+    <h1>Workflow Status</h1>
+    <p>Read-only progress through the session canon workflow, seeded from reviewed campaign history.</p>
+  </div>
+</section>
+
+<section class="workflow-layout">
+  <div class="table-wrap archive-ledger" aria-label="Workflow session ledger">
+    <table class="status-table workflow-session-table">
+      <caption>Session Workflow Ledger</caption>
+      <thead>
+        <tr>
+          <th>Session</th>
+          <th>State</th>
+          <th>Progress</th>
+          <th>Steps</th>
+          <th>Next</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr class="{% if row.session_number == selected_session %}selected-row{% endif %}">
+          <td class="session-cell" data-label="Session">Session {{ "%02d"|format(row.session_number) }}</td>
+          <td data-label="State"><span class="badge workflow-{{ row.status }}">{{ row.status }}</span></td>
+          <td data-label="Progress">
+            <div class="progress-strip" aria-label="{{ row.progress_percent or 0 }} percent complete">
+              <span style="width: {{ row.progress_percent or 0 }}%"></span>
+            </div>
+            <span class="progress-label">{{ row.progress_percent or 0 }}%</span>
+          </td>
+          <td data-label="Steps">{{ row.complete_steps }} complete{% if row.not_applicable_steps %}, {{ row.not_applicable_steps }} n/a{% endif %}{% if row.pending_steps %}, {{ row.pending_steps }} pending{% endif %}</td>
+          <td data-label="Next">{% if row.next_step_name %}{{ row.next_step_name }}{% else %}<span class="ok">Complete</span>{% endif %}</td>
+          <td data-label="Open"><a class="icon-link" href="/workflow?session={{ row.session_number }}">View</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <aside class="workflow-detail-panel" aria-label="Workflow detail">
+    {% if detail %}
+    <div class="workflow-detail-head">
+      <p class="eyebrow">Session {{ "%02d"|format(detail.session_number) }}</p>
+      <h2>{{ detail.session_title }}</h2>
+      <span class="badge workflow-{{ detail.status }}">{{ detail.status }}</span>
+    </div>
+    <p class="muted">{{ detail.summary_comment or "No workflow summary comment recorded." }}</p>
+    {% if detail.metadata and detail.metadata.timestamp_estimate %}
+    <p class="timeline-note">Historical timestamps are estimated from chat work, Git history, and existing canon artifacts.</p>
+    {% endif %}
+
+    <ol class="workflow-step-list">
+      {% for step in detail.steps %}
+      <li class="workflow-step workflow-step-{{ step.status }}">
+        <div class="workflow-step-marker">{{ step.step_order }}</div>
+        <div>
+          <div class="workflow-step-title">
+            <span>{{ step.display_name }}</span>
+            <span class="badge workflow-{{ step.status }}">{{ step.status }}</span>
+          </div>
+          <p>{{ step.summary_comment or "No step comment recorded." }}</p>
+          <dl class="workflow-step-meta">
+            <div>
+              <dt>Lane</dt>
+              <dd>{{ step.lane or "unknown" }}</dd>
+            </div>
+            <div>
+              <dt>Gate</dt>
+              <dd>{{ step.gate or "none" }}</dd>
+            </div>
+            <div>
+              <dt>Canon</dt>
+              <dd>{{ step.canon_impact or "none" }}</dd>
+            </div>
+          </dl>
+          {% if step.command %}
+          <code class="workflow-command">{{ step.command }}</code>
+          {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+    {% else %}
+    <p class="muted">No workflow state has been recorded yet.</p>
+    {% endif %}
+  </aside>
+</section>
+{% endblock %}

@@ -1,6 +1,6 @@
 # Version
 
-v0.2.17
+v0.3.0
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.2.17` closes Phase 2 and moves LangGraph to a future workflow item.
+`v0.3.0` starts Phase 3 with a read-only workflow status web view.
