@@ -1,6 +1,6 @@
 # Version
 
-v0.2.1
+v0.2.2
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.2.1` updates the canonical workflow documentation for the plain Python worker skeleton.
+`v0.2.2` adds the Python 3.11 virtual environment migration check to the roadmap.

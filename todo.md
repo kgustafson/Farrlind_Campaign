@@ -139,6 +139,7 @@ audio/transcript
 - Define backup and restore expectations for local development.
 - Track seed/reference data that should be treated as managed project data.
 - Strengthen canon integrity checks as the review workflow grows.
+- Evaluate upgrading the local development virtual environment from Python 3.9 to Python 3.11 by creating a parallel venv, installing requirements, and validating faster-whisper transcription, the worker skeleton, the web app, and the full test suite before replacing `rag-env`.
 
 ## Resolved Questions
 

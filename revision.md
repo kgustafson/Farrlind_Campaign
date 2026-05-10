@@ -1,5 +1,12 @@
 # Revision History
 
+## v0.2.2 - 5/10/2026
+
+Added Python 3.11 virtual environment migration to the roadmap.
+
+- Docs: Added a Data Management task to evaluate moving from Python 3.9 to Python 3.11 using a parallel venv.
+- Docs: Captured validation expectations for faster-whisper transcription, the worker skeleton, the web app, and the full test suite before replacing `rag-env`.
+
 ## v0.2.1 - 5/10/2026
 
 Updated the canonical workflow reference for the plain Python worker skeleton.
