@@ -1,6 +1,6 @@
 # Version
 
-v0.2.11
+v0.2.12
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.2.11` adds the Artifact Registry web interface and documents the artifact canon load path.
+`v0.2.12` adds hover notes to artifact names in the Artifact Registry.

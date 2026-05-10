@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.2.12 - 5/10/2026
+
+Added hover notes to artifact names.
+
+- App: Artifact names now show the artifact notes field in a browser tooltip when notes are present.
+- App: Added a subtle dotted underline to artifact names with hover notes.
+- Tests: Added route coverage for artifact note tooltips.
+
 ## v0.2.11 - 5/10/2026
 
 Added the Artifact Registry web interface.

@@ -48,7 +48,13 @@
     <tbody>
       {% for artifact in artifacts %}
       <tr>
-        <td class="session-cell" data-label="Name">{{ artifact.name }}</td>
+        <td class="session-cell" data-label="Name">
+          {% if artifact.notes %}
+            <span class="hover-note" title="{{ artifact.notes }}">{{ artifact.name }}</span>
+          {% else %}
+            {{ artifact.name }}
+          {% endif %}
+        </td>
         <td data-label="Type">{{ artifact.artifact_type or "unknown" }}</td>
         <td data-label="Discovered">{% if artifact.discovered_session is not none %}Session {{ artifact.discovered_session }}{% else %}<span class="muted">—</span>{% endif %}</td>
         <td data-label="Holder">{{ artifact.current_holder or "—" }}</td>

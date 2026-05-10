@@ -806,6 +806,10 @@ dd { margin: 0; }
   font-style: italic;
   font-weight: 400;
 }
+.hover-note {
+  cursor: help;
+  border-bottom: 1px dotted rgba(110, 67, 24, .55);
+}
 .npc-status-alive,
 .npc-status-witnessed { color: var(--ok); }
 .npc-status-dead,

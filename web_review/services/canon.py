@@ -210,7 +210,7 @@ def artifact_rows() -> list[dict[str, Any]]:
             a.is_cursed,
             a.is_infernal,
             holder.holder_name AS current_holder,
-            a.notes
+            NULLIF(a.notes, 'None') AS notes
         FROM artifact a
         LEFT JOIN artifact_type at ON at.id = a.artifact_type_id
         LEFT JOIN session ds ON ds.id = a.discovered_session
@@ -239,7 +239,7 @@ def artifact_detail(artifact_id: int) -> Optional[dict[str, Any]]:
             a.is_sentient,
             a.is_cursed,
             a.is_infernal,
-            a.notes
+            NULLIF(a.notes, 'None') AS notes
         FROM artifact a
         LEFT JOIN session ds ON ds.id = a.discovered_session
         WHERE a.id = :id;

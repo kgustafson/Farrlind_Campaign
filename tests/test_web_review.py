@@ -904,7 +904,7 @@ class CanonServiceTest(unittest.TestCase):
             "is_cursed": False,
             "is_infernal": False,
             "current_holder": "Faban Colon",
-            "notes": "",
+            "notes": "Given by Balrog dwarves, Session 20",
         }]
         with patch("web_review.db.fetch_all", return_value=rows) as fetch:
             self.assertEqual(canon.artifact_rows(), rows)
@@ -1198,7 +1198,7 @@ class ArtifactRouteTest(unittest.TestCase):
             "is_cursed": False,
             "is_infernal": False,
             "current_holder": "Faban Colon",
-            "notes": "",
+            "notes": "Given by Balrog dwarves, Session 20",
         }]
 
     def artifact_types(self):
@@ -1213,6 +1213,7 @@ class ArtifactRouteTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Artifacts", response.text)
         self.assertIn("The Black Blade", response.text)
+        self.assertIn('title="Given by Balrog dwarves, Session 20"', response.text)
         self.assertIn("Faban Colon", response.text)
         self.assertIn('href="/artifacts"', response.text)
         self.assertIn("Add New", response.text)
