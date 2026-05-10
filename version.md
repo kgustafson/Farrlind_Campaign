@@ -1,6 +1,6 @@
 # Version
 
-v0.2.10
+v0.2.11
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.2.10` adds the NPC Registry web interface and documents the NPC canon load path.
+`v0.2.11` adds the Artifact Registry web interface and documents the artifact canon load path.

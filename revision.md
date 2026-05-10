@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.2.11 - 5/10/2026
+
+Added the Artifact Registry web interface.
+
+- App: Wired Artifacts into the left archive menu.
+- App: Added artifact listing, add/edit modals, delete actions, and an `/api/artifacts` endpoint.
+- App: Added artifact service queries and CRUD helpers for type, discovered session, description, lore significance, sentient/cursed/infernal flags, current holder, and notes.
+- Tests: Added service and route coverage for artifact registry behavior.
+- Docs: Documented how artifact canon is currently maintained through first-mention loading, registry edits, and future durable artifact scrub/custody records.
+
 ## v0.2.10 - 5/10/2026
 
 Added the NPC Registry web interface.

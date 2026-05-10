@@ -892,6 +892,47 @@ class CanonServiceTest(unittest.TestCase):
         self.assertIn("UPDATE npc", execute.call_args_list[1].args[0])
         self.assertIn("DELETE FROM npc", execute.call_args_list[2].args[0])
 
+    def test_artifact_rows_returns_full_ledger(self):
+        rows = [{
+            "id": 1,
+            "name": "The Black Blade",
+            "artifact_type": "weapon",
+            "discovered_session": 20,
+            "description": "Matte black blade.",
+            "lore_significance": "Feels like a decision already made.",
+            "is_sentient": False,
+            "is_cursed": False,
+            "is_infernal": False,
+            "current_holder": "Faban Colon",
+            "notes": "",
+        }]
+        with patch("web_review.db.fetch_all", return_value=rows) as fetch:
+            self.assertEqual(canon.artifact_rows(), rows)
+        self.assertIn("LEFT JOIN artifact_type", fetch.call_args.args[0])
+        self.assertIn("artifact_custody", fetch.call_args.args[0])
+
+    def test_artifact_crud_services_run_expected_statements(self):
+        values = {
+            "name": "New Relic",
+            "artifact_type_id": 1,
+            "discovered_session": 21,
+            "description": "A newly found relic.",
+            "lore_significance": "It hums quietly.",
+            "is_sentient": False,
+            "is_cursed": False,
+            "is_infernal": True,
+            "notes": "",
+        }
+        with patch("web_review.db.execute") as execute:
+            canon.create_artifact(values)
+            canon.update_artifact(12, values)
+            canon.delete_artifact(12)
+
+        self.assertIn("INSERT INTO artifact", execute.call_args_list[0].args[0])
+        self.assertIn("SELECT id FROM session WHERE session_number = :discovered_session", execute.call_args_list[0].args[0])
+        self.assertIn("UPDATE artifact", execute.call_args_list[1].args[0])
+        self.assertIn("DELETE FROM artifact", execute.call_args_list[2].args[0])
+
     def test_event_types_returns_ordered_names_from_db_rows(self):
         with patch("web_review.db.fetch_all", return_value=[{"type_name": "combat"}, {"type_name": "social"}]):
             self.assertEqual(canon.event_types(), ["combat", "social"])
@@ -1138,6 +1179,129 @@ class NPCRouteTest(unittest.TestCase):
         with patch("web_review.services.canon.delete_npc") as delete:
             client = TestClient(app)
             response = client.post("/npcs/4/delete", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("deleted=1", response.headers["location"])
+        delete.assert_called_once_with(4)
+
+
+class ArtifactRouteTest(unittest.TestCase):
+    def artifact_rows(self):
+        return [{
+            "id": 1,
+            "name": "The Black Blade",
+            "artifact_type": "weapon",
+            "discovered_session": 20,
+            "description": "Matte black blade.",
+            "lore_significance": "Feels like a decision already made.",
+            "is_sentient": False,
+            "is_cursed": False,
+            "is_infernal": False,
+            "current_holder": "Faban Colon",
+            "notes": "",
+        }]
+
+    def artifact_types(self):
+        return [{"id": 1, "type_name": "weapon"}]
+
+    def test_artifacts_page_renders_sidebar_and_ledger(self):
+        with patch("web_review.services.canon.artifact_rows", return_value=self.artifact_rows()), \
+             patch("web_review.services.canon.artifact_types", return_value=self.artifact_types()):
+            client = TestClient(app)
+            response = client.get("/artifacts")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Artifacts", response.text)
+        self.assertIn("The Black Blade", response.text)
+        self.assertIn("Faban Colon", response.text)
+        self.assertIn('href="/artifacts"', response.text)
+        self.assertIn("Add New", response.text)
+        self.assertNotIn("Add Artifact</h2>", response.text)
+
+    def test_artifacts_add_modal_renders_form(self):
+        with patch("web_review.services.canon.artifact_rows", return_value=self.artifact_rows()), \
+             patch("web_review.services.canon.artifact_types", return_value=self.artifact_types()):
+            client = TestClient(app)
+            response = client.get("/artifacts?modal=add")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Add Artifact", response.text)
+        self.assertIn('role="dialog"', response.text)
+        self.assertIn('action="/artifacts"', response.text)
+
+    def test_create_artifact_route_writes_form_values(self):
+        with patch("web_review.services.canon.create_artifact") as create:
+            client = TestClient(app)
+            response = client.post("/artifacts", data={
+                "name": "Moon Compass",
+                "artifact_type_id": "1",
+                "discovered_session": "21",
+                "description": "A compass that ignores north.",
+                "lore_significance": "Points toward promises.",
+                "is_sentient": "",
+                "is_cursed": "",
+                "is_infernal": "on",
+                "notes": "Suspicious.",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("created=1", response.headers["location"])
+        create.assert_called_once()
+        values = create.call_args.args[0]
+        self.assertEqual(values["name"], "Moon Compass")
+        self.assertEqual(values["artifact_type_id"], 1)
+        self.assertEqual(values["discovered_session"], 21)
+        self.assertTrue(values["is_infernal"])
+
+    def test_edit_artifact_page_loads_artifact(self):
+        detail = {
+            "id": 1,
+            "name": "The Black Blade",
+            "artifact_type_id": 1,
+            "discovered_session": 20,
+            "description": "Matte black blade.",
+            "lore_significance": "Feels like a decision already made.",
+            "is_sentient": False,
+            "is_cursed": False,
+            "is_infernal": False,
+            "notes": "",
+        }
+        with patch("web_review.services.canon.artifact_rows", return_value=self.artifact_rows()), \
+             patch("web_review.services.canon.artifact_types", return_value=self.artifact_types()), \
+             patch("web_review.services.canon.artifact_detail", return_value=detail):
+            client = TestClient(app)
+            response = client.get("/artifacts/1/edit")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Edit Artifact", response.text)
+        self.assertIn('role="dialog"', response.text)
+        self.assertIn("Matte black blade.", response.text)
+
+    def test_update_artifact_route_writes_form_values(self):
+        with patch("web_review.services.canon.update_artifact") as update:
+            client = TestClient(app)
+            response = client.post("/artifacts/3", data={
+                "name": "The Black Blade",
+                "artifact_type_id": "1",
+                "discovered_session": "20",
+                "description": "Matte black blade.",
+                "lore_significance": "Still unnerving.",
+                "is_sentient": "",
+                "is_cursed": "on",
+                "is_infernal": "",
+                "notes": "",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("updated=1", response.headers["location"])
+        update.assert_called_once()
+        self.assertEqual(update.call_args.args[0], 3)
+        self.assertTrue(update.call_args.args[1]["is_cursed"])
+
+    def test_delete_artifact_route_runs_delete(self):
+        with patch("web_review.services.canon.delete_artifact") as delete:
+            client = TestClient(app)
+            response = client.post("/artifacts/4/delete", follow_redirects=False)
 
         self.assertEqual(response.status_code, 303)
         self.assertIn("deleted=1", response.headers["location"])

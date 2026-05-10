@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Artifacts | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div>
+    <p class="eyebrow">Relics, Tools, and Dangerous Keepsakes</p>
+    <h1>Artifacts</h1>
+    <p>Canon artifacts known to the campaign database, including discovery, lore weight, flags, and current holder.</p>
+  </div>
+  <a class="icon-link add-new-link" href="/artifacts?modal=add">Add New</a>
+</section>
+
+{% if request.query_params.get("created") %}
+  <div class="flash">Artifact added.</div>
+{% endif %}
+{% if request.query_params.get("updated") %}
+  <div class="flash">Artifact updated.</div>
+{% endif %}
+{% if request.query_params.get("deleted") %}
+  <div class="flash">Artifact deleted.</div>
+{% endif %}
+{% if request.query_params.get("create_failed") %}
+  <div class="flash error-flash">Artifact was not added. Name must be filled in and related fields must be valid.</div>
+{% endif %}
+{% if request.query_params.get("update_failed") %}
+  <div class="flash error-flash">Artifact was not updated. Check the name and related fields.</div>
+{% endif %}
+{% if request.query_params.get("delete_failed") %}
+  <div class="flash error-flash">Artifact was not deleted. It may still be referenced by events, custody, knowledge, or grimoire entries.</div>
+{% endif %}
+
+<section class="table-wrap archive-ledger" aria-label="Artifact ledger">
+  <table class="status-table artifact-table">
+    <caption>Artifact Ledger</caption>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Discovered</th>
+        <th>Holder</th>
+        <th>Flags</th>
+        <th>Description</th>
+        <th>Lore</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for artifact in artifacts %}
+      <tr>
+        <td class="session-cell" data-label="Name">{{ artifact.name }}</td>
+        <td data-label="Type">{{ artifact.artifact_type or "unknown" }}</td>
+        <td data-label="Discovered">{% if artifact.discovered_session is not none %}Session {{ artifact.discovered_session }}{% else %}<span class="muted">—</span>{% endif %}</td>
+        <td data-label="Holder">{{ artifact.current_holder or "—" }}</td>
+        <td data-label="Flags">
+          {% if artifact.is_sentient %}<span class="badge status-reviewed">sentient</span>{% endif %}
+          {% if artifact.is_cursed %}<span class="badge decision-rejected">cursed</span>{% endif %}
+          {% if artifact.is_infernal %}<span class="badge status-in_review">infernal</span>{% endif %}
+          {% if not artifact.is_sentient and not artifact.is_cursed and not artifact.is_infernal %}<span class="muted">—</span>{% endif %}
+        </td>
+        <td data-label="Description">{{ artifact.description or "—" }}</td>
+        <td data-label="Lore">{{ artifact.lore_significance or "—" }}</td>
+        <td data-label="Actions">
+          <div class="row-actions">
+            <a class="icon-link" href="/artifacts/{{ artifact.id }}/edit">Edit</a>
+            <form method="post" action="/artifacts/{{ artifact.id }}/delete">
+              <button class="danger-button" type="submit">Delete</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{% if show_artifact_modal %}
+<section class="modal-backdrop" role="presentation">
+  <div class="archive-modal" role="dialog" aria-modal="true" aria-labelledby="artifact-modal-title">
+    <div class="modal-head">
+      <h2 id="artifact-modal-title">{% if editing %}Edit Artifact{% else %}Add Artifact{% endif %}</h2>
+      <a class="modal-close" href="/artifacts" aria-label="Close artifact form">×</a>
+    </div>
+    <form method="post" action="{% if editing %}/artifacts/{{ editing.id }}{% else %}/artifacts{% endif %}">
+      <div class="form-grid three-col">
+        <label class="field-block">
+          <span>Name</span>
+          <input name="name" required value="{{ editing.name if editing else '' }}">
+        </label>
+        <label class="field-block">
+          <span>Type</span>
+          <select name="artifact_type_id">
+            <option value="">unknown</option>
+            {% for artifact_type in artifact_types %}
+              <option value="{{ artifact_type.id }}" {% if editing and editing.artifact_type_id == artifact_type.id %}selected{% endif %}>{{ artifact_type.type_name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field-block">
+          <span>Discovered Session</span>
+          <input name="discovered_session" inputmode="numeric" value="{{ editing.discovered_session if editing and editing.discovered_session is not none else '' }}">
+        </label>
+      </div>
+      <label class="field-block">
+        <span>Description</span>
+        <textarea name="description">{{ editing.description if editing else '' }}</textarea>
+      </label>
+      <label class="field-block">
+        <span>Lore Significance</span>
+        <textarea name="lore_significance">{{ editing.lore_significance if editing else '' }}</textarea>
+      </label>
+      <label class="field-block">
+        <span>Notes</span>
+        <textarea name="notes">{{ editing.notes if editing else '' }}</textarea>
+      </label>
+      <div class="location-checks">
+        <label class="check-row">
+          <input type="checkbox" name="is_sentient" {% if editing and editing.is_sentient %}checked{% endif %}>
+          <span>Sentient</span>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" name="is_cursed" {% if editing and editing.is_cursed %}checked{% endif %}>
+          <span>Cursed</span>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" name="is_infernal" {% if editing and editing.is_infernal %}checked{% endif %}>
+          <span>Infernal</span>
+        </label>
+      </div>
+      <div class="panel-actions split-actions">
+        <a class="icon-link secondary-link" href="/artifacts">Cancel</a>
+        <button type="submit">{% if editing %}Save Artifact{% else %}Add Artifact{% endif %}</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

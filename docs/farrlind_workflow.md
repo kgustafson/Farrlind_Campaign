@@ -147,6 +147,15 @@ NPC canon is maintained through the same reviewed-canon load path as sessions an
 - First-seen corrections are intentional canon decisions. The load path may move an NPC earlier when review establishes that the NPC appeared in an earlier session.
 - The web NPC Registry edits the database view of those records, but future durable canon updates should still be reflected back into reviewed summaries or the scrub list so reloads do not lose them.
 
+## Artifact Registry Flow
+
+Artifact canon is partly maintained through the reviewed-canon load path and partly through the artifact registry.
+
+- `scripts/load_summaries.py` tracks first mentions for known artifacts and updates `artifact.discovered_session` during `scripts/rag.py dbload --apply`.
+- Rich artifact fields such as type, description, lore significance, sentient/cursed/infernal flags, and notes are editable in the web Artifact Registry.
+- Current holder is read from the latest `artifact_custody` row when available.
+- Durable artifact canon should eventually be promoted into reviewed summaries, a reviewed artifact scrub list, or explicit custody records so future reloads preserve manual edits.
+
 ## Stage Definitions
 
 | Stage | Command | Input | Output | Canon Impact | Gate |

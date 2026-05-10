@@ -98,6 +98,20 @@ def npc_form_values(form) -> dict:
     }
 
 
+def artifact_form_values(form) -> dict:
+    return {
+        "name": (form.get("name") or "").strip(),
+        "artifact_type_id": optional_int(form.get("artifact_type_id")),
+        "discovered_session": optional_int(form.get("discovered_session")),
+        "description": (form.get("description") or "").strip(),
+        "lore_significance": (form.get("lore_significance") or "").strip(),
+        "is_sentient": checkbox_value(form.get("is_sentient")),
+        "is_cursed": checkbox_value(form.get("is_cursed")),
+        "is_infernal": checkbox_value(form.get("is_infernal")),
+        "notes": (form.get("notes") or "").strip(),
+    }
+
+
 @app.get("/", response_class=HTMLResponse)
 def dashboard(request: Request):
     return templates.TemplateResponse(
@@ -495,6 +509,82 @@ async def delete_npc(npc_id: int):
     return RedirectResponse(url="/npcs?deleted=1", status_code=303)
 
 
+@app.get("/artifacts", response_class=HTMLResponse)
+def artifacts_index(request: Request, modal: str = ""):
+    try:
+        rows = canon.artifact_rows()
+        artifact_types = canon.artifact_types()
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    return templates.TemplateResponse(
+        request,
+        "artifacts.html",
+        {
+            "artifacts": rows,
+            "artifact_types": artifact_types,
+            "editing": None,
+            "show_artifact_modal": modal == "add",
+        },
+    )
+
+
+@app.post("/artifacts")
+async def create_artifact(request: Request):
+    form = await request.form()
+    values = artifact_form_values(form)
+    if not values["name"]:
+        return RedirectResponse(url="/artifacts?create_failed=1", status_code=303)
+    try:
+        canon.create_artifact(values)
+    except canon.CanonWriteError:
+        return RedirectResponse(url="/artifacts?create_failed=1", status_code=303)
+    return RedirectResponse(url="/artifacts?created=1", status_code=303)
+
+
+@app.get("/artifacts/{artifact_id}/edit", response_class=HTMLResponse)
+def edit_artifact(request: Request, artifact_id: int):
+    try:
+        rows = canon.artifact_rows()
+        artifact_types = canon.artifact_types()
+        editing = canon.artifact_detail(artifact_id)
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    if not editing:
+        raise HTTPException(status_code=404, detail="Artifact not found.")
+    return templates.TemplateResponse(
+        request,
+        "artifacts.html",
+        {
+            "artifacts": rows,
+            "artifact_types": artifact_types,
+            "editing": editing,
+            "show_artifact_modal": True,
+        },
+    )
+
+
+@app.post("/artifacts/{artifact_id}")
+async def update_artifact(request: Request, artifact_id: int):
+    form = await request.form()
+    values = artifact_form_values(form)
+    if not values["name"]:
+        return RedirectResponse(url=f"/artifacts/{artifact_id}/edit?update_failed=1", status_code=303)
+    try:
+        canon.update_artifact(artifact_id, values)
+    except canon.CanonWriteError:
+        return RedirectResponse(url=f"/artifacts/{artifact_id}/edit?update_failed=1", status_code=303)
+    return RedirectResponse(url="/artifacts?updated=1", status_code=303)
+
+
+@app.post("/artifacts/{artifact_id}/delete")
+async def delete_artifact(artifact_id: int):
+    try:
+        canon.delete_artifact(artifact_id)
+    except canon.CanonWriteError:
+        return RedirectResponse(url="/artifacts?delete_failed=1", status_code=303)
+    return RedirectResponse(url="/artifacts?deleted=1", status_code=303)
+
+
 @app.get("/api/review-status")
 def api_review_status():
     return [row.__dict__ for row in reviews.dashboard_rows()]
@@ -533,6 +623,14 @@ def api_locations():
 def api_npcs():
     try:
         return canon.npc_rows()
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+
+@app.get("/api/artifacts")
+def api_artifacts():
+    try:
+        return canon.artifact_rows()
     except canon.CanonReadError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
 

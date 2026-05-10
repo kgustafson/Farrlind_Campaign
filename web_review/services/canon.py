@@ -36,6 +36,10 @@ def location_types() -> list[dict[str, Any]]:
     return _fetch("SELECT id, type_name FROM location_type ORDER BY type_name;")
 
 
+def artifact_types() -> list[dict[str, Any]]:
+    return _fetch("SELECT id, type_name FROM artifact_type ORDER BY type_name;")
+
+
 def entity_statuses() -> list[dict[str, Any]]:
     return _fetch("SELECT id, status_code, description FROM entity_status ORDER BY status_code;")
 
@@ -191,6 +195,93 @@ def update_npc(npc_id: int, values: dict[str, Any]) -> None:
 
 def delete_npc(npc_id: int) -> None:
     _execute("DELETE FROM npc WHERE id = :id;", {"id": npc_id})
+
+
+def artifact_rows() -> list[dict[str, Any]]:
+    return _fetch("""
+        SELECT
+            a.id,
+            a.name,
+            at.type_name AS artifact_type,
+            ds.session_number AS discovered_session,
+            a.description,
+            a.lore_significance,
+            a.is_sentient,
+            a.is_cursed,
+            a.is_infernal,
+            holder.holder_name AS current_holder,
+            a.notes
+        FROM artifact a
+        LEFT JOIN artifact_type at ON at.id = a.artifact_type_id
+        LEFT JOIN session ds ON ds.id = a.discovered_session
+        LEFT JOIN LATERAL (
+            SELECT COALESCE(pc.name, n.name, 'Unknown or lost') AS holder_name
+            FROM artifact_custody ac
+            LEFT JOIN player_character pc ON pc.id = ac.character_id
+            LEFT JOIN npc n ON n.id = ac.npc_id
+            WHERE ac.artifact_id = a.id
+            ORDER BY ac.session_id DESC, ac.id DESC
+            LIMIT 1
+        ) holder ON TRUE
+        ORDER BY COALESCE(ds.session_number, 9999), a.name;
+    """)
+
+
+def artifact_detail(artifact_id: int) -> Optional[dict[str, Any]]:
+    rows = _fetch("""
+        SELECT
+            a.id,
+            a.name,
+            a.artifact_type_id,
+            ds.session_number AS discovered_session,
+            a.description,
+            a.lore_significance,
+            a.is_sentient,
+            a.is_cursed,
+            a.is_infernal,
+            a.notes
+        FROM artifact a
+        LEFT JOIN session ds ON ds.id = a.discovered_session
+        WHERE a.id = :id;
+    """, {"id": artifact_id})
+    return rows[0] if rows else None
+
+
+def create_artifact(values: dict[str, Any]) -> None:
+    _execute("""
+        INSERT INTO artifact (
+            name, artifact_type_id, discovered_session, description,
+            lore_significance, is_sentient, is_cursed, is_infernal, notes
+        )
+        VALUES (
+            :name, :artifact_type_id,
+            (SELECT id FROM session WHERE session_number = :discovered_session),
+            :description, :lore_significance,
+            :is_sentient, :is_cursed, :is_infernal, :notes
+        );
+    """, values)
+
+
+def update_artifact(artifact_id: int, values: dict[str, Any]) -> None:
+    params = {**values, "id": artifact_id}
+    _execute("""
+        UPDATE artifact
+        SET
+            name = :name,
+            artifact_type_id = :artifact_type_id,
+            discovered_session = (SELECT id FROM session WHERE session_number = :discovered_session),
+            description = :description,
+            lore_significance = :lore_significance,
+            is_sentient = :is_sentient,
+            is_cursed = :is_cursed,
+            is_infernal = :is_infernal,
+            notes = :notes
+        WHERE id = :id;
+    """, params)
+
+
+def delete_artifact(artifact_id: int) -> None:
+    _execute("DELETE FROM artifact WHERE id = :id;", {"id": artifact_id})
 
 
 def event_types() -> list[str]:
