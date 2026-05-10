@@ -22,7 +22,7 @@
         <a class="sidebar-link {% if request.url.path == '/' %}active{% endif %}" href="/">Dashboard</a>
         <span class="sidebar-link disabled" aria-disabled="true">Sessions</span>
         <span class="sidebar-link disabled" aria-disabled="true">Wells of Magic</span>
-        <span class="sidebar-link disabled" aria-disabled="true">NPC Registry</span>
+        <a class="sidebar-link {% if request.url.path.startswith('/npcs') %}active{% endif %}" href="/npcs">NPC Registry</a>
         <a class="sidebar-link {% if request.url.path.startswith('/locations') %}active{% endif %}" href="/locations">Locations</a>
         <span class="sidebar-link disabled" aria-disabled="true">Artifacts</span>
         <span class="sidebar-link disabled" aria-disabled="true">Open Threads</span>

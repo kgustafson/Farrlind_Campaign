@@ -137,6 +137,16 @@ For the current large-v3 CPU benchmark, the parallel architecture defaults to tw
 - Any canon-changing rerun must return to human review before it can become canon.
 - Human review decisions are part of the session record and should remain inspectable.
 
+## NPC Registry Flow
+
+NPC canon is maintained through the same reviewed-canon load path as sessions and locations.
+
+- New or corrected NPCs should first be captured in session review decisions or the reviewed canon scrub list in `scripts/load_summaries.py`.
+- `scripts/rag.py dbload --apply` runs the NPC scrub and updates/inserts canonical NPC rows.
+- NPC fields currently preserved by the load path include name, alias, status, last known location, first-seen session, description, named/unnamed flag, and notes.
+- First-seen corrections are intentional canon decisions. The load path may move an NPC earlier when review establishes that the NPC appeared in an earlier session.
+- The web NPC Registry edits the database view of those records, but future durable canon updates should still be reflected back into reviewed summaries or the scrub list so reloads do not lose them.
+
 ## Stage Definitions
 
 | Stage | Command | Input | Output | Canon Impact | Gate |

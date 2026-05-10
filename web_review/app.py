@@ -84,6 +84,20 @@ def location_form_values(form) -> dict:
     }
 
 
+def npc_form_values(form) -> dict:
+    return {
+        "name": (form.get("name") or "").strip(),
+        "alias": (form.get("alias") or "").strip(),
+        "faction_id": optional_int(form.get("faction_id")),
+        "entity_status_id": optional_int(form.get("entity_status_id")),
+        "last_known_location_id": optional_int(form.get("last_known_location_id")),
+        "first_seen_session": optional_int(form.get("first_seen_session")),
+        "description": (form.get("description") or "").strip(),
+        "is_named": checkbox_value(form.get("is_named")),
+        "notes": (form.get("notes") or "").strip(),
+    }
+
+
 @app.get("/", response_class=HTMLResponse)
 def dashboard(request: Request):
     return templates.TemplateResponse(
@@ -397,6 +411,90 @@ async def delete_location(location_id: int):
     return RedirectResponse(url="/locations?deleted=1", status_code=303)
 
 
+@app.get("/npcs", response_class=HTMLResponse)
+def npcs_index(request: Request, modal: str = ""):
+    try:
+        rows = canon.npc_rows()
+        statuses = canon.entity_statuses()
+        factions = canon.factions()
+        locations = canon.location_rows()
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    return templates.TemplateResponse(
+        request,
+        "npcs.html",
+        {
+            "npcs": rows,
+            "statuses": statuses,
+            "factions": factions,
+            "locations": locations,
+            "editing": None,
+            "show_npc_modal": modal == "add",
+        },
+    )
+
+
+@app.post("/npcs")
+async def create_npc(request: Request):
+    form = await request.form()
+    values = npc_form_values(form)
+    if not values["name"]:
+        return RedirectResponse(url="/npcs?create_failed=1", status_code=303)
+    try:
+        canon.create_npc(values)
+    except canon.CanonWriteError:
+        return RedirectResponse(url="/npcs?create_failed=1", status_code=303)
+    return RedirectResponse(url="/npcs?created=1", status_code=303)
+
+
+@app.get("/npcs/{npc_id}/edit", response_class=HTMLResponse)
+def edit_npc(request: Request, npc_id: int):
+    try:
+        rows = canon.npc_rows()
+        statuses = canon.entity_statuses()
+        factions = canon.factions()
+        locations = canon.location_rows()
+        editing = canon.npc_detail(npc_id)
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    if not editing:
+        raise HTTPException(status_code=404, detail="NPC not found.")
+    return templates.TemplateResponse(
+        request,
+        "npcs.html",
+        {
+            "npcs": rows,
+            "statuses": statuses,
+            "factions": factions,
+            "locations": locations,
+            "editing": editing,
+            "show_npc_modal": True,
+        },
+    )
+
+
+@app.post("/npcs/{npc_id}")
+async def update_npc(request: Request, npc_id: int):
+    form = await request.form()
+    values = npc_form_values(form)
+    if not values["name"]:
+        return RedirectResponse(url=f"/npcs/{npc_id}/edit?update_failed=1", status_code=303)
+    try:
+        canon.update_npc(npc_id, values)
+    except canon.CanonWriteError:
+        return RedirectResponse(url=f"/npcs/{npc_id}/edit?update_failed=1", status_code=303)
+    return RedirectResponse(url="/npcs?updated=1", status_code=303)
+
+
+@app.post("/npcs/{npc_id}/delete")
+async def delete_npc(npc_id: int):
+    try:
+        canon.delete_npc(npc_id)
+    except canon.CanonWriteError:
+        return RedirectResponse(url="/npcs?delete_failed=1", status_code=303)
+    return RedirectResponse(url="/npcs?deleted=1", status_code=303)
+
+
 @app.get("/api/review-status")
 def api_review_status():
     return [row.__dict__ for row in reviews.dashboard_rows()]
@@ -427,6 +525,14 @@ def api_session_source(session: str, source: str = "diary"):
 def api_locations():
     try:
         return canon.locations()
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+
+@app.get("/api/npcs")
+def api_npcs():
+    try:
+        return canon.npc_rows()
     except canon.CanonReadError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
 

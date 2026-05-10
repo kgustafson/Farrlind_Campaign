@@ -36,6 +36,14 @@ def location_types() -> list[dict[str, Any]]:
     return _fetch("SELECT id, type_name FROM location_type ORDER BY type_name;")
 
 
+def entity_statuses() -> list[dict[str, Any]]:
+    return _fetch("SELECT id, status_code, description FROM entity_status ORDER BY status_code;")
+
+
+def factions() -> list[dict[str, Any]]:
+    return _fetch("SELECT id, name FROM faction ORDER BY name;")
+
+
 def location_rows() -> list[dict[str, Any]]:
     return _fetch("""
         SELECT
@@ -105,6 +113,84 @@ def update_location(location_id: int, values: dict[str, Any]) -> None:
 
 def delete_location(location_id: int) -> None:
     _execute("DELETE FROM location WHERE id = :id;", {"id": location_id})
+
+
+def npc_rows() -> list[dict[str, Any]]:
+    return _fetch("""
+        SELECT
+            n.id,
+            n.name,
+            n.alias,
+            f.name AS faction,
+            es.status_code AS status,
+            l.name AS last_known_location,
+            fs.session_number AS first_seen_session,
+            n.description,
+            n.is_named,
+            n.notes
+        FROM npc n
+        LEFT JOIN faction f ON f.id = n.faction_id
+        LEFT JOIN entity_status es ON es.id = n.entity_status_id
+        LEFT JOIN location l ON l.id = n.last_known_location_id
+        LEFT JOIN session fs ON fs.id = n.first_seen_session
+        ORDER BY COALESCE(fs.session_number, 9999), n.name;
+    """)
+
+
+def npc_detail(npc_id: int) -> Optional[dict[str, Any]]:
+    rows = _fetch("""
+        SELECT
+            n.id,
+            n.name,
+            n.alias,
+            n.faction_id,
+            n.entity_status_id,
+            n.last_known_location_id,
+            fs.session_number AS first_seen_session,
+            n.description,
+            n.is_named,
+            n.notes
+        FROM npc n
+        LEFT JOIN session fs ON fs.id = n.first_seen_session
+        WHERE n.id = :id;
+    """, {"id": npc_id})
+    return rows[0] if rows else None
+
+
+def create_npc(values: dict[str, Any]) -> None:
+    _execute("""
+        INSERT INTO npc (
+            name, alias, faction_id, entity_status_id, last_known_location_id,
+            first_seen_session, description, is_named, notes
+        )
+        VALUES (
+            :name, :alias, :faction_id, :entity_status_id, :last_known_location_id,
+            (SELECT id FROM session WHERE session_number = :first_seen_session),
+            :description, :is_named, :notes
+        );
+    """, values)
+
+
+def update_npc(npc_id: int, values: dict[str, Any]) -> None:
+    params = {**values, "id": npc_id}
+    _execute("""
+        UPDATE npc
+        SET
+            name = :name,
+            alias = :alias,
+            faction_id = :faction_id,
+            entity_status_id = :entity_status_id,
+            last_known_location_id = :last_known_location_id,
+            first_seen_session = (SELECT id FROM session WHERE session_number = :first_seen_session),
+            description = :description,
+            is_named = :is_named,
+            notes = :notes
+        WHERE id = :id;
+    """, params)
+
+
+def delete_npc(npc_id: int) -> None:
+    _execute("DELETE FROM npc WHERE id = :id;", {"id": npc_id})
 
 
 def event_types() -> list[str]:

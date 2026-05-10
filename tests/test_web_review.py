@@ -852,6 +852,46 @@ class CanonServiceTest(unittest.TestCase):
         self.assertIn("UPDATE location", execute.call_args_list[1].args[0])
         self.assertIn("DELETE FROM location", execute.call_args_list[2].args[0])
 
+    def test_npc_rows_returns_full_registry(self):
+        rows = [{
+            "id": 1,
+            "name": "Alistair",
+            "alias": None,
+            "faction": None,
+            "status": "alive",
+            "last_known_location": "Coast near Catur",
+            "first_seen_session": 20,
+            "description": "Boat contact.",
+            "is_named": True,
+            "notes": "",
+        }]
+        with patch("web_review.db.fetch_all", return_value=rows) as fetch:
+            self.assertEqual(canon.npc_rows(), rows)
+        self.assertIn("LEFT JOIN entity_status", fetch.call_args.args[0])
+        self.assertIn("LEFT JOIN session fs", fetch.call_args.args[0])
+
+    def test_npc_crud_services_run_expected_statements(self):
+        values = {
+            "name": "New NPC",
+            "alias": "",
+            "faction_id": None,
+            "entity_status_id": 1,
+            "last_known_location_id": 2,
+            "first_seen_session": 21,
+            "description": "A newly met person.",
+            "is_named": True,
+            "notes": "",
+        }
+        with patch("web_review.db.execute") as execute:
+            canon.create_npc(values)
+            canon.update_npc(12, values)
+            canon.delete_npc(12)
+
+        self.assertIn("INSERT INTO npc", execute.call_args_list[0].args[0])
+        self.assertIn("SELECT id FROM session WHERE session_number = :first_seen_session", execute.call_args_list[0].args[0])
+        self.assertIn("UPDATE npc", execute.call_args_list[1].args[0])
+        self.assertIn("DELETE FROM npc", execute.call_args_list[2].args[0])
+
     def test_event_types_returns_ordered_names_from_db_rows(self):
         with patch("web_review.db.fetch_all", return_value=[{"type_name": "combat"}, {"type_name": "social"}]):
             self.assertEqual(canon.event_types(), ["combat", "social"])
@@ -964,6 +1004,140 @@ class LocationRouteTest(unittest.TestCase):
         with patch("web_review.services.canon.delete_location") as delete:
             client = TestClient(app)
             response = client.post("/locations/4/delete", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("deleted=1", response.headers["location"])
+        delete.assert_called_once_with(4)
+
+
+class NPCRouteTest(unittest.TestCase):
+    def npc_rows(self):
+        return [{
+            "id": 1,
+            "name": "Alistair",
+            "alias": "",
+            "faction": None,
+            "status": "alive",
+            "last_known_location": "Coast near Catur",
+            "first_seen_session": 20,
+            "description": "Coastal boat contact.",
+            "is_named": True,
+            "notes": "",
+        }]
+
+    def support_rows(self):
+        return {
+            "statuses": [{"id": 1, "status_code": "alive"}],
+            "factions": [{"id": 2, "name": "Dwarves of Balrog"}],
+            "locations": [{"id": 3, "name": "Coast near Catur"}],
+        }
+
+    def test_npcs_page_renders_sidebar_and_ledger(self):
+        support = self.support_rows()
+        with patch("web_review.services.canon.npc_rows", return_value=self.npc_rows()), \
+             patch("web_review.services.canon.entity_statuses", return_value=support["statuses"]), \
+             patch("web_review.services.canon.factions", return_value=support["factions"]), \
+             patch("web_review.services.canon.location_rows", return_value=support["locations"]):
+            client = TestClient(app)
+            response = client.get("/npcs")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("NPC Registry", response.text)
+        self.assertIn("Alistair", response.text)
+        self.assertIn("Coast near Catur", response.text)
+        self.assertIn('href="/npcs"', response.text)
+        self.assertIn("Add New", response.text)
+        self.assertNotIn("Add NPC</h2>", response.text)
+
+    def test_npcs_add_modal_renders_form(self):
+        support = self.support_rows()
+        with patch("web_review.services.canon.npc_rows", return_value=self.npc_rows()), \
+             patch("web_review.services.canon.entity_statuses", return_value=support["statuses"]), \
+             patch("web_review.services.canon.factions", return_value=support["factions"]), \
+             patch("web_review.services.canon.location_rows", return_value=support["locations"]):
+            client = TestClient(app)
+            response = client.get("/npcs?modal=add")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Add NPC", response.text)
+        self.assertIn('role="dialog"', response.text)
+        self.assertIn('action="/npcs"', response.text)
+
+    def test_create_npc_route_writes_form_values(self):
+        with patch("web_review.services.canon.create_npc") as create:
+            client = TestClient(app)
+            response = client.post("/npcs", data={
+                "name": "Captain Myra",
+                "alias": "The Tide Hand",
+                "faction_id": "",
+                "entity_status_id": "1",
+                "last_known_location_id": "3",
+                "first_seen_session": "21",
+                "description": "A sea captain.",
+                "is_named": "on",
+                "notes": "Potential ally.",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("created=1", response.headers["location"])
+        create.assert_called_once()
+        values = create.call_args.args[0]
+        self.assertEqual(values["name"], "Captain Myra")
+        self.assertEqual(values["entity_status_id"], 1)
+        self.assertEqual(values["last_known_location_id"], 3)
+        self.assertEqual(values["first_seen_session"], 21)
+        self.assertTrue(values["is_named"])
+
+    def test_edit_npc_page_loads_npc(self):
+        support = self.support_rows()
+        detail = {
+            "id": 1,
+            "name": "Alistair",
+            "alias": "",
+            "faction_id": None,
+            "entity_status_id": 1,
+            "last_known_location_id": 3,
+            "first_seen_session": 20,
+            "description": "Coastal boat contact.",
+            "is_named": True,
+            "notes": "",
+        }
+        with patch("web_review.services.canon.npc_rows", return_value=self.npc_rows()), \
+             patch("web_review.services.canon.entity_statuses", return_value=support["statuses"]), \
+             patch("web_review.services.canon.factions", return_value=support["factions"]), \
+             patch("web_review.services.canon.location_rows", return_value=support["locations"]), \
+             patch("web_review.services.canon.npc_detail", return_value=detail):
+            client = TestClient(app)
+            response = client.get("/npcs/1/edit")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Edit NPC", response.text)
+        self.assertIn('role="dialog"', response.text)
+        self.assertIn("Coastal boat contact.", response.text)
+
+    def test_update_npc_route_writes_form_values(self):
+        with patch("web_review.services.canon.update_npc") as update:
+            client = TestClient(app)
+            response = client.post("/npcs/3", data={
+                "name": "Alistair",
+                "entity_status_id": "1",
+                "last_known_location_id": "3",
+                "first_seen_session": "20",
+                "description": "Boat contact.",
+                "is_named": "on",
+                "notes": "",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("updated=1", response.headers["location"])
+        update.assert_called_once()
+        self.assertEqual(update.call_args.args[0], 3)
+        self.assertEqual(update.call_args.args[1]["first_seen_session"], 20)
+
+    def test_delete_npc_route_runs_delete(self):
+        with patch("web_review.services.canon.delete_npc") as delete:
+            client = TestClient(app)
+            response = client.post("/npcs/4/delete", follow_redirects=False)
 
         self.assertEqual(response.status_code, 303)
         self.assertIn("deleted=1", response.headers["location"])

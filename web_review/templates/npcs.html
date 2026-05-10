@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}NPC Registry | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div>
+    <p class="eyebrow">People, Powers, and Peculiar Contacts</p>
+    <h1>NPC Registry</h1>
+    <p>Canon NPCs known to the campaign database, including first appearances and last known whereabouts.</p>
+  </div>
+  <a class="icon-link add-new-link" href="/npcs?modal=add">Add New</a>
+</section>
+
+{% if request.query_params.get("created") %}
+  <div class="flash">NPC added.</div>
+{% endif %}
+{% if request.query_params.get("updated") %}
+  <div class="flash">NPC updated.</div>
+{% endif %}
+{% if request.query_params.get("deleted") %}
+  <div class="flash">NPC deleted.</div>
+{% endif %}
+{% if request.query_params.get("create_failed") %}
+  <div class="flash error-flash">NPC was not added. Name must be filled in and related fields must be valid.</div>
+{% endif %}
+{% if request.query_params.get("update_failed") %}
+  <div class="flash error-flash">NPC was not updated. Check the name and related fields.</div>
+{% endif %}
+{% if request.query_params.get("delete_failed") %}
+  <div class="flash error-flash">NPC was not deleted. It may still be referenced by events, artifacts, knowledge records, or relationships.</div>
+{% endif %}
+
+<section class="table-wrap archive-ledger" aria-label="NPC ledger">
+  <table class="status-table npc-table">
+    <caption>NPC Ledger</caption>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Faction</th>
+        <th>Last Known</th>
+        <th>First Seen</th>
+        <th>Description</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for npc in npcs %}
+      <tr>
+        <td class="session-cell" data-label="Name">
+          {{ npc.name }}
+          {% if npc.alias %}<span class="subtle-line">{{ npc.alias }}</span>{% endif %}
+          {% if not npc.is_named %}<span class="badge status-in_review">unnamed</span>{% endif %}
+        </td>
+        <td data-label="Status">
+          {% if npc.status %}
+            <span class="badge npc-status-{{ npc.status }}">{{ npc.status }}</span>
+          {% else %}
+            <span class="muted">unknown</span>
+          {% endif %}
+        </td>
+        <td data-label="Faction">{{ npc.faction or "—" }}</td>
+        <td data-label="Last Known">{{ npc.last_known_location or "—" }}</td>
+        <td data-label="First Seen">{% if npc.first_seen_session is not none %}Session {{ npc.first_seen_session }}{% else %}<span class="muted">—</span>{% endif %}</td>
+        <td data-label="Description">{{ npc.description or "—" }}</td>
+        <td data-label="Actions">
+          <div class="row-actions">
+            <a class="icon-link" href="/npcs/{{ npc.id }}/edit">Edit</a>
+            <form method="post" action="/npcs/{{ npc.id }}/delete">
+              <button class="danger-button" type="submit">Delete</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{% if show_npc_modal %}
+<section class="modal-backdrop" role="presentation">
+  <div class="archive-modal" role="dialog" aria-modal="true" aria-labelledby="npc-modal-title">
+    <div class="modal-head">
+      <h2 id="npc-modal-title">{% if editing %}Edit NPC{% else %}Add NPC{% endif %}</h2>
+      <a class="modal-close" href="/npcs" aria-label="Close NPC form">×</a>
+    </div>
+    <form method="post" action="{% if editing %}/npcs/{{ editing.id }}{% else %}/npcs{% endif %}">
+      <div class="form-grid two-col">
+        <label class="field-block">
+          <span>Name</span>
+          <input name="name" required value="{{ editing.name if editing else '' }}">
+        </label>
+        <label class="field-block">
+          <span>Alias</span>
+          <input name="alias" value="{{ editing.alias if editing and editing.alias else '' }}">
+        </label>
+      </div>
+      <div class="form-grid three-col">
+        <label class="field-block">
+          <span>Status</span>
+          <select name="entity_status_id">
+            <option value="">unknown</option>
+            {% for status in statuses %}
+              <option value="{{ status.id }}" {% if editing and editing.entity_status_id == status.id %}selected{% endif %}>{{ status.status_code }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field-block">
+          <span>Faction</span>
+          <select name="faction_id">
+            <option value="">none</option>
+            {% for faction in factions %}
+              <option value="{{ faction.id }}" {% if editing and editing.faction_id == faction.id %}selected{% endif %}>{{ faction.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field-block">
+          <span>First Seen Session</span>
+          <input name="first_seen_session" inputmode="numeric" value="{{ editing.first_seen_session if editing and editing.first_seen_session is not none else '' }}">
+        </label>
+      </div>
+      <label class="field-block">
+        <span>Last Known Location</span>
+        <select name="last_known_location_id">
+          <option value="">unknown</option>
+          {% for location in locations %}
+            <option value="{{ location.id }}" {% if editing and editing.last_known_location_id == location.id %}selected{% endif %}>{{ location.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field-block">
+        <span>Description</span>
+        <textarea name="description">{{ editing.description if editing else '' }}</textarea>
+      </label>
+      <label class="field-block">
+        <span>Notes</span>
+        <textarea name="notes">{{ editing.notes if editing else '' }}</textarea>
+      </label>
+      <div class="location-checks">
+        <label class="check-row">
+          <input type="checkbox" name="is_named" {% if not editing or editing.is_named %}checked{% endif %}>
+          <span>Named NPC</span>
+        </label>
+      </div>
+      <div class="panel-actions split-actions">
+        <a class="icon-link secondary-link" href="/npcs">Cancel</a>
+        <button type="submit">{% if editing %}Save NPC{% else %}Add NPC{% endif %}</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

@@ -729,7 +729,8 @@ dd { margin: 0; }
   background: rgba(29, 23, 18, .58);
   backdrop-filter: blur(2px);
 }
-.location-modal {
+.location-modal,
+.archive-modal {
   width: min(640px, 100%);
   max-height: calc(100vh - 44px);
   overflow: auto;
@@ -749,7 +750,8 @@ dd { margin: 0; }
   padding-bottom: 10px;
   border-bottom: 1px solid rgba(110, 67, 24, .24);
 }
-.location-modal h2 {
+.location-modal h2,
+.archive-modal h2 {
   margin: 0;
   color: var(--brass-dark);
 }
@@ -786,6 +788,31 @@ dd { margin: 0; }
   gap: 8px;
   margin-top: 12px;
 }
+.form-grid {
+  display: grid;
+  gap: 12px;
+}
+.form-grid.two-col {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.form-grid.three-col {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.subtle-line {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 400;
+}
+.npc-status-alive,
+.npc-status-witnessed { color: var(--ok); }
+.npc-status-dead,
+.npc-status-fled { color: var(--bad); }
+.npc-status-unknown,
+.npc-status-missing,
+.npc-status-imprisoned { color: var(--warn); }
 .row-actions {
   display: flex;
   align-items: center;
@@ -809,6 +836,9 @@ dd { margin: 0; }
 }
 .location-table td:nth-child(6) {
   max-width: 360px;
+}
+.npc-table td:nth-child(6) {
+  max-width: 420px;
 }
 @media (max-width: 1180px) {
   .app-shell {
@@ -922,6 +952,10 @@ dd { margin: 0; }
   }
   .status-table .icon-link {
     justify-self: start;
+  }
+  .form-grid.two-col,
+  .form-grid.three-col {
+    grid-template-columns: 1fr;
   }
 }
 @media (max-width: 1100px) {

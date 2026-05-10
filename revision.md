@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.2.10 - 5/10/2026
+
+Added the NPC Registry web interface.
+
+- App: Wired NPC Registry into the left archive menu.
+- App: Added NPC listing, add/edit modals, delete actions, and an `/api/npcs` endpoint.
+- App: Added NPC service queries and CRUD helpers for status, faction, last known location, first-seen session, description, and named/unnamed state.
+- Tests: Added service and route coverage for NPC registry behavior.
+- Docs: Documented how NPC canon is maintained through reviewed session workflow and the `load_summaries.py` NPC scrub.
+
 ## v0.2.9 - 5/10/2026
 
 Promoted parallel transcription into the campaign workflow.
