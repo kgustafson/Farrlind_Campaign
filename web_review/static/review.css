@@ -427,15 +427,31 @@ button:disabled {
 }
 .workflow-layout > .table-wrap {
   min-width: 0;
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 .workflow-session-table {
-  min-width: 860px;
+  table-layout: fixed;
+  min-width: 0;
 }
+.workflow-session-table th:nth-child(1),
+.workflow-session-table td:nth-child(1) { width: 92px; }
+.workflow-session-table th:nth-child(2),
+.workflow-session-table td:nth-child(2) { width: 112px; }
+.workflow-session-table th:nth-child(3),
+.workflow-session-table td:nth-child(3) { width: 112px; }
+.workflow-session-table th:nth-child(4),
+.workflow-session-table td:nth-child(4) { width: 142px; }
+.workflow-session-table th:nth-child(5),
+.workflow-session-table td:nth-child(5) { width: 112px; }
+.workflow-session-table th:nth-child(6),
+.workflow-session-table td:nth-child(6) { width: 120px; }
 .workflow-session-table th:last-child,
 .workflow-session-table td:last-child {
-  width: 78px;
+  width: 72px;
   padding-right: 18px;
+}
+.workflow-session-table td {
+  overflow-wrap: anywhere;
 }
 .workflow-session-table .selected-row {
   background: rgba(216, 190, 124, .38);

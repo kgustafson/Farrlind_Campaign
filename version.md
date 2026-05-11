@@ -1,6 +1,6 @@
 # Version
 
-v0.3.3
+v0.3.4
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.3` fixes workflow ledger layout and optional correction-note attention noise.
+`v0.3.4` removes horizontal-scroll reliance from the workflow ledger for Safari.

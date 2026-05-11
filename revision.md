@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.3.4 - 5/10/2026
+
+Removed horizontal-scroll reliance from the workflow ledger for Safari.
+
+- App: Changed the workflow session table to a fixed compact layout so the action column remains visible without using a horizontal scrollbar.
+- App: Allowed long workflow text to wrap inside cells instead of forcing table overflow.
+- App: Hid horizontal overflow on the ledger panel to avoid Safari scrollbar behavior differences.
+
 ## v0.3.3 - 5/10/2026
 
 Fixed workflow ledger layout and optional correction-note attention noise.
