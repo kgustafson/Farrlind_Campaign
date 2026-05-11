@@ -1,5 +1,12 @@
 # Revision History
 
+## v0.3.8 - 5/10/2026
+
+Closed Phase 3 workflow status UI work.
+
+- Docs: Marked Phase 3 as complete in `todo.md`.
+- Docs: Confirmed the workflow UI now covers read-only status, progress, status distinctions, attention surfacing, and archive navigation links.
+
 ## v0.3.7 - 5/10/2026
 
 Kept workflow View buttons on one line.

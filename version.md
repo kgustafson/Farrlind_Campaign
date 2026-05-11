@@ -1,6 +1,6 @@
 # Version
 
-v0.3.7
+v0.3.8
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.7` keeps workflow View buttons on one line.
+`v0.3.8` closes Phase 3 workflow status UI work.

@@ -66,14 +66,14 @@ audio/transcript
 - Done - Add a historical workflow seeding command for sessions 00 through 20, with estimated timestamps and evidence comments.
 - Done - Kept the first workflow graph deterministic, inspectable, YAML-defined, and database-backed.
 
-### Phase 3: Show Workflow State In The Web UI
+### Phase 3: Show Workflow State In The Web UI - Complete
 
 - Done - Add a read-only workflow/status view to the local web app.
 - Done - Show each session's progress through the graph.
 - Done - Make incomplete, blocked, stale, complete, and not-applicable steps visually distinct.
 - Done - Link workflow steps back to existing review/session, lore, and registry pages where useful.
 - Done - Surface missing artifacts and validation/status problems.
-- Focus on per-session workflow state first.
+- Done - Focused on per-session workflow state first.
 
 ### Phase 4: Wire Existing Commands To Workflow Actions
 
