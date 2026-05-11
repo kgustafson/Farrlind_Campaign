@@ -72,7 +72,7 @@ audio/transcript
 - Done - Show each session's progress through the graph.
 - Done - Make incomplete, blocked, stale, complete, and not-applicable steps visually distinct.
 - Done - Link workflow steps back to existing review/session, lore, and registry pages where useful.
-- Surface missing artifacts and validation problems.
+- Done - Surface missing artifacts and validation/status problems.
 - Focus on per-session workflow state first.
 
 ### Phase 4: Wire Existing Commands To Workflow Actions

@@ -1,6 +1,6 @@
 # Version
 
-v0.3.1
+v0.3.2
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.1` adds archive navigation links to workflow status steps.
+`v0.3.2` surfaces workflow attention items for missing artifacts and validation/status problems.

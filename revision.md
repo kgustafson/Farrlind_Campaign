@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.3.2 - 5/10/2026
+
+Surfaced workflow attention items for missing artifacts and validation/status problems.
+
+- App: Added attention counts to the workflow session ledger.
+- App: Added a detail-level Needs Attention panel and per-step issue lists.
+- Workflow: Detects pending, blocked, and stale step statuses as attention items.
+- Workflow: Checks declared input/output file artifacts and reports missing paths or unmatched globs.
+- Tests: Added coverage for status issues, missing artifact checks, rendered attention panels, and API issue metadata.
+
 ## v0.3.1 - 5/10/2026
 
 Added archive navigation links to workflow status steps.

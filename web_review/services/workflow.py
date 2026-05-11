@@ -1,8 +1,8 @@
 from typing import Any, Optional
-
 from sqlalchemy.exc import SQLAlchemyError
 
 from web_review import db
+from web_review.services import reviews
 
 
 class WorkflowReadError(RuntimeError):
@@ -33,6 +33,7 @@ def workflow_rows() -> list[dict[str, Any]]:
             COUNT(wss.id) FILTER (WHERE wss.status = 'pending') AS pending_steps,
             COUNT(wss.id) FILTER (WHERE wss.status = 'blocked') AS blocked_steps,
             COUNT(wss.id) FILTER (WHERE wss.status = 'stale') AS stale_steps,
+            COUNT(wss.id) FILTER (WHERE wss.status IN ('pending', 'blocked', 'stale')) AS attention_count,
             ROUND(
                 100.0 * COUNT(wss.id) FILTER (WHERE wss.status IN ('complete', 'not_applicable'))
                 / NULLIF(COUNT(wss.id), 0),
@@ -60,6 +61,7 @@ def workflow_rows() -> list[dict[str, Any]]:
     for row in rows:
         row["session_key"] = session_key(row["session_number"])
         row["workflow_url"] = f"/workflow?session={row['session_number']}"
+        row["has_attention"] = bool(row.get("attention_count"))
     return rows
 
 
@@ -116,6 +118,12 @@ def workflow_detail(session_number: int) -> Optional[dict[str, Any]]:
     """, {"workflow_run_id": run["id"]})
     for step in run["steps"]:
         step["links"] = step_links(step["step_id"], run["session_number"])
+        step["issues"] = step_issues(step)
+    run["attention_items"] = [
+        {"step": step["display_name"], "issues": step["issues"]}
+        for step in run["steps"]
+        if step["issues"]
+    ]
     return run
 
 
@@ -142,3 +150,53 @@ def step_links(step_id: str, session_number: int) -> list[dict[str, str]]:
         "dbload_refresh": [{"label": "Dashboard", "url": "/"}],
     }
     return links_by_step.get(step_id, [])
+
+
+def step_issues(step: dict[str, Any]) -> list[str]:
+    issues = status_issues(step)
+    issues.extend(missing_artifact_issues("input", step.get("inputs") or []))
+    issues.extend(missing_artifact_issues("output", step.get("outputs") or []))
+    return issues
+
+
+def status_issues(step: dict[str, Any]) -> list[str]:
+    status = step.get("status")
+    comment = step.get("summary_comment") or ""
+    if status == "pending":
+        return [comment or "Step is pending."]
+    if status == "blocked":
+        return [comment or "Step is blocked."]
+    if status == "stale":
+        return [comment or "Step may be stale."]
+    return []
+
+
+def missing_artifact_issues(kind: str, artifacts: list[Any]) -> list[str]:
+    issues = []
+    for artifact in artifacts:
+        if not isinstance(artifact, str) or not is_file_artifact(artifact):
+            continue
+        if "*" in artifact:
+            if not list(reviews.REPO_ROOT.glob(artifact)):
+                issues.append(f"Missing {kind} artifact matching {artifact}.")
+            continue
+        if not (reviews.REPO_ROOT / artifact).exists():
+            issues.append(f"Missing {kind} artifact {artifact}.")
+    return issues
+
+
+def is_file_artifact(value: str) -> bool:
+    if value.startswith("/"):
+        return False
+    if value.startswith(("operator ", "database ", "reviewed ", "source artifacts", "test result", "health report", "local ", "GitHub ")):
+        return False
+    suffixes = (
+        ".wav",
+        ".txt",
+        ".md",
+        ".yaml",
+        ".yml",
+        ".sql",
+        ".json",
+    )
+    return any(value.endswith(suffix) for suffix in suffixes) or "*" in value

@@ -19,6 +19,7 @@
           <th>State</th>
           <th>Progress</th>
           <th>Steps</th>
+          <th>Attention</th>
           <th>Next</th>
           <th></th>
         </tr>
@@ -35,6 +36,13 @@
             <span class="progress-label">{{ row.progress_percent or 0 }}%</span>
           </td>
           <td data-label="Steps">{{ row.complete_steps }} complete{% if row.not_applicable_steps %}, {{ row.not_applicable_steps }} n/a{% endif %}{% if row.pending_steps %}, {{ row.pending_steps }} pending{% endif %}</td>
+          <td data-label="Attention">
+            {% if row.has_attention %}
+            <span class="badge workflow-attention">{{ row.attention_count }} issue{% if row.attention_count != 1 %}s{% endif %}</span>
+            {% else %}
+            <span class="ok">Clear</span>
+            {% endif %}
+          </td>
           <td data-label="Next">{% if row.next_step_name %}{{ row.next_step_name }}{% else %}<span class="ok">Complete</span>{% endif %}</td>
           <td data-label="Open"><a class="icon-link" href="/workflow?session={{ row.session_number }}">View</a></td>
         </tr>
@@ -56,6 +64,16 @@
     <p class="muted">{{ detail.summary_comment or "No workflow summary comment recorded." }}</p>
     {% if detail.metadata and detail.metadata.timestamp_estimate %}
     <p class="timeline-note">Historical timestamps are estimated from chat work, Git history, and existing canon artifacts.</p>
+    {% endif %}
+    {% if detail.attention_items %}
+    <section class="workflow-attention-panel" aria-label="Workflow attention items">
+      <h3>Needs Attention</h3>
+      <ul>
+        {% for item in detail.attention_items %}
+        <li><strong>{{ item.step }}</strong>: {{ item.issues|join(" ") }}</li>
+        {% endfor %}
+      </ul>
+    </section>
     {% endif %}
 
     <ol class="workflow-step-list">
@@ -84,6 +102,13 @@
           </dl>
           {% if step.command %}
           <code class="workflow-command">{{ step.command }}</code>
+          {% endif %}
+          {% if step.issues %}
+          <ul class="workflow-issue-list" aria-label="Step issues">
+            {% for issue in step.issues %}
+            <li>{{ issue }}</li>
+            {% endfor %}
+          </ul>
           {% endif %}
           {% if step.links %}
           <div class="workflow-step-links" aria-label="Related archive links">

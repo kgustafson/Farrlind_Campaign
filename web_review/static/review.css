@@ -489,6 +489,31 @@ button:disabled {
   color: var(--warn);
   font-size: 13px;
 }
+.workflow-attention-panel {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid rgba(141, 52, 48, .32);
+  border-radius: 8px;
+  background: rgba(234, 208, 194, .42);
+}
+.workflow-attention-panel h3 {
+  margin: 0 0 8px;
+  color: var(--bad);
+  font-size: 12px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.workflow-attention-panel ul,
+.workflow-issue-list {
+  margin: 0;
+  padding-left: 18px;
+}
+.workflow-attention-panel li,
+.workflow-issue-list li {
+  margin: 4px 0;
+  color: #6b2e25;
+  font-size: 13px;
+}
 .workflow-step-list {
   list-style: none;
   display: grid;
@@ -562,6 +587,11 @@ button:disabled {
   font-size: 12px;
   overflow-wrap: anywhere;
 }
+.workflow-issue-list {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(141, 52, 48, .2);
+}
 .workflow-step-links {
   display: flex;
   flex-wrap: wrap;
@@ -599,7 +629,8 @@ button:disabled {
   background: #f0dfaf;
 }
 .workflow-blocked,
-.workflow-stale {
+.workflow-stale,
+.workflow-attention {
   color: var(--bad);
   background: #ead0c2;
 }

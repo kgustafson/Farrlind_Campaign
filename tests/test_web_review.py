@@ -1357,6 +1357,7 @@ class WorkflowServiceTest(unittest.TestCase):
             "pending_steps": 0,
             "blocked_steps": 0,
             "stale_steps": 0,
+            "attention_count": 0,
             "progress_percent": 100,
             "next_step_name": None,
             "next_step_status": None,
@@ -1368,6 +1369,7 @@ class WorkflowServiceTest(unittest.TestCase):
         self.assertEqual(loaded[0]["progress_percent"], 100)
         self.assertEqual(loaded[0]["session_key"], "session20")
         self.assertEqual(loaded[0]["workflow_url"], "/workflow?session=20")
+        self.assertFalse(loaded[0]["has_attention"])
         self.assertIn("workflow_run", fetch.call_args.args[0])
         self.assertIn("workflow_step_state", fetch.call_args.args[0])
 
@@ -1411,6 +1413,27 @@ class WorkflowServiceTest(unittest.TestCase):
         self.assertEqual(loaded["session_number"], 20)
         self.assertEqual(loaded["review_url"], "/sessions/session20/review")
         self.assertEqual(loaded["steps"][0]["step_id"], "source_audio_registered")
+        self.assertEqual(loaded["attention_items"], [])
+
+    def test_step_issues_surface_status_and_missing_artifacts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "knowledge" / "Faban" / "clean").mkdir(parents=True)
+            (root / "knowledge" / "Faban" / "clean" / "session21_diary.md").write_text("diary", encoding="utf-8")
+            with patch("web_review.services.reviews.REPO_ROOT", root):
+                issues = workflow.step_issues({
+                    "status": "pending",
+                    "summary_comment": "Waiting for transcript.",
+                    "inputs": [
+                        "knowledge/Faban/clean/session21_diary.md",
+                        "knowledge/Faban/raw/session21_transcript.txt",
+                    ],
+                    "outputs": ["knowledge/Faban/clean/session21_summary.md"],
+                })
+
+        self.assertIn("Waiting for transcript.", issues)
+        self.assertIn("Missing input artifact knowledge/Faban/raw/session21_transcript.txt.", issues)
+        self.assertIn("Missing output artifact knowledge/Faban/clean/session21_summary.md.", issues)
 
     def test_step_links_route_review_and_registry_steps(self):
         self.assertEqual(
@@ -1449,6 +1472,7 @@ class WorkflowRouteTest(unittest.TestCase):
             "pending_steps": 0,
             "blocked_steps": 0,
             "stale_steps": 0,
+            "attention_count": 0,
             "progress_percent": 100,
             "next_step_name": None,
             "next_step_status": None,
@@ -1470,6 +1494,10 @@ class WorkflowRouteTest(unittest.TestCase):
             "completed_at": None,
             "summary_comment": "Seeded from historical chat workflow.",
             "metadata": {"seeded_history": True, "timestamp_estimate": True},
+            "attention_items": [{
+                "step": "Transcribe Audio",
+                "issues": ["Missing output artifact knowledge/Faban/raw/session21_transcript.txt."],
+            }],
             "session_key": "session20",
             "review_url": "/sessions/session20/review",
             "workflow_url": "/workflow?session=20",
@@ -1492,6 +1520,27 @@ class WorkflowRouteTest(unittest.TestCase):
                 "status_rules": {},
                 "metadata": {},
                 "links": [],
+                "issues": [],
+            }, {
+                "step_order": 2,
+                "step_id": "transcribe_audio",
+                "display_name": "Transcribe Audio",
+                "lane": "intake",
+                "status": "pending",
+                "started_at": None,
+                "completed_at": None,
+                "summary_comment": "Waiting for transcript.",
+                "inputs": ["audio/session21.wav"],
+                "outputs": ["knowledge/Faban/raw/session21_transcript.txt"],
+                "dependencies": ["source_audio_registered"],
+                "gate": "automatic_allowed_before_review",
+                "rerun_policy": "safe_before_review",
+                "canon_impact": "source_material",
+                "command": "./rag-env/bin/python scripts/rag.py transcribe session21",
+                "status_rules": {},
+                "metadata": {},
+                "links": [],
+                "issues": ["Missing output artifact knowledge/Faban/raw/session21_transcript.txt."],
             }, {
                 "step_order": 14,
                 "step_id": "edit_review_decisions",
@@ -1511,6 +1560,7 @@ class WorkflowRouteTest(unittest.TestCase):
                 "status_rules": {},
                 "metadata": {},
                 "links": [{"label": "Review", "url": "/sessions/session20/review"}],
+                "issues": [],
             }, {
                 "step_order": 18,
                 "step_id": "update_lore_sections",
@@ -1535,6 +1585,7 @@ class WorkflowRouteTest(unittest.TestCase):
                     {"label": "Locations", "url": "/locations"},
                     {"label": "Artifacts", "url": "/artifacts"},
                 ],
+                "issues": [],
             }],
         }
 
@@ -1550,6 +1601,8 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertIn("Session 20", response.text)
         self.assertIn("Source Audio Registered", response.text)
         self.assertIn("Edit Review Decisions", response.text)
+        self.assertIn("Needs Attention", response.text)
+        self.assertIn("Missing output artifact knowledge/Faban/raw/session21_transcript.txt.", response.text)
         self.assertIn("Historical timestamps are estimated", response.text)
         self.assertIn('href="/workflow?session=20"', response.text)
         self.assertIn('href="/sessions/session20/review"', response.text)
