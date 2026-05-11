@@ -1,5 +1,12 @@
 # Revision History
 
+## v0.3.7 - 5/10/2026
+
+Kept workflow View buttons on one line.
+
+- App: Added no-wrap styling to archive action links.
+- App: Added no-wrap styling to the workflow status action column.
+
 ## v0.3.6 - 5/10/2026
 
 Expanded the Wells of Magic lore editor textarea.

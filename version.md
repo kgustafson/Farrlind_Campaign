@@ -1,6 +1,6 @@
 # Version
 
-v0.3.6
+v0.3.7
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.6` expands the Wells of Magic lore editor textarea.
+`v0.3.7` keeps workflow View buttons on one line.

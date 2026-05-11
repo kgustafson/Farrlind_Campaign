@@ -414,6 +414,7 @@ button:disabled {
   background: #3a2919;
   color: #f8e6b6;
   font-weight: 700;
+  white-space: nowrap;
 }
 .icon-link:hover {
   background: #5a371b;
@@ -426,6 +427,7 @@ button:disabled {
 .workflow-session-table td:last-child {
   width: 86px;
   padding-right: 18px;
+  white-space: nowrap;
 }
 .workflow-session-table td {
   overflow-wrap: anywhere;
