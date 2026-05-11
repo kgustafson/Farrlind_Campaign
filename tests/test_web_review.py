@@ -1326,6 +1326,7 @@ class WellsLoreRouteTest(unittest.TestCase):
         self.assertIn("Wells of Magic", response.text)
         self.assertIn("Six Wells Exist", response.text)
         self.assertIn('name="lore_text"', response.text)
+        self.assertIn('rows="20"', response.text)
         self.assertIn('href="/wells"', response.text)
 
     def test_save_wells_lore_writes_text(self):

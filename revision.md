@@ -1,5 +1,12 @@
 # Revision History
 
+## v0.3.6 - 5/10/2026
+
+Expanded the Wells of Magic lore editor textarea.
+
+- App: Set the Wells lore textarea to `20` visible rows for more comfortable editing.
+- Tests: Added route coverage for the larger lore textarea.
+
 ## v0.3.5 - 5/10/2026
 
 Moved workflow detail into a modal and restored the full ledger.
