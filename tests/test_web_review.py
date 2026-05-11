@@ -1435,6 +1435,18 @@ class WorkflowServiceTest(unittest.TestCase):
         self.assertIn("Missing input artifact knowledge/Faban/raw/session21_transcript.txt.", issues)
         self.assertIn("Missing output artifact knowledge/Faban/clean/session21_summary.md.", issues)
 
+    def test_step_issues_ignore_optional_corrections_notes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch("web_review.services.reviews.REPO_ROOT", Path(tmp)):
+                issues = workflow.step_issues({
+                    "status": "complete",
+                    "summary_comment": "",
+                    "inputs": ["knowledge/Faban/notes/session20_corrections.md"],
+                    "outputs": [],
+                })
+
+        self.assertEqual(issues, [])
+
     def test_step_links_route_review_and_registry_steps(self):
         self.assertEqual(
             workflow.step_links("edit_review_decisions", 20),

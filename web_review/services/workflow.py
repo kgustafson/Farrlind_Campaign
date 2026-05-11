@@ -176,6 +176,8 @@ def missing_artifact_issues(kind: str, artifacts: list[Any]) -> list[str]:
     for artifact in artifacts:
         if not isinstance(artifact, str) or not is_file_artifact(artifact):
             continue
+        if is_optional_artifact(artifact):
+            continue
         if "*" in artifact:
             if not list(reviews.REPO_ROOT.glob(artifact)):
                 issues.append(f"Missing {kind} artifact matching {artifact}.")
@@ -200,3 +202,7 @@ def is_file_artifact(value: str) -> bool:
         ".json",
     )
     return any(value.endswith(suffix) for suffix in suffixes) or "*" in value
+
+
+def is_optional_artifact(value: str) -> bool:
+    return value.startswith("knowledge/Faban/notes/") and value.endswith("_corrections.md")

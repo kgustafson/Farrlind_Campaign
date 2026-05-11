@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.3.3 - 5/10/2026
+
+Fixed workflow ledger layout and optional correction-note attention noise.
+
+- App: Prevented the workflow detail panel from covering the ledger's View buttons by allowing the ledger panel to own horizontal scrolling.
+- App: Added a stable minimum width and right-side padding for the workflow session table action column.
+- Workflow: Treats `knowledge/Faban/notes/sessionXX_corrections.md` as optional so missing correction notes do not create false attention items.
+- Tests: Added coverage to confirm optional correction notes are ignored by workflow issue detection.
+
 ## v0.3.2 - 5/10/2026
 
 Surfaced workflow attention items for missing artifacts and validation/status problems.

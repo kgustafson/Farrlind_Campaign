@@ -421,9 +421,21 @@ button:disabled {
 
 .workflow-layout {
   display: grid;
-  grid-template-columns: minmax(520px, 1fr) minmax(360px, 460px);
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 430px);
   gap: 18px;
   align-items: start;
+}
+.workflow-layout > .table-wrap {
+  min-width: 0;
+  overflow-x: auto;
+}
+.workflow-session-table {
+  min-width: 860px;
+}
+.workflow-session-table th:last-child,
+.workflow-session-table td:last-child {
+  width: 78px;
+  padding-right: 18px;
 }
 .workflow-session-table .selected-row {
   background: rgba(216, 190, 124, .38);
