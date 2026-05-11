@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.3.5 - 5/10/2026
+
+Moved workflow detail into a modal and restored the full ledger.
+
+- App: Changed workflow View actions to open a modal detail view instead of a side-by-side panel.
+- App: Restored the workflow ledger to a full-width table so the View buttons are no longer squeezed by the detail panel.
+- App: `/workflow` now shows the ledger alone, while `/workflow?session=XX` opens the selected session detail modal.
+- Tests: Added route coverage for default ledger-only rendering and selected-session modal rendering.
+
 ## v0.3.4 - 5/10/2026
 
 Removed horizontal-scroll reliance from the workflow ledger for Safari.

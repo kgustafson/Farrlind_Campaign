@@ -125,7 +125,7 @@ def dashboard(request: Request):
 def workflow_index(request: Request, session: Optional[int] = None):
     try:
         rows = workflow.workflow_rows()
-        selected_session = session or (rows[0]["session_number"] if rows else None)
+        selected_session = session
         detail = workflow.workflow_detail(selected_session) if selected_session is not None else None
     except workflow.WorkflowReadError as exc:
         raise HTTPException(status_code=503, detail=str(exc))

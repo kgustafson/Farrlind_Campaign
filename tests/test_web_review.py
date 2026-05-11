@@ -1601,15 +1601,32 @@ class WorkflowRouteTest(unittest.TestCase):
             }],
         }
 
-    def test_workflow_page_renders_ledger_and_detail(self):
+    def test_workflow_page_renders_ledger_without_detail_by_default(self):
         with patch("web_review.services.workflow.workflow_rows", return_value=self.workflow_rows()), \
-             patch("web_review.services.workflow.workflow_detail", return_value=self.workflow_detail()):
+             patch("web_review.services.workflow.workflow_detail") as detail:
             client = TestClient(app)
             response = client.get("/workflow")
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Workflow Status", response.text)
         self.assertIn("Session Workflow Ledger", response.text)
+        self.assertIn("Session 20", response.text)
+        self.assertIn('href="/workflow?session=20"', response.text)
+        self.assertNotIn('role="dialog"', response.text)
+        detail.assert_not_called()
+
+    def test_workflow_page_renders_detail_modal_when_session_selected(self):
+        with patch("web_review.services.workflow.workflow_rows", return_value=self.workflow_rows()), \
+             patch("web_review.services.workflow.workflow_detail", return_value=self.workflow_detail()):
+            client = TestClient(app)
+            response = client.get("/workflow?session=20")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Workflow Status", response.text)
+        self.assertIn("Session Workflow Ledger", response.text)
+        self.assertIn('role="dialog"', response.text)
+        self.assertIn('aria-modal="true"', response.text)
+        self.assertIn('href="/workflow" aria-label="Close workflow detail"', response.text)
         self.assertIn("Session 20", response.text)
         self.assertIn("Source Audio Registered", response.text)
         self.assertIn("Edit Review Decisions", response.text)
