@@ -351,6 +351,19 @@ button:disabled {
   font-weight: 700;
   white-space: nowrap;
 }
+.session-cell a,
+.inline-archive-link {
+  color: inherit;
+  text-decoration-color: rgba(110, 67, 24, .42);
+  text-underline-offset: 3px;
+}
+.inline-archive-link {
+  display: inline-block;
+  margin-top: 7px;
+  color: var(--brass-dark);
+  font-size: 13px;
+  font-weight: 700;
+}
 .badge {
   display: inline-flex;
   align-items: center;
@@ -548,6 +561,28 @@ button:disabled {
   color: #f8e6b6;
   font-size: 12px;
   overflow-wrap: anywhere;
+}
+.workflow-step-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 10px;
+}
+.workflow-step-links a {
+  min-height: 28px;
+  padding: 5px 8px;
+  border: 1px solid rgba(110, 67, 24, .34);
+  border-radius: 999px;
+  background: rgba(255, 247, 223, .72);
+  color: var(--brass-dark);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.workflow-step-links a:hover,
+.inline-archive-link:hover,
+.session-cell a:hover {
+  color: #5a371b;
 }
 .workflow-completed,
 .workflow-complete {

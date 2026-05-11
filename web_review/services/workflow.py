@@ -17,7 +17,7 @@ def _fetch(sql: str, params: Optional[dict[str, Any]] = None) -> list[dict[str, 
 
 
 def workflow_rows() -> list[dict[str, Any]]:
-    return _fetch("""
+    rows = _fetch("""
         SELECT
             s.session_number,
             COALESCE(s.title, 'Session ' || LPAD(s.session_number::text, 2, '0')) AS session_title,
@@ -57,6 +57,10 @@ def workflow_rows() -> list[dict[str, Any]]:
             next_step.display_name, next_step.status
         ORDER BY s.session_number DESC;
     """)
+    for row in rows:
+        row["session_key"] = session_key(row["session_number"])
+        row["workflow_url"] = f"/workflow?session={row['session_number']}"
+    return rows
 
 
 def workflow_detail(session_number: int) -> Optional[dict[str, Any]]:
@@ -84,6 +88,9 @@ def workflow_detail(session_number: int) -> Optional[dict[str, Any]]:
         return None
 
     run = runs[0]
+    run["session_key"] = session_key(run["session_number"])
+    run["review_url"] = f"/sessions/{run['session_key']}/review"
+    run["workflow_url"] = f"/workflow?session={run['session_number']}"
     run["steps"] = _fetch("""
         SELECT
             step_order,
@@ -107,4 +114,31 @@ def workflow_detail(session_number: int) -> Optional[dict[str, Any]]:
         WHERE workflow_run_id = :workflow_run_id
         ORDER BY step_order;
     """, {"workflow_run_id": run["id"]})
+    for step in run["steps"]:
+        step["links"] = step_links(step["step_id"], run["session_number"])
     return run
+
+
+def session_key(session_number: int) -> str:
+    return f"session{session_number:02d}"
+
+
+def step_links(step_id: str, session_number: int) -> list[dict[str, str]]:
+    key = session_key(session_number)
+    review_url = f"/sessions/{key}/review"
+    links_by_step = {
+        "initialize_review": [{"label": "Review", "url": review_url}],
+        "edit_review_decisions": [{"label": "Review", "url": review_url}],
+        "mark_reviewed": [{"label": "Review", "url": review_url}],
+        "apply_review": [{"label": "Review", "url": review_url}],
+        "write_final_summary": [{"label": "Final Summary", "url": f"{review_url}?source=final&view=print"}],
+        "update_lore_sections": [
+            {"label": "Wells", "url": "/wells"},
+            {"label": "NPCs", "url": "/npcs"},
+            {"label": "Locations", "url": "/locations"},
+            {"label": "Artifacts", "url": "/artifacts"},
+        ],
+        "run_health": [{"label": "Review Tools", "url": review_url}],
+        "dbload_refresh": [{"label": "Dashboard", "url": "/"}],
+    }
+    return links_by_step.get(step_id, [])

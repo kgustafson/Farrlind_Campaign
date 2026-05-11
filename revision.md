@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.3.1 - 5/10/2026
+
+Added archive navigation links to workflow status steps.
+
+- App: Linked workflow session rows directly to their selected workflow detail.
+- App: Added review, final-summary, lore, and registry links to relevant workflow steps.
+- App: Exposed generated workflow URLs in the workflow API responses.
+- Tests: Added service, route, and rendered-template coverage for workflow navigation links.
+
 ## v0.3.0 - 5/10/2026
 
 Started Phase 3 with a read-only workflow status web view.

@@ -26,7 +26,7 @@
       <tbody>
         {% for row in rows %}
         <tr class="{% if row.session_number == selected_session %}selected-row{% endif %}">
-          <td class="session-cell" data-label="Session">Session {{ "%02d"|format(row.session_number) }}</td>
+          <td class="session-cell" data-label="Session"><a href="{{ row.workflow_url }}">Session {{ "%02d"|format(row.session_number) }}</a></td>
           <td data-label="State"><span class="badge workflow-{{ row.status }}">{{ row.status }}</span></td>
           <td data-label="Progress">
             <div class="progress-strip" aria-label="{{ row.progress_percent or 0 }} percent complete">
@@ -46,8 +46,11 @@
   <aside class="workflow-detail-panel" aria-label="Workflow detail">
     {% if detail %}
     <div class="workflow-detail-head">
-      <p class="eyebrow">Session {{ "%02d"|format(detail.session_number) }}</p>
-      <h2>{{ detail.session_title }}</h2>
+      <div>
+        <p class="eyebrow">Session {{ "%02d"|format(detail.session_number) }}</p>
+        <h2>{{ detail.session_title }}</h2>
+        <a class="inline-archive-link" href="{{ detail.review_url }}">Open Review</a>
+      </div>
       <span class="badge workflow-{{ detail.status }}">{{ detail.status }}</span>
     </div>
     <p class="muted">{{ detail.summary_comment or "No workflow summary comment recorded." }}</p>
@@ -81,6 +84,13 @@
           </dl>
           {% if step.command %}
           <code class="workflow-command">{{ step.command }}</code>
+          {% endif %}
+          {% if step.links %}
+          <div class="workflow-step-links" aria-label="Related archive links">
+            {% for link in step.links %}
+            <a href="{{ link.url }}">{{ link.label }}</a>
+            {% endfor %}
+          </div>
           {% endif %}
         </div>
       </li>

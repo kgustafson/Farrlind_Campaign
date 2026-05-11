@@ -1,6 +1,6 @@
 # Version
 
-v0.3.0
+v0.3.1
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.0` starts Phase 3 with a read-only workflow status web view.
+`v0.3.1` adds archive navigation links to workflow status steps.

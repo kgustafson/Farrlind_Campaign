@@ -1366,6 +1366,8 @@ class WorkflowServiceTest(unittest.TestCase):
 
         self.assertEqual(loaded[0]["session_number"], 20)
         self.assertEqual(loaded[0]["progress_percent"], 100)
+        self.assertEqual(loaded[0]["session_key"], "session20")
+        self.assertEqual(loaded[0]["workflow_url"], "/workflow?session=20")
         self.assertIn("workflow_run", fetch.call_args.args[0])
         self.assertIn("workflow_step_state", fetch.call_args.args[0])
 
@@ -1407,7 +1409,27 @@ class WorkflowServiceTest(unittest.TestCase):
             loaded = workflow.workflow_detail(20)
 
         self.assertEqual(loaded["session_number"], 20)
+        self.assertEqual(loaded["review_url"], "/sessions/session20/review")
         self.assertEqual(loaded["steps"][0]["step_id"], "source_audio_registered")
+
+    def test_step_links_route_review_and_registry_steps(self):
+        self.assertEqual(
+            workflow.step_links("edit_review_decisions", 20),
+            [{"label": "Review", "url": "/sessions/session20/review"}],
+        )
+        self.assertEqual(
+            workflow.step_links("write_final_summary", 20),
+            [{"label": "Final Summary", "url": "/sessions/session20/review?source=final&view=print"}],
+        )
+        self.assertEqual(
+            workflow.step_links("update_lore_sections", 20),
+            [
+                {"label": "Wells", "url": "/wells"},
+                {"label": "NPCs", "url": "/npcs"},
+                {"label": "Locations", "url": "/locations"},
+                {"label": "Artifacts", "url": "/artifacts"},
+            ],
+        )
 
 
 class WorkflowRouteTest(unittest.TestCase):
@@ -1430,6 +1452,8 @@ class WorkflowRouteTest(unittest.TestCase):
             "progress_percent": 100,
             "next_step_name": None,
             "next_step_status": None,
+            "session_key": "session20",
+            "workflow_url": "/workflow?session=20",
         }]
 
     def workflow_detail(self):
@@ -1446,6 +1470,9 @@ class WorkflowRouteTest(unittest.TestCase):
             "completed_at": None,
             "summary_comment": "Seeded from historical chat workflow.",
             "metadata": {"seeded_history": True, "timestamp_estimate": True},
+            "session_key": "session20",
+            "review_url": "/sessions/session20/review",
+            "workflow_url": "/workflow?session=20",
             "steps": [{
                 "step_order": 1,
                 "step_id": "source_audio_registered",
@@ -1464,6 +1491,50 @@ class WorkflowRouteTest(unittest.TestCase):
                 "command": None,
                 "status_rules": {},
                 "metadata": {},
+                "links": [],
+            }, {
+                "step_order": 14,
+                "step_id": "edit_review_decisions",
+                "display_name": "Edit Review Decisions",
+                "lane": "human_review",
+                "status": "complete",
+                "started_at": None,
+                "completed_at": None,
+                "summary_comment": "Review was edited.",
+                "inputs": ["knowledge/Faban/reviews/session20_review.yaml"],
+                "outputs": ["knowledge/Faban/reviews/session20_review.yaml"],
+                "dependencies": ["initialize_review"],
+                "gate": "human_required",
+                "rerun_policy": "edit_until_reviewed",
+                "canon_impact": "review_record",
+                "command": "web_review session review page",
+                "status_rules": {},
+                "metadata": {},
+                "links": [{"label": "Review", "url": "/sessions/session20/review"}],
+            }, {
+                "step_order": 18,
+                "step_id": "update_lore_sections",
+                "display_name": "Update Cross-Session Lore Sections",
+                "lane": "canonization",
+                "status": "complete",
+                "started_at": None,
+                "completed_at": None,
+                "summary_comment": "Registries checked.",
+                "inputs": ["knowledge/Faban/final/session20_summary.md"],
+                "outputs": ["knowledge/Faban/lore/wells_of_magic.md"],
+                "dependencies": ["write_final_summary"],
+                "gate": "human_required",
+                "rerun_policy": "canon_affecting_requires_confirmation",
+                "canon_impact": "canon_file_or_database_canon",
+                "command": "web_review lore and registry pages",
+                "status_rules": {},
+                "metadata": {},
+                "links": [
+                    {"label": "Wells", "url": "/wells"},
+                    {"label": "NPCs", "url": "/npcs"},
+                    {"label": "Locations", "url": "/locations"},
+                    {"label": "Artifacts", "url": "/artifacts"},
+                ],
             }],
         }
 
@@ -1478,8 +1549,14 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertIn("Session Workflow Ledger", response.text)
         self.assertIn("Session 20", response.text)
         self.assertIn("Source Audio Registered", response.text)
+        self.assertIn("Edit Review Decisions", response.text)
         self.assertIn("Historical timestamps are estimated", response.text)
-        self.assertIn('href="/workflow"', response.text)
+        self.assertIn('href="/workflow?session=20"', response.text)
+        self.assertIn('href="/sessions/session20/review"', response.text)
+        self.assertIn('href="/wells"', response.text)
+        self.assertIn('href="/npcs"', response.text)
+        self.assertIn('href="/locations"', response.text)
+        self.assertIn('href="/artifacts"', response.text)
 
     def test_workflow_api_returns_rows(self):
         with patch("web_review.services.workflow.workflow_rows", return_value=self.workflow_rows()):
