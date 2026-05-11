@@ -77,6 +77,12 @@ audio/transcript
 
 ### Phase 4: Wire Existing Commands To Workflow Actions
 
+- Add a session initiation action for future sessions.
+  - Capture the real-world session date.
+  - Accept an uploaded audio file or a filesystem path to the audio file.
+  - Create the session row and workflow run.
+  - Seed ordered workflow step state from `workflows/session_workflow.yaml`.
+  - Record the audio path in session/workflow state without starting transcription automatically unless explicitly confirmed.
 - Add buttons for safe existing commands, such as:
   - initialize review
   - run health

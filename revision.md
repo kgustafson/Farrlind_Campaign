@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.3.9 - 5/10/2026
+
+Added future session initiation requirements to Phase 4.
+
+- Docs: Added a Phase 4 requirement for session initiation before workflow actions.
+- Docs: Session initiation must capture the real-world session date and either an uploaded audio file or a filesystem path to the audio file.
+- Docs: Session initiation should create the session row, create the workflow run, seed ordered workflow step state from the YAML definition, and record the audio path without automatically starting transcription unless explicitly confirmed.
+
 ## v0.3.8 - 5/10/2026
 
 Closed Phase 3 workflow status UI work.

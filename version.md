@@ -1,6 +1,6 @@
 # Version
 
-v0.3.8
+v0.3.9
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.8` closes Phase 3 workflow status UI work.
+`v0.3.9` adds future session initiation requirements to Phase 4.
