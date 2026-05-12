@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.3.13 - 5/12/2026
+
+Tightened the Balrog cultist combat encounter.
+
+- Canon: Replaced the unknown Balrog cultist count with two spellcasting cultists and three melee cultists.
+- Canon: Marked all five Balrog cultists as killed in the Orsydon encounter.
+- Tests: Added loader coverage for the split cultist composition and outcomes.
+
 ## v0.3.12 - 5/12/2026
 
 Added the Combat Encounters archive section.

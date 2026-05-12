@@ -648,6 +648,59 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertIn("2,", sql)
         self.assertIn("'defeated'", sql)
 
+    def test_build_sql_loads_balrog_cultist_composition(self):
+        summaries = [
+            {
+                "session_number": 19,
+                "physical_date": "2026-04-12",
+                "in_game_date": "1832 AS Namal 19",
+                "title": "Of Teeth, Memory, and What Remains",
+                "summary": "The party fights Orsydon and cultists.",
+                "events": [
+                    "Combat involved Orsydon, cultists, party positioning around cover/pillars.",
+                    "The dragon was defeated.",
+                ],
+                "source_path": "session19_summary.md",
+                "location": "Balrog",
+            }
+        ]
+        enemy_encounters = [
+            {
+                "session_number": 19,
+                "event_sequence": 1,
+                "enemy_name": "Cultist spellcaster",
+                "enemy_type": "cultist_spellcaster",
+                "quantity": 2,
+                "outcome": "killed",
+                "confidence": "high",
+                "notes": "Two spellcasting cultists; both killed.",
+            },
+            {
+                "session_number": 19,
+                "event_sequence": 1,
+                "enemy_name": "Cultist melee fighter",
+                "enemy_type": "cultist_melee",
+                "quantity": 3,
+                "outcome": "killed",
+                "confidence": "high",
+                "notes": "Three melee cultists; all killed.",
+            },
+        ]
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_enemy_encounters", return_value=enemy_encounters):
+                    with patch("load_summaries.load_review_documents", return_value={}):
+                        sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("'Cultist spellcaster'", sql)
+        self.assertIn("'cultist_spellcaster'", sql)
+        self.assertIn("'Cultist melee fighter'", sql)
+        self.assertIn("'cultist_melee'", sql)
+        self.assertIn("2,", sql)
+        self.assertIn("3,", sql)
+        self.assertIn("'killed'", sql)
+
     def test_build_sql_loads_general_encounters(self):
         summaries = [
             {

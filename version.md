@@ -1,6 +1,6 @@
 # Version
 
-v0.3.12
+v0.3.13
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.12` adds a Combat Encounters archive page and API with enemy counts, types, outcomes, and unknown quantity indicators.
+`v0.3.13` tightens the Balrog cultist combat encounter with confirmed cultist counts, roles, and killed outcomes.

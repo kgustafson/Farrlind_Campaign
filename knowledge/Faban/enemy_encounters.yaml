@@ -176,9 +176,18 @@ encounters:
 
   - session: session19
     event_sequence: 4
-    enemy: Cultist
-    enemy_type: cultist
-    quantity:
-    outcome: defeated
-    confidence: medium
-    notes: "Cultists in Balrog summon Orsydon; exact count should be tightened later from transcript/audio if available."
+    enemy: Cultist spellcaster
+    enemy_type: cultist_spellcaster
+    quantity: 2
+    outcome: killed
+    confidence: high
+    notes: "Two spellcasting cultists in Balrog helped summon Orsydon; both were killed."
+
+  - session: session19
+    event_sequence: 4
+    enemy: Cultist melee fighter
+    enemy_type: cultist_melee
+    quantity: 3
+    outcome: killed
+    confidence: high
+    notes: "Three melee cultists in Balrog helped defend the Orsydon summoning; all were killed."
