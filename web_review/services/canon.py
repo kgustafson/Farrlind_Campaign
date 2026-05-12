@@ -355,6 +355,25 @@ def combat_encounter_rows() -> list[dict[str, Any]]:
     return list(encounters.values())
 
 
+def murder_hobo_count(encounters: list[dict[str, Any]]) -> dict[str, Any]:
+    kill_outcomes = {"killed", "defeated"}
+    total = 0
+    unknown_rows = 0
+    for encounter in encounters:
+        for enemy in encounter.get("enemies", []):
+            if (enemy.get("outcome") or "").lower() not in kill_outcomes:
+                continue
+            if enemy.get("quantity") is None:
+                unknown_rows += 1
+                continue
+            total += enemy["quantity"]
+    return {
+        "total": total,
+        "unknown_rows": unknown_rows,
+        "label": f"{total}+ unknown" if unknown_rows else str(total),
+    }
+
+
 def event_types() -> list[str]:
     rows = _fetch("SELECT type_name FROM event_type ORDER BY type_name;")
     return [row["type_name"] for row in rows]

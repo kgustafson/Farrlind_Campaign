@@ -1012,6 +1012,23 @@ class CanonServiceTest(unittest.TestCase):
 
         self.assertEqual(rows[0]["session_span"], "Session 00 -> Session 01")
 
+    def test_murder_hobo_count_sums_known_killed_and_defeated_enemies(self):
+        summary = canon.murder_hobo_count([
+            {
+                "enemies": [
+                    {"quantity": 1, "outcome": "defeated"},
+                    {"quantity": 2, "outcome": "killed"},
+                    {"quantity": 5, "outcome": "fled"},
+                    {"quantity": None, "outcome": "killed"},
+                    {"quantity": 3, "outcome": "defeated_or_fled"},
+                ],
+            }
+        ])
+
+        self.assertEqual(summary["total"], 3)
+        self.assertEqual(summary["unknown_rows"], 1)
+        self.assertEqual(summary["label"], "3+ unknown")
+
     def test_event_types_returns_ordered_names_from_db_rows(self):
         with patch("web_review.db.fetch_all", return_value=[{"type_name": "combat"}, {"type_name": "social"}]):
             self.assertEqual(canon.event_types(), ["combat", "social"])
@@ -1402,8 +1419,8 @@ class CombatEncounterRouteTest(unittest.TestCase):
             "outcome": "dragon_defeated",
             "confidence": "high",
             "notes": "Cultists summon Orsydon in Balrog.",
-            "known_enemy_total": 1,
-            "has_unknown_quantity": True,
+            "known_enemy_total": 6,
+            "has_unknown_quantity": False,
             "enemies": [
                 {
                     "name": "Orsydon",
@@ -1414,17 +1431,25 @@ class CombatEncounterRouteTest(unittest.TestCase):
                     "notes": "Dragon defeated.",
                 },
                 {
-                    "name": "Cultist",
-                    "enemy_type": "cultist",
-                    "quantity": None,
-                    "outcome": "defeated",
-                    "confidence": "medium",
-                    "notes": "Count unknown.",
+                    "name": "Cultist spellcaster",
+                    "enemy_type": "cultist_spellcaster",
+                    "quantity": 2,
+                    "outcome": "killed",
+                    "confidence": "high",
+                    "notes": "Both killed.",
+                },
+                {
+                    "name": "Cultist melee fighter",
+                    "enemy_type": "cultist_melee",
+                    "quantity": 3,
+                    "outcome": "killed",
+                    "confidence": "high",
+                    "notes": "All killed.",
                 },
             ],
         }]
 
-    def test_combat_encounters_page_renders_ledger_and_unknown_counts(self):
+    def test_combat_encounters_page_renders_ledger_and_murder_hobo_count(self):
         with patch("web_review.services.canon.combat_encounter_rows", return_value=self.combat_rows()):
             client = TestClient(app)
             response = client.get("/combat-encounters")
@@ -1432,8 +1457,8 @@ class CombatEncounterRouteTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Combat Encounters", response.text)
         self.assertIn("Orsydon summoned in Balrog", response.text)
-        self.assertIn("unknown", response.text)
-        self.assertIn("1+ unknown", response.text)
+        self.assertIn("Murder Hobo Count", response.text)
+        self.assertIn(">6<", response.text)
         self.assertIn('href="/combat-encounters"', response.text)
 
     def test_combat_encounters_api_returns_rows(self):
@@ -1442,7 +1467,7 @@ class CombatEncounterRouteTest(unittest.TestCase):
             response = client.get("/api/combat-encounters")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()[0]["enemies"][1]["quantity"], None)
+        self.assertEqual(response.json()[0]["enemies"][1]["quantity"], 2)
 
 
 class WellsLoreRouteTest(unittest.TestCase):

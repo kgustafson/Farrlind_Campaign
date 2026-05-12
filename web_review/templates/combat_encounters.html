@@ -10,6 +10,17 @@
   </div>
 </section>
 
+<section class="archive-stat-row" aria-label="Combat statistics">
+  <div class="archive-stat-card murder-hobo-card">
+    <span class="stat-label">Murder Hobo Count</span>
+    <strong>{{ murder_hobo_count.label }}</strong>
+    <span class="stat-note">
+      Confirmed party kills from combat rows with killed or defeated outcomes.
+      {% if murder_hobo_count.unknown_rows %}Unknown-count kill rows remain unresolved.{% endif %}
+    </span>
+  </div>
+</section>
+
 <section class="table-wrap archive-ledger" aria-label="Combat encounter ledger">
   <table class="status-table combat-table">
     <caption>Combat Encounter Ledger</caption>

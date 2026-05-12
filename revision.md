@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.3.14 - 5/12/2026
+
+Added the Murder Hobo Count to Combat Encounters.
+
+- App: Added a parchment stat card to `/combat-encounters` with the party's confirmed kill total.
+- App: The count includes known quantities with `killed` or `defeated` outcomes and excludes fled, resolved, unknown, or mixed unresolved outcomes.
+- Tests: Added service and route coverage for kill-total calculation and rendering.
+
 ## v0.3.13 - 5/12/2026
 
 Tightened the Balrog cultist combat encounter.

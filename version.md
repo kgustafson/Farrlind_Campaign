@@ -1,6 +1,6 @@
 # Version
 
-v0.3.13
+v0.3.14
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.13` tightens the Balrog cultist combat encounter with confirmed cultist counts, roles, and killed outcomes.
+`v0.3.14` adds a tongue-in-cheek Murder Hobo Count to the Combat Encounters archive.

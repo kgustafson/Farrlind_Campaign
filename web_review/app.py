@@ -613,7 +613,10 @@ def combat_encounters_index(request: Request):
     return templates.TemplateResponse(
         request,
         "combat_encounters.html",
-        {"encounters": rows},
+        {
+            "encounters": rows,
+            "murder_hobo_count": canon.murder_hobo_count(rows),
+        },
     )
 
 

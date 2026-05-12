@@ -1116,6 +1116,57 @@ dd { margin: 0; }
 .artifact-table td:nth-child(7) {
   max-width: 340px;
 }
+.archive-stat-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 340px);
+  gap: 16px;
+  margin: 0 0 18px;
+}
+.archive-stat-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(139, 95, 39, .34);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 247, 223, .92), rgba(229, 202, 146, .7)),
+    var(--parchment);
+  box-shadow: 0 14px 30px rgba(52, 35, 19, .14);
+  padding: 18px 20px;
+}
+.archive-stat-card::after {
+  content: "";
+  position: absolute;
+  right: -28px;
+  top: -30px;
+  width: 116px;
+  height: 116px;
+  border: 3px double rgba(141, 52, 48, .18);
+  border-radius: 50%;
+}
+.stat-label,
+.stat-note {
+  display: block;
+}
+.stat-label {
+  color: #6e4318;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.archive-stat-card strong {
+  display: block;
+  margin: 3px 0 5px;
+  color: var(--bad);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 42px;
+  line-height: 1;
+}
+.stat-note {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
 .combat-table td:nth-child(4),
 .combat-table td:nth-child(7) {
   max-width: 420px;
