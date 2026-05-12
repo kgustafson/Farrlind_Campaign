@@ -442,6 +442,29 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertIn("'Leprechaun thief'", sql)
         self.assertIn("SELECT id FROM session WHERE session_number = 5", sql)
 
+    def test_build_sql_scrubs_crossroads_festival_npc(self):
+        summaries = [
+            {
+                "session_number": 17,
+                "physical_date": "2026-04-06",
+                "in_game_date": "1832 AS Namal 15-17",
+                "title": "After Iron Paw",
+                "summary": "The party visits the Crossroads Festival.",
+                "events": ["The party encounters the Crossroads Festival."],
+                "source_path": "session17_summary.md",
+                "location": "Crossroads",
+            }
+        ]
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_review_documents", return_value={}):
+                    sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("'Jebediah Galloway'", sql)
+        self.assertIn("SELECT id FROM session WHERE session_number = 17", sql)
+        self.assertIn("(SELECT id FROM location WHERE name = 'Crossroads' LIMIT 1)", sql)
+
     def test_build_sql_scrubs_session04_npcs(self):
         summaries = [
             {

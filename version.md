@@ -1,6 +1,6 @@
 # Version
 
-v0.3.9
+v0.3.10
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.9` adds future session initiation requirements to Phase 4.
+`v0.3.10` adds Jebediah Galloway to the canonical NPC scrub and current NPC registry.

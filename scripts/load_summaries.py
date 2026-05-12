@@ -256,6 +256,13 @@ CANON_NPCS = [
         "status": "alive",
     },
     {
+        "name": "Jebediah Galloway",
+        "first_seen_session": 17,
+        "location": "Crossroads",
+        "description": "Main named figure associated with the Crossroads Festival, where the party found real revelry without illusion or glamour.",
+        "status": "alive",
+    },
+    {
         "name": "Lightdelver",
         "first_seen_session": 18,
         "location": "Balrog",

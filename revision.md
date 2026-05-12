@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.3.10 - 5/12/2026
+
+Added Jebediah Galloway to the NPC registry canon.
+
+- Canon: Added Jebediah Galloway to the canonical NPC scrub with first appearance in Session 17 at the Crossroads Festival.
+- App: Reloaded the database so the NPC Registry includes Jebediah Galloway in the current listing.
+- Tests: Added loader coverage to keep the Crossroads Festival NPC scrub from regressing.
+
 ## v0.3.9 - 5/10/2026
 
 Added future session initiation requirements to Phase 4.
