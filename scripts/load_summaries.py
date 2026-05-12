@@ -63,6 +63,13 @@ TRAVEL_LOCATION_ALIASES = {
 
 CANON_NPCS = [
     {
+        "name": "Alexander Venrid",
+        "first_seen_session": 0,
+        "location": "Alexander's Inn",
+        "description": "Founder of the Alexander's Inn tavern chain, introduced through the Bentrios inn where the party first gathered.",
+        "status": "unknown",
+    },
+    {
         "name": "Baron Wells",
         "first_seen_session": 1,
         "location": "Bentrios",
@@ -84,6 +91,14 @@ CANON_NPCS = [
         "status": "alive",
     },
     {
+        "name": "Blue-skinned fey creature",
+        "first_seen_session": 2,
+        "location": "Fey Woods",
+        "description": "Hostile fey creature who offered information about Urgan's Axe if the party led gnolls to the Satyr camp, then brandished claws when refused.",
+        "status": "unknown",
+        "is_named": False,
+    },
+    {
         "name": "Ardema",
         "first_seen_session": 6,
         "location": "Thataways",
@@ -95,6 +110,13 @@ CANON_NPCS = [
         "first_seen_session": 6,
         "location": "Thataways",
         "description": "Librarian under the tree in Thataways.",
+        "status": "alive",
+    },
+    {
+        "name": "Khorag",
+        "first_seen_session": 6,
+        "location": "Thataways",
+        "description": "Thataways Well of Magic beneath the tree; a truth-bound Well connected to nature and the divine god of nature.",
         "status": "alive",
     },
     {
@@ -179,9 +201,9 @@ CANON_NPCS = [
     },
     {
         "name": "Cole",
-        "first_seen_session": 13,
-        "location": "Mountain Road",
-        "description": "Traveler who appeared with a magical deck of cards.",
+        "first_seen_session": 2,
+        "location": "Road to Fey Woods",
+        "description": "Old man first met near the Fey Woods who warned against fey bargains, traded riddles with Faban, gave him a healing potion, and later reappeared with a magical deck of cards.",
         "status": "alive",
     },
     {
@@ -235,6 +257,13 @@ CANON_NPCS = [
         "status": "dead",
     },
     {
+        "name": "Magistrate Kaotoa",
+        "first_seen_session": 15,
+        "location": "Paramon",
+        "description": "Paramon magistrate encountered on the shore while attempting to steady the shaken populace after the water elemental battle.",
+        "status": "alive",
+    },
+    {
         "name": "Erling Rostad",
         "first_seen_session": 17,
         "location": "Paramon",
@@ -260,6 +289,13 @@ CANON_NPCS = [
         "first_seen_session": 17,
         "location": "Crossroads",
         "description": "Main named figure associated with the Crossroads Festival, where the party found real revelry without illusion or glamour.",
+        "status": "alive",
+    },
+    {
+        "name": "Bolder Grog",
+        "first_seen_session": 17,
+        "location": "Balrog",
+        "description": "Balrog barkeep at the Miner's Thumb who made a performance bargain with Faban and paid him after the room turned thunderous.",
         "status": "alive",
     },
     {
@@ -289,6 +325,13 @@ CANON_NPCS = [
         "location": "Balrog",
         "description": "Dragon summoned by cultists in Balrog and defeated by the party.",
         "status": "dead",
+    },
+    {
+        "name": "Benjamin",
+        "first_seen_session": 18,
+        "location": "Balrog",
+        "description": "Named Balrog cultist present near Orsydon when the dragon was summoned; remembered because another cultist snapped, 'Benjamin, dammit!'",
+        "status": "unknown",
     },
     {
         "name": "Alistair",

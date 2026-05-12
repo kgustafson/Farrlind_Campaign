@@ -1,6 +1,6 @@
 # Version
 
-v0.3.10
+v0.3.11
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.10` adds Jebediah Galloway to the canonical NPC scrub and current NPC registry.
+`v0.3.11` audits diary and summary NPC coverage, adds missed high-confidence NPCs, and corrects Cole's first-seen session.

@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.3.11 - 5/12/2026
+
+Audited diary and summary NPC coverage.
+
+- Canon: Added high-confidence missed NPCs from diary/final-summary review: Alexander Venrid, Blue-skinned fey creature, Khorag, Magistrate Kaotoa, Bolder Grog, and Benjamin.
+- Canon: Corrected Cole's first-seen session from Session 13 to Session 02 based on the diary identifying him as the old man first met near the Fey Woods.
+- Tests: Added loader coverage for the audited NPC scrub entries.
+
 ## v0.3.10 - 5/12/2026
 
 Added Jebediah Galloway to the NPC registry canon.

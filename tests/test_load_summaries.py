@@ -418,6 +418,38 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertIn("Alistair", sql)
         self.assertIn("Coastal boat contact who gave the party a boat near Catur.", sql)
 
+    def test_build_sql_scrubs_audited_missed_npcs(self):
+        summaries = [
+            {
+                "session_number": 18,
+                "physical_date": "2026-02-22",
+                "in_game_date": "1832 AS Namal 18",
+                "title": "The Falling and the Forge",
+                "summary": "The party speaks with Saiffi in Balrog.",
+                "events": ["The party speaks with Saiffi in Balrog."],
+                "source_path": "session18_summary.md",
+                "location": "Balrog",
+            }
+        ]
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_review_documents", return_value={}):
+                    sql = load_summaries.build_sql(summaries)
+
+        for name in [
+            "Alexander Venrid",
+            "Blue-skinned fey creature",
+            "Khorag",
+            "Cole",
+            "Magistrate Kaotoa",
+            "Bolder Grog",
+            "Benjamin",
+        ]:
+            self.assertIn(f"'{name}'", sql)
+        self.assertIn("SELECT id FROM session WHERE session_number = 2", sql)
+        self.assertIn("(SELECT id FROM location WHERE name = 'Balrog' LIMIT 1)", sql)
+
     def test_build_sql_scrubs_session05_npcs(self):
         summaries = [
             {
