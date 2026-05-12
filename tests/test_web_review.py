@@ -940,6 +940,78 @@ class CanonServiceTest(unittest.TestCase):
         self.assertIn("UPDATE artifact", execute.call_args_list[1].args[0])
         self.assertIn("DELETE FROM artifact", execute.call_args_list[2].args[0])
 
+    def test_combat_encounter_rows_groups_enemies_and_unknown_quantities(self):
+        db_rows = [
+            {
+                "id": 1,
+                "session_number": 19,
+                "session_title": "Of Teeth, Memory, and What Remains",
+                "title": "Orsydon summoned in Balrog",
+                "subtype": "dragon_summoning",
+                "location": "Balrog",
+                "participants": "Party, Orsydon, cultists",
+                "outcome": "dragon_defeated",
+                "confidence": "high",
+                "notes": "Cultists summon Orsydon.",
+                "enemy_name": "Cultist",
+                "enemy_type": "cultist",
+                "quantity": None,
+                "enemy_outcome": "defeated",
+                "enemy_confidence": "medium",
+                "enemy_notes": "Count unknown.",
+            },
+            {
+                "id": 1,
+                "session_number": 19,
+                "session_title": "Of Teeth, Memory, and What Remains",
+                "title": "Orsydon summoned in Balrog",
+                "subtype": "dragon_summoning",
+                "location": "Balrog",
+                "participants": "Party, Orsydon, cultists",
+                "outcome": "dragon_defeated",
+                "confidence": "high",
+                "notes": "Cultists summon Orsydon.",
+                "enemy_name": "Orsydon",
+                "enemy_type": "dragon",
+                "quantity": 1,
+                "enemy_outcome": "defeated",
+                "enemy_confidence": "high",
+                "enemy_notes": "Dragon defeated.",
+            },
+        ]
+        with patch("web_review.db.fetch_all", return_value=db_rows) as fetch:
+            rows = canon.combat_encounter_rows()
+
+        self.assertIn("WHERE c.encounter_type = 'combat'", fetch.call_args.args[0])
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["known_enemy_total"], 1)
+        self.assertTrue(rows[0]["has_unknown_quantity"])
+        self.assertEqual([enemy["name"] for enemy in rows[0]["enemies"]], ["Cultist", "Orsydon"])
+
+    def test_combat_encounter_rows_labels_spanning_combat(self):
+        db_rows = [{
+            "id": 2,
+            "session_number": 0,
+            "session_title": "The Party forms",
+            "title": "Rock-being street attack",
+            "subtype": "construct_attack",
+            "location": "Bentrios",
+            "participants": "Party, regenerating construct",
+            "outcome": "continues_into_session01",
+            "confidence": "high",
+            "notes": "Continues into the next session.",
+            "enemy_name": "Regenerating construct",
+            "enemy_type": "construct",
+            "quantity": 1,
+            "enemy_outcome": "defeated",
+            "enemy_confidence": "high",
+            "enemy_notes": "",
+        }]
+        with patch("web_review.db.fetch_all", return_value=db_rows):
+            rows = canon.combat_encounter_rows()
+
+        self.assertEqual(rows[0]["session_span"], "Session 00 -> Session 01")
+
     def test_event_types_returns_ordered_names_from_db_rows(self):
         with patch("web_review.db.fetch_all", return_value=[{"type_name": "combat"}, {"type_name": "social"}]):
             self.assertEqual(canon.event_types(), ["combat", "social"])
@@ -1314,6 +1386,63 @@ class ArtifactRouteTest(unittest.TestCase):
         self.assertEqual(response.status_code, 303)
         self.assertIn("deleted=1", response.headers["location"])
         delete.assert_called_once_with(4)
+
+
+class CombatEncounterRouteTest(unittest.TestCase):
+    def combat_rows(self):
+        return [{
+            "id": 1,
+            "session_number": 19,
+            "session_title": "Of Teeth, Memory, and What Remains",
+            "session_span": "Session 19",
+            "title": "Orsydon summoned in Balrog",
+            "subtype": "dragon_summoning",
+            "location": "Balrog",
+            "participants": "Party, Orsydon, cultists",
+            "outcome": "dragon_defeated",
+            "confidence": "high",
+            "notes": "Cultists summon Orsydon in Balrog.",
+            "known_enemy_total": 1,
+            "has_unknown_quantity": True,
+            "enemies": [
+                {
+                    "name": "Orsydon",
+                    "enemy_type": "dragon",
+                    "quantity": 1,
+                    "outcome": "defeated",
+                    "confidence": "high",
+                    "notes": "Dragon defeated.",
+                },
+                {
+                    "name": "Cultist",
+                    "enemy_type": "cultist",
+                    "quantity": None,
+                    "outcome": "defeated",
+                    "confidence": "medium",
+                    "notes": "Count unknown.",
+                },
+            ],
+        }]
+
+    def test_combat_encounters_page_renders_ledger_and_unknown_counts(self):
+        with patch("web_review.services.canon.combat_encounter_rows", return_value=self.combat_rows()):
+            client = TestClient(app)
+            response = client.get("/combat-encounters")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Combat Encounters", response.text)
+        self.assertIn("Orsydon summoned in Balrog", response.text)
+        self.assertIn("unknown", response.text)
+        self.assertIn("1+ unknown", response.text)
+        self.assertIn('href="/combat-encounters"', response.text)
+
+    def test_combat_encounters_api_returns_rows(self):
+        with patch("web_review.services.canon.combat_encounter_rows", return_value=self.combat_rows()):
+            client = TestClient(app)
+            response = client.get("/api/combat-encounters")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()[0]["enemies"][1]["quantity"], None)
 
 
 class WellsLoreRouteTest(unittest.TestCase):

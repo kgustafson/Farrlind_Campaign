@@ -1,3 +1,4 @@
+import re
 from typing import Any, Optional
 
 from sqlalchemy.exc import SQLAlchemyError
@@ -282,6 +283,76 @@ def update_artifact(artifact_id: int, values: dict[str, Any]) -> None:
 
 def delete_artifact(artifact_id: int) -> None:
     _execute("DELETE FROM artifact WHERE id = :id;", {"id": artifact_id})
+
+
+def _session_span_label(session_number: int, outcome: str) -> str:
+    match = re.search(r"continues_into_session(\d+)", outcome or "")
+    if not match:
+        return f"Session {session_number:02d}"
+    return f"Session {session_number:02d} -> Session {int(match.group(1)):02d}"
+
+
+def combat_encounter_rows() -> list[dict[str, Any]]:
+    rows = _fetch("""
+        SELECT
+            c.id,
+            s.session_number,
+            s.title AS session_title,
+            c.title,
+            c.subtype,
+            l.name AS location,
+            c.participants,
+            c.outcome,
+            c.confidence,
+            c.notes,
+            e.name AS enemy_name,
+            e.enemy_type,
+            ee.quantity,
+            ee.outcome AS enemy_outcome,
+            ee.confidence AS enemy_confidence,
+            ee.notes AS enemy_notes
+        FROM encounter c
+        JOIN session s ON s.id = c.session_id
+        LEFT JOIN location l ON l.id = c.location_id
+        LEFT JOIN event_enemy ee ON ee.event_id = c.event_id
+        LEFT JOIN enemy e ON e.id = ee.enemy_id
+        WHERE c.encounter_type = 'combat'
+        ORDER BY s.session_number, c.id, e.name;
+    """)
+    encounters: dict[int, dict[str, Any]] = {}
+    for row in rows:
+        encounter = encounters.setdefault(row["id"], {
+            "id": row["id"],
+            "session_number": row["session_number"],
+            "session_title": row["session_title"],
+            "session_span": _session_span_label(row["session_number"], row.get("outcome") or ""),
+            "title": row["title"],
+            "subtype": row["subtype"],
+            "location": row["location"],
+            "participants": row["participants"],
+            "outcome": row["outcome"],
+            "confidence": row["confidence"],
+            "notes": row["notes"],
+            "known_enemy_total": 0,
+            "has_unknown_quantity": False,
+            "enemies": [],
+        })
+        if not row.get("enemy_name"):
+            continue
+        quantity = row.get("quantity")
+        if quantity is None:
+            encounter["has_unknown_quantity"] = True
+        else:
+            encounter["known_enemy_total"] += quantity
+        encounter["enemies"].append({
+            "name": row["enemy_name"],
+            "enemy_type": row["enemy_type"],
+            "quantity": quantity,
+            "outcome": row["enemy_outcome"],
+            "confidence": row["enemy_confidence"],
+            "notes": row["enemy_notes"],
+        })
+    return list(encounters.values())
 
 
 def event_types() -> list[str]:

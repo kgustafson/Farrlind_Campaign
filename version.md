@@ -1,6 +1,6 @@
 # Version
 
-v0.3.11
+v0.3.12
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.11` audits diary and summary NPC coverage, adds missed high-confidence NPCs, and corrects Cole's first-seen session.
+`v0.3.12` adds a Combat Encounters archive page and API with enemy counts, types, outcomes, and unknown quantity indicators.

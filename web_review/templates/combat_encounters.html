@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Combat Encounters | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div>
+    <p class="eyebrow">Blades, Beasts, and Battle Records</p>
+    <h1>Combat Encounters</h1>
+    <p>Canon combat scenes by session, with enemy counts, types, outcomes, and unknown quantities marked plainly.</p>
+  </div>
+</section>
+
+<section class="table-wrap archive-ledger" aria-label="Combat encounter ledger">
+  <table class="status-table combat-table">
+    <caption>Combat Encounter Ledger</caption>
+    <thead>
+      <tr>
+        <th>Session</th>
+        <th>Encounter</th>
+        <th>Location</th>
+        <th>Enemies</th>
+        <th>Total</th>
+        <th>Outcome</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for encounter in encounters %}
+      <tr>
+        <td class="session-cell" data-label="Session">
+          {{ encounter.session_span }}
+          {% if encounter.session_title %}<span class="subtle-line">{{ encounter.session_title }}</span>{% endif %}
+        </td>
+        <td data-label="Encounter">
+          <strong>{{ encounter.title }}</strong>
+          {% if encounter.subtype %}<span class="subtle-line">{{ encounter.subtype }}</span>{% endif %}
+          {% if encounter.confidence %}<span class="badge status-in_review">{{ encounter.confidence }}</span>{% endif %}
+        </td>
+        <td data-label="Location">{{ encounter.location or "—" }}</td>
+        <td data-label="Enemies">
+          {% if encounter.enemies %}
+            <ul class="enemy-list">
+              {% for enemy in encounter.enemies %}
+                <li>
+                  <span class="enemy-count">{% if enemy.quantity is not none %}{{ enemy.quantity }}{% else %}unknown{% endif %}</span>
+                  <span class="enemy-name">{{ enemy.name }}</span>
+                  {% if enemy.enemy_type %}<span class="enemy-type">{{ enemy.enemy_type }}</span>{% endif %}
+                  {% if enemy.outcome %}<span class="enemy-outcome">{{ enemy.outcome }}</span>{% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <span class="muted">No enemy rows linked</span>
+          {% endif %}
+        </td>
+        <td data-label="Total">
+          {% if encounter.known_enemy_total %}
+            {{ encounter.known_enemy_total }}{% if encounter.has_unknown_quantity %}+ unknown{% endif %}
+          {% elif encounter.has_unknown_quantity %}
+            unknown
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </td>
+        <td data-label="Outcome">{{ encounter.outcome or "—" }}</td>
+        <td data-label="Notes">{{ encounter.notes or "—" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

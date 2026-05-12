@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.3.12 - 5/12/2026
+
+Added the Combat Encounters archive section.
+
+- App: Added a sidebar link, `/combat-encounters` page, and `/api/combat-encounters` endpoint.
+- App: Combat rows group enemy records by combat scene and show session span, location, enemy type, enemy count, outcome, confidence, and notes.
+- App: Unknown enemy quantities now render explicitly as `unknown`, while mixed known/unknown totals render like `1+ unknown`.
+- Tests: Added service and route coverage for grouped enemies, unknown quantities, and combat spanning multiple sessions.
+
 ## v0.3.11 - 5/12/2026
 
 Audited diary and summary NPC coverage.

@@ -604,6 +604,19 @@ async def delete_artifact(artifact_id: int):
     return RedirectResponse(url="/artifacts?deleted=1", status_code=303)
 
 
+@app.get("/combat-encounters", response_class=HTMLResponse)
+def combat_encounters_index(request: Request):
+    try:
+        rows = canon.combat_encounter_rows()
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    return templates.TemplateResponse(
+        request,
+        "combat_encounters.html",
+        {"encounters": rows},
+    )
+
+
 @app.get("/wells", response_class=HTMLResponse)
 def wells_lore(request: Request):
     return templates.TemplateResponse(
@@ -692,6 +705,14 @@ def api_npcs():
 def api_artifacts():
     try:
         return canon.artifact_rows()
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+
+@app.get("/api/combat-encounters")
+def api_combat_encounters():
+    try:
+        return canon.combat_encounter_rows()
     except canon.CanonReadError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
 
