@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.3.18 - 5/14/2026
+
+Hid workflow status from archive mode.
+
+- App: Workflow Status is no longer shown in archive-mode navigation.
+- App/API: `/workflow`, `/api/workflow`, and workflow session detail APIs now return `404` in archive mode.
+- Tests: Added archive-mode coverage for workflow navigation and API blocking.
+
 ## v0.3.17 - 5/14/2026
 
 Added environment-controlled edit and archive interface modes.

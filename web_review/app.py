@@ -146,6 +146,8 @@ def dashboard(request: Request):
 
 @app.get("/workflow", response_class=HTMLResponse)
 def workflow_index(request: Request, session: Optional[int] = None):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Workflow status is not available in archive mode.")
     try:
         rows = workflow.workflow_rows()
         selected_session = session
@@ -720,6 +722,8 @@ def api_review_status():
 
 @app.get("/api/workflow")
 def api_workflow():
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Workflow status is not available in archive mode.")
     try:
         return workflow.workflow_rows()
     except workflow.WorkflowReadError as exc:
@@ -728,6 +732,8 @@ def api_workflow():
 
 @app.get("/api/workflow/sessions/{session}")
 def api_workflow_session(session: str):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Workflow status is not available in archive mode.")
     try:
         session_number = reviews.parse_session_ref(session)
     except ValueError as exc:

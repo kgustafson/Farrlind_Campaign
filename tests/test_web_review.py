@@ -2030,6 +2030,19 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertIn('href="/locations"', response.text)
         self.assertIn('href="/artifacts"', response.text)
 
+    def test_archive_mode_hides_workflow_from_navigation_and_route(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}), \
+             patch("web_review.services.reviews.dashboard_rows", return_value=[]):
+            client = TestClient(app)
+            dashboard_response = client.get("/")
+            workflow_response = client.get("/workflow")
+
+        self.assertEqual(dashboard_response.status_code, 200)
+        self.assertIn("Published Archive", dashboard_response.text)
+        self.assertNotIn("Workflow Status", dashboard_response.text)
+        self.assertNotIn('href="/workflow"', dashboard_response.text)
+        self.assertEqual(workflow_response.status_code, 404)
+
     def test_workflow_api_returns_rows(self):
         with patch("web_review.services.workflow.workflow_rows", return_value=self.workflow_rows()):
             client = TestClient(app)
@@ -2037,6 +2050,15 @@ class WorkflowRouteTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()[0]["session_number"], 20)
+
+    def test_archive_mode_blocks_workflow_api(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}), \
+             patch("web_review.services.workflow.workflow_rows") as rows:
+            client = TestClient(app)
+            response = client.get("/api/workflow")
+
+        self.assertEqual(response.status_code, 404)
+        rows.assert_not_called()
 
     def test_workflow_session_api_returns_detail(self):
         with patch("web_review.services.workflow.workflow_detail", return_value=self.workflow_detail()):
