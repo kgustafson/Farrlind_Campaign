@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 from typing import Any, Optional
 
 from sqlalchemy.exc import SQLAlchemyError
@@ -12,6 +13,9 @@ class CanonReadError(RuntimeError):
 
 class CanonWriteError(RuntimeError):
     pass
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def _fetch(sql: str, params: Optional[dict[str, Any]] = None) -> list[dict[str, Any]]:
@@ -372,6 +376,97 @@ def murder_hobo_count(encounters: list[dict[str, Any]]) -> dict[str, Any]:
         "unknown_rows": unknown_rows,
         "label": f"{total}+ unknown" if unknown_rows else str(total),
     }
+
+
+def songbook_rows() -> list[dict[str, Any]]:
+    rows = _fetch("""
+        SELECT
+            song_number,
+            title,
+            style,
+            category,
+            song_type,
+            short_description,
+            long_description,
+            summary,
+            suno_prompt,
+            musical_key,
+            meter,
+            tempo,
+            instrumentation,
+            lyrics_local_path,
+            mp3_local_path,
+            mp3_url,
+            lyrics_url
+        FROM v_songbook
+        ORDER BY song_number;
+    """)
+    for row in rows:
+        row["has_local_audio"] = bool(row.get("mp3_local_path") and _safe_repo_path(row["mp3_local_path"]).exists())
+        row["has_local_lyrics"] = bool(row.get("lyrics_local_path") and _safe_repo_path(row["lyrics_local_path"]).exists())
+    return rows
+
+
+def songbook_detail(song_number: int) -> Optional[dict[str, Any]]:
+    rows = _fetch("""
+        SELECT
+            song_number,
+            title,
+            style,
+            category,
+            song_type,
+            short_description,
+            long_description,
+            summary,
+            suno_prompt,
+            musical_key,
+            meter,
+            tempo,
+            instrumentation,
+            lyrics_local_path,
+            mp3_local_path,
+            mp3_url,
+            lyrics_url
+        FROM v_songbook
+        WHERE song_number = :song_number;
+    """, {"song_number": song_number})
+    if not rows:
+        return None
+    row = rows[0]
+    row["has_local_audio"] = bool(row.get("mp3_local_path") and _safe_repo_path(row["mp3_local_path"]).exists())
+    row["has_local_lyrics"] = bool(row.get("lyrics_local_path") and _safe_repo_path(row["lyrics_local_path"]).exists())
+    return row
+
+
+def _safe_repo_path(path_value: str) -> Path:
+    path = Path(path_value)
+    if not path.is_absolute():
+        path = REPO_ROOT / path
+    resolved = path.resolve()
+    if REPO_ROOT.resolve() not in [resolved, *resolved.parents]:
+        raise CanonReadError("Songbook asset path is outside the repository.")
+    return resolved
+
+
+def songbook_asset_path(song_number: int, asset: str) -> Optional[Path]:
+    detail = songbook_detail(song_number)
+    if not detail:
+        return None
+    column = {
+        "audio": "mp3_local_path",
+        "lyrics": "lyrics_local_path",
+    }.get(asset)
+    if column is None or not detail.get(column):
+        return None
+    path = _safe_repo_path(detail[column])
+    return path if path.exists() else None
+
+
+def songbook_lyrics(song_number: int) -> Optional[str]:
+    path = songbook_asset_path(song_number, "lyrics")
+    if path is None:
+        return None
+    return path.read_text(encoding="utf-8-sig")
 
 
 def event_types() -> list[str]:

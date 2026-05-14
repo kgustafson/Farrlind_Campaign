@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ song.title }} | Faban's Songbook{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div>
+    <p class="eyebrow">Song {{ "%02d"|format(song.song_number) }}</p>
+    <h1>{{ song.title }}</h1>
+    <p>{{ song.long_description or song.summary or song.song_type or "Songbook entry" }}</p>
+  </div>
+  <a class="icon-link secondary-link" href="/songbook">Back to Songbook</a>
+</section>
+
+<section class="song-lyrics-shell">
+  <aside class="song-meta-panel">
+    {% if song.has_local_audio %}
+      <audio controls preload="none" src="/songbook/{{ song.song_number }}/audio"></audio>
+    {% endif %}
+    <dl>
+      <div><dt>Type</dt><dd>{{ song.song_type or "—" }}</dd></div>
+      <div><dt>Category</dt><dd>{{ song.category or "—" }}</dd></div>
+      <div><dt>Style</dt><dd>{{ song.style or "—" }}</dd></div>
+      <div><dt>Meter</dt><dd>{{ song.meter or "—" }}</dd></div>
+      <div><dt>Tempo</dt><dd>{{ song.tempo or "—" }}</dd></div>
+      <div><dt>Key</dt><dd>{{ song.musical_key or "—" }}</dd></div>
+    </dl>
+    {% if song.instrumentation %}
+      <p>{{ song.instrumentation }}</p>
+    {% endif %}
+  </aside>
+  <article class="lyrics-page">
+    <pre>{{ lyrics_text }}</pre>
+  </article>
+</section>
+{% endblock %}

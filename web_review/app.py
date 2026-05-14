@@ -2,7 +2,7 @@ from uuid import uuid4
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -620,6 +620,49 @@ def combat_encounters_index(request: Request):
     )
 
 
+@app.get("/songbook", response_class=HTMLResponse)
+def songbook_index(request: Request):
+    try:
+        songs = canon.songbook_rows()
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    return templates.TemplateResponse(
+        request,
+        "songbook.html",
+        {"songs": songs},
+    )
+
+
+@app.get("/songbook/{song_number}/lyrics", response_class=HTMLResponse)
+def songbook_lyrics(request: Request, song_number: int):
+    try:
+        song = canon.songbook_detail(song_number)
+        lyrics_text = canon.songbook_lyrics(song_number)
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    if not song or lyrics_text is None:
+        raise HTTPException(status_code=404, detail="Song lyrics not found.")
+    return templates.TemplateResponse(
+        request,
+        "song_lyrics.html",
+        {
+            "song": song,
+            "lyrics_text": lyrics_text,
+        },
+    )
+
+
+@app.get("/songbook/{song_number}/audio")
+def songbook_audio(song_number: int):
+    try:
+        path = canon.songbook_asset_path(song_number, "audio")
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    if path is None:
+        raise HTTPException(status_code=404, detail="Song audio not found.")
+    return FileResponse(path, media_type="audio/mpeg")
+
+
 @app.get("/wells", response_class=HTMLResponse)
 def wells_lore(request: Request):
     return templates.TemplateResponse(
@@ -716,6 +759,14 @@ def api_artifacts():
 def api_combat_encounters():
     try:
         return canon.combat_encounter_rows()
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+
+@app.get("/api/songbook")
+def api_songbook():
+    try:
+        return canon.songbook_rows()
     except canon.CanonReadError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
 

@@ -1029,6 +1029,72 @@ class CanonServiceTest(unittest.TestCase):
         self.assertEqual(summary["unknown_rows"], 1)
         self.assertEqual(summary["label"], "3+ unknown")
 
+    def test_songbook_rows_marks_local_assets(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            lyrics = root / "knowledge" / "Faban" / "songbook" / "Song" / "lyrics.md"
+            audio = lyrics.parent / "song.mp3"
+            lyrics.parent.mkdir(parents=True)
+            lyrics.write_text("Verse", encoding="utf-8")
+            audio.write_bytes(b"mp3")
+            db_rows = [{
+                "song_number": 1,
+                "title": "Test Song",
+                "style": "ballad",
+                "category": "lore",
+                "song_type": "Test ballad",
+                "short_description": "",
+                "long_description": "",
+                "summary": "",
+                "suno_prompt": "",
+                "musical_key": "",
+                "meter": "4/4",
+                "tempo": "90 BPM",
+                "instrumentation": "",
+                "lyrics_local_path": "knowledge/Faban/songbook/Song/lyrics.md",
+                "mp3_local_path": "knowledge/Faban/songbook/Song/song.mp3",
+                "mp3_url": "",
+                "lyrics_url": "",
+            }]
+
+            with patch("web_review.services.canon.REPO_ROOT", root), \
+                 patch("web_review.db.fetch_all", return_value=db_rows) as fetch:
+                rows = canon.songbook_rows()
+
+        self.assertIn("FROM v_songbook", fetch.call_args.args[0])
+        self.assertTrue(rows[0]["has_local_audio"])
+        self.assertTrue(rows[0]["has_local_lyrics"])
+
+    def test_songbook_lyrics_reads_local_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            lyrics = root / "knowledge" / "Faban" / "songbook" / "Song" / "lyrics.md"
+            lyrics.parent.mkdir(parents=True)
+            lyrics.write_text("A line worth singing.", encoding="utf-8")
+            db_rows = [{
+                "song_number": 2,
+                "title": "Test Song",
+                "style": "ballad",
+                "category": "lore",
+                "song_type": "",
+                "short_description": "",
+                "long_description": "",
+                "summary": "",
+                "suno_prompt": "",
+                "musical_key": "",
+                "meter": "",
+                "tempo": "",
+                "instrumentation": "",
+                "lyrics_local_path": "knowledge/Faban/songbook/Song/lyrics.md",
+                "mp3_local_path": "",
+                "mp3_url": "",
+                "lyrics_url": "",
+            }]
+
+            with patch("web_review.services.canon.REPO_ROOT", root), \
+                 patch("web_review.db.fetch_all", return_value=db_rows):
+                self.assertEqual(canon.songbook_lyrics(2), "A line worth singing.")
+
     def test_event_types_returns_ordered_names_from_db_rows(self):
         with patch("web_review.db.fetch_all", return_value=[{"type_name": "combat"}, {"type_name": "social"}]):
             self.assertEqual(canon.event_types(), ["combat", "social"])
@@ -1468,6 +1534,73 @@ class CombatEncounterRouteTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()[0]["enemies"][1]["quantity"], 2)
+
+
+class SongbookRouteTest(unittest.TestCase):
+    def song_rows(self):
+        return [{
+            "song_number": 1,
+            "title": "The Off-Key Dragon",
+            "style": "tavern_song",
+            "category": "humor",
+            "song_type": "Comic tavern song",
+            "short_description": "Tavern comedy",
+            "long_description": "A ridiculous tale of a dragon whose singing voice is worse than its fire.",
+            "summary": "",
+            "suno_prompt": "",
+            "musical_key": "G major",
+            "meter": "6/8",
+            "tempo": "120 BPM",
+            "instrumentation": "fiddle and drum",
+            "lyrics_local_path": "knowledge/Faban/songbook/The_Off_Key_Dragon/lyrics.md",
+            "mp3_local_path": "knowledge/Faban/songbook/The_Off_Key_Dragon/song.mp3",
+            "mp3_url": "https://example.com/audio",
+            "lyrics_url": "https://example.com/lyrics",
+            "has_local_audio": True,
+            "has_local_lyrics": True,
+        }]
+
+    def test_songbook_page_renders_cards_and_audio_controls(self):
+        with patch("web_review.services.canon.songbook_rows", return_value=self.song_rows()):
+            client = TestClient(app)
+            response = client.get("/songbook")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Faban", response.text)
+        self.assertIn("The Off-Key Dragon", response.text)
+        self.assertIn("/songbook/1/audio", response.text)
+        self.assertIn("/songbook/1/lyrics", response.text)
+        self.assertIn('href="/songbook"', response.text)
+
+    def test_songbook_api_returns_rows(self):
+        with patch("web_review.services.canon.songbook_rows", return_value=self.song_rows()):
+            client = TestClient(app)
+            response = client.get("/api/songbook")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()[0]["title"], "The Off-Key Dragon")
+
+    def test_song_lyrics_page_renders_lyrics_and_metadata(self):
+        with patch("web_review.services.canon.songbook_detail", return_value=self.song_rows()[0]), \
+             patch("web_review.services.canon.songbook_lyrics", return_value="# The Off-Key Dragon\n\nVerse one."):
+            client = TestClient(app)
+            response = client.get("/songbook/1/lyrics")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Verse one.", response.text)
+        self.assertIn("Comic tavern song", response.text)
+        self.assertIn("Back to Songbook", response.text)
+
+    def test_song_audio_route_serves_local_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "song.mp3"
+            path.write_bytes(b"fake mp3")
+            with patch("web_review.services.canon.songbook_asset_path", return_value=path):
+                client = TestClient(app)
+                response = client.get("/songbook/1/audio")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["content-type"], "audio/mpeg")
 
 
 class WellsLoreRouteTest(unittest.TestCase):

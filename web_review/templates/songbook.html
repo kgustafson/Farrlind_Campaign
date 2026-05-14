@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Faban's Songbook | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div>
+    <p class="eyebrow">Repertoire, Lore, and Tavern Evidence</p>
+    <h1>Faban&rsquo;s Songbook</h1>
+    <p>Recorded songs from Faban&rsquo;s working repertoire, with local lyrics and audio where available.</p>
+  </div>
+</section>
+
+<section class="songbook-grid" aria-label="Faban songbook">
+  {% for song in songs %}
+  <article class="song-card">
+    <div class="song-card-head">
+      <span class="song-number">{{ "%02d"|format(song.song_number) }}</span>
+      <div>
+        <h2><a href="/songbook/{{ song.song_number }}/lyrics">{{ song.title }}</a></h2>
+        <p>{{ song.song_type or song.short_description or song.style or "song" }}</p>
+      </div>
+    </div>
+    <div class="song-tags">
+      {% if song.category %}<span>{{ song.category }}</span>{% endif %}
+      {% if song.style %}<span>{{ song.style }}</span>{% endif %}
+      {% if song.meter %}<span>{{ song.meter }}</span>{% endif %}
+      {% if song.tempo %}<span>{{ song.tempo }}</span>{% endif %}
+      {% if song.musical_key %}<span>{{ song.musical_key }}</span>{% endif %}
+    </div>
+    <p class="song-description">{{ song.long_description or song.summary or "No description recorded." }}</p>
+    {% if song.instrumentation %}
+      <p class="song-instrumentation">{{ song.instrumentation }}</p>
+    {% endif %}
+    {% if song.has_local_audio %}
+      <audio controls preload="none" src="/songbook/{{ song.song_number }}/audio"></audio>
+    {% else %}
+      <span class="muted">No local audio file</span>
+    {% endif %}
+    <div class="song-actions">
+      {% if song.has_local_lyrics %}<a class="icon-link secondary-link" href="/songbook/{{ song.song_number }}/lyrics">Lyrics</a>{% endif %}
+      {% if song.lyrics_url %}<a class="icon-link secondary-link" href="{{ song.lyrics_url }}" target="_blank" rel="noreferrer">Source Doc</a>{% endif %}
+      {% if song.mp3_url %}<a class="icon-link secondary-link" href="{{ song.mp3_url }}" target="_blank" rel="noreferrer">Source Audio</a>{% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</section>
+{% endblock %}

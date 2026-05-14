@@ -28,7 +28,7 @@
         <a class="sidebar-link {% if request.url.path.startswith('/artifacts') %}active{% endif %}" href="/artifacts">Artifacts</a>
         <a class="sidebar-link {% if request.url.path.startswith('/combat-encounters') %}active{% endif %}" href="/combat-encounters">Combat Encounters</a>
         <span class="sidebar-link disabled" aria-disabled="true">Open Threads</span>
-        <span class="sidebar-link disabled" aria-disabled="true">Faban&rsquo;s Songbook</span>
+        <a class="sidebar-link {% if request.url.path.startswith('/songbook') %}active{% endif %}" href="/songbook">Faban&rsquo;s Songbook</a>
         <span class="sidebar-link disabled" aria-disabled="true">Validation Queue</span>
         <span class="sidebar-link disabled" aria-disabled="true">Campaign Timeline</span>
       </nav>

@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.3.15 - 5/13/2026
+
+Added Faban's Songbook to the campaign archive.
+
+- App: Wired Faban's Songbook into the sidebar with a `/songbook` archive page.
+- App: Added read-only song cards from `v_songbook` with metadata, local audio playback, source links, and lyrics pages.
+- App/API: Added `/api/songbook` plus safe local asset routes for lyrics and audio.
+- Tests: Added service and route coverage for songbook rows, lyrics, and audio serving.
+
 ## v0.3.14 - 5/12/2026
 
 Added the Murder Hobo Count to Combat Encounters.
