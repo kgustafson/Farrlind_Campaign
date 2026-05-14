@@ -1209,6 +1209,37 @@ dd { margin: 0; }
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 16px;
 }
+.songbook-preface {
+  display: grid;
+  grid-template-columns: minmax(180px, .45fr) minmax(280px, 1fr);
+  gap: 18px;
+  margin-bottom: 22px;
+  border: 1px solid rgba(139, 95, 39, .34);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 249, 226, .9), rgba(229, 202, 146, .42)),
+    var(--parchment);
+  box-shadow: 0 12px 26px rgba(52, 35, 19, .12);
+  padding: 20px;
+}
+.songbook-preface h2 {
+  margin: 0;
+  font-size: 23px;
+}
+.songbook-preface details {
+  color: var(--muted);
+}
+.songbook-preface summary {
+  color: #6e4318;
+  cursor: pointer;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 800;
+}
+.songbook-preface-text {
+  margin-top: 12px;
+  max-width: 76ch;
+  padding: 0;
+}
 .song-card {
   display: grid;
   gap: 12px;
@@ -1436,6 +1467,9 @@ dd { margin: 0; }
     grid-template-columns: 1fr;
   }
   .song-lyrics-shell {
+    grid-template-columns: 1fr;
+  }
+  .songbook-preface {
     grid-template-columns: 1fr;
   }
   .song-meta-panel {

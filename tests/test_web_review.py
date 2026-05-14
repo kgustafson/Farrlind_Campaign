@@ -7,6 +7,7 @@ import yaml
 
 from web_review.services import canon, commands, lore, reviews, workflow
 from web_review.app import COMMAND_RESULTS, app, app_version
+from scripts.load_songbook import songbook_source_sql
 from fastapi.testclient import TestClient
 
 
@@ -1095,6 +1096,39 @@ class CanonServiceTest(unittest.TestCase):
                  patch("web_review.db.fetch_all", return_value=db_rows):
                 self.assertEqual(canon.songbook_lyrics(2), "A line worth singing.")
 
+    def test_songbook_foreword_reads_front_matter_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            foreword = root / "knowledge" / "Faban" / "songbook" / "foreward.md"
+            foreword.parent.mkdir(parents=True)
+            foreword.write_text("Songs remember what steel forgets.", encoding="utf-8")
+            db_rows = [{
+                "title": "The Revealed Songbook",
+                "foreword_path": "knowledge/Faban/songbook/foreward.md",
+                "foreword_text": "",
+                "notes": "front matter",
+            }]
+
+            with patch("web_review.services.canon.REPO_ROOT", root), \
+                 patch("web_review.db.fetch_all", return_value=db_rows) as fetch:
+                result = canon.songbook_foreword()
+
+        self.assertIn("songbook_front_matter", fetch.call_args.args[0])
+        self.assertEqual(result["title"], "The Revealed Songbook")
+        self.assertEqual(result["text"], "Songs remember what steel forgets.")
+
+    def test_songbook_source_sql_updates_urls_by_song_number(self):
+        class Asset:
+            number = 5
+            lyrics_url = "https://docs.example/song"
+            mp3_url = "https://drive.example/song.mp3"
+
+        sql = songbook_source_sql(Asset())
+
+        self.assertIn("WHERE song_number = 5", sql)
+        self.assertIn("lyrics_url = 'https://docs.example/song'", sql)
+        self.assertIn("mp3_url = 'https://drive.example/song.mp3'", sql)
+
     def test_event_types_returns_ordered_names_from_db_rows(self):
         with patch("web_review.db.fetch_all", return_value=[{"type_name": "combat"}, {"type_name": "social"}]):
             self.assertEqual(canon.event_types(), ["combat", "social"])
@@ -1561,7 +1595,9 @@ class SongbookRouteTest(unittest.TestCase):
         }]
 
     def test_songbook_page_renders_cards_and_audio_controls(self):
-        with patch("web_review.services.canon.songbook_rows", return_value=self.song_rows()):
+        foreword = {"title": "The Revealed Songbook", "text": "A bard's duty is to remember.", "path": "", "notes": ""}
+        with patch("web_review.services.canon.songbook_rows", return_value=self.song_rows()), \
+             patch("web_review.services.canon.songbook_foreword", return_value=foreword):
             client = TestClient(app)
             response = client.get("/songbook")
 
@@ -1571,6 +1607,8 @@ class SongbookRouteTest(unittest.TestCase):
         self.assertIn("/songbook/1/audio", response.text)
         self.assertIn("/songbook/1/lyrics", response.text)
         self.assertIn('href="/songbook"', response.text)
+        self.assertIn("Read Faban", response.text)
+        self.assertIn("A bard", response.text)
 
     def test_songbook_api_returns_rows(self):
         with patch("web_review.services.canon.songbook_rows", return_value=self.song_rows()):

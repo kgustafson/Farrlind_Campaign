@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.3.16 - 5/13/2026
+
+Fixed Faban's Songbook source links and surfaced the preface.
+
+- App: Added a compact expandable preface section to `/songbook` using the existing songbook front matter file.
+- Canon: Corrected the initial song seed for The Contract of Baron Wells and Ranger Rick and his Mighty Stick so source docs and audio links match the proper songs.
+- Workflow: Updated the rerunnable songbook loader to sync source links from the master revealed songbook index.
+- Tests: Added coverage for songbook front matter and source-link SQL generation.
+
 ## v0.3.15 - 5/13/2026
 
 Added Faban's Songbook to the campaign archive.

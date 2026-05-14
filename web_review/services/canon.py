@@ -407,6 +407,32 @@ def songbook_rows() -> list[dict[str, Any]]:
     return rows
 
 
+def songbook_foreword() -> dict[str, str]:
+    rows = _fetch("""
+        SELECT title, foreword_path, foreword_text, notes
+        FROM songbook_front_matter
+        ORDER BY id
+        LIMIT 1;
+    """)
+    if not rows:
+        return {"title": "", "text": "", "path": "", "notes": ""}
+
+    row = rows[0]
+    text = row.get("foreword_text") or ""
+    path = row.get("foreword_path") or ""
+    if path:
+        foreword_path = _safe_repo_path(path)
+        if foreword_path.exists():
+            text = foreword_path.read_text(encoding="utf-8-sig")
+
+    return {
+        "title": row.get("title") or "",
+        "text": text.strip(),
+        "path": path,
+        "notes": row.get("notes") or "",
+    }
+
+
 def songbook_detail(song_number: int) -> Optional[dict[str, Any]]:
     rows = _fetch("""
         SELECT

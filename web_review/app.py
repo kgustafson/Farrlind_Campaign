@@ -624,12 +624,13 @@ def combat_encounters_index(request: Request):
 def songbook_index(request: Request):
     try:
         songs = canon.songbook_rows()
+        foreword = canon.songbook_foreword()
     except canon.CanonReadError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
     return templates.TemplateResponse(
         request,
         "songbook.html",
-        {"songs": songs},
+        {"songs": songs, "foreword": foreword, "foreword_html": reviews.render_markdown(foreword.get("text", ""))},
     )
 
 

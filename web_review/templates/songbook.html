@@ -10,6 +10,19 @@
   </div>
 </section>
 
+{% if foreword and foreword.text %}
+<section class="songbook-preface">
+  <div>
+    <p class="eyebrow">Preface</p>
+    <h2>{{ foreword.title or "The Revealed Songbook of Faban Colon" }}</h2>
+  </div>
+  <details>
+    <summary>Read Faban&rsquo;s note on the songs</summary>
+    <div class="songbook-preface-text source-rendered">{{ foreword_html | safe }}</div>
+  </details>
+</section>
+{% endif %}
+
 <section class="songbook-grid" aria-label="Faban songbook">
   {% for song in songs %}
   <article class="song-card">

@@ -1,6 +1,6 @@
 # Version
 
-v0.3.15
+v0.3.16
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.15` adds Faban's Songbook to the campaign archive.
+`v0.3.16` fixes Faban's Songbook source links and adds the preface to the archive page.
