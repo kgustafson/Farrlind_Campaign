@@ -75,6 +75,12 @@ Then open:
 http://127.0.0.1:8000
 ```
 
+Docker Compose also starts a read-only archive viewer at:
+
+```text
+http://127.0.0.1:8002
+```
+
 The web container bind-mounts the repo into `/app`, so review and canon files written by the UI persist in the working tree.
 
 The interface can run in either edit mode or read-only archive mode. Copy `farrlind/.env.example` to `farrlind/.env` and set:
@@ -90,6 +96,8 @@ FARRLIND_INTERFACE_MODE=archive
 ```
 
 Archive mode hides edit controls and rejects mutating requests, which is intended for a hosted viewer copy.
+
+The `web_archive` Compose service always runs in archive mode and mounts the repository read-only for local viewing/testing.
 
 ## Artifact Flow
 

@@ -1,6 +1,6 @@
 # Version
 
-v0.3.18
+v0.3.19
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.18` hides workflow status from archive mode.
+`v0.3.19` adds a side-by-side archive-mode Docker service.

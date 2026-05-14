@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.3.19 - 5/14/2026
+
+Added a side-by-side archive-mode Docker service.
+
+- Docker: Added `web_archive`, running the same app in archive mode on port `8002`.
+- Docker: Mounted the archive service repository read-only and left the edit service on port `8000`.
+- Docs: Documented the edit and archive viewer URLs for local testing.
+
 ## v0.3.18 - 5/14/2026
 
 Hid workflow status from archive mode.
