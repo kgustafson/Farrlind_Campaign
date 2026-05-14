@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.3.17 - 5/14/2026
+
+Added environment-controlled edit and archive interface modes.
+
+- App: Added `FARRLIND_INTERFACE_MODE=edit|archive`, defaulting to edit mode.
+- App: Archive mode hides Add/Edit/Delete/review action controls and renders Wells lore read-only.
+- App: Archive mode rejects mutating HTTP requests with `403` so the hosted PC version cannot change canon.
+- Docker/Docs: Passed the interface mode through Docker Compose and documented `.env` usage.
+- Tests: Added archive-mode coverage for hidden controls, blocked writes, and read-only lore rendering.
+
 ## v0.3.16 - 5/13/2026
 
 Fixed Faban's Songbook source links and surfaced the preface.

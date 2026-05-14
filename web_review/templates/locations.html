@@ -8,7 +8,7 @@
     <h1>Locations</h1>
     <p>Known places, regions, roads, sanctuaries, cities, and strange corners of Farrlind.</p>
   </div>
-  <a class="icon-link add-new-link" href="/locations?modal=add">Add New</a>
+  {% if can_edit() %}<a class="icon-link add-new-link" href="/locations?modal=add">Add New</a>{% endif %}
 </section>
 
 {% if request.query_params.get("created") %}
@@ -41,7 +41,7 @@
         <th>Flags</th>
         <th>First</th>
         <th>Description</th>
-        <th></th>
+        {% if can_edit() %}<th></th>{% endif %}
       </tr>
     </thead>
     <tbody>
@@ -57,14 +57,14 @@
         </td>
         <td data-label="First">{% if location.first_visited_session is not none %}{{ location.first_visited_session }}{% else %}<span class="muted">—</span>{% endif %}</td>
         <td data-label="Description">{{ location.description or "—" }}</td>
-        <td data-label="Actions">
+        {% if can_edit() %}<td data-label="Actions">
           <div class="row-actions">
             <a class="icon-link" href="/locations/{{ location.id }}/edit">Edit</a>
             <form method="post" action="/locations/{{ location.id }}/delete">
               <button class="danger-button" type="submit">Delete</button>
             </form>
           </div>
-        </td>
+        </td>{% endif %}
       </tr>
       {% endfor %}
     </tbody>

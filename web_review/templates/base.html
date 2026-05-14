@@ -10,6 +10,7 @@
   <header class="app-header">
     <a class="brand" href="/">The Farrlind Archivum</a>
     <nav class="top-nav">
+      <span class="mode-pill mode-{{ interface_mode() }}">{% if can_edit() %}Edit Archive{% else %}Published Archive{% endif %}</span>
       <a href="/">Dashboard</a>
     </nav>
   </header>

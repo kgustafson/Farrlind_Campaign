@@ -25,6 +25,8 @@ knowledge/Faban/lore/*
 #Temp
 *.log
 *.tmp
+.env
+farrlind/.env
 farrlind/out/
 benchmarks/
 

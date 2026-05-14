@@ -8,7 +8,7 @@
     <h1>Artifacts</h1>
     <p>Canon artifacts known to the campaign database, including discovery, lore weight, flags, and current holder.</p>
   </div>
-  <a class="icon-link add-new-link" href="/artifacts?modal=add">Add New</a>
+  {% if can_edit() %}<a class="icon-link add-new-link" href="/artifacts?modal=add">Add New</a>{% endif %}
 </section>
 
 {% if request.query_params.get("created") %}
@@ -42,7 +42,7 @@
         <th>Flags</th>
         <th>Description</th>
         <th>Lore</th>
-        <th></th>
+        {% if can_edit() %}<th></th>{% endif %}
       </tr>
     </thead>
     <tbody>
@@ -66,14 +66,14 @@
         </td>
         <td data-label="Description">{{ artifact.description or "—" }}</td>
         <td data-label="Lore">{{ artifact.lore_significance or "—" }}</td>
-        <td data-label="Actions">
+        {% if can_edit() %}<td data-label="Actions">
           <div class="row-actions">
             <a class="icon-link" href="/artifacts/{{ artifact.id }}/edit">Edit</a>
             <form method="post" action="/artifacts/{{ artifact.id }}/delete">
               <button class="danger-button" type="submit">Delete</button>
             </form>
           </div>
-        </td>
+        </td>{% endif %}
       </tr>
       {% endfor %}
     </tbody>

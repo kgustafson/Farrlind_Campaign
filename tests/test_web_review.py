@@ -1172,6 +1172,20 @@ class LocationRouteTest(unittest.TestCase):
         self.assertIn('role="dialog"', response.text)
         self.assertIn('action="/locations"', response.text)
 
+    def test_archive_mode_hides_location_edit_controls(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}), \
+             patch("web_review.services.canon.location_rows", return_value=self.location_rows()), \
+             patch("web_review.services.canon.location_types", return_value=[{"id": 1, "type_name": "city"}]):
+            client = TestClient(app)
+            response = client.get("/locations?modal=add")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Published Archive", response.text)
+        self.assertNotIn("Add New", response.text)
+        self.assertNotIn("Edit</a>", response.text)
+        self.assertNotIn("Delete</button>", response.text)
+        self.assertNotIn('role="dialog"', response.text)
+
     def test_create_location_route_writes_form_values(self):
         with patch("web_review.services.canon.create_location") as create:
             client = TestClient(app)
@@ -1246,6 +1260,16 @@ class LocationRouteTest(unittest.TestCase):
         self.assertIn("deleted=1", response.headers["location"])
         delete.assert_called_once_with(4)
 
+    def test_archive_mode_blocks_location_mutation(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}), \
+             patch("web_review.services.canon.create_location") as create:
+            client = TestClient(app)
+            response = client.post("/locations", data={"name": "Hidden Gate"}, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertIn("archive mode", response.text)
+        create.assert_not_called()
+
 
 class NPCRouteTest(unittest.TestCase):
     def npc_rows(self):
@@ -1299,6 +1323,22 @@ class NPCRouteTest(unittest.TestCase):
         self.assertIn("Add NPC", response.text)
         self.assertIn('role="dialog"', response.text)
         self.assertIn('action="/npcs"', response.text)
+
+    def test_archive_mode_hides_npc_edit_controls(self):
+        support = self.support_rows()
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}), \
+             patch("web_review.services.canon.npc_rows", return_value=self.npc_rows()), \
+             patch("web_review.services.canon.entity_statuses", return_value=support["statuses"]), \
+             patch("web_review.services.canon.factions", return_value=support["factions"]), \
+             patch("web_review.services.canon.location_rows", return_value=support["locations"]):
+            client = TestClient(app)
+            response = client.get("/npcs?modal=add")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("Add New", response.text)
+        self.assertNotIn("Edit</a>", response.text)
+        self.assertNotIn("Delete</button>", response.text)
+        self.assertNotIn('role="dialog"', response.text)
 
     def test_create_npc_route_writes_form_values(self):
         with patch("web_review.services.canon.create_npc") as create:
@@ -1425,6 +1465,19 @@ class ArtifactRouteTest(unittest.TestCase):
         self.assertIn("Add Artifact", response.text)
         self.assertIn('role="dialog"', response.text)
         self.assertIn('action="/artifacts"', response.text)
+
+    def test_archive_mode_hides_artifact_edit_controls(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}), \
+             patch("web_review.services.canon.artifact_rows", return_value=self.artifact_rows()), \
+             patch("web_review.services.canon.artifact_types", return_value=self.artifact_types()):
+            client = TestClient(app)
+            response = client.get("/artifacts?modal=add")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("Add New", response.text)
+        self.assertNotIn("Edit</a>", response.text)
+        self.assertNotIn("Delete</button>", response.text)
+        self.assertNotIn('role="dialog"', response.text)
 
     def test_create_artifact_route_writes_form_values(self):
         with patch("web_review.services.canon.create_artifact") as create:
@@ -1653,6 +1706,17 @@ class WellsLoreRouteTest(unittest.TestCase):
         self.assertIn('name="lore_text"', response.text)
         self.assertIn('rows="20"', response.text)
         self.assertIn('href="/wells"', response.text)
+
+    def test_archive_mode_renders_wells_as_read_only_lore(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}), \
+             patch("web_review.services.lore.read_wells_of_magic", return_value="## Six Wells\n\nThey never lie."):
+            client = TestClient(app)
+            response = client.get("/wells")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("<h2>Six Wells</h2>", response.text)
+        self.assertNotIn('name="lore_text"', response.text)
+        self.assertNotIn("Save Lore", response.text)
 
     def test_save_wells_lore_writes_text(self):
         with patch("web_review.services.lore.write_wells_of_magic") as write_lore:

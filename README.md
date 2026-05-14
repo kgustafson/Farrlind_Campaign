@@ -77,6 +77,20 @@ http://127.0.0.1:8000
 
 The web container bind-mounts the repo into `/app`, so review and canon files written by the UI persist in the working tree.
 
+The interface can run in either edit mode or read-only archive mode. Copy `farrlind/.env.example` to `farrlind/.env` and set:
+
+```text
+FARRLIND_INTERFACE_MODE=edit
+```
+
+or:
+
+```text
+FARRLIND_INTERFACE_MODE=archive
+```
+
+Archive mode hides edit controls and rejects mutating requests, which is intended for a hosted viewer copy.
+
 ## Artifact Flow
 
 The full artifact map and canon safety rules live in [Farrlind Campaign Workflow](docs/farrlind_workflow.md).

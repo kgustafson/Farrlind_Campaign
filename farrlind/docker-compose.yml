@@ -37,6 +37,7 @@ services:
     restart: unless-stopped
     environment:
       FARRLIND_DATABASE_URL: postgresql+psycopg2://admin:gofaban@db:5432/farrlind
+      FARRLIND_INTERFACE_MODE: ${FARRLIND_INTERFACE_MODE:-edit}
     depends_on:
       db:
         condition: service_healthy

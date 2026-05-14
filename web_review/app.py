@@ -1,3 +1,4 @@
+import os
 from uuid import uuid4
 from typing import Optional
 
@@ -14,6 +15,19 @@ app.mount("/static", StaticFiles(directory=str(reviews.REPO_ROOT / "web_review" 
 templates = Jinja2Templates(directory=str(reviews.REPO_ROOT / "web_review" / "templates"))
 COMMAND_RESULTS = {}
 
+EDIT_MODE = "edit"
+ARCHIVE_MODE = "archive"
+SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
+
+
+def interface_mode() -> str:
+    value = os.getenv("FARRLIND_INTERFACE_MODE", EDIT_MODE).strip().lower()
+    return value if value in {EDIT_MODE, ARCHIVE_MODE} else EDIT_MODE
+
+
+def can_edit() -> bool:
+    return interface_mode() == EDIT_MODE
+
 
 def app_version() -> str:
     version_path = reviews.REPO_ROOT / "version.md"
@@ -28,6 +42,15 @@ def app_version() -> str:
 
 
 templates.env.globals["app_version"] = app_version
+templates.env.globals["interface_mode"] = interface_mode
+templates.env.globals["can_edit"] = can_edit
+
+
+@app.middleware("http")
+async def archive_mode_write_guard(request: Request, call_next):
+    if not can_edit() and request.method.upper() not in SAFE_METHODS:
+        return PlainTextResponse("Farrlind Archivum is running in archive mode.", status_code=403)
+    return await call_next(request)
 
 
 def store_command_result(action: str, result: commands.CommandResult) -> str:
@@ -381,7 +404,7 @@ def locations_index(request: Request, modal: str = ""):
             "location_types": location_types,
             "all_locations": rows,
             "editing": None,
-            "show_location_modal": modal == "add",
+            "show_location_modal": can_edit() and modal == "add",
         },
     )
 
@@ -401,6 +424,8 @@ async def create_location(request: Request):
 
 @app.get("/locations/{location_id}/edit", response_class=HTMLResponse)
 def edit_location(request: Request, location_id: int):
+    if not can_edit():
+        return RedirectResponse(url="/locations", status_code=303)
     try:
         rows = canon.location_rows()
         location_types = canon.location_types()
@@ -462,7 +487,7 @@ def npcs_index(request: Request, modal: str = ""):
             "factions": factions,
             "locations": locations,
             "editing": None,
-            "show_npc_modal": modal == "add",
+            "show_npc_modal": can_edit() and modal == "add",
         },
     )
 
@@ -482,6 +507,8 @@ async def create_npc(request: Request):
 
 @app.get("/npcs/{npc_id}/edit", response_class=HTMLResponse)
 def edit_npc(request: Request, npc_id: int):
+    if not can_edit():
+        return RedirectResponse(url="/npcs", status_code=303)
     try:
         rows = canon.npc_rows()
         statuses = canon.entity_statuses()
@@ -542,7 +569,7 @@ def artifacts_index(request: Request, modal: str = ""):
             "artifacts": rows,
             "artifact_types": artifact_types,
             "editing": None,
-            "show_artifact_modal": modal == "add",
+            "show_artifact_modal": can_edit() and modal == "add",
         },
     )
 
@@ -562,6 +589,8 @@ async def create_artifact(request: Request):
 
 @app.get("/artifacts/{artifact_id}/edit", response_class=HTMLResponse)
 def edit_artifact(request: Request, artifact_id: int):
+    if not can_edit():
+        return RedirectResponse(url="/artifacts", status_code=303)
     try:
         rows = canon.artifact_rows()
         artifact_types = canon.artifact_types()
@@ -666,10 +695,11 @@ def songbook_audio(song_number: int):
 
 @app.get("/wells", response_class=HTMLResponse)
 def wells_lore(request: Request):
+    lore_text = lore.read_wells_of_magic()
     return templates.TemplateResponse(
         request,
         "wells.html",
-        {"lore_text": lore.read_wells_of_magic()},
+        {"lore_text": lore_text, "lore_html": reviews.render_markdown(lore_text)},
     )
 
 

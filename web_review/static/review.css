@@ -60,6 +60,29 @@ a { color: inherit; }
   padding: 7px 12px;
   background: rgba(255, 245, 206, .06);
 }
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mode-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  border: 1px solid rgba(216, 190, 124, .35);
+  border-radius: 999px;
+  background: rgba(255, 245, 206, .06);
+  color: #d9be7c;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .11em;
+  padding: 7px 12px;
+  text-transform: uppercase;
+}
+.mode-archive {
+  border-color: rgba(124, 156, 100, .45);
+  color: #c7dca1;
+}
 .app-shell {
   display: grid;
   grid-template-columns: 248px minmax(0, 1fr);
