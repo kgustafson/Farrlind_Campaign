@@ -1346,6 +1346,9 @@ dd { margin: 0; }
   flex-wrap: wrap;
   gap: 8px;
 }
+.song-detail-actions {
+  margin-top: 12px;
+}
 .song-lyrics-shell {
   display: grid;
   grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);

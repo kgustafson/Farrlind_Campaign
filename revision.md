@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.3.21 - 5/14/2026
+
+Added song source links to lyrics pages.
+
+- App: Individual song lyrics pages now show Source Doc and Source Audio links when known.
+- App: Added spacing for the lyrics-page source action buttons.
+- Tests: Covered source links on the song lyrics route.
+
 ## v0.3.20 - 5/14/2026
 
 Simplified archive-mode session review pages.

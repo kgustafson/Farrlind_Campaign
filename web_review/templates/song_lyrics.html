@@ -27,6 +27,12 @@
     {% if song.instrumentation %}
       <p>{{ song.instrumentation }}</p>
     {% endif %}
+    {% if song.lyrics_url or song.mp3_url %}
+      <div class="song-actions song-detail-actions">
+        {% if song.lyrics_url %}<a class="icon-link secondary-link" href="{{ song.lyrics_url }}" target="_blank" rel="noreferrer">Source Doc</a>{% endif %}
+        {% if song.mp3_url %}<a class="icon-link secondary-link" href="{{ song.mp3_url }}" target="_blank" rel="noreferrer">Source Audio</a>{% endif %}
+      </div>
+    {% endif %}
   </aside>
   <article class="lyrics-page">
     <pre>{{ lyrics_text }}</pre>

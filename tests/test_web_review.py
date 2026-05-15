@@ -1701,6 +1701,10 @@ class SongbookRouteTest(unittest.TestCase):
         self.assertIn("Verse one.", response.text)
         self.assertIn("Comic tavern song", response.text)
         self.assertIn("Back to Songbook", response.text)
+        self.assertIn('href="https://example.com/lyrics"', response.text)
+        self.assertIn("Source Doc", response.text)
+        self.assertIn('href="https://example.com/audio"', response.text)
+        self.assertIn("Source Audio", response.text)
 
     def test_song_audio_route_serves_local_file(self):
         with tempfile.TemporaryDirectory() as tmp:
