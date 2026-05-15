@@ -1,5 +1,12 @@
 # Revision History
 
+## v0.3.23 - 5/14/2026
+
+Updated Urgan Wyrmbane to the Drive-folder source URL.
+
+- Canon: Stored the Drive-reported Songbook URL for Urgan Wyrmbane's recreated source doc.
+- Data: Reloaded songbook source metadata into the running database after the document was moved into the Songbook folder.
+
 ## v0.3.22 - 5/14/2026
 
 Recreated the Urgan Wyrmbane source document.
