@@ -115,6 +115,33 @@ To restore from Git Bash, macOS, or another shell with `cat`:
 cat backups/farrlind_YYYYMMDD_HHMMSS.sql | docker exec -i farrlind_db psql -U admin -d farrlind -v ON_ERROR_STOP=1
 ```
 
+### Daily macOS Backup
+
+The repo includes a user-level launchd plist at:
+
+```text
+ops/launchd/com.farrlind.db-backup.plist
+```
+
+It runs daily at 1:00 AM and writes clean backups to:
+
+```text
+~/FarrlindBackups/
+```
+
+The installed LaunchAgent lives at:
+
+```text
+~/Library/LaunchAgents/com.farrlind.db-backup.plist
+```
+
+Launchd logs are written to:
+
+```text
+/tmp/farrlind_db_backup.launchd.log
+/tmp/farrlind_db_backup.launchd.err.log
+```
+
 ## Artifact Flow
 
 The full artifact map and canon safety rules live in [Farrlind Campaign Workflow](docs/farrlind_workflow.md).

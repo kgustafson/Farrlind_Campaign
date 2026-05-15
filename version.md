@@ -1,6 +1,6 @@
 # Version
 
-v0.3.24
+v0.3.25
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.24` adds a clean database backup command for restore-friendly PC/archive transfers.
+`v0.3.25` adds a daily macOS LaunchAgent for automated database backups.

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.farrlind.db-backup</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>-lc</string>
+    <string>mkdir -p "$HOME/FarrlindBackups" &amp;&amp; /usr/local/bin/docker exec farrlind_db pg_dump --clean --if-exists -U admin -d farrlind &gt; "$HOME/FarrlindBackups/farrlind_$(date +%Y%m%d_%H%M%S).sql"</string>
+  </array>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Docker.app/Contents/Resources/bin</string>
+  </dict>
+
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>1</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/farrlind_db_backup.launchd.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/tmp/farrlind_db_backup.launchd.err.log</string>
+</dict>
+</plist>

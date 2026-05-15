@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.3.25 - 5/14/2026
+
+Added daily macOS database backup scheduling.
+
+- Ops: Added a launchd plist for `com.farrlind.db-backup`.
+- Ops: The scheduled job runs daily at 1:00 AM and writes clean Postgres dumps to `~/FarrlindBackups/`.
+- Docs: Documented the LaunchAgent path, backup destination, and launchd log files.
+
 ## v0.3.24 - 5/14/2026
 
 Added a clean database backup command.
