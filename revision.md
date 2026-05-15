@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.3.24 - 5/14/2026
+
+Added a clean database backup command.
+
+- App: Added `rag.py db-backup` to create timestamped Postgres dumps from the Docker database.
+- Data: The backup command runs `pg_dump --clean --if-exists` so restores can replace existing schema objects cleanly.
+- Docs: Documented backup and restore commands for archive/PC setup.
+- Project: Ignored local backup dump files under `backups/`.
+- Tests: Covered backup path generation and `pg_dump` command construction.
+
 ## v0.3.23 - 5/14/2026
 
 Updated Urgan Wyrmbane to the Drive-folder source URL.

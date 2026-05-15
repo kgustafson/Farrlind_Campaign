@@ -17,6 +17,7 @@ from raglib.summarize import summarize_session
 from scripts.load_summaries import apply_sql, write_sql
 from scripts.load_songbook import apply_sql as apply_songbook_sql
 from scripts.load_songbook import write_songbook_sql
+from scripts.db_backup import backup_database
 from scripts.transcribe_parallel import default_audio_path, default_output_path, run_transcription
 from raglib.workflow_state import write_historical_workflow_seed_sql, write_workflow_init_sql
 
@@ -85,6 +86,7 @@ def parse_args():
             "status",
             "dbload",
             "songbook-load",
+            "db-backup",
             "workflow-init",
             "workflow-seed-history",
         ],
@@ -95,6 +97,7 @@ def parse_args():
     parser.add_argument("--container", default="farrlind_db", help="Postgres Docker container name.")
     parser.add_argument("--user", default="admin", help="Postgres user.")
     parser.add_argument("--database", default="farrlind", help="Postgres database.")
+    parser.add_argument("--backup-output", type=Path, default=None, help="Optional db-backup output path.")
     parser.add_argument("--audio-file", type=Path, default=None, help="Transcribe command input. Defaults to audio/<session>.wav.")
     parser.add_argument("--output", type=Path, default=None, help="Transcribe command output. Defaults to raw/<session>_transcript.txt.")
     parser.add_argument("--model", default=None, help="Transcribe command Whisper model. Defaults to large-v3.")
@@ -120,6 +123,21 @@ def main():
         sql_path, _report_path, _prompts, _warnings = write_songbook_sql()
         if args.apply:
             apply_songbook_sql(sql_path, args.container, args.user, args.database)
+        return
+
+    if args.command == "db-backup":
+        backup_path = backup_database(
+            args.backup_output,
+            container=args.container,
+            user=args.user,
+            database=args.database,
+        )
+        print(f"Wrote database backup: {backup_path}")
+        print("Restore with:")
+        print(
+            f"cat {backup_path} | docker exec -i {args.container} "
+            f"psql -U {args.user} -d {args.database} -v ON_ERROR_STOP=1"
+        )
         return
 
     if args.command == "workflow-init":

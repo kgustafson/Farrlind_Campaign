@@ -29,6 +29,7 @@ knowledge/Faban/lore/*
 farrlind/.env
 farrlind/out/
 benchmarks/
+backups/
 
 #OS
 .DS_Store

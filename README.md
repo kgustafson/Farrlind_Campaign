@@ -99,6 +99,22 @@ Archive mode hides edit controls and rejects mutating requests, which is intende
 
 The `web_archive` Compose service always runs in archive mode and mounts the repository read-only for local viewing/testing.
 
+## Database Backup
+
+Create a clean restore-friendly database backup from the running Docker database:
+
+```bash
+./rag-env/bin/python scripts/rag.py db-backup
+```
+
+Backups are written to ignored `backups/farrlind_YYYYMMDD_HHMMSS.sql` files. The command uses `pg_dump --clean --if-exists` so restoring onto an initialized database drops matching existing objects first.
+
+To restore from Git Bash, macOS, or another shell with `cat`:
+
+```bash
+cat backups/farrlind_YYYYMMDD_HHMMSS.sql | docker exec -i farrlind_db psql -U admin -d farrlind -v ON_ERROR_STOP=1
+```
+
 ## Artifact Flow
 
 The full artifact map and canon safety rules live in [Farrlind Campaign Workflow](docs/farrlind_workflow.md).
