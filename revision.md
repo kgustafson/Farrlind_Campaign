@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.3.22 - 5/14/2026
+
+Recreated the Urgan Wyrmbane source document.
+
+- Canon: Updated the seed schema to point Urgan Wyrmbane at the recreated Google Doc source.
+- Canon: Corrected the base Urgan Wyrmbane source audio URL in the seed schema.
+- Data: Reloaded songbook source metadata into the running database.
+
 ## v0.3.21 - 5/14/2026
 
 Added song source links to lyrics pages.

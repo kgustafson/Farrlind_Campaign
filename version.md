@@ -1,6 +1,6 @@
 # Version
 
-v0.3.21
+v0.3.22
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.21` surfaces song source links on individual lyrics pages.
+`v0.3.22` points Urgan Wyrmbane at the recreated source document.
