@@ -171,6 +171,12 @@ def session_review(request: Request, session: str, source: str = "diary", view: 
         session_number = reviews.parse_session_ref(session)
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
+    if not can_edit():
+        view = "print"
+        if source == "summary":
+            source = "final"
+        elif source not in {"diary", "final"}:
+            source = "diary"
     workspace = reviews.session_workspace(session_number, source, view)
     workspace["locations"] = canon_location_names()
     token = request.query_params.get("command_result")

@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.3.20 - 5/14/2026
+
+Simplified archive-mode session review pages.
+
+- App: Archive-mode session review URLs now force rendered print view.
+- App: Archive-mode session pages show only Diary and Summary source buttons.
+- App: Archive-mode session pages hide review decision and validation controls, leaving a clean reader.
+- Tests: Added route coverage for archive reader controls.
+
 ## v0.3.19 - 5/14/2026
 
 Added a side-by-side archive-mode Docker service.

@@ -356,6 +356,26 @@ class WebReviewAppTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("source-text", response.text)
 
+    def test_archive_session_review_is_print_only_reader(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}):
+            client = TestClient(app)
+            response = client.get("/sessions/session20/review?source=final&view=raw")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("session20 Archive", response.text)
+        self.assertIn("source-rendered", response.text)
+        self.assertIn("Archive source selector", response.text)
+        self.assertIn("Diary</a>", response.text)
+        self.assertIn("Summary</a>", response.text)
+        self.assertNotIn("source-text", response.text)
+        self.assertNotIn("Draft Summary", response.text)
+        self.assertNotIn("Final Summary", response.text)
+        self.assertNotIn("Source</a>", response.text)
+        self.assertNotIn("Print</a>", response.text)
+        self.assertNotIn("Save Review", response.text)
+        self.assertNotIn("Reopen Review", response.text)
+        self.assertNotIn("Add Item", response.text)
+
     def test_save_review_route_writes_yaml_and_redirects(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

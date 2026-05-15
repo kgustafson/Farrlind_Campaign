@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}{{ session_key }} Review{% endblock %}
+{% block title %}{% if can_edit() %}{{ session_key }} Review{% else %}{{ session_key }} Archive{% endif %}{% endblock %}
 {% block content %}
-<form method="post" action="/sessions/{{ session_key }}/review/save" class="review-form">
+<form method="post" action="/sessions/{{ session_key }}/review/save" class="review-form{% if not can_edit() %} archive-review-form{% endif %}">
 <input type="hidden" name="source" value="{{ source }}">
 <input type="hidden" name="view" value="{{ source_view }}">
 <section class="workspace-head">
   <div>
-    <h1>{{ session_key }} Review</h1>
+    <h1>{% if can_edit() %}{{ session_key }} Review{% else %}{{ session_key }} Archive{% endif %}</h1>
     <p>{{ document.session_title or "Untitled" }}</p>
   </div>
   {% if can_edit() %}
@@ -23,6 +23,7 @@
   {% endif %}
 </section>
 
+{% if can_edit() %}
 {% if request.query_params.get("saved") %}
   <div class="flash">Review YAML saved.</div>
 {% endif %}
@@ -87,20 +88,30 @@
     {% endif %}
   </section>
 {% endif %}
+{% endif %}
 
-<section class="workspace-grid">
+<section class="workspace-grid{% if not can_edit() %} archive-source-grid{% endif %}">
   <aside class="source-pane">
-    <div class="segmented" aria-label="Source selector">
-      <a class="{% if source == "diary" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=diary&view={{ source_view }}">Diary</a>
-      <a class="{% if source == "draft" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=draft&view={{ source_view }}">Draft Summary</a>
-      <a class="{% if source == "final" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=final&view={{ source_view }}">Final Summary</a>
-    </div>
-    <div class="source-toolbar">
-      <h2>{{ source_label }}</h2>
-      <div class="segmented compact" aria-label="Source view selector">
-        <a class="{% if source_view == "raw" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source={{ source }}&view=raw">Source</a>
-        <a class="{% if source_view == "print" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source={{ source }}&view=print">Print</a>
+    {% if can_edit() %}
+      <div class="segmented" aria-label="Source selector">
+        <a class="{% if source == "diary" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=diary&view={{ source_view }}">Diary</a>
+        <a class="{% if source == "draft" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=draft&view={{ source_view }}">Draft Summary</a>
+        <a class="{% if source == "final" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=final&view={{ source_view }}">Final Summary</a>
       </div>
+    {% else %}
+      <div class="segmented archive-source-tabs" aria-label="Archive source selector">
+        <a class="{% if source == "diary" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=diary">Diary</a>
+        <a class="{% if source == "final" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=final">Summary</a>
+      </div>
+    {% endif %}
+    <div class="source-toolbar">
+      <h2>{% if not can_edit() and source == "final" %}Summary{% else %}{{ source_label }}{% endif %}</h2>
+      {% if can_edit() %}
+        <div class="segmented compact" aria-label="Source view selector">
+          <a class="{% if source_view == "raw" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source={{ source }}&view=raw">Source</a>
+          <a class="{% if source_view == "print" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source={{ source }}&view=print">Print</a>
+        </div>
+      {% endif %}
     </div>
     {% if source_view == "print" %}
       <article class="source-rendered">{{ source_html | safe }}</article>
@@ -109,6 +120,7 @@
     {% endif %}
   </aside>
 
+  {% if can_edit() %}
   <section class="review-list">
     {% if not document %}
       <div class="empty-state">Review file has not been initialized.</div>
@@ -248,9 +260,12 @@
       </label>
     </section>
   </aside>
+  {% endif %}
 </section>
+{% if can_edit() %}
 <datalist id="location-options">
   {% for location in locations %}<option value="{{ location }}"></option>{% endfor %}
 </datalist>
+{% endif %}
 </form>
 {% endblock %}

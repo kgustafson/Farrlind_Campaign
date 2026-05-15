@@ -804,6 +804,14 @@ button:disabled {
   gap: 16px;
   align-items: start;
 }
+.archive-source-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+.archive-source-grid .source-pane {
+  width: min(100%, 980px);
+  margin: 0 auto;
+  position: static;
+}
 .source-pane,
 .meta-pane section { padding: 14px; }
 .source-pane,
@@ -834,6 +842,9 @@ button:disabled {
   padding: 4px 8px;
   font-size: 13px;
 }
+.archive-source-tabs {
+  max-width: 360px;
+}
 .source-text {
   margin: 0;
   white-space: pre-wrap;
@@ -847,6 +858,11 @@ button:disabled {
   max-height: calc(100vh - 205px);
   overflow: auto;
   padding-right: 4px;
+}
+.archive-review-form .source-rendered {
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
 }
 .source-rendered h1,
 .source-rendered h2,
