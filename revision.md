@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.4.3 - 5/16/2026
+
+Improved Open Threads edit-mode controls and ledger readability.
+
+- App: Moved Open Threads edit/delete controls into the thread title cell so CRUD is visible in edit mode.
+- App: Reworked the Open Threads ledger into Thread, State, Scope, Description, and Resolution columns.
+- App: Gave description text more width and allowed long thread titles to wrap cleanly.
+- Tests: Added route assertions that edit/delete controls render for Open Threads in edit mode.
+
 ## v0.4.2 - 5/16/2026
 
 Promoted approved Open Threads into managed canon data.

@@ -33,16 +33,20 @@
 <section class="table-wrap archive-ledger" aria-label="Open threads ledger">
   <table class="status-table open-thread-table">
     <caption>Open Thread Ledger</caption>
+    <colgroup>
+      <col class="thread-title-col">
+      <col class="thread-state-col">
+      <col class="thread-scope-col">
+      <col class="thread-description-col">
+      <col class="thread-resolution-col">
+    </colgroup>
     <thead>
       <tr>
         <th>Thread</th>
-        <th>Status</th>
-        <th>Type</th>
-        <th>Sessions</th>
-        <th>Location</th>
+        <th>State</th>
+        <th>Scope</th>
         <th>Description</th>
         <th>Resolution</th>
-        {% if can_edit() %}<th></th>{% endif %}
       </tr>
     </thead>
     <tbody>
@@ -54,25 +58,29 @@
           {% else %}
             {{ thread.title }}
           {% endif %}
+          {% if can_edit() %}
+            <div class="row-actions thread-title-actions">
+              <a class="icon-link" href="/open-threads/{{ thread.id }}/edit">Edit</a>
+              <form method="post" action="/open-threads/{{ thread.id }}/delete">
+                <button class="danger-button" type="submit">Delete</button>
+              </form>
+            </div>
+          {% endif %}
         </td>
-        <td data-label="Status"><span class="badge thread-status-{{ thread.status }}">{{ thread.status }}</span></td>
-        <td data-label="Type">{{ thread.thread_type.replace("_", " ") }}</td>
-        <td data-label="Sessions">
-          {% if thread.first_session is not none %}{{ thread.first_session }}{% else %}<span class="muted">?</span>{% endif %}
-          <span class="muted">to</span>
-          {% if thread.last_session is not none %}{{ thread.last_session }}{% else %}<span class="muted">?</span>{% endif %}
+        <td data-label="State">
+          <div class="thread-state-stack">
+            <span class="badge thread-status-{{ thread.status }}">{{ thread.status }}</span>
+            <span>{{ thread.thread_type.replace("_", " ") }}</span>
+          </div>
         </td>
-        <td data-label="Location">{{ thread.related_location or "-" }}</td>
+        <td data-label="Scope">
+          <div class="thread-scope-stack">
+            <span class="session-range">Sessions {% if thread.first_session is not none %}{{ thread.first_session }}{% else %}?{% endif %}-{% if thread.last_session is not none %}{{ thread.last_session }}{% else %}?{% endif %}</span>
+            <span>{{ thread.related_location or "-" }}</span>
+          </div>
+        </td>
         <td data-label="Description">{{ thread.description or "-" }}</td>
         <td data-label="Resolution">{{ thread.resolution or "-" }}</td>
-        {% if can_edit() %}<td data-label="Actions">
-          <div class="row-actions">
-            <a class="icon-link" href="/open-threads/{{ thread.id }}/edit">Edit</a>
-            <form method="post" action="/open-threads/{{ thread.id }}/delete">
-              <button class="danger-button" type="submit">Delete</button>
-            </form>
-          </div>
-        </td>{% endif %}
       </tr>
       {% endfor %}
     </tbody>

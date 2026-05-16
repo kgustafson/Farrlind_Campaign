@@ -1,6 +1,6 @@
 # Version
 
-v0.4.2
+v0.4.3
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.2` promotes approved Open Threads into managed seed/load data.
+`v0.4.3` improves Open Threads edit-mode controls and ledger readability.

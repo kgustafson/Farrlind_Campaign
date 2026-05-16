@@ -338,6 +338,14 @@ button:disabled {
   border-collapse: collapse;
   position: relative;
 }
+.open-thread-table {
+  table-layout: fixed;
+}
+.thread-title-col { width: 25%; }
+.thread-state-col { width: 13%; }
+.thread-scope-col { width: 15%; }
+.thread-description-col { width: 34%; }
+.thread-resolution-col { width: 13%; }
 .status-table caption {
   padding: 16px 18px 10px;
   color: var(--brass-dark);
@@ -438,6 +446,9 @@ button:disabled {
   color: #f8e6b6;
   font-weight: 700;
   white-space: nowrap;
+}
+.icon-link:visited {
+  color: #f8e6b6;
 }
 .icon-link:hover {
   background: #5a371b;
@@ -1132,14 +1143,52 @@ dd { margin: 0; }
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: nowrap;
 }
 .row-actions form {
   margin: 0;
+}
+.action-cell {
+  min-width: 132px;
+}
+.thread-title-actions {
+  margin-top: 10px;
+}
+.session-cell .thread-title-actions .icon-link,
+.session-cell .thread-title-actions .icon-link:visited {
+  color: #f8e6b6;
+  text-decoration: none;
+}
+.open-thread-table .session-cell {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+.open-thread-table td {
+  vertical-align: top;
+}
+.open-thread-table td[data-label="Description"],
+.open-thread-table td[data-label="Resolution"] {
+  line-height: 1.35;
+}
+.thread-state-stack,
+.thread-scope-stack {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+.thread-state-stack span,
+.thread-scope-stack span {
+  overflow-wrap: anywhere;
+}
+.session-range {
+  white-space: nowrap;
 }
 .danger-button {
   border-color: rgba(141, 52, 48, .42);
   background: #ead0c2;
   color: var(--bad);
+  white-space: nowrap;
 }
 .secondary-link {
   background: #fff7df;

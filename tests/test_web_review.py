@@ -1609,6 +1609,10 @@ class OpenThreadRouteTest(unittest.TestCase):
         self.assertIn("The Gale", response.text)
         self.assertIn('href="/open-threads"', response.text)
         self.assertIn("Add New", response.text)
+        self.assertIn("<th>State</th>", response.text)
+        self.assertIn("<th>Scope</th>", response.text)
+        self.assertIn('href="/open-threads/1/edit"', response.text)
+        self.assertIn('action="/open-threads/1/delete"', response.text)
         self.assertNotIn("Add Open Thread</h2>", response.text)
 
     def test_open_threads_add_modal_renders_four_statuses(self):
