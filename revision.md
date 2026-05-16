@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.4.1 - 5/16/2026
+
+Added the first Open Threads candidate review pass.
+
+- Canon: Reviewed final summaries, diary entries, and Wells lore for unresolved campaign threads.
+- Docs: Added `docs/open_threads_pass.md` with recommended open thread candidates, likely resolved threads, and source anchors.
+- Data: Did not load candidates into the database yet; this pass is a review artifact for human approval.
+
 ## v0.4.0 - 5/16/2026
 
 Added the Open Threads archive section.

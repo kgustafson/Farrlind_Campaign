@@ -1,6 +1,6 @@
 # Version
 
-v0.4.0
+v0.4.1
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.0` adds the Open Threads archive section with edit-mode CRUD and archive-mode read-only viewing.
+`v0.4.1` adds the first Open Threads candidate review pass.
