@@ -1,5 +1,12 @@
 # Revision History
 
+## v0.3.27 - 5/16/2026
+
+Renamed the root archive navigation item to Sessions.
+
+- App: Changed the root top-nav and sidebar labels from Dashboard to Sessions.
+- App: Removed the redundant disabled Sessions placeholder from the sidebar.
+
 ## v0.3.26 - 5/16/2026
 
 Removed Validation Queue from the published archive navigation.

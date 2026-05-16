@@ -1,6 +1,6 @@
 # Version
 
-v0.3.26
+v0.3.27
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.26` hides the Validation Queue placeholder from the published archive website.
+`v0.3.27` renames the root archive navigation item from Dashboard to Sessions.
