@@ -1,6 +1,6 @@
 # Version
 
-v0.4.15
+v0.4.16
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.15` refreshes archive section icons and Sessions subtitle copy.
+`v0.4.16` tightens Campaign Timeline labels and date ranges.

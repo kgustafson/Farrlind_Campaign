@@ -16,6 +16,20 @@ class CanonWriteError(RuntimeError):
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+FARRLIND_MONTH_ORDER = {
+    "Sha'al": 1,
+    "Amoral": 2,
+    "Yugal": 3,
+    "Klasal": 4,
+    "Wurral": 5,
+    "Runal": 6,
+    "Eeral": 7,
+    "Apollal": 8,
+    "Namal": 9,
+    "Hephal": 10,
+    "Sial": 11,
+    "Lunal": 12,
+}
 
 
 def _fetch(sql: str, params: Optional[dict[str, Any]] = None) -> list[dict[str, Any]]:
@@ -30,6 +44,41 @@ def _execute(sql: str, params: dict[str, Any]) -> None:
         db.execute(sql, params)
     except SQLAlchemyError as exc:
         raise CanonWriteError(str(exc)) from exc
+
+
+def timeline_in_game_date_bounds(value: Optional[str]) -> tuple[Optional[str], Optional[str]]:
+    if not value:
+        return None, None
+
+    parsed_dates: list[tuple[tuple[int, int, int], str]] = []
+    pattern = re.compile(
+        r"(?P<year>\d{3,4})\s+AS\s+(?:[—-]\s*)?"
+        r"(?P<month>[A-Za-z']+)\s+"
+        r"(?P<start>\d{1,2})(?:\s*-\s*(?P<end>\d{1,2}))?"
+    )
+    for match in pattern.finditer(value):
+        year = int(match.group("year"))
+        month = match.group("month")
+        month_order = FARRLIND_MONTH_ORDER.get(month, 99)
+        start_day = int(match.group("start"))
+        end_day = int(match.group("end") or start_day)
+        parsed_dates.append(((year, month_order, start_day), f"{year} AS {month} {start_day}"))
+        parsed_dates.append(((year, month_order, end_day), f"{year} AS {month} {end_day}"))
+
+    if not parsed_dates:
+        return value, value
+
+    parsed_dates.sort(key=lambda item: item[0])
+    return parsed_dates[0][1], parsed_dates[-1][1]
+
+
+def timeline_in_game_date_display(value: Optional[str]) -> str:
+    earliest, latest = timeline_in_game_date_bounds(value)
+    if not earliest:
+        return ""
+    if earliest == latest:
+        return earliest
+    return f"{earliest} thru {latest}"
 
 
 def locations() -> list[str]:
@@ -556,11 +605,16 @@ def campaign_timeline() -> dict[str, Any]:
                 total_travel_days += travel["duration_days"]
                 known_travel_segments += 1
         session_events = events_by_session.get(session["id"], [])
+        in_game_date_display = timeline_in_game_date_display(session["in_game_date"])
+        in_game_date_earliest, in_game_date_latest = timeline_in_game_date_bounds(session["in_game_date"])
         rows.append({
             "session_number": session["session_number"],
             "session_label": f"Session {session['session_number']:02d}",
             "session_date": session["session_date"],
             "in_game_date": session["in_game_date"],
+            "in_game_date_display": in_game_date_display or session["in_game_date"],
+            "in_game_date_earliest": in_game_date_earliest,
+            "in_game_date_latest": in_game_date_latest,
             "title": session["title"],
             "summary": session["summary"],
             "primary_location": session["primary_location"],
@@ -576,8 +630,8 @@ def campaign_timeline() -> dict[str, Any]:
             "session_count": len(rows),
             "total_travel_days": total_travel_days,
             "known_travel_segments": known_travel_segments,
-            "first_in_game_date": first_session["in_game_date"] if first_session else None,
-            "latest_in_game_date": last_session["in_game_date"] if last_session else None,
+            "first_in_game_date": first_session["in_game_date_earliest"] if first_session else None,
+            "latest_in_game_date": last_session["in_game_date_latest"] if last_session else None,
             "current_location": last_session["primary_location"] if last_session else None,
         },
         "rows": rows,

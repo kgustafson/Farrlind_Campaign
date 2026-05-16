@@ -839,6 +839,24 @@ class WebReviewAppTest(unittest.TestCase):
 
 
 class CanonServiceTest(unittest.TestCase):
+    def test_timeline_in_game_date_display_collapses_multiple_dates_to_bounds(self):
+        self.assertEqual(
+            canon.timeline_in_game_date_display(
+                "1832 AS Namal 13, 1832 AS Namal 14, 1832 AS Namal 15-17, 1832 AS Namal 18"
+            ),
+            "1832 AS Namal 13 thru 1832 AS Namal 18",
+        )
+        self.assertEqual(
+            canon.timeline_in_game_date_display(
+                "1832 AS Apollal 21, 1832 AS Namal 1, 1832 AS Namal 4, 1832 AS Namal 6"
+            ),
+            "1832 AS Apollal 21 thru 1832 AS Namal 6",
+        )
+        self.assertEqual(
+            canon.timeline_in_game_date_display("1832 AS Namal 19 (continued)"),
+            "1832 AS Namal 19",
+        )
+
     def test_locations_returns_ordered_names_from_db_rows(self):
         with patch("web_review.db.fetch_all", return_value=[{"name": "Balrog"}, {"name": "Catur"}]) as fetch:
             self.assertEqual(canon.locations(), ["Balrog", "Catur"])
@@ -1832,6 +1850,7 @@ class CampaignTimelineRouteTest(unittest.TestCase):
                     "session_label": "Session 20",
                     "session_date": "2026-04-27",
                     "in_game_date": "1832 AS Namal 20, 1832 AS Namal 24",
+                    "in_game_date_display": "1832 AS Namal 20 thru 1832 AS Namal 24",
                     "title": "Salt, Steel, and the Distance Between Legends",
                     "summary": "",
                     "primary_location": "Coast near Catur",
@@ -1870,6 +1889,8 @@ class CampaignTimelineRouteTest(unittest.TestCase):
         self.assertIn('data-tooltip="Session 20: Salt, Steel, and the Distance Between Legends"', response.text)
         self.assertIn('id="session-20-modal"', response.text)
         self.assertIn('role="dialog"', response.text)
+        self.assertIn("1832 AS Namal 20 thru 1832 AS Namal 24", response.text)
+        self.assertNotIn(">1832 AS Namal 20, 1832 AS Namal 24<", response.text)
         self.assertIn("Balrog -> Coast near Catur", response.text)
         self.assertIn("The party begins to form", response.text)
         self.assertIn('href="/timeline"', response.text)

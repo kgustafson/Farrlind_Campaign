@@ -40,7 +40,7 @@
         </a>
         <div class="session-flow-label">
           <span class="session-flow-location">{{ row.primary_location or "unknown" }}</span>
-          <span class="session-flow-date">{{ row.in_game_date or "unknown" }}</span>
+          <span class="session-flow-date">{{ row.in_game_date_display or row.in_game_date or "unknown" }}</span>
         </div>
       </article>
     {% endfor %}
@@ -60,7 +60,7 @@
 
       <dl class="timeline-modal-meta">
         <div><dt>Real Date</dt><dd>{{ row.session_date or "unknown" }}</dd></div>
-        <div><dt>In World</dt><dd>{{ row.in_game_date or "unknown" }}</dd></div>
+        <div><dt>In World</dt><dd>{{ row.in_game_date_display or row.in_game_date or "unknown" }}</dd></div>
         <div><dt>Primary Location</dt><dd>{{ row.primary_location or "unknown" }}</dd></div>
       </dl>
 

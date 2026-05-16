@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.4.16 - 5/16/2026
+
+Tightened Campaign Timeline labels and date ranges.
+
+- App: Reduced the location and in-game date label size beside timeline session circles by half.
+- App: Added timeline display formatting that collapses multiple in-game dates to earliest date thru latest date.
+- App: Preserved raw in-game date strings in the timeline API while adding display/date-bound fields.
+- Tests: Added coverage for multi-date, cross-month, ranged, and continued in-game date display.
+
 ## v0.4.15 - 5/16/2026
 
 Refreshed archive section icons and Sessions subtitle copy.
