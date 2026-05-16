@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.4.17 - 5/16/2026
+
+Added Project Utilities lookup table CRUD.
+
+- Schema: Added reference tables for combat outcomes, workflow status states, and artifact flags.
+- App: Added a Project Utilities lookup manager for Artifact Types, Location Types, Combat Outcomes, NPC Status, Workflow Status States, and Artifact Flags.
+- App: Added add, edit, and delete routes for managed lookup values in edit mode.
+- App: Seeded default values for the new combat outcome, workflow status, and artifact flag reference tables.
+- Tests: Added service and route coverage for lookup listing and CRUD actions.
+
 ## v0.4.16 - 5/16/2026
 
 Tightened Campaign Timeline labels and date ranges.

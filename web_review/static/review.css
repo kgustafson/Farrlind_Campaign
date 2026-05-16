@@ -832,6 +832,12 @@ button:disabled {
   flex-wrap: wrap;
   gap: 8px;
 }
+.lookup-tabs {
+  margin: 0 0 16px;
+}
+.lookup-table td:nth-child(2) {
+  max-width: 560px;
+}
 .project-doc-body {
   margin-top: 16px;
   max-width: 92ch;

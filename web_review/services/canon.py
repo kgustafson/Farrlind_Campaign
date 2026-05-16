@@ -122,6 +122,86 @@ OPEN_THREAD_TYPES = [
 ]
 
 
+LOOKUP_TABLES: dict[str, dict[str, Any]] = {
+    "artifact-types": {
+        "key": "artifact-types",
+        "label": "Artifact Types",
+        "table": "artifact_type",
+        "value_column": "type_name",
+        "description_column": None,
+        "seed": [],
+        "custom": False,
+    },
+    "location-types": {
+        "key": "location-types",
+        "label": "Location Types",
+        "table": "location_type",
+        "value_column": "type_name",
+        "description_column": None,
+        "seed": [],
+        "custom": False,
+    },
+    "combat-outcomes": {
+        "key": "combat-outcomes",
+        "label": "Combat Outcomes",
+        "table": "combat_outcome",
+        "value_column": "outcome_code",
+        "description_column": "description",
+        "seed": [
+            ("defeated", "Enemy or encounter was overcome."),
+            ("killed", "Enemy was killed."),
+            ("captured", "Enemy was captured."),
+            ("escaped", "Enemy escaped the encounter."),
+            ("fled", "Enemy fled the encounter."),
+            ("summoned", "Enemy was summoned or appeared."),
+            ("unknown", "Outcome has not been established."),
+        ],
+        "custom": True,
+    },
+    "npc-status": {
+        "key": "npc-status",
+        "label": "NPC Status",
+        "table": "entity_status",
+        "value_column": "status_code",
+        "description_column": "description",
+        "seed": [],
+        "custom": False,
+    },
+    "workflow-status-states": {
+        "key": "workflow-status-states",
+        "label": "Workflow Status States",
+        "table": "workflow_status_state",
+        "value_column": "status_code",
+        "description_column": "description",
+        "seed": [
+            ("initialized", "Workflow has been created but not started."),
+            ("pending", "Step is waiting to run."),
+            ("running", "Step is currently running."),
+            ("completed", "Step or workflow completed successfully."),
+            ("partially_completed", "Workflow has completed some but not all steps."),
+            ("blocked", "Step cannot proceed until a blocker is cleared."),
+            ("needs_attention", "Human attention is required."),
+            ("failed", "Step or workflow failed."),
+            ("skipped", "Step was intentionally skipped."),
+        ],
+        "custom": True,
+    },
+    "artifact-flags": {
+        "key": "artifact-flags",
+        "label": "Artifact Flags",
+        "table": "artifact_flag",
+        "value_column": "flag_code",
+        "description_column": "description",
+        "seed": [
+            ("sentient", "Artifact has awareness or agency."),
+            ("cursed", "Artifact carries a harmful curse."),
+            ("infernal", "Artifact has infernal origin, influence, or binding."),
+        ],
+        "custom": True,
+    },
+}
+
+
 def location_rows() -> list[dict[str, Any]]:
     return _fetch("""
         SELECT
@@ -364,6 +444,118 @@ def open_thread_statuses() -> list[dict[str, str]]:
 
 def open_thread_types() -> list[str]:
     return OPEN_THREAD_TYPES
+
+
+def lookup_definitions() -> list[dict[str, Any]]:
+    return [
+        {
+            "key": definition["key"],
+            "label": definition["label"],
+            "description_column": definition["description_column"],
+        }
+        for definition in LOOKUP_TABLES.values()
+    ]
+
+
+def lookup_definition(lookup_key: str) -> dict[str, Any]:
+    if lookup_key not in LOOKUP_TABLES:
+        raise CanonReadError("Unknown lookup table.")
+    return LOOKUP_TABLES[lookup_key]
+
+
+def _ensure_custom_lookup_table(definition: dict[str, Any]) -> None:
+    if not definition.get("custom"):
+        return
+    table = definition["table"]
+    value_column = definition["value_column"]
+    description_column = definition["description_column"]
+    _execute(f"""
+        CREATE TABLE IF NOT EXISTS {table} (
+            id SERIAL PRIMARY KEY,
+            {value_column} VARCHAR(80) NOT NULL UNIQUE,
+            {description_column} TEXT
+        );
+    """, {})
+    for value, description in definition["seed"]:
+        _execute(f"""
+            INSERT INTO {table} ({value_column}, {description_column})
+            VALUES (:value, :description)
+            ON CONFLICT ({value_column}) DO NOTHING;
+        """, {"value": value, "description": description})
+
+
+def lookup_rows(lookup_key: str) -> list[dict[str, Any]]:
+    definition = lookup_definition(lookup_key)
+    _ensure_custom_lookup_table(definition)
+    table = definition["table"]
+    value_column = definition["value_column"]
+    description_column = definition["description_column"]
+    description_select = f"{description_column} AS description" if description_column else "NULL AS description"
+    return _fetch(f"""
+        SELECT id, {value_column} AS value, {description_select}
+        FROM {table}
+        ORDER BY {value_column};
+    """)
+
+
+def lookup_detail(lookup_key: str, lookup_id: int) -> Optional[dict[str, Any]]:
+    definition = lookup_definition(lookup_key)
+    _ensure_custom_lookup_table(definition)
+    table = definition["table"]
+    value_column = definition["value_column"]
+    description_column = definition["description_column"]
+    description_select = f"{description_column} AS description" if description_column else "NULL AS description"
+    rows = _fetch(f"""
+        SELECT id, {value_column} AS value, {description_select}
+        FROM {table}
+        WHERE id = :id;
+    """, {"id": lookup_id})
+    return rows[0] if rows else None
+
+
+def create_lookup_value(lookup_key: str, value: str, description: str = "") -> None:
+    definition = lookup_definition(lookup_key)
+    _ensure_custom_lookup_table(definition)
+    table = definition["table"]
+    value_column = definition["value_column"]
+    description_column = definition["description_column"]
+    if description_column:
+        _execute(f"""
+            INSERT INTO {table} ({value_column}, {description_column})
+            VALUES (:value, :description);
+        """, {"value": value, "description": description})
+    else:
+        _execute(f"""
+            INSERT INTO {table} ({value_column})
+            VALUES (:value);
+        """, {"value": value})
+
+
+def update_lookup_value(lookup_key: str, lookup_id: int, value: str, description: str = "") -> None:
+    definition = lookup_definition(lookup_key)
+    _ensure_custom_lookup_table(definition)
+    table = definition["table"]
+    value_column = definition["value_column"]
+    description_column = definition["description_column"]
+    if description_column:
+        _execute(f"""
+            UPDATE {table}
+            SET {value_column} = :value,
+                {description_column} = :description
+            WHERE id = :id;
+        """, {"id": lookup_id, "value": value, "description": description})
+    else:
+        _execute(f"""
+            UPDATE {table}
+            SET {value_column} = :value
+            WHERE id = :id;
+        """, {"id": lookup_id, "value": value})
+
+
+def delete_lookup_value(lookup_key: str, lookup_id: int) -> None:
+    definition = lookup_definition(lookup_key)
+    _ensure_custom_lookup_table(definition)
+    _execute(f"DELETE FROM {definition['table']} WHERE id = :id;", {"id": lookup_id})
 
 
 def open_thread_rows() -> list[dict[str, Any]]:

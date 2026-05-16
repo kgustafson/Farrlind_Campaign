@@ -48,6 +48,24 @@ CREATE TABLE artifact_type (
     type_name       VARCHAR(50) NOT NULL UNIQUE   -- 'weapon','armor','orb','grimoire','wand','staff','shield','cap'
 );
 
+CREATE TABLE combat_outcome (
+    id              SERIAL PRIMARY KEY,
+    outcome_code    VARCHAR(80) NOT NULL UNIQUE,
+    description     TEXT
+);
+
+CREATE TABLE workflow_status_state (
+    id              SERIAL PRIMARY KEY,
+    status_code     VARCHAR(80) NOT NULL UNIQUE,
+    description     TEXT
+);
+
+CREATE TABLE artifact_flag (
+    id              SERIAL PRIMARY KEY,
+    flag_code       VARCHAR(80) NOT NULL UNIQUE,
+    description     TEXT
+);
+
 CREATE TABLE well_status (
     id              SERIAL PRIMARY KEY,
     status_code     VARCHAR(30) NOT NULL UNIQUE,  -- 'stable','disturbed','active','depleted','unknown','with_party'
@@ -795,6 +813,31 @@ INSERT INTO location_type (type_name) VALUES
 INSERT INTO artifact_type (type_name) VALUES
     ('weapon'), ('armor'), ('orb'), ('grimoire'), ('wand'),
     ('staff'), ('shield'), ('cap'), ('axe'), ('bow');
+
+INSERT INTO combat_outcome (outcome_code, description) VALUES
+    ('defeated', 'Enemy or encounter was overcome.'),
+    ('killed', 'Enemy was killed.'),
+    ('captured', 'Enemy was captured.'),
+    ('escaped', 'Enemy escaped the encounter.'),
+    ('fled', 'Enemy fled the encounter.'),
+    ('summoned', 'Enemy was summoned or appeared.'),
+    ('unknown', 'Outcome has not been established.');
+
+INSERT INTO workflow_status_state (status_code, description) VALUES
+    ('initialized', 'Workflow has been created but not started.'),
+    ('pending', 'Step is waiting to run.'),
+    ('running', 'Step is currently running.'),
+    ('completed', 'Step or workflow completed successfully.'),
+    ('partially_completed', 'Workflow has completed some but not all steps.'),
+    ('blocked', 'Step cannot proceed until a blocker is cleared.'),
+    ('needs_attention', 'Human attention is required.'),
+    ('failed', 'Step or workflow failed.'),
+    ('skipped', 'Step was intentionally skipped.');
+
+INSERT INTO artifact_flag (flag_code, description) VALUES
+    ('sentient', 'Artifact has awareness or agency.'),
+    ('cursed', 'Artifact carries a harmful curse.'),
+    ('infernal', 'Artifact has infernal origin, influence, or binding.');
 
 INSERT INTO song_style (style_name) VALUES
     ('tavern_song'), ('ballad'), ('sea_shanty'), ('war_chant'), ('jig'), ('lament')

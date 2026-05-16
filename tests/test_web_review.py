@@ -1171,6 +1171,32 @@ class CanonServiceTest(unittest.TestCase):
         with patch("web_review.db.fetch_all", return_value=[{"type_name": "combat"}, {"type_name": "social"}]):
             self.assertEqual(canon.event_types(), ["combat", "social"])
 
+    def test_lookup_rows_reads_configured_lookup_table(self):
+        with patch("web_review.db.fetch_all", return_value=[{"id": 1, "value": "weapon", "description": None}]) as fetch:
+            rows = canon.lookup_rows("artifact-types")
+
+        self.assertEqual(rows[0]["value"], "weapon")
+        self.assertIn("FROM artifact_type", fetch.call_args.args[0])
+
+    def test_custom_lookup_rows_ensures_table_and_seed_values(self):
+        with patch("web_review.db.execute") as execute, \
+             patch("web_review.db.fetch_all", return_value=[{"id": 1, "value": "defeated", "description": "Done."}]) as fetch:
+            rows = canon.lookup_rows("combat-outcomes")
+
+        self.assertEqual(rows[0]["value"], "defeated")
+        self.assertIn("CREATE TABLE IF NOT EXISTS combat_outcome", execute.call_args_list[0].args[0])
+        self.assertIn("FROM combat_outcome", fetch.call_args.args[0])
+
+    def test_lookup_crud_services_run_expected_statements(self):
+        with patch("web_review.db.execute") as execute:
+            canon.create_lookup_value("location-types", "ruin")
+            canon.update_lookup_value("location-types", 3, "ancient_ruin")
+            canon.delete_lookup_value("location-types", 3)
+
+        self.assertIn("INSERT INTO location_type", execute.call_args_list[0].args[0])
+        self.assertIn("UPDATE location_type", execute.call_args_list[1].args[0])
+        self.assertIn("DELETE FROM location_type", execute.call_args_list[2].args[0])
+
 
 class LocationRouteTest(unittest.TestCase):
     def location_rows(self):
@@ -1919,8 +1945,100 @@ class ProjectUtilitiesRouteTest(unittest.TestCase):
         self.assertIn("View Todo", response.text)
         self.assertIn("Backup Database", response.text)
         self.assertIn("Run Smoke Test", response.text)
+        self.assertIn("Lookup Tables", response.text)
+        self.assertIn('href="/project-utilities/lookups"', response.text)
         self.assertIn("todo.md", response.text)
         self.assertIn('href="/project-utilities"', response.text)
+
+    def lookup_context_patches(self, editing=None):
+        return (
+            patch("web_review.services.canon.lookup_definitions", return_value=[
+                {"key": "artifact-types", "label": "Artifact Types", "description_column": None},
+                {"key": "combat-outcomes", "label": "Combat Outcomes", "description_column": "description"},
+            ]),
+            patch("web_review.services.canon.lookup_definition", return_value={
+                "key": "combat-outcomes",
+                "label": "Combat Outcomes",
+                "table": "combat_outcome",
+                "value_column": "outcome_code",
+                "description_column": "description",
+            }),
+            patch("web_review.services.canon.lookup_rows", return_value=[
+                {"id": 1, "value": "defeated", "description": "Enemy was overcome."},
+            ]),
+            patch("web_review.services.canon.lookup_detail", return_value=editing),
+        )
+
+    def test_lookup_tables_page_renders_active_table(self):
+        definition, active, rows, detail = self.lookup_context_patches()
+        with definition, active, rows, detail:
+            client = TestClient(app)
+            response = client.get("/project-utilities/lookups?table=combat-outcomes")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Lookup Tables", response.text)
+        self.assertIn("Combat Outcomes", response.text)
+        self.assertIn("defeated", response.text)
+        self.assertIn("Enemy was overcome.", response.text)
+        self.assertIn('href="/project-utilities/lookups?table=artifact-types"', response.text)
+
+    def test_lookup_tables_add_modal_renders_form(self):
+        definition, active, rows, detail = self.lookup_context_patches()
+        with definition, active, rows, detail:
+            client = TestClient(app)
+            response = client.get("/project-utilities/lookups?table=combat-outcomes&modal=add")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Add Combat Outcomes", response.text)
+        self.assertIn('name="value"', response.text)
+        self.assertIn('name="description"', response.text)
+
+    def test_lookup_tables_edit_modal_loads_row(self):
+        definition, active, rows, detail = self.lookup_context_patches(
+            {"id": 1, "value": "defeated", "description": "Enemy was overcome."}
+        )
+        with definition, active, rows, detail:
+            client = TestClient(app)
+            response = client.get("/project-utilities/lookups/combat-outcomes/1/edit")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Edit Combat Outcomes", response.text)
+        self.assertIn("Enemy was overcome.", response.text)
+
+    def test_create_lookup_value_route_writes_form_values(self):
+        with patch("web_review.services.canon.create_lookup_value") as create:
+            client = TestClient(app)
+            response = client.post(
+                "/project-utilities/lookups/combat-outcomes",
+                data={"value": "banished", "description": "Sent away."},
+                follow_redirects=False,
+            )
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("created=1", response.headers["location"])
+        create.assert_called_once_with("combat-outcomes", "banished", "Sent away.")
+
+    def test_update_lookup_value_route_writes_form_values(self):
+        with patch("web_review.services.canon.update_lookup_value") as update:
+            client = TestClient(app)
+            response = client.post(
+                "/project-utilities/lookups/combat-outcomes/4",
+                data={"value": "banished", "description": "Sent away."},
+                follow_redirects=False,
+            )
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("updated=1", response.headers["location"])
+        update.assert_called_once_with("combat-outcomes", 4, "banished", "Sent away.")
+
+    def test_delete_lookup_value_route_runs_delete(self):
+        with patch("web_review.services.canon.delete_lookup_value") as delete:
+            client = TestClient(app)
+            response = client.post("/project-utilities/lookups/combat-outcomes/4/delete", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("deleted=1", response.headers["location"])
+        delete.assert_called_once_with("combat-outcomes", 4)
 
     def test_project_utilities_page_renders_revision_viewer(self):
         client = TestClient(app)

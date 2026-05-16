@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Lookup Tables | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div>
+    <p class="eyebrow">Project Utilities</p>
+    <h1>Lookup Tables</h1>
+    <p>Controlled reference values for canon records, workflow state, and review-friendly dropdowns.</p>
+  </div>
+  <a class="icon-link add-new-link" href="/project-utilities/lookups?table={{ active_lookup.key }}&modal=add">Add New</a>
+</section>
+
+{% if request.query_params.get("created") %}
+  <div class="flash">Lookup value added.</div>
+{% endif %}
+{% if request.query_params.get("updated") %}
+  <div class="flash">Lookup value updated.</div>
+{% endif %}
+{% if request.query_params.get("deleted") %}
+  <div class="flash">Lookup value deleted.</div>
+{% endif %}
+{% if request.query_params.get("create_failed") %}
+  <div class="flash error-flash">Lookup value was not added. Value must be unique and filled in.</div>
+{% endif %}
+{% if request.query_params.get("update_failed") %}
+  <div class="flash error-flash">Lookup value was not updated. Check the value and related references.</div>
+{% endif %}
+{% if request.query_params.get("delete_failed") %}
+  <div class="flash error-flash">Lookup value was not deleted. It may still be referenced by canon records.</div>
+{% endif %}
+
+<section class="document-viewer-tabs lookup-tabs" aria-label="Lookup table selector">
+  {% for lookup in lookup_definitions %}
+    <a class="icon-link {% if lookup.key == active_lookup.key %}secondary-link{% endif %}" href="/project-utilities/lookups?table={{ lookup.key }}">{{ lookup.label }}</a>
+  {% endfor %}
+</section>
+
+<section class="table-wrap archive-ledger" aria-label="{{ active_lookup.label }} ledger">
+  <table class="status-table lookup-table">
+    <caption>{{ active_lookup.label }}</caption>
+    <thead>
+      <tr>
+        <th>Value</th>
+        {% if active_lookup.description_column %}<th>Description</th>{% endif %}
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in lookup_rows %}
+      <tr>
+        <td data-label="Value">{{ row.value }}</td>
+        {% if active_lookup.description_column %}<td data-label="Description">{{ row.description or "" }}</td>{% endif %}
+        <td data-label="Actions">
+          <div class="row-actions">
+            <a class="icon-link action-link" href="/project-utilities/lookups/{{ active_lookup.key }}/{{ row.id }}/edit">Edit</a>
+            <form method="post" action="/project-utilities/lookups/{{ active_lookup.key }}/{{ row.id }}/delete">
+              <button class="danger-button" type="submit">Delete</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="{% if active_lookup.description_column %}3{% else %}2{% endif %}" class="muted">No lookup values found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{% if show_lookup_modal %}
+<section class="modal-backdrop">
+  <div class="archive-modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h2>{% if editing %}Edit{% else %}Add{% endif %} {{ active_lookup.label }}</h2>
+      <a class="modal-close" href="/project-utilities/lookups?table={{ active_lookup.key }}" aria-label="Close lookup form">x</a>
+    </div>
+    <form method="post" action="{% if editing %}/project-utilities/lookups/{{ active_lookup.key }}/{{ editing.id }}{% else %}/project-utilities/lookups/{{ active_lookup.key }}{% endif %}">
+      <label class="field-block">
+        <span>Value</span>
+        <input name="value" value="{{ editing.value if editing else '' }}" required>
+      </label>
+      {% if active_lookup.description_column %}
+      <label class="field-block">
+        <span>Description</span>
+        <textarea name="description" rows="4">{{ editing.description if editing else '' }}</textarea>
+      </label>
+      {% endif %}
+      <div class="panel-actions split-actions">
+        <a class="icon-link secondary-link" href="/project-utilities/lookups?table={{ active_lookup.key }}">Cancel</a>
+        <button type="submit">{% if editing %}Update{% else %}Create{% endif %}</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

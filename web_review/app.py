@@ -172,6 +172,29 @@ def open_thread_form_values(form) -> dict:
     }
 
 
+def lookup_form_values(form) -> dict[str, str]:
+    return {
+        "value": (form.get("value") or "").strip(),
+        "description": (form.get("description") or "").strip(),
+    }
+
+
+def lookup_context(lookup_key: str, editing_id: Optional[int] = None, show_modal: bool = False) -> dict:
+    definitions = canon.lookup_definitions()
+    active = canon.lookup_definition(lookup_key)
+    rows = canon.lookup_rows(lookup_key)
+    editing = canon.lookup_detail(lookup_key, editing_id) if editing_id is not None else None
+    if editing_id is not None and not editing:
+        raise HTTPException(status_code=404, detail="Lookup row not found.")
+    return {
+        "lookup_definitions": definitions,
+        "active_lookup": active,
+        "lookup_rows": rows,
+        "editing": editing,
+        "show_lookup_modal": show_modal,
+    }
+
+
 @app.get("/", response_class=HTMLResponse)
 def dashboard(request: Request):
     return templates.TemplateResponse(
@@ -806,6 +829,69 @@ def project_utilities(request: Request, document: str = "todo", command_result: 
             "backup": BACKUP_DOWNLOADS.get(backup) if backup else None,
         },
     )
+
+
+@app.get("/project-utilities/lookups", response_class=HTMLResponse)
+def project_lookup_tables(request: Request, table: str = "artifact-types", modal: str = ""):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Project utilities are not available in archive mode.")
+    try:
+        context = lookup_context(table, show_modal=(modal == "add"))
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    return templates.TemplateResponse(request, "project_lookups.html", context)
+
+
+@app.get("/project-utilities/lookups/{lookup_key}/{lookup_id}/edit", response_class=HTMLResponse)
+def edit_project_lookup_value(request: Request, lookup_key: str, lookup_id: int):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Project utilities are not available in archive mode.")
+    try:
+        context = lookup_context(lookup_key, editing_id=lookup_id, show_modal=True)
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    return templates.TemplateResponse(request, "project_lookups.html", context)
+
+
+@app.post("/project-utilities/lookups/{lookup_key}")
+async def create_project_lookup_value(request: Request, lookup_key: str):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Project utilities are not available in archive mode.")
+    form = await request.form()
+    values = lookup_form_values(form)
+    if not values["value"]:
+        return RedirectResponse(url=f"/project-utilities/lookups?table={lookup_key}&create_failed=1", status_code=303)
+    try:
+        canon.create_lookup_value(lookup_key, values["value"], values["description"])
+    except (canon.CanonReadError, canon.CanonWriteError):
+        return RedirectResponse(url=f"/project-utilities/lookups?table={lookup_key}&create_failed=1", status_code=303)
+    return RedirectResponse(url=f"/project-utilities/lookups?table={lookup_key}&created=1", status_code=303)
+
+
+@app.post("/project-utilities/lookups/{lookup_key}/{lookup_id}")
+async def update_project_lookup_value(request: Request, lookup_key: str, lookup_id: int):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Project utilities are not available in archive mode.")
+    form = await request.form()
+    values = lookup_form_values(form)
+    if not values["value"]:
+        return RedirectResponse(url=f"/project-utilities/lookups/{lookup_key}/{lookup_id}/edit?update_failed=1", status_code=303)
+    try:
+        canon.update_lookup_value(lookup_key, lookup_id, values["value"], values["description"])
+    except (canon.CanonReadError, canon.CanonWriteError):
+        return RedirectResponse(url=f"/project-utilities/lookups/{lookup_key}/{lookup_id}/edit?update_failed=1", status_code=303)
+    return RedirectResponse(url=f"/project-utilities/lookups?table={lookup_key}&updated=1", status_code=303)
+
+
+@app.post("/project-utilities/lookups/{lookup_key}/{lookup_id}/delete")
+def delete_project_lookup_value(lookup_key: str, lookup_id: int):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Project utilities are not available in archive mode.")
+    try:
+        canon.delete_lookup_value(lookup_key, lookup_id)
+    except (canon.CanonReadError, canon.CanonWriteError):
+        return RedirectResponse(url=f"/project-utilities/lookups?table={lookup_key}&delete_failed=1", status_code=303)
+    return RedirectResponse(url=f"/project-utilities/lookups?table={lookup_key}&deleted=1", status_code=303)
 
 
 @app.post("/project-utilities/backup")
