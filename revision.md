@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.4.12 - 5/16/2026
+
+Added illustrated stat-card icons to the Campaign Timeline.
+
+- App: Added sepia archive-style SVG icons for reviewed sessions, travel days, and current location.
+- App: Placed and resized the icons inside the three timeline stat cards with responsive styling.
+- Tests: Extended Campaign Timeline route coverage to assert the stat icon assets are rendered.
+
 ## v0.4.11 - 5/16/2026
 
 Redesigned the Campaign Timeline as a clickable session flow chart.

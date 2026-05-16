@@ -1307,6 +1307,22 @@ dd { margin: 0; }
 .timeline-stats {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+.timeline-stat-card {
+  display: grid;
+  align-content: start;
+  min-height: 250px;
+}
+.timeline-stat-icon {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: min(190px, 72%);
+  height: 88px;
+  margin: -2px auto 12px;
+  object-fit: contain;
+  opacity: .9;
+  filter: sepia(.18) saturate(.88) contrast(.98);
+}
 .archive-stat-card {
   position: relative;
   overflow: hidden;
@@ -1330,6 +1346,8 @@ dd { margin: 0; }
 }
 .stat-label,
 .stat-note {
+  position: relative;
+  z-index: 1;
   display: block;
 }
 .stat-label {
@@ -1340,6 +1358,8 @@ dd { margin: 0; }
   text-transform: uppercase;
 }
 .archive-stat-card strong {
+  position: relative;
+  z-index: 1;
   display: block;
   margin: 3px 0 5px;
   color: var(--bad);
@@ -1777,6 +1797,13 @@ dd { margin: 0; }
   }
   .timeline-stats {
     grid-template-columns: 1fr;
+  }
+  .timeline-stat-card {
+    min-height: 0;
+  }
+  .timeline-stat-icon {
+    width: min(170px, 58%);
+    height: 78px;
   }
   .timeline-modal-meta {
     grid-template-columns: 1fr;

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Lantern, compass, rope, and field journal">
+  <defs>
+    <filter id="rough-line">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="21"/>
+      <feDisplacementMap in="SourceGraphic" scale="1.5"/>
+    </filter>
+    <radialGradient id="lamp" cx="50%" cy="50%" r="55%">
+      <stop offset="0" stop-color="#ffe08d"/>
+      <stop offset=".58" stop-color="#d98324"/>
+      <stop offset="1" stop-color="#5b2b10"/>
+    </radialGradient>
+  </defs>
+  <g filter="url(#rough-line)" fill="none" stroke="#4a2b12" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="163" cy="145" rx="104" ry="14" fill="#4a2b12" opacity=".14" stroke="none"/>
+    <path d="M108 42c37-13 83-10 136 9 10 4 15 12 12 22l-23 73c-3 9-12 13-23 9-44-16-86-17-126-3-10 4-17 0-15-9l24-85c2-7 7-13 15-16Z" fill="#a87034" opacity=".74" stroke-width="5"/>
+    <path d="M108 42c39 10 78 24 117 43M93 92c35 6 72 17 111 33" opacity=".35" stroke-width="3"/>
+    <path d="M67 53h43l11 18v54l-13 20H68l-13-20V71Z" fill="#5a3215" opacity=".88" stroke-width="4"/>
+    <path d="M75 75h25v48H75Z" fill="url(#lamp)" stroke-width="3"/>
+    <path d="M78 53c0-13 8-23 20-23s20 10 20 23M74 39h48M71 145h38" stroke-width="5"/>
+    <circle cx="178" cy="107" r="43" fill="#e0b86d" opacity=".72" stroke-width="5"/>
+    <circle cx="178" cy="107" r="31" fill="#f0d69d" opacity=".7" stroke-width="3"/>
+    <path d="M178 70l9 28 27 9-27 9-9 28-9-28-27-9 27-9Z" fill="#7d2e20" opacity=".78" stroke-width="2"/>
+    <path d="M209 55c36-25 74 22 41 50-19 16-41 0-30-20 9-16 29-7 20 8" opacity=".48" stroke-width="7"/>
+    <path d="M214 129c26 20 63 6 70-23" opacity=".48" stroke-width="7"/>
+    <path d="M47 65c24-8 47-8 70-1M46 133c26 8 52 8 78 0" opacity=".32" stroke-width="2"/>
+  </g>
+</svg>

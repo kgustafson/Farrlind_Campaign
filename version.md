@@ -1,6 +1,6 @@
 # Version
 
-v0.4.11
+v0.4.12
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.11` redesigns Campaign Timeline as a clickable session flow chart with modal session details.
+`v0.4.12` adds illustrated stat-card icons to the Campaign Timeline.
