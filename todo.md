@@ -136,10 +136,10 @@ audio/transcript
 
 ### Minor Release Upgrade Candidates
 
-- Develop NPC Registry.
-- Develop Artifact Listing.
-- Develop Well of Magic Lore Section.
-- Develop Faban Songbook.
+- Develop NPC Registry. Done in v0.2.10 with listing, add/edit modals, delete actions, API route, and canon workflow notes.
+- Develop Artifact Listing. Done in v0.2.11 with listing, add/edit modals, delete actions, API route, and artifact canon notes.
+- Develop Well of Magic Lore Section. Done in v0.2.13 with editable Markdown lore backed by `knowledge/Faban/lore/wells_of_magic.md`.
+- Develop Faban Songbook. Done in v0.3.15 with sidebar page, song cards, metadata, local playback, source links, lyrics pages, and API route.
 - Develop Campaign Timeline. Done in v0.4.4 with read-only timeline, travel movements, major events, and API route.
 
 ## Data Management

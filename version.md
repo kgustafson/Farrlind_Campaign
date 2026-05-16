@@ -1,6 +1,6 @@
 # Version
 
-v0.4.4
+v0.4.5
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.4` adds the Campaign Timeline archive section.
+`v0.4.5` marks completed Web Interface Improvement roadmap items with their implementation versions.

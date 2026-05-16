@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.4.5 - 5/16/2026
+
+Marked completed Web Interface Improvement roadmap items.
+
+- Docs: Audited the Web Interface Improvements list against `revision.md`.
+- Docs: Marked NPC Registry, Artifact Listing, Wells of Magic lore, Faban Songbook, and Campaign Timeline as done.
+- Docs: Added the implementation version and short delivered scope for each completed item.
+
 ## v0.4.4 - 5/16/2026
 
 Added the Campaign Timeline archive section.
