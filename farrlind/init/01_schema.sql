@@ -581,6 +581,25 @@ CREATE TABLE active_threat (
 
 
 -- =============================================================================
+-- OPEN THREADS  (unresolved campaign mysteries, promises, hooks, and ambiguities)
+-- =============================================================================
+
+CREATE TABLE open_thread (
+    id                  SERIAL PRIMARY KEY,
+    title               TEXT NOT NULL UNIQUE,
+    thread_type         VARCHAR(80) NOT NULL DEFAULT 'lore_mystery',
+    status              VARCHAR(30) NOT NULL DEFAULT 'open'
+                            CHECK (status IN ('open', 'resolved', 'superseded', 'unknown')),
+    first_session_id    INT REFERENCES session(id),
+    last_session_id     INT REFERENCES session(id),
+    related_location_id INT REFERENCES location(id),
+    description         TEXT,
+    resolution          TEXT,
+    notes               TEXT
+);
+
+
+-- =============================================================================
 -- PIPELINE METADATA  (track extraction runs — data scientist essential)
 -- =============================================================================
 

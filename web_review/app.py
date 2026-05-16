@@ -135,6 +135,24 @@ def artifact_form_values(form) -> dict:
     }
 
 
+def open_thread_form_values(form) -> dict:
+    status = (form.get("status") or "open").strip()
+    thread_type = (form.get("thread_type") or "lore_mystery").strip()
+    valid_statuses = {row["code"] for row in canon.open_thread_statuses()}
+    valid_types = set(canon.open_thread_types())
+    return {
+        "title": (form.get("title") or "").strip(),
+        "thread_type": thread_type if thread_type in valid_types else "lore_mystery",
+        "status": status if status in valid_statuses else "open",
+        "first_session": optional_int(form.get("first_session")),
+        "last_session": optional_int(form.get("last_session")),
+        "related_location_id": optional_int(form.get("related_location_id")),
+        "description": (form.get("description") or "").strip(),
+        "resolution": (form.get("resolution") or "").strip(),
+        "notes": (form.get("notes") or "").strip(),
+    }
+
+
 @app.get("/", response_class=HTMLResponse)
 def dashboard(request: Request):
     return templates.TemplateResponse(
@@ -639,6 +657,88 @@ async def delete_artifact(artifact_id: int):
     except canon.CanonWriteError:
         return RedirectResponse(url="/artifacts?delete_failed=1", status_code=303)
     return RedirectResponse(url="/artifacts?deleted=1", status_code=303)
+
+
+@app.get("/open-threads", response_class=HTMLResponse)
+def open_threads_index(request: Request, modal: str = ""):
+    try:
+        rows = canon.open_thread_rows()
+        locations = canon.location_rows()
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    return templates.TemplateResponse(
+        request,
+        "open_threads.html",
+        {
+            "threads": rows,
+            "statuses": canon.open_thread_statuses(),
+            "thread_types": canon.open_thread_types(),
+            "locations": locations,
+            "editing": None,
+            "show_thread_modal": can_edit() and modal == "add",
+        },
+    )
+
+
+@app.post("/open-threads")
+async def create_open_thread(request: Request):
+    form = await request.form()
+    values = open_thread_form_values(form)
+    if not values["title"]:
+        return RedirectResponse(url="/open-threads?create_failed=1", status_code=303)
+    try:
+        canon.create_open_thread(values)
+    except canon.CanonWriteError:
+        return RedirectResponse(url="/open-threads?create_failed=1", status_code=303)
+    return RedirectResponse(url="/open-threads?created=1", status_code=303)
+
+
+@app.get("/open-threads/{thread_id}/edit", response_class=HTMLResponse)
+def edit_open_thread(request: Request, thread_id: int):
+    if not can_edit():
+        return RedirectResponse(url="/open-threads", status_code=303)
+    try:
+        rows = canon.open_thread_rows()
+        locations = canon.location_rows()
+        editing = canon.open_thread_detail(thread_id)
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    if not editing:
+        raise HTTPException(status_code=404, detail="Open thread not found.")
+    return templates.TemplateResponse(
+        request,
+        "open_threads.html",
+        {
+            "threads": rows,
+            "statuses": canon.open_thread_statuses(),
+            "thread_types": canon.open_thread_types(),
+            "locations": locations,
+            "editing": editing,
+            "show_thread_modal": True,
+        },
+    )
+
+
+@app.post("/open-threads/{thread_id}")
+async def update_open_thread(request: Request, thread_id: int):
+    form = await request.form()
+    values = open_thread_form_values(form)
+    if not values["title"]:
+        return RedirectResponse(url=f"/open-threads/{thread_id}/edit?update_failed=1", status_code=303)
+    try:
+        canon.update_open_thread(thread_id, values)
+    except canon.CanonWriteError:
+        return RedirectResponse(url=f"/open-threads/{thread_id}/edit?update_failed=1", status_code=303)
+    return RedirectResponse(url="/open-threads?updated=1", status_code=303)
+
+
+@app.post("/open-threads/{thread_id}/delete")
+async def delete_open_thread(thread_id: int):
+    try:
+        canon.delete_open_thread(thread_id)
+    except canon.CanonWriteError:
+        return RedirectResponse(url="/open-threads?delete_failed=1", status_code=303)
+    return RedirectResponse(url="/open-threads?deleted=1", status_code=303)
 
 
 @app.get("/combat-encounters", response_class=HTMLResponse)

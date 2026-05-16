@@ -1578,6 +1578,150 @@ class ArtifactRouteTest(unittest.TestCase):
         delete.assert_called_once_with(4)
 
 
+class OpenThreadRouteTest(unittest.TestCase):
+    def thread_rows(self):
+        return [{
+            "id": 1,
+            "title": "What does the Gale want?",
+            "thread_type": "lore_mystery",
+            "status": "open",
+            "first_session": 20,
+            "last_session": None,
+            "related_location": "The Gale",
+            "description": "The Gale may be more than weather.",
+            "resolution": "",
+            "notes": "Connects to the coast near Catur.",
+        }]
+
+    def locations(self):
+        return [{"id": 3, "name": "The Gale"}]
+
+    def test_open_threads_page_renders_sidebar_and_ledger(self):
+        with patch("web_review.services.canon.open_thread_rows", return_value=self.thread_rows()), \
+             patch("web_review.services.canon.location_rows", return_value=self.locations()):
+            client = TestClient(app)
+            response = client.get("/open-threads")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Open Threads", response.text)
+        self.assertIn("What does the Gale want?", response.text)
+        self.assertIn("lore mystery", response.text)
+        self.assertIn("The Gale", response.text)
+        self.assertIn('href="/open-threads"', response.text)
+        self.assertIn("Add New", response.text)
+        self.assertNotIn("Add Open Thread</h2>", response.text)
+
+    def test_open_threads_add_modal_renders_four_statuses(self):
+        with patch("web_review.services.canon.open_thread_rows", return_value=self.thread_rows()), \
+             patch("web_review.services.canon.location_rows", return_value=self.locations()):
+            client = TestClient(app)
+            response = client.get("/open-threads?modal=add")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Add Open Thread", response.text)
+        self.assertIn('role="dialog"', response.text)
+        self.assertIn('value="open"', response.text)
+        self.assertIn('value="resolved"', response.text)
+        self.assertIn('value="superseded"', response.text)
+        self.assertIn('value="unknown"', response.text)
+
+    def test_archive_mode_hides_open_thread_edit_controls(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}), \
+             patch("web_review.services.canon.open_thread_rows", return_value=self.thread_rows()), \
+             patch("web_review.services.canon.location_rows", return_value=self.locations()):
+            client = TestClient(app)
+            response = client.get("/open-threads?modal=add")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Open Threads", response.text)
+        self.assertNotIn("Add New", response.text)
+        self.assertNotIn("Edit</a>", response.text)
+        self.assertNotIn("Delete</button>", response.text)
+        self.assertNotIn('role="dialog"', response.text)
+
+    def test_create_open_thread_route_writes_form_values(self):
+        with patch("web_review.services.canon.create_open_thread") as create:
+            client = TestClient(app)
+            response = client.post("/open-threads", data={
+                "title": "What does the Gale want?",
+                "thread_type": "lore_mystery",
+                "status": "open",
+                "first_session": "20",
+                "last_session": "",
+                "related_location_id": "3",
+                "description": "The Gale may be more than weather.",
+                "resolution": "",
+                "notes": "Connects to the coast near Catur.",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("created=1", response.headers["location"])
+        create.assert_called_once()
+        values = create.call_args.args[0]
+        self.assertEqual(values["title"], "What does the Gale want?")
+        self.assertEqual(values["thread_type"], "lore_mystery")
+        self.assertEqual(values["status"], "open")
+        self.assertEqual(values["first_session"], 20)
+        self.assertIsNone(values["last_session"])
+        self.assertEqual(values["related_location_id"], 3)
+
+    def test_edit_open_thread_page_loads_thread(self):
+        detail = {
+            "id": 1,
+            "title": "What does the Gale want?",
+            "thread_type": "lore_mystery",
+            "status": "open",
+            "first_session": 20,
+            "last_session": None,
+            "related_location_id": 3,
+            "description": "The Gale may be more than weather.",
+            "resolution": "",
+            "notes": "Connects to the coast near Catur.",
+        }
+        with patch("web_review.services.canon.open_thread_rows", return_value=self.thread_rows()), \
+             patch("web_review.services.canon.location_rows", return_value=self.locations()), \
+             patch("web_review.services.canon.open_thread_detail", return_value=detail):
+            client = TestClient(app)
+            response = client.get("/open-threads/1/edit")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Edit Open Thread", response.text)
+        self.assertIn('role="dialog"', response.text)
+        self.assertIn("The Gale may be more than weather.", response.text)
+
+    def test_update_open_thread_route_writes_form_values(self):
+        with patch("web_review.services.canon.update_open_thread") as update:
+            client = TestClient(app)
+            response = client.post("/open-threads/3", data={
+                "title": "What does the Gale want?",
+                "thread_type": "dm_foreshadowing",
+                "status": "resolved",
+                "first_session": "20",
+                "last_session": "21",
+                "related_location_id": "",
+                "description": "Settled by later revelation.",
+                "resolution": "The party learned the answer.",
+                "notes": "",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("updated=1", response.headers["location"])
+        update.assert_called_once()
+        self.assertEqual(update.call_args.args[0], 3)
+        self.assertEqual(update.call_args.args[1]["thread_type"], "dm_foreshadowing")
+        self.assertEqual(update.call_args.args[1]["status"], "resolved")
+        self.assertEqual(update.call_args.args[1]["last_session"], 21)
+
+    def test_delete_open_thread_route_runs_delete(self):
+        with patch("web_review.services.canon.delete_open_thread") as delete:
+            client = TestClient(app)
+            response = client.post("/open-threads/4/delete", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("deleted=1", response.headers["location"])
+        delete.assert_called_once_with(4)
+
+
 class CombatEncounterRouteTest(unittest.TestCase):
     def combat_rows(self):
         return [{

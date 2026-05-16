@@ -1124,6 +1124,10 @@ dd { margin: 0; }
 .npc-status-unknown,
 .npc-status-missing,
 .npc-status-imprisoned { color: var(--warn); }
+.thread-status-open { color: var(--warn); }
+.thread-status-resolved { color: var(--ok); }
+.thread-status-superseded { color: var(--muted); }
+.thread-status-unknown { color: var(--bad); }
 .row-actions {
   display: flex;
   align-items: center;

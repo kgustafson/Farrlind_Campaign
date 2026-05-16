@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.4.0 - 5/16/2026
+
+Added the Open Threads archive section.
+
+- Schema: Added `open_thread` to persist campaign mysteries, promises, threats, ambiguities, and hooks.
+- App: Wired the Open Threads sidebar item to a real page in both edit and archive mode.
+- App: Added edit-mode CRUD with modal add/edit forms and read-only archive-mode display.
+- App: Implemented the four thread statuses: `open`, `resolved`, `superseded`, and `unknown`.
+- Tests: Added Open Threads route coverage and preserved broader archive route coverage.
+
 ## v0.3.27 - 5/16/2026
 
 Renamed the root archive navigation item to Sessions.

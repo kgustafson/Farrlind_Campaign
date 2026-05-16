@@ -53,6 +53,26 @@ def factions() -> list[dict[str, Any]]:
     return _fetch("SELECT id, name FROM faction ORDER BY name;")
 
 
+OPEN_THREAD_STATUSES = [
+    {"code": "open", "label": "open"},
+    {"code": "resolved", "label": "resolved"},
+    {"code": "superseded", "label": "superseded"},
+    {"code": "unknown", "label": "unknown"},
+]
+
+
+OPEN_THREAD_TYPES = [
+    "lore_mystery",
+    "active_threat",
+    "unresolved_promise",
+    "pending_quest",
+    "character_hook",
+    "faction_tension",
+    "canon_ambiguity",
+    "dm_foreshadowing",
+]
+
+
 def location_rows() -> list[dict[str, Any]]:
     return _fetch("""
         SELECT
@@ -287,6 +307,102 @@ def update_artifact(artifact_id: int, values: dict[str, Any]) -> None:
 
 def delete_artifact(artifact_id: int) -> None:
     _execute("DELETE FROM artifact WHERE id = :id;", {"id": artifact_id})
+
+
+def open_thread_statuses() -> list[dict[str, str]]:
+    return OPEN_THREAD_STATUSES
+
+
+def open_thread_types() -> list[str]:
+    return OPEN_THREAD_TYPES
+
+
+def open_thread_rows() -> list[dict[str, Any]]:
+    return _fetch("""
+        SELECT
+            ot.id,
+            ot.title,
+            ot.thread_type,
+            ot.status,
+            fs.session_number AS first_session,
+            ls.session_number AS last_session,
+            l.name AS related_location,
+            ot.description,
+            ot.resolution,
+            ot.notes
+        FROM open_thread ot
+        LEFT JOIN session fs ON fs.id = ot.first_session_id
+        LEFT JOIN session ls ON ls.id = ot.last_session_id
+        LEFT JOIN location l ON l.id = ot.related_location_id
+        ORDER BY
+            CASE ot.status
+                WHEN 'open' THEN 1
+                WHEN 'unknown' THEN 2
+                WHEN 'superseded' THEN 3
+                WHEN 'resolved' THEN 4
+                ELSE 5
+            END,
+            COALESCE(fs.session_number, 9999),
+            ot.title;
+    """)
+
+
+def open_thread_detail(thread_id: int) -> Optional[dict[str, Any]]:
+    rows = _fetch("""
+        SELECT
+            ot.id,
+            ot.title,
+            ot.thread_type,
+            ot.status,
+            fs.session_number AS first_session,
+            ls.session_number AS last_session,
+            ot.related_location_id,
+            ot.description,
+            ot.resolution,
+            ot.notes
+        FROM open_thread ot
+        LEFT JOIN session fs ON fs.id = ot.first_session_id
+        LEFT JOIN session ls ON ls.id = ot.last_session_id
+        WHERE ot.id = :id;
+    """, {"id": thread_id})
+    return rows[0] if rows else None
+
+
+def create_open_thread(values: dict[str, Any]) -> None:
+    _execute("""
+        INSERT INTO open_thread (
+            title, thread_type, status, first_session_id, last_session_id,
+            related_location_id, description, resolution, notes
+        )
+        VALUES (
+            :title, :thread_type, :status,
+            (SELECT id FROM session WHERE session_number = :first_session),
+            (SELECT id FROM session WHERE session_number = :last_session),
+            :related_location_id, :description, :resolution, :notes
+        );
+    """, values)
+
+
+def update_open_thread(thread_id: int, values: dict[str, Any]) -> None:
+    params = {**values, "id": thread_id}
+    _execute("""
+        UPDATE open_thread
+        SET
+            title = :title,
+            thread_type = :thread_type,
+            status = :status,
+            first_session_id = (SELECT id FROM session WHERE session_number = :first_session),
+            last_session_id = (SELECT id FROM session WHERE session_number = :last_session),
+            related_location_id = :related_location_id,
+            description = :description,
+            resolution = :resolution,
+            notes = :notes
+        WHERE id = :id;
+    """, params)
+
+
+def delete_open_thread(thread_id: int) -> None:
+    _execute("DELETE FROM open_thread WHERE id = :id;", {"id": thread_id})
 
 
 def _session_span_label(session_number: int, outcome: str) -> str:

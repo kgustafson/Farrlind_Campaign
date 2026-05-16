@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Open Threads | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div>
+    <p class="eyebrow">Unresolved Campaign Business</p>
+    <h1>Open Threads</h1>
+    <p>Mysteries, promises, threats, ambiguities, and story hooks still tugging at the campaign.</p>
+  </div>
+  {% if can_edit() %}<a class="icon-link add-new-link" href="/open-threads?modal=add">Add New</a>{% endif %}
+</section>
+
+{% if request.query_params.get("created") %}
+  <div class="flash">Open thread added.</div>
+{% endif %}
+{% if request.query_params.get("updated") %}
+  <div class="flash">Open thread updated.</div>
+{% endif %}
+{% if request.query_params.get("deleted") %}
+  <div class="flash">Open thread deleted.</div>
+{% endif %}
+{% if request.query_params.get("create_failed") %}
+  <div class="flash error-flash">Open thread was not added. Title must be unique and filled in.</div>
+{% endif %}
+{% if request.query_params.get("update_failed") %}
+  <div class="flash error-flash">Open thread was not updated. Check the title and related fields.</div>
+{% endif %}
+{% if request.query_params.get("delete_failed") %}
+  <div class="flash error-flash">Open thread was not deleted.</div>
+{% endif %}
+
+<section class="table-wrap archive-ledger" aria-label="Open threads ledger">
+  <table class="status-table open-thread-table">
+    <caption>Open Thread Ledger</caption>
+    <thead>
+      <tr>
+        <th>Thread</th>
+        <th>Status</th>
+        <th>Type</th>
+        <th>Sessions</th>
+        <th>Location</th>
+        <th>Description</th>
+        <th>Resolution</th>
+        {% if can_edit() %}<th></th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for thread in threads %}
+      <tr>
+        <td class="session-cell" data-label="Thread">
+          {% if thread.notes %}
+            <span class="hover-note" title="{{ thread.notes }}">{{ thread.title }}</span>
+          {% else %}
+            {{ thread.title }}
+          {% endif %}
+        </td>
+        <td data-label="Status"><span class="badge thread-status-{{ thread.status }}">{{ thread.status }}</span></td>
+        <td data-label="Type">{{ thread.thread_type.replace("_", " ") }}</td>
+        <td data-label="Sessions">
+          {% if thread.first_session is not none %}{{ thread.first_session }}{% else %}<span class="muted">?</span>{% endif %}
+          <span class="muted">to</span>
+          {% if thread.last_session is not none %}{{ thread.last_session }}{% else %}<span class="muted">?</span>{% endif %}
+        </td>
+        <td data-label="Location">{{ thread.related_location or "-" }}</td>
+        <td data-label="Description">{{ thread.description or "-" }}</td>
+        <td data-label="Resolution">{{ thread.resolution or "-" }}</td>
+        {% if can_edit() %}<td data-label="Actions">
+          <div class="row-actions">
+            <a class="icon-link" href="/open-threads/{{ thread.id }}/edit">Edit</a>
+            <form method="post" action="/open-threads/{{ thread.id }}/delete">
+              <button class="danger-button" type="submit">Delete</button>
+            </form>
+          </div>
+        </td>{% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{% if show_thread_modal %}
+<section class="modal-backdrop" role="presentation">
+  <div class="archive-modal" role="dialog" aria-modal="true" aria-labelledby="thread-modal-title">
+    <div class="modal-head">
+      <h2 id="thread-modal-title">{% if editing %}Edit Open Thread{% else %}Add Open Thread{% endif %}</h2>
+      <a class="modal-close" href="/open-threads" aria-label="Close open thread form">x</a>
+    </div>
+    <form method="post" action="{% if editing %}/open-threads/{{ editing.id }}{% else %}/open-threads{% endif %}">
+      <label class="field-block">
+        <span>Title</span>
+        <input name="title" required value="{{ editing.title if editing else '' }}">
+      </label>
+      <div class="form-grid three-col">
+        <label class="field-block">
+          <span>Status</span>
+          <select name="status">
+            {% for status in statuses %}
+              <option value="{{ status.code }}" {% if editing and editing.status == status.code %}selected{% endif %}>{{ status.label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field-block">
+          <span>Type</span>
+          <select name="thread_type">
+            {% for thread_type in thread_types %}
+              <option value="{{ thread_type }}" {% if editing and editing.thread_type == thread_type %}selected{% endif %}>{{ thread_type.replace("_", " ") }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field-block">
+          <span>Related Location</span>
+          <select name="related_location_id">
+            <option value="">none</option>
+            {% for location in locations %}
+              <option value="{{ location.id }}" {% if editing and editing.related_location_id == location.id %}selected{% endif %}>{{ location.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
+      <div class="form-grid two-col">
+        <label class="field-block">
+          <span>First Session</span>
+          <input name="first_session" inputmode="numeric" value="{{ editing.first_session if editing and editing.first_session is not none else '' }}">
+        </label>
+        <label class="field-block">
+          <span>Last Session</span>
+          <input name="last_session" inputmode="numeric" value="{{ editing.last_session if editing and editing.last_session is not none else '' }}">
+        </label>
+      </div>
+      <label class="field-block">
+        <span>Description</span>
+        <textarea name="description">{{ editing.description if editing else '' }}</textarea>
+      </label>
+      <label class="field-block">
+        <span>Resolution</span>
+        <textarea name="resolution">{{ editing.resolution if editing else '' }}</textarea>
+      </label>
+      <label class="field-block">
+        <span>Notes</span>
+        <textarea name="notes">{{ editing.notes if editing else '' }}</textarea>
+      </label>
+      <div class="panel-actions split-actions">
+        <a class="icon-link secondary-link" href="/open-threads">Cancel</a>
+        <button type="submit">{% if editing %}Save Open Thread{% else %}Add Open Thread{% endif %}</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endif %}
+{% endblock %}
