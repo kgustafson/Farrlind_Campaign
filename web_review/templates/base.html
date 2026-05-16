@@ -32,6 +32,7 @@
         <a class="sidebar-link {% if request.url.path.startswith('/open-threads') %}active{% endif %}" href="/open-threads">Open Threads</a>
         <a class="sidebar-link {% if request.url.path.startswith('/songbook') %}active{% endif %}" href="/songbook">Faban&rsquo;s Songbook</a>
         {% if can_edit() %}
+        <a class="sidebar-link {% if request.url.path.startswith('/project-utilities') %}active{% endif %}" href="/project-utilities">Project Utilities</a>
         <span class="sidebar-link disabled" aria-disabled="true">Validation Queue</span>
         {% endif %}
         <a class="sidebar-link {% if request.url.path.startswith('/timeline') %}active{% endif %}" href="/timeline">Campaign Timeline</a>

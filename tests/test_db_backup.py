@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
-from scripts.db_backup import backup_database, default_backup_path
+from scripts.db_backup import backup_database, default_backup_path, pg_dump_url
 
 
 class DatabaseBackupTest(unittest.TestCase):
@@ -22,7 +22,8 @@ class DatabaseBackupTest(unittest.TestCase):
     def test_backup_database_runs_pg_dump_with_clean_flags(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
             output_path = Path(tmp_dir) / "backup.sql"
-            with patch("scripts.db_backup.subprocess.run") as run:
+            with patch.dict("scripts.db_backup.os.environ", {}, clear=True), \
+                 patch("scripts.db_backup.subprocess.run") as run:
                 backup_path = backup_database(
                     output_path,
                     container="test_db",
@@ -48,6 +49,31 @@ class DatabaseBackupTest(unittest.TestCase):
         )
         self.assertTrue(run.call_args.kwargs["check"])
         self.assertIsNotNone(run.call_args.kwargs["stdout"])
+
+    def test_backup_database_uses_database_url_when_pg_dump_is_available(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            output_path = Path(tmp_dir) / "backup.sql"
+            with patch.dict("scripts.db_backup.os.environ", {"FARRLIND_DATABASE_URL": "postgresql+psycopg2://user:pass@db:5432/farrlind"}), \
+                 patch("scripts.db_backup.shutil.which", return_value="/usr/bin/pg_dump"), \
+                 patch("scripts.db_backup.subprocess.run") as run:
+                backup_path = backup_database(output_path)
+
+        self.assertEqual(backup_path, output_path)
+        self.assertEqual(
+            run.call_args.args[0],
+            [
+                "pg_dump",
+                "--clean",
+                "--if-exists",
+                "postgresql://user:pass@db:5432/farrlind",
+            ],
+        )
+
+    def test_pg_dump_url_normalizes_sqlalchemy_scheme(self):
+        self.assertEqual(
+            pg_dump_url("postgresql+psycopg2://user:pass@db:5432/farrlind"),
+            "postgresql://user:pass@db:5432/farrlind",
+        )
 
 
 if __name__ == "__main__":

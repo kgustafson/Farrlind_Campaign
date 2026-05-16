@@ -6,7 +6,7 @@ from unittest.mock import patch
 import yaml
 
 from web_review.services import canon, commands, lore, reviews, workflow
-from web_review.app import COMMAND_RESULTS, app, app_version
+from web_review.app import BACKUP_DOWNLOADS, COMMAND_RESULTS, app, app_version
 from scripts.load_songbook import songbook_source_sql
 from fastapi.testclient import TestClient
 
@@ -1867,6 +1867,60 @@ class CampaignTimelineRouteTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["stats"]["current_location"], "Coast near Catur")
         self.assertEqual(response.json()["rows"][1]["travel"][0]["duration_days"], 4)
+
+
+class ProjectUtilitiesRouteTest(unittest.TestCase):
+    def setUp(self):
+        COMMAND_RESULTS.clear()
+        BACKUP_DOWNLOADS.clear()
+
+    def test_project_utilities_page_renders_todo_viewer(self):
+        client = TestClient(app)
+        response = client.get("/project-utilities")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Project Utilities", response.text)
+        self.assertIn("View Todo", response.text)
+        self.assertIn("Backup Database", response.text)
+        self.assertIn("Run Smoke Test", response.text)
+        self.assertIn("todo.md", response.text)
+        self.assertIn('href="/project-utilities"', response.text)
+
+    def test_project_utilities_page_renders_revision_viewer(self):
+        client = TestClient(app)
+        response = client.get("/project-utilities?document=revision")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("revision.md", response.text)
+        self.assertIn("Revision History", response.text)
+
+    def test_archive_mode_hides_project_utilities(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}):
+            client = TestClient(app)
+            response = client.get("/project-utilities")
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_backup_route_creates_download_link(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            backup_path = Path(tmp) / "farrlind_test.sql"
+            backup_path.write_text("-- backup", encoding="utf-8")
+            with patch("web_review.app.backup_database", return_value=backup_path):
+                client = TestClient(app)
+                response = client.post("/project-utilities/backup", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("backup=", response.headers["location"])
+        self.assertEqual(len(BACKUP_DOWNLOADS), 1)
+
+    def test_smoke_test_route_reports_result(self):
+        with patch("web_review.services.commands.run_smoke_test", return_value=commands.CommandResult(0, "Smoke test passed.", "")) as smoke:
+            client = TestClient(app)
+            response = client.post("/project-utilities/smoke-test", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("command_result=", response.headers["location"])
+        smoke.assert_called_once()
 
 
 class SongbookRouteTest(unittest.TestCase):

@@ -746,6 +746,88 @@ button:disabled {
   font-size: 13px;
   white-space: pre-wrap;
 }
+.utility-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.utility-card,
+.utility-result {
+  border: 1px solid rgba(139, 95, 39, .34);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 249, 226, .88), rgba(239, 218, 169, .62)),
+    var(--parchment);
+  box-shadow: 0 12px 26px rgba(52, 35, 19, .12);
+  padding: 16px;
+}
+.utility-card {
+  display: grid;
+  align-content: space-between;
+  gap: 12px;
+}
+.utility-card h2,
+.document-viewer-head h2 {
+  margin: 0;
+  font-size: 22px;
+}
+.utility-card p {
+  margin: 0;
+  color: var(--muted);
+}
+.utility-card form {
+  margin: 0;
+}
+.utility-result {
+  margin-bottom: 16px;
+}
+.command-result-head,
+.document-viewer-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+.command-result-head h2 {
+  margin: 0;
+}
+.utility-result pre {
+  margin: 12px 0 0;
+  max-height: 260px;
+  overflow: auto;
+  padding: 10px;
+  border-radius: 6px;
+  background: #202423;
+  color: #f4f7f2;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  white-space: pre-wrap;
+}
+.project-doc-viewer {
+  position: static;
+  padding: 18px;
+}
+.document-viewer-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.project-doc-body {
+  margin-top: 16px;
+  max-width: 92ch;
+}
+.project-doc-body h1,
+.project-doc-body h2,
+.project-doc-body h3 {
+  color: var(--ink);
+}
+.project-doc-body code {
+  border: 1px solid rgba(139, 95, 39, .24);
+  border-radius: 4px;
+  background: rgba(255, 247, 223, .72);
+  padding: 1px 4px;
+}
 .editable-item input,
 .editable-item select,
 .editable-item textarea {
@@ -1595,6 +1677,9 @@ dd { margin: 0; }
   .sidebar-link {
     flex: 0 0 auto;
   }
+  .utility-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .timeline-stats {
     grid-template-columns: 1fr;
   }
@@ -1699,6 +1784,12 @@ dd { margin: 0; }
   }
   .workflow-step-meta {
     grid-template-columns: 1fr;
+  }
+  .utility-grid {
+    grid-template-columns: 1fr;
+  }
+  .document-viewer-head {
+    flex-direction: column;
   }
   .timeline-shell {
     padding-left: 30px;

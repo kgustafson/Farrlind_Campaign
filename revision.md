@@ -1,5 +1,16 @@
 # Revision History
 
+## v0.4.6 - 5/16/2026
+
+Added edit-mode Project Utilities.
+
+- App: Added a Project Utilities sidebar link in edit mode only.
+- App: Added viewers for `todo.md` and `revision.md`.
+- App: Added a database backup action that creates a restore-friendly SQL dump and exposes a download link.
+- App: Added a smoke-test action that checks core routes and database connectivity with pass/fail output.
+- Docker: Installed `postgresql-client` in the web image so in-app backups can run `pg_dump`.
+- Tests: Added route coverage for Project Utilities and backup fallback coverage for container execution.
+
 ## v0.4.5 - 5/16/2026
 
 Marked completed Web Interface Improvement roadmap items.

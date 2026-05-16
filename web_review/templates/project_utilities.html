@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Project Utilities | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div>
+    <p class="eyebrow">Edit Archive Operator Tools</p>
+    <h1>Project Utilities</h1>
+    <p>Project notes, revision history, database backup, and a quick application smoke test.</p>
+  </div>
+</section>
+
+{% if command_result %}
+  <section class="command-result utility-result">
+    <div class="command-result-head">
+      <h2>{{ command_result.action }}</h2>
+      <span class="badge {% if command_result.ok %}applied-applied{% else %}decision-rejected{% endif %}">
+        {% if command_result.ok %}pass{% else %}fail{% endif %}
+      </span>
+    </div>
+    {% if command_result.stdout %}<pre>{{ command_result.stdout }}</pre>{% endif %}
+    {% if command_result.stderr %}<pre>{{ command_result.stderr }}</pre>{% endif %}
+  </section>
+{% endif %}
+
+{% if backup %}
+  <section class="command-result utility-result">
+    <div class="command-result-head">
+      <h2>Database Backup Ready</h2>
+      <span class="badge applied-applied">ready</span>
+    </div>
+    <p>{{ backup.filename }} ({{ backup.size }} bytes)</p>
+    <a class="icon-link" href="/project-utilities/backups/{{ backup.token }}">Download Backup</a>
+  </section>
+{% endif %}
+
+<section class="utility-grid" aria-label="Project utilities">
+  <article class="utility-card">
+    <h2>View Project Notes</h2>
+    <p>Open the working project checklist.</p>
+    <a class="icon-link" href="/project-utilities?document=todo">View Todo</a>
+  </article>
+  <article class="utility-card">
+    <h2>View Revision History</h2>
+    <p>Open the versioned change log.</p>
+    <a class="icon-link" href="/project-utilities?document=revision">View Revision</a>
+  </article>
+  <article class="utility-card">
+    <h2>Backup Database</h2>
+    <p>Create a clean restore-friendly SQL dump and make it available for download.</p>
+    <form method="post" action="/project-utilities/backup">
+      <button type="submit">Run Backup</button>
+    </form>
+  </article>
+  <article class="utility-card">
+    <h2>Smoke Test</h2>
+    <p>Check core routes and database connectivity.</p>
+    <form method="post" action="/project-utilities/smoke-test">
+      <button type="submit">Run Smoke Test</button>
+    </form>
+  </article>
+</section>
+
+<section class="source-pane project-doc-viewer" aria-label="{{ active_document.filename }} viewer">
+  <div class="document-viewer-head">
+    <div>
+      <p class="eyebrow">{{ active_document.filename }}</p>
+      <h2>{{ active_document.title }}</h2>
+    </div>
+    <div class="document-viewer-tabs">
+      <a class="icon-link {% if active_document.key == 'todo' %}secondary-link{% endif %}" href="/project-utilities?document=todo">Todo</a>
+      <a class="icon-link {% if active_document.key == 'revision' %}secondary-link{% endif %}" href="/project-utilities?document=revision">Revision</a>
+    </div>
+  </div>
+  <div class="markdown-body project-doc-body">
+    {{ active_document.html | safe }}
+  </div>
+</section>
+{% endblock %}

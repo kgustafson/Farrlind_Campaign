@@ -7,6 +7,7 @@ from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, Red
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+from scripts.db_backup import backup_database
 from web_review.services import canon, commands, lore, reviews, workflow
 
 
@@ -14,6 +15,7 @@ app = FastAPI(title="Farrlind Review Workbench")
 app.mount("/static", StaticFiles(directory=str(reviews.REPO_ROOT / "web_review" / "static")), name="static")
 templates = Jinja2Templates(directory=str(reviews.REPO_ROOT / "web_review" / "templates"))
 COMMAND_RESULTS = {}
+BACKUP_DOWNLOADS = {}
 
 EDIT_MODE = "edit"
 ARCHIVE_MODE = "archive"
@@ -63,6 +65,23 @@ def store_command_result(action: str, result: commands.CommandResult) -> str:
         "ok": result.ok,
     }
     return token
+
+
+def project_document(document: str) -> dict[str, str]:
+    choices = {
+        "todo": reviews.REPO_ROOT / "todo.md",
+        "revision": reviews.REPO_ROOT / "revision.md",
+    }
+    key = document if document in choices else "todo"
+    path = choices[key]
+    text = path.read_text(encoding="utf-8")
+    return {
+        "key": key,
+        "title": "Todo" if key == "todo" else "Revision History",
+        "filename": path.name,
+        "text": text,
+        "html": reviews.render_markdown(text),
+    }
 
 
 def redirect_to_review(session_number: int, source: str, view: str, flag: str) -> RedirectResponse:
@@ -768,6 +787,66 @@ def timeline_index(request: Request):
         "timeline.html",
         {"timeline": timeline},
     )
+
+
+@app.get("/project-utilities", response_class=HTMLResponse)
+def project_utilities(request: Request, document: str = "todo", command_result: str = "", backup: str = ""):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Project utilities are not available in archive mode.")
+    try:
+        active_document = project_document(document)
+    except OSError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    return templates.TemplateResponse(
+        request,
+        "project_utilities.html",
+        {
+            "active_document": active_document,
+            "command_result": COMMAND_RESULTS.get(command_result) if command_result else None,
+            "backup": BACKUP_DOWNLOADS.get(backup) if backup else None,
+        },
+    )
+
+
+@app.post("/project-utilities/backup")
+def project_utilities_backup():
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Project utilities are not available in archive mode.")
+    try:
+        path = backup_database()
+    except Exception as exc:  # pragma: no cover - surfaced to operator
+        token = store_command_result("Backup Database", commands.CommandResult(1, "", str(exc)))
+        return RedirectResponse(url=f"/project-utilities?command_result={token}", status_code=303)
+    token = uuid4().hex
+    BACKUP_DOWNLOADS[token] = {
+        "token": token,
+        "path": str(path),
+        "filename": path.name,
+        "size": path.stat().st_size,
+    }
+    return RedirectResponse(url=f"/project-utilities?backup={token}", status_code=303)
+
+
+@app.get("/project-utilities/backups/{token}")
+def project_utilities_backup_download(token: str):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Project utilities are not available in archive mode.")
+    backup = BACKUP_DOWNLOADS.get(token)
+    if not backup:
+        raise HTTPException(status_code=404, detail="Backup file not found.")
+    path = reviews.REPO_ROOT / "backups" / backup["filename"]
+    if not path.exists() or str(path) != backup["path"]:
+        raise HTTPException(status_code=404, detail="Backup file not found.")
+    return FileResponse(path, media_type="application/sql", filename=backup["filename"])
+
+
+@app.post("/project-utilities/smoke-test")
+def project_utilities_smoke_test():
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Project utilities are not available in archive mode.")
+    result = commands.run_smoke_test(os.getenv("FARRLIND_SMOKE_BASE_URL", "http://127.0.0.1:8000"))
+    token = store_command_result("Run Smoke Test", result)
+    return RedirectResponse(url=f"/project-utilities?command_result={token}", status_code=303)
 
 
 @app.get("/songbook", response_class=HTMLResponse)

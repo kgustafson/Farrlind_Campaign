@@ -1,6 +1,6 @@
 # Version
 
-v0.4.5
+v0.4.6
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.5` marks completed Web Interface Improvement roadmap items with their implementation versions.
+`v0.4.6` adds edit-mode Project Utilities for docs, database backup, and smoke testing.
