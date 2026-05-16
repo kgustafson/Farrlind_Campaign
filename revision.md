@@ -1,5 +1,11 @@
 # Revision History
 
+## v0.4.14 - 5/16/2026
+
+Updated the Sessions hero copy.
+
+- App: Replaced the Sessions landing-page description with the travelling bard archive wording.
+
 ## v0.4.13 - 5/16/2026
 
 Switched archive icons to the standardized 512px artwork.

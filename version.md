@@ -1,6 +1,6 @@
 # Version
 
-v0.4.13
+v0.4.14
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.13` switches archive icons to the standardized 512px artwork.
+`v0.4.14` updates the Sessions hero copy.
