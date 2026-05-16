@@ -28,60 +28,75 @@
   </div>
 </section>
 
-<section class="timeline-shell" aria-label="Campaign timeline">
-  {% for row in timeline.rows %}
-    <article class="timeline-entry">
-      <div class="timeline-marker" aria-hidden="true">{{ "%02d"|format(row.session_number) }}</div>
-      <div class="timeline-card">
-        <header class="timeline-card-head">
-          <div>
-            <p class="eyebrow">{{ row.session_label }}</p>
-            <h2>{{ row.title or "Untitled Session" }}</h2>
-          </div>
-          <dl class="timeline-meta">
-            <div><dt>Real Date</dt><dd>{{ row.session_date or "unknown" }}</dd></div>
-            <div><dt>In World</dt><dd>{{ row.in_game_date or "unknown" }}</dd></div>
-            <div><dt>Primary Location</dt><dd>{{ row.primary_location or "unknown" }}</dd></div>
-          </dl>
-        </header>
-
-        {% if row.travel %}
-          <div class="timeline-block">
-            <h3>Travel</h3>
-            <ul class="timeline-travel-list">
-              {% for travel in row.travel %}
-                <li>
-                  <span class="travel-route">{{ travel.from_location or "unknown" }} -> {{ travel.to_location or "unknown" }}</span>
-                  <span class="travel-detail">
-                    {{ travel.travel_method or "method unknown" }}
-                    {% if travel.duration_days is not none %}, {{ travel.duration_days }} day{% if travel.duration_days != 1 %}s{% endif %}{% endif %}
-                    {% if travel.duration_confidence %}<span class="badge status-in_review">{{ travel.duration_confidence }}</span>{% endif %}
-                  </span>
-                  {% if travel.duration_basis %}<span class="subtle-line">{{ travel.duration_basis }}</span>{% endif %}
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
-        {% endif %}
-
-        <div class="timeline-block">
-          <h3>Major Events</h3>
-          {% if row.key_events %}
-            <ol class="timeline-event-list">
-              {% for event in row.key_events %}
-                <li>
-                  <span class="event-type">{{ event.event_type or "event" }}</span>
-                  {% if event.location %}<span class="event-location">{{ event.location }}</span>{% endif %}
-                  <span>{{ event.description }}</span>
-                </li>
-              {% endfor %}
-            </ol>
-          {% else %}
-            <p class="muted">No high-significance event rows are linked yet.</p>
-          {% endif %}
+<section class="campaign-flow-wrap" aria-label="Campaign timeline flow chart">
+  <div class="campaign-flow">
+    {% for row in timeline.rows %}
+      <article class="campaign-flow-node">
+        <a class="session-orb" href="#session-{{ "%02d"|format(row.session_number) }}-modal" aria-label="Open {{ row.session_label }} details" title="{{ row.session_label }}: {{ row.title or 'Untitled Session' }}" data-tooltip="{{ row.session_label }}: {{ row.title or 'Untitled Session' }}">
+          {{ "%02d"|format(row.session_number) }}
+        </a>
+        <div class="session-flow-label">
+          <span class="session-flow-location">{{ row.primary_location or "unknown" }}</span>
+          <span class="session-flow-date">{{ row.in_game_date or "unknown" }}</span>
         </div>
-      </div>
-    </article>
-  {% endfor %}
+      </article>
+    {% endfor %}
+  </div>
 </section>
+
+{% for row in timeline.rows %}
+  <section id="session-{{ "%02d"|format(row.session_number) }}-modal" class="timeline-modal-backdrop" aria-labelledby="session-{{ "%02d"|format(row.session_number) }}-title">
+    <div class="archive-modal timeline-session-modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">{{ row.session_label }}</p>
+          <h2 id="session-{{ "%02d"|format(row.session_number) }}-title">{{ row.title or "Untitled Session" }}</h2>
+        </div>
+        <a class="modal-close" href="/timeline" aria-label="Close session details">x</a>
+      </div>
+
+      <dl class="timeline-modal-meta">
+        <div><dt>Real Date</dt><dd>{{ row.session_date or "unknown" }}</dd></div>
+        <div><dt>In World</dt><dd>{{ row.in_game_date or "unknown" }}</dd></div>
+        <div><dt>Primary Location</dt><dd>{{ row.primary_location or "unknown" }}</dd></div>
+      </dl>
+
+      {% if row.travel %}
+        <section class="timeline-modal-block">
+          <h3>Travel</h3>
+          <ul class="timeline-travel-list">
+            {% for travel in row.travel %}
+              <li>
+                <span class="travel-route">{{ travel.from_location or "unknown" }} -> {{ travel.to_location or "unknown" }}</span>
+                <span class="travel-detail">
+                  {{ travel.travel_method or "method unknown" }}
+                  {% if travel.duration_days is not none %}, {{ travel.duration_days }} day{% if travel.duration_days != 1 %}s{% endif %}{% endif %}
+                  {% if travel.duration_confidence %}<span class="badge status-in_review">{{ travel.duration_confidence }}</span>{% endif %}
+                </span>
+                {% if travel.duration_basis %}<span class="subtle-line">{{ travel.duration_basis }}</span>{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
+
+      <section class="timeline-modal-block">
+        <h3>Major Events</h3>
+        {% if row.key_events %}
+          <ol class="timeline-event-list">
+            {% for event in row.key_events %}
+              <li>
+                <span class="event-type">{{ event.event_type or "event" }}</span>
+                {% if event.location %}<span class="event-location">{{ event.location }}</span>{% endif %}
+                <span>{{ event.description }}</span>
+              </li>
+            {% endfor %}
+          </ol>
+        {% else %}
+          <p class="muted">No high-significance event rows are linked yet.</p>
+        {% endif %}
+      </section>
+    </div>
+  </section>
+{% endfor %}
 {% endblock %}

@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.4.11 - 5/16/2026
+
+Redesigned the Campaign Timeline as a clickable session flow chart.
+
+- App: Replaced stacked timeline cards with a vertical session-node flow chart.
+- App: Added clickable numbered session circles that open session detail modals.
+- App: Kept location and in-game date visible beside each node, with session-title tooltips on hover.
+- App: Added responsive flow styling that extends cleanly as future sessions are added.
+- Tests: Updated Campaign Timeline route coverage for the flow chart, tooltip attributes, and modals.
+
 ## v0.4.10 - 5/16/2026
 
 Added the PostgreSQL 18 upgrade task to Data Management.

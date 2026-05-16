@@ -1,6 +1,6 @@
 # Version
 
-v0.4.10
+v0.4.11
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.10` adds the PostgreSQL 18 upgrade task to Data Management.
+`v0.4.11` redesigns Campaign Timeline as a clickable session flow chart with modal session details.
