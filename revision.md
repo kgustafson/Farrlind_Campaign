@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.4.9 - 5/16/2026
+
+Pinned the web container backup client to PostgreSQL 16.
+
+- Docker: Installed `postgresql-client-16` from the PostgreSQL apt repository instead of Debian's default latest client.
+- Data: Confirmed the edit container now runs `pg_dump 16.x` against the PostgreSQL 16 app database.
+- Data: Generated and restore-tested a fresh utility backup produced by `pg_dump 16.x`.
+
 ## v0.4.8 - 5/16/2026
 
 Fixed Project Utilities database backup restore compatibility.
