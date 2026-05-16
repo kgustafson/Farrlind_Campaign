@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
-from scripts.db_backup import backup_database, default_backup_path, pg_dump_url
+from scripts.db_backup import backup_database, default_backup_path, pg_dump_url, sanitize_backup_file
 
 
 class DatabaseBackupTest(unittest.TestCase):
@@ -73,6 +73,25 @@ class DatabaseBackupTest(unittest.TestCase):
         self.assertEqual(
             pg_dump_url("postgresql+psycopg2://user:pass@db:5432/farrlind"),
             "postgresql://user:pass@db:5432/farrlind",
+        )
+
+    def test_sanitize_backup_file_removes_pg17_transaction_timeout(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            backup_path = Path(tmp_dir) / "backup.sql"
+            backup_path.write_text(
+                "SET statement_timeout = 0;\n"
+                "SET transaction_timeout = 0;\n"
+                "CREATE TABLE public.session (id integer);\n",
+                encoding="utf-8",
+            )
+
+            sanitize_backup_file(backup_path)
+            sanitized = backup_path.read_text(encoding="utf-8")
+
+        self.assertEqual(
+            sanitized,
+            "SET statement_timeout = 0;\n"
+            "CREATE TABLE public.session (id integer);\n",
         )
 
 

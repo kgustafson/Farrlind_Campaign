@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.4.8 - 5/16/2026
+
+Fixed Project Utilities database backup restore compatibility.
+
+- App: Sanitized generated SQL backups to remove PostgreSQL 17's `transaction_timeout` setting.
+- Data: Generated and restore-tested a fresh in-app backup against a temporary PostgreSQL database.
+- Tests: Added coverage for backup-file sanitization.
+
 ## v0.4.7 - 5/16/2026
 
 Expanded the Project Utilities smoke-test report.

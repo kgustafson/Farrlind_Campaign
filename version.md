@@ -1,6 +1,6 @@
 # Version
 
-v0.4.7
+v0.4.8
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.7` expands the Project Utilities smoke-test report.
+`v0.4.8` makes Project Utilities database backups restore-compatible with PostgreSQL 16.

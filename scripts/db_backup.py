@@ -8,6 +8,9 @@ from typing import Optional
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_BACKUP_DIR = REPO_ROOT / "backups"
+INCOMPATIBLE_DUMP_LINES = {
+    "SET transaction_timeout = 0;\n",
+}
 
 
 def pg_dump_url(database_url: str) -> str:
@@ -19,6 +22,13 @@ def pg_dump_url(database_url: str) -> str:
 def default_backup_path(backup_dir: Path = DEFAULT_BACKUP_DIR, now: Optional[datetime] = None) -> Path:
     timestamp = (now or datetime.now()).strftime("%Y%m%d_%H%M%S")
     return backup_dir / f"farrlind_{timestamp}.sql"
+
+
+def sanitize_backup_file(path: Path) -> None:
+    lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+    filtered = [line for line in lines if line not in INCOMPATIBLE_DUMP_LINES]
+    if filtered != lines:
+        path.write_text("".join(filtered), encoding="utf-8")
 
 
 def backup_database(
@@ -49,4 +59,5 @@ def backup_database(
         ]
     with path.open("wb") as output:
         subprocess.run(command, stdout=output, check=True)
+    sanitize_backup_file(path)
     return path
