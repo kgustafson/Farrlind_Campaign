@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.4.18 - 5/16/2026
+
+Added Project Utilities and Workflow Status title-card icons.
+
+- App: Added standardized 512px source and static icons for Project Utilities and Workflow Status.
+- App: Wired both icons into the right side of their archive title cards.
+- Tests: Added route coverage for both icon assets.
+
 ## v0.4.17 - 5/16/2026
 
 Added Project Utilities lookup table CRUD.

@@ -1947,6 +1947,7 @@ class ProjectUtilitiesRouteTest(unittest.TestCase):
         self.assertIn("Run Smoke Test", response.text)
         self.assertIn("Lookup Tables", response.text)
         self.assertIn('href="/project-utilities/lookups"', response.text)
+        self.assertIn("/static/project-utilities-icon.png", response.text)
         self.assertIn("todo.md", response.text)
         self.assertIn('href="/project-utilities"', response.text)
 
@@ -2459,6 +2460,7 @@ class WorkflowRouteTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Workflow Status", response.text)
+        self.assertIn("/static/workflow-status-icon.png", response.text)
         self.assertIn("Session Workflow Ledger", response.text)
         self.assertIn("Session 20", response.text)
         self.assertIn('href="/workflow?session=20"', response.text)

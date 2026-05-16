@@ -1,6 +1,6 @@
 # Version
 
-v0.4.17
+v0.4.18
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.17` adds Project Utilities lookup table CRUD.
+`v0.4.18` adds Project Utilities and Workflow Status title-card icons.
