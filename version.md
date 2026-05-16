@@ -1,6 +1,6 @@
 # Version
 
-v0.4.14
+v0.4.15
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.14` updates the Sessions hero copy.
+`v0.4.15` refreshes archive section icons and Sessions subtitle copy.

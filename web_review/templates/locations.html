@@ -3,10 +3,13 @@
 {% block body_class %}archive-dashboard{% endblock %}
 {% block content %}
 <section class="page-head archive-section-head">
-  <div>
-    <p class="eyebrow">Campaign Gazetteer</p>
-    <h1>Locations</h1>
-    <p>Known places, regions, roads, sanctuaries, cities, and strange corners of Farrlind.</p>
+  <div class="archive-section-title">
+    <div>
+      <p class="eyebrow">Campaign Gazetteer</p>
+      <h1>Locations</h1>
+      <p>Known places, regions, roads, sanctuaries, cities, and strange corners of Farrlind.</p>
+    </div>
+    <img class="archive-section-icon" src="/static/locations-icon.png" alt="" aria-hidden="true">
   </div>
   {% if can_edit() %}<a class="icon-link add-new-link" href="/locations?modal=add">Add New</a>{% endif %}
 </section>

@@ -1180,6 +1180,7 @@ class LocationRouteTest(unittest.TestCase):
         self.assertIn("Add New", response.text)
         self.assertNotIn("Add Location</h2>", response.text)
         self.assertIn('href="/locations"', response.text)
+        self.assertIn("/static/locations-icon.png", response.text)
 
     def test_locations_add_modal_renders_form(self):
         with patch("web_review.services.canon.location_rows", return_value=self.location_rows()), \
@@ -1613,6 +1614,7 @@ class OpenThreadRouteTest(unittest.TestCase):
         self.assertIn("Add New", response.text)
         self.assertIn("<th>State</th>", response.text)
         self.assertIn("<th>Scope</th>", response.text)
+        self.assertIn("/static/open-threads-icon.png", response.text)
         self.assertIn('href="/open-threads/1/edit"', response.text)
         self.assertIn('action="/open-threads/1/delete"', response.text)
         self.assertNotIn("Add Open Thread</h2>", response.text)
@@ -2024,6 +2026,7 @@ class WellsLoreRouteTest(unittest.TestCase):
         self.assertIn('name="lore_text"', response.text)
         self.assertIn('rows="20"', response.text)
         self.assertIn('href="/wells"', response.text)
+        self.assertIn("/static/wells-of-magic-icon.png", response.text)
 
     def test_archive_mode_renders_wells_as_read_only_lore(self):
         with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}), \

@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.4.15 - 5/16/2026
+
+Refreshed archive section icons and Sessions subtitle copy.
+
+- App: Updated the Sessions landing-page subtitle to the final eclectic travelling bard wording.
+- App: Added title-card icons for Locations, Open Threads, and Wells of Magic.
+- App: Refreshed the NPC Registry, Artifacts, Combat Encounters, and Faban's Songbook icon artwork.
+- Docs: Added the standardized 512px source images for Locations, Open Threads, and Wells of Magic.
+- Tests: Extended route coverage for the new Locations, Open Threads, and Wells of Magic icon assets.
+
 ## v0.4.14 - 5/16/2026
 
 Updated the Sessions hero copy.
