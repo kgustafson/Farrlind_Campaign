@@ -1,5 +1,12 @@
 # Revision History
 
+## v0.3.26 - 5/16/2026
+
+Removed Validation Queue from the published archive navigation.
+
+- App: Archive mode no longer shows the Validation Queue placeholder in the sidebar.
+- Tests: Extended archive navigation coverage to assert that Validation Queue is hidden.
+
 ## v0.3.25 - 5/14/2026
 
 Added daily macOS database backup scheduling.

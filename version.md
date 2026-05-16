@@ -1,6 +1,6 @@
 # Version
 
-v0.3.25
+v0.3.26
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.3.25` adds a daily macOS LaunchAgent for automated database backups.
+`v0.3.26` hides the Validation Queue placeholder from the published archive website.

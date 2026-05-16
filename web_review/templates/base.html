@@ -32,7 +32,9 @@
         <a class="sidebar-link {% if request.url.path.startswith('/combat-encounters') %}active{% endif %}" href="/combat-encounters">Combat Encounters</a>
         <span class="sidebar-link disabled" aria-disabled="true">Open Threads</span>
         <a class="sidebar-link {% if request.url.path.startswith('/songbook') %}active{% endif %}" href="/songbook">Faban&rsquo;s Songbook</a>
+        {% if can_edit() %}
         <span class="sidebar-link disabled" aria-disabled="true">Validation Queue</span>
+        {% endif %}
         <span class="sidebar-link disabled" aria-disabled="true">Campaign Timeline</span>
       </nav>
     </aside>

@@ -2064,6 +2064,7 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertEqual(dashboard_response.status_code, 200)
         self.assertIn("Published Archive", dashboard_response.text)
         self.assertNotIn("Workflow Status", dashboard_response.text)
+        self.assertNotIn("Validation Queue", dashboard_response.text)
         self.assertNotIn('href="/workflow"', dashboard_response.text)
         self.assertEqual(workflow_response.status_code, 404)
 
