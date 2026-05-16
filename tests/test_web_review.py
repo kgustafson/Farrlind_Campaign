@@ -2425,6 +2425,26 @@ class CommandServiceTest(unittest.TestCase):
             "health",
         ])
 
+    def test_run_smoke_test_reports_multiline_category_summary(self):
+        response = type("Response", (), {
+            "status": 200,
+            "read": lambda self: b"Session Review Ledger Campaign Timeline Open Threads session_count",
+            "__enter__": lambda self: self,
+            "__exit__": lambda self, exc_type, exc, traceback: False,
+        })()
+        with patch("web_review.services.commands.urllib.request.urlopen", return_value=response), \
+             patch("web_review.services.commands.db.fetch_all", return_value=[{"session_count": 21}]):
+            result = commands.run_smoke_test()
+
+        self.assertTrue(result.ok)
+        self.assertIn("Tests run: 5", result.stdout)
+        self.assertIn("Passed: 5", result.stdout)
+        self.assertIn("Failed: 0", result.stdout)
+        self.assertIn("Categories: API, Database, Routes", result.stdout)
+        self.assertIn("- Routes", result.stdout)
+        self.assertIn("PASS /timeline: ok", result.stdout)
+        self.assertIn("PASS session count query: 21 sessions", result.stdout)
+
     def test_apply_review_route_requires_reviewed_status(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

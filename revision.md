@@ -1,5 +1,12 @@
 # Revision History
 
+## v0.4.7 - 5/16/2026
+
+Expanded the Project Utilities smoke-test report.
+
+- App: Smoke test output now reports total tests run, pass/fail counts, categories, and per-check details.
+- Tests: Added service coverage for the multiline categorized smoke-test summary.
+
 ## v0.4.6 - 5/16/2026
 
 Added edit-mode Project Utilities.
