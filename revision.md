@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.4.2 - 5/16/2026
+
+Promoted approved Open Threads into managed canon data.
+
+- Canon: Added the approved Open Threads set to the deterministic database loader.
+- Schema: Seeded Open Threads and supporting locations in the init schema for fresh installs.
+- Data: Loaded the approved threads into the running Docker database.
+- Tests: Added loader coverage for Open Threads SQL generation.
+
 ## v0.4.1 - 5/16/2026
 
 Added the first Open Threads candidate review pass.

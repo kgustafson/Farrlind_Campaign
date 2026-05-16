@@ -1,6 +1,6 @@
 # Version
 
-v0.4.1
+v0.4.2
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.1` adds the first Open Threads candidate review pass.
+`v0.4.2` promotes approved Open Threads into managed seed/load data.

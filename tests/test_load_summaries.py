@@ -742,6 +742,33 @@ class LoadSummariesTest(unittest.TestCase):
         self.assertIn("'Party, Father Joseph'", sql)
         self.assertIn("se.sequence_order = 1", sql)
 
+    def test_build_sql_loads_open_threads(self):
+        summaries = [
+            {
+                "session_number": 20,
+                "physical_date": "2026-04-27",
+                "in_game_date": "1832 AS Namal 24",
+                "title": "Salt, Steel, and the Distance Between Legends",
+                "summary": "The party prepares for Catur.",
+                "events": ["Preparing to descend into sunken city."],
+                "source_path": "session20_summary.md",
+                "location": "Coast near Catur",
+            }
+        ]
+
+        with patch("load_summaries.load_canon_decisions", return_value={}):
+            with patch("load_summaries.load_travel_facts", return_value=[]):
+                with patch("load_summaries.load_enemy_encounters", return_value=[]):
+                    with patch("load_summaries.load_encounters", return_value=[]):
+                        with patch("load_summaries.load_review_documents", return_value={}):
+                            sql = load_summaries.build_sql(summaries)
+
+        self.assertIn("CREATE TABLE IF NOT EXISTS open_thread", sql)
+        self.assertIn("INSERT INTO open_thread", sql)
+        self.assertIn("'Where is the Wand of Wells now?'", sql)
+        self.assertIn("'open'", sql)
+        self.assertIn("ON CONFLICT (title) DO UPDATE SET", sql)
+
     def test_build_sql_scrubs_father_joseph_from_earliest_known_session(self):
         summaries = [
             {

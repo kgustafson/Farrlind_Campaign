@@ -382,6 +382,189 @@ KNOWN_ARTIFACTS = [
     "Roon's Shield",
 ]
 
+CANON_OPEN_THREADS = [
+    {
+        "title": "Where is the Wand of Wells now?",
+        "thread_type": "lore_mystery",
+        "status": "open",
+        "first_session": 6,
+        "last_session": 19,
+        "location": "Druid Retreat",
+        "description": "Khorag says the Wand closes Wells and names Jennifer as last known user; Jennifer later says it was stolen amid magical failures. The party continues planning around the Wand.",
+    },
+    {
+        "title": "What does it mean to carry Saiffi?",
+        "thread_type": "lore_mystery",
+        "status": "open",
+        "first_session": 18,
+        "last_session": 20,
+        "location": "Balrog",
+        "description": "Saiffi is a truth-bound Well and is currently with the party in a waterskin. The lore file explicitly marks the meaning of carrying Saiffi as unanswered.",
+    },
+    {
+        "title": "What will happen at the sunken city of Catur?",
+        "thread_type": "pending_quest",
+        "status": "open",
+        "first_session": 13,
+        "last_session": 20,
+        "location": "Catur",
+        "description": "Catur is one of the known Wells. The party has reached the coast, gained a boat, and is preparing to descend, while locals warn that Catur's peoples distrust strangers.",
+    },
+    {
+        "title": "What is the large intelligence or force beneath the waters near Catur?",
+        "thread_type": "dm_foreshadowing",
+        "status": "open",
+        "first_session": 20,
+        "last_session": 20,
+        "location": "Coast near Catur",
+        "description": "The fishermen report missing boats, lights under the water, and something thought-large beneath. This appears to be immediate next-session foreshadowing.",
+    },
+    {
+        "title": "Can the Cataclysm be stopped, or only softened?",
+        "thread_type": "lore_mystery",
+        "status": "open",
+        "first_session": 5,
+        "last_session": 19,
+        "location": "",
+        "description": "Multiple sources say the Cataclysm may be underway, tied to Wells, primordial over-release, dragons, and possibly not fully preventable.",
+    },
+    {
+        "title": "What are the rules of disturbed, active, depleted, or portable Wells?",
+        "thread_type": "lore_mystery",
+        "status": "open",
+        "first_session": 14,
+        "last_session": 18,
+        "location": "Paramon",
+        "description": "Ordor is disturbed and later no longer sentient; Saiffi can be carried; the consolidated Wells lore lists the rules of Well states as an open question.",
+    },
+    {
+        "title": "What does each Well want, fear, or protect?",
+        "thread_type": "lore_mystery",
+        "status": "open",
+        "first_session": 6,
+        "last_session": 18,
+        "location": "",
+        "description": "Khorag, Ordor, and Saiffi behave differently. The lore file names this as an open question, and future Wells may distrust the party.",
+    },
+    {
+        "title": "Where is the Monastery of the Open Hand Well in the Gale?",
+        "thread_type": "pending_quest",
+        "status": "open",
+        "first_session": 6,
+        "last_session": 14,
+        "location": "Gale Monastery",
+        "description": "Khorag identifies a sibling in the heart of the Gale at a monastery of the Open Hand; Jennifer confirms it as a known Well. It has not been visited.",
+    },
+    {
+        "title": "How will the party reach Hanedal and its Well?",
+        "thread_type": "pending_quest",
+        "status": "open",
+        "first_session": 5,
+        "last_session": 14,
+        "location": "Hanedal Island",
+        "description": "Father Joseph says Hanedal Island has one of the Wells and no known maps; Jennifer identifies Henedal/Hanedal as birthplace of magic and a Well location across the sea.",
+    },
+    {
+        "title": "Who stole the Wand of Wells, and for what purpose?",
+        "thread_type": "active_threat",
+        "status": "open",
+        "first_session": 13,
+        "last_session": 15,
+        "location": "Druid Retreat",
+        "description": "Jennifer says the Wand was stolen; the tabaxi later says demons seek resurrection material and that the Cataclysm may be required. This may point to an organized actor.",
+    },
+    {
+        "title": "Are the cults trying to return Tiamat, Chaotix, or both?",
+        "thread_type": "active_threat",
+        "status": "open",
+        "first_session": 9,
+        "last_session": 19,
+        "location": "Balrog",
+        "description": "Library research names Chaotix and primordial chaos; the tabaxi says Tiamat and demons are preparing resurrection; Balrog cultists summon Orsydon while trying to awaken Tiamat.",
+    },
+    {
+        "title": "What is Corvinas' connection to Rage, the Wells, and the Cataclysm?",
+        "thread_type": "character_hook",
+        "status": "open",
+        "first_session": 4,
+        "last_session": 17,
+        "location": "Paramon",
+        "description": "Corvinas bears an infernal mark tied to a demon of rage; the Paramon Well recognizes him as conflict; his village history and the Well backlash remain unresolved.",
+    },
+    {
+        "title": "Who is Cole, and what does The Rogue betrayal card mean?",
+        "thread_type": "character_hook",
+        "status": "open",
+        "first_session": 13,
+        "last_session": 13,
+        "location": "Mountain Road",
+        "description": "Cole reappears with a magical deck; Faban draws The Rogue, which Cole says harbingers betrayal. No later resolution appears in current canon.",
+    },
+    {
+        "title": "What remains of Ardema of the Seven Seals?",
+        "thread_type": "active_threat",
+        "status": "open",
+        "first_session": 6,
+        "last_session": 7,
+        "location": "Thataways",
+        "description": "Ardema appears during the attack on Thataways and plane-shifts away rather than dying. His identity, faction, and next move remain unresolved.",
+    },
+    {
+        "title": "What is the meaning of the sapphire-eyed stranger?",
+        "thread_type": "dm_foreshadowing",
+        "status": "unknown",
+        "first_session": 15,
+        "last_session": 15,
+        "location": "Paramon",
+        "description": "Gildas speaks with a sapphire-eyed stranger in a tavern and mentions it only once afterward. This has no current explanation.",
+    },
+    {
+        "title": "Who or what was riding the Paramon guardian?",
+        "thread_type": "active_threat",
+        "status": "open",
+        "first_session": 14,
+        "last_session": 15,
+        "location": "Paramon",
+        "description": "The water elemental appears to have been a place-bound guardian used or ridden by another force, suggesting an invader capable of repeating the act.",
+    },
+    {
+        "title": "What faith or faction was Iron Paw actually serving?",
+        "thread_type": "faction_tension",
+        "status": "open",
+        "first_session": 15,
+        "last_session": 17,
+        "location": "Paramon",
+        "description": "Iron Paw wears borrowed Namaloan colors, reacts strongly to the Celestial Isles, casts Silence readily, and reveals eldritch or hellish power before defeat. His larger allegiance remains unclear.",
+    },
+    {
+        "title": "Why does the eastern coast remember conquest around the Celestial Isles?",
+        "thread_type": "faction_tension",
+        "status": "open",
+        "first_session": 15,
+        "last_session": 16,
+        "location": "Paramon",
+        "description": "Paramon grows quiet around the Celestial Isles, and commoner testimony suggests the eastern coast remembers conquest while claiming forgetfulness.",
+    },
+    {
+        "title": "What ancient curses or protections remain at the archaeological dig site?",
+        "thread_type": "lore_mystery",
+        "status": "open",
+        "first_session": 11,
+        "last_session": 13,
+        "location": "Archaeological Dig Site",
+        "description": "Sam warns that removing the site's protection may return the arcane, Wells, and ancient curses; later evidence includes Abyssal influence and a necrotic dagger.",
+    },
+    {
+        "title": "What is the role of the black/obsidian Abyssal dagger?",
+        "thread_type": "active_threat",
+        "status": "open",
+        "first_session": 12,
+        "last_session": 13,
+        "location": "Archaeological Dig Site",
+        "description": "Sam uses the black dagger in a failed blood ritual; Gildas identifies it as Abyssal/necrotic and stores it with other dangerous artifacts.",
+    },
+]
+
 SONG_TITLE_TO_NUMBER = {
     "the off-key dragon": 1,
     "sally and the good day": 2,
@@ -1292,6 +1475,24 @@ CREATE TABLE IF NOT EXISTS encounter (
 """.strip()
 
 
+def open_thread_schema_sql() -> str:
+    return """
+CREATE TABLE IF NOT EXISTS open_thread (
+    id                  SERIAL PRIMARY KEY,
+    title               TEXT NOT NULL UNIQUE,
+    thread_type         VARCHAR(80) NOT NULL DEFAULT 'lore_mystery',
+    status              VARCHAR(30) NOT NULL DEFAULT 'open'
+                            CHECK (status IN ('open', 'resolved', 'superseded', 'unknown')),
+    first_session_id    INT REFERENCES session(id),
+    last_session_id     INT REFERENCES session(id),
+    related_location_id INT REFERENCES location(id),
+    description         TEXT,
+    resolution          TEXT,
+    notes               TEXT
+);
+""".strip()
+
+
 def encounter_sql(encounter: dict) -> str:
     session_number = encounter["session_number"]
     event_sequence = encounter["event_sequence"]
@@ -1507,6 +1708,39 @@ def canon_enemy_scrub_sql() -> str:
     return "\n\n".join(canon_enemy_sql(enemy) for enemy in CANON_ENEMIES)
 
 
+def canon_open_thread_sql(thread: dict) -> str:
+    return f"""
+INSERT INTO open_thread (
+    title, thread_type, status, first_session_id, last_session_id,
+    related_location_id, description, resolution, notes
+)
+VALUES (
+    {sql_quote(thread["title"])},
+    {sql_quote(thread.get("thread_type", "lore_mystery"))},
+    {sql_quote(thread.get("status", "open"))},
+    (SELECT id FROM session WHERE session_number = {thread.get("first_session")}),
+    (SELECT id FROM session WHERE session_number = {thread.get("last_session")}),
+    {location_expr(thread.get("location", ""))},
+    {sql_quote(thread.get("description", ""))},
+    {sql_quote(thread.get("resolution", ""))},
+    {sql_quote(thread.get("notes", "Loaded from approved open threads pass."))}
+)
+ON CONFLICT (title) DO UPDATE SET
+    thread_type = EXCLUDED.thread_type,
+    status = EXCLUDED.status,
+    first_session_id = EXCLUDED.first_session_id,
+    last_session_id = EXCLUDED.last_session_id,
+    related_location_id = EXCLUDED.related_location_id,
+    description = EXCLUDED.description,
+    resolution = EXCLUDED.resolution,
+    notes = EXCLUDED.notes;
+""".strip()
+
+
+def canon_open_threads_sql() -> str:
+    return "\n\n".join(canon_open_thread_sql(thread) for thread in CANON_OPEN_THREADS)
+
+
 def pipeline_run_sql(session_count: int, event_count: int) -> str:
     return f"""
 INSERT INTO pipeline_run (
@@ -1642,6 +1876,8 @@ def build_sql(summaries: list[dict]) -> str:
     statements.append(travel_log_schema_sql())
     statements.append(encounter_schema_sql())
     statements.append(enemy_encounter_schema_sql())
+    statements.append(open_thread_schema_sql())
+    statements.append(canon_open_threads_sql())
 
     for summary in summaries:
         statements.append(delete_events_sql(summary["session_number"]))
