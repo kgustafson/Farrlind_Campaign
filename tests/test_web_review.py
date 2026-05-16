@@ -1791,6 +1791,84 @@ class CombatEncounterRouteTest(unittest.TestCase):
         self.assertEqual(response.json()[0]["enemies"][1]["quantity"], 2)
 
 
+class CampaignTimelineRouteTest(unittest.TestCase):
+    def timeline(self):
+        return {
+            "stats": {
+                "session_count": 2,
+                "total_travel_days": 4,
+                "known_travel_segments": 1,
+                "first_in_game_date": "1832 AS Apollal 10",
+                "latest_in_game_date": "1832 AS Namal 24",
+                "current_location": "Coast near Catur",
+            },
+            "rows": [
+                {
+                    "session_number": 0,
+                    "session_label": "Session 00",
+                    "session_date": "2025-02-02",
+                    "in_game_date": "1832 AS Apollal 10",
+                    "title": "The Party forms",
+                    "summary": "",
+                    "primary_location": "Bentrios",
+                    "travel": [],
+                    "key_events": [
+                        {
+                            "event_type": "social",
+                            "location": "Alexander's Inn",
+                            "description": "The party begins to form at Alexander's Inn.",
+                            "significance": 4,
+                        },
+                    ],
+                    "event_count": 1,
+                },
+                {
+                    "session_number": 20,
+                    "session_label": "Session 20",
+                    "session_date": "2026-04-27",
+                    "in_game_date": "1832 AS Namal 20, 1832 AS Namal 24",
+                    "title": "Salt, Steel, and the Distance Between Legends",
+                    "summary": "",
+                    "primary_location": "Coast near Catur",
+                    "travel": [
+                        {
+                            "from_location": "Balrog",
+                            "to_location": "Coast near Catur",
+                            "travel_method": "foot",
+                            "duration_days": 4,
+                            "duration_confidence": "high",
+                            "duration_basis": "Diary dates span Namal 20 to Namal 24.",
+                            "notes": "",
+                        },
+                    ],
+                    "key_events": [],
+                    "event_count": 0,
+                },
+            ],
+        }
+
+    def test_campaign_timeline_page_renders_timeline(self):
+        with patch("web_review.services.canon.campaign_timeline", return_value=self.timeline()):
+            client = TestClient(app)
+            response = client.get("/timeline")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Campaign Timeline", response.text)
+        self.assertIn("Known Travel Days", response.text)
+        self.assertIn("Balrog -> Coast near Catur", response.text)
+        self.assertIn("The party begins to form", response.text)
+        self.assertIn('href="/timeline"', response.text)
+
+    def test_campaign_timeline_api_returns_rows(self):
+        with patch("web_review.services.canon.campaign_timeline", return_value=self.timeline()):
+            client = TestClient(app)
+            response = client.get("/api/timeline")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["stats"]["current_location"], "Coast near Catur")
+        self.assertEqual(response.json()["rows"][1]["travel"][0]["duration_days"], 4)
+
+
 class SongbookRouteTest(unittest.TestCase):
     def song_rows(self):
         return [{

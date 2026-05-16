@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Campaign Timeline | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div>
+    <p class="eyebrow">Chronicle of Roads and Revelations</p>
+    <h1>Campaign Timeline</h1>
+    <p>Sessions arranged in canon order, with in-world dates, travel movements, locations, and major events.</p>
+  </div>
+</section>
+
+<section class="archive-stat-row timeline-stats" aria-label="Campaign timeline statistics">
+  <div class="archive-stat-card">
+    <span class="stat-label">Reviewed Sessions</span>
+    <strong>{{ timeline.stats.session_count }}</strong>
+    <span class="stat-note">{{ timeline.stats.first_in_game_date or "unknown" }} to {{ timeline.stats.latest_in_game_date or "unknown" }}</span>
+  </div>
+  <div class="archive-stat-card">
+    <span class="stat-label">Known Travel Days</span>
+    <strong>{{ timeline.stats.total_travel_days }}</strong>
+    <span class="stat-note">{{ timeline.stats.known_travel_segments }} dated or inferred travel segments</span>
+  </div>
+  <div class="archive-stat-card">
+    <span class="stat-label">Current Canon Location</span>
+    <strong>{{ timeline.stats.current_location or "unknown" }}</strong>
+    <span class="stat-note">Taken from the latest reviewed session primary location.</span>
+  </div>
+</section>
+
+<section class="timeline-shell" aria-label="Campaign timeline">
+  {% for row in timeline.rows %}
+    <article class="timeline-entry">
+      <div class="timeline-marker" aria-hidden="true">{{ "%02d"|format(row.session_number) }}</div>
+      <div class="timeline-card">
+        <header class="timeline-card-head">
+          <div>
+            <p class="eyebrow">{{ row.session_label }}</p>
+            <h2>{{ row.title or "Untitled Session" }}</h2>
+          </div>
+          <dl class="timeline-meta">
+            <div><dt>Real Date</dt><dd>{{ row.session_date or "unknown" }}</dd></div>
+            <div><dt>In World</dt><dd>{{ row.in_game_date or "unknown" }}</dd></div>
+            <div><dt>Primary Location</dt><dd>{{ row.primary_location or "unknown" }}</dd></div>
+          </dl>
+        </header>
+
+        {% if row.travel %}
+          <div class="timeline-block">
+            <h3>Travel</h3>
+            <ul class="timeline-travel-list">
+              {% for travel in row.travel %}
+                <li>
+                  <span class="travel-route">{{ travel.from_location or "unknown" }} -> {{ travel.to_location or "unknown" }}</span>
+                  <span class="travel-detail">
+                    {{ travel.travel_method or "method unknown" }}
+                    {% if travel.duration_days is not none %}, {{ travel.duration_days }} day{% if travel.duration_days != 1 %}s{% endif %}{% endif %}
+                    {% if travel.duration_confidence %}<span class="badge status-in_review">{{ travel.duration_confidence }}</span>{% endif %}
+                  </span>
+                  {% if travel.duration_basis %}<span class="subtle-line">{{ travel.duration_basis }}</span>{% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        <div class="timeline-block">
+          <h3>Major Events</h3>
+          {% if row.key_events %}
+            <ol class="timeline-event-list">
+              {% for event in row.key_events %}
+                <li>
+                  <span class="event-type">{{ event.event_type or "event" }}</span>
+                  {% if event.location %}<span class="event-location">{{ event.location }}</span>{% endif %}
+                  <span>{{ event.description }}</span>
+                </li>
+              {% endfor %}
+            </ol>
+          {% else %}
+            <p class="muted">No high-significance event rows are linked yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </article>
+  {% endfor %}
+</section>
+{% endblock %}

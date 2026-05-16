@@ -757,6 +757,19 @@ def combat_encounters_index(request: Request):
     )
 
 
+@app.get("/timeline", response_class=HTMLResponse)
+def timeline_index(request: Request):
+    try:
+        timeline = canon.campaign_timeline()
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    return templates.TemplateResponse(
+        request,
+        "timeline.html",
+        {"timeline": timeline},
+    )
+
+
 @app.get("/songbook", response_class=HTMLResponse)
 def songbook_index(request: Request):
     try:
@@ -902,6 +915,14 @@ def api_artifacts():
 def api_combat_encounters():
     try:
         return canon.combat_encounter_rows()
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+
+@app.get("/api/timeline")
+def api_timeline():
+    try:
+        return canon.campaign_timeline()
     except canon.CanonReadError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
 

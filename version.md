@@ -1,6 +1,6 @@
 # Version
 
-v0.4.3
+v0.4.4
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.3` improves Open Threads edit-mode controls and ledger readability.
+`v0.4.4` adds the Campaign Timeline archive section.

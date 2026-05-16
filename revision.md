@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.4.4 - 5/16/2026
+
+Added the Campaign Timeline archive section.
+
+- App: Wired Campaign Timeline into the sidebar for edit and archive mode.
+- App: Added `/timeline` and `/api/timeline` for a derived canon timeline view.
+- App: Displayed reviewed sessions with real dates, in-world dates, primary locations, travel movements, and major events.
+- App: Fixed Open Threads edit button contrast with a dedicated action-link style.
+- Tests: Added route and API coverage for the Campaign Timeline.
+
 ## v0.4.3 - 5/16/2026
 
 Improved Open Threads edit-mode controls and ledger readability.

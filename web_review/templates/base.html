@@ -34,7 +34,7 @@
         {% if can_edit() %}
         <span class="sidebar-link disabled" aria-disabled="true">Validation Queue</span>
         {% endif %}
-        <span class="sidebar-link disabled" aria-disabled="true">Campaign Timeline</span>
+        <a class="sidebar-link {% if request.url.path.startswith('/timeline') %}active{% endif %}" href="/timeline">Campaign Timeline</a>
       </nav>
     </aside>
     <main>

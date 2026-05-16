@@ -140,7 +140,7 @@ audio/transcript
 - Develop Artifact Listing.
 - Develop Well of Magic Lore Section.
 - Develop Faban Songbook.
-- Develop Campaign Timeline.
+- Develop Campaign Timeline. Done in v0.4.4 with read-only timeline, travel movements, major events, and API route.
 
 ## Data Management
 

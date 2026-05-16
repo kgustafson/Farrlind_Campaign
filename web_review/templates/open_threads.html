@@ -60,7 +60,7 @@
           {% endif %}
           {% if can_edit() %}
             <div class="row-actions thread-title-actions">
-              <a class="icon-link" href="/open-threads/{{ thread.id }}/edit">Edit</a>
+              <a class="icon-link thread-edit-link" href="/open-threads/{{ thread.id }}/edit">Edit</a>
               <form method="post" action="/open-threads/{{ thread.id }}/delete">
                 <button class="danger-button" type="submit">Delete</button>
               </form>

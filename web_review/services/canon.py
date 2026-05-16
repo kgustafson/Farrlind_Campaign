@@ -494,6 +494,96 @@ def murder_hobo_count(encounters: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def campaign_timeline() -> dict[str, Any]:
+    sessions = _fetch("""
+        SELECT
+            s.id,
+            s.session_number,
+            s.session_date,
+            s.in_game_date,
+            s.title,
+            s.summary,
+            l.name AS primary_location
+        FROM session s
+        LEFT JOIN location l ON l.id = s.location_id
+        ORDER BY s.session_number;
+    """)
+    events = _fetch("""
+        SELECT
+            e.session_id,
+            e.sequence_order,
+            et.type_name AS event_type,
+            l.name AS location,
+            e.description,
+            e.significance
+        FROM session_event e
+        LEFT JOIN event_type et ON et.id = e.event_type_id
+        LEFT JOIN location l ON l.id = e.location_id
+        WHERE e.significance >= 4
+        ORDER BY e.session_id, e.sequence_order, e.id;
+    """)
+    travels = _fetch("""
+        SELECT
+            tr.session_id,
+            fl.name AS from_location,
+            tl.name AS to_location,
+            tr.travel_method,
+            tr.duration_days,
+            tr.duration_confidence,
+            tr.duration_basis,
+            tr.notes
+        FROM travel_log tr
+        LEFT JOIN location fl ON fl.id = tr.from_location_id
+        LEFT JOIN location tl ON tl.id = tr.to_location_id
+        ORDER BY tr.session_id, tr.id;
+    """)
+
+    events_by_session: dict[int, list[dict[str, Any]]] = {}
+    for event in events:
+        events_by_session.setdefault(event["session_id"], []).append(event)
+
+    travel_by_session: dict[int, list[dict[str, Any]]] = {}
+    for travel in travels:
+        travel_by_session.setdefault(travel["session_id"], []).append(travel)
+
+    rows: list[dict[str, Any]] = []
+    total_travel_days = 0
+    known_travel_segments = 0
+    for session in sessions:
+        session_travel = travel_by_session.get(session["id"], [])
+        for travel in session_travel:
+            if travel.get("duration_days") is not None:
+                total_travel_days += travel["duration_days"]
+                known_travel_segments += 1
+        session_events = events_by_session.get(session["id"], [])
+        rows.append({
+            "session_number": session["session_number"],
+            "session_label": f"Session {session['session_number']:02d}",
+            "session_date": session["session_date"],
+            "in_game_date": session["in_game_date"],
+            "title": session["title"],
+            "summary": session["summary"],
+            "primary_location": session["primary_location"],
+            "travel": session_travel,
+            "key_events": session_events,
+            "event_count": len(session_events),
+        })
+
+    first_session = rows[0] if rows else None
+    last_session = rows[-1] if rows else None
+    return {
+        "stats": {
+            "session_count": len(rows),
+            "total_travel_days": total_travel_days,
+            "known_travel_segments": known_travel_segments,
+            "first_in_game_date": first_session["in_game_date"] if first_session else None,
+            "latest_in_game_date": last_session["in_game_date"] if last_session else None,
+            "current_location": last_session["primary_location"] if last_session else None,
+        },
+        "rows": rows,
+    }
+
+
 def songbook_rows() -> list[dict[str, Any]]:
     rows = _fetch("""
         SELECT
