@@ -148,6 +148,7 @@ audio/transcript
 - Define backup and restore expectations for local development.
 - Track seed/reference data that should be treated as managed project data.
 - Strengthen canon integrity checks as the review workflow grows.
+- Plan and execute a deliberate PostgreSQL major-version upgrade from `postgres:16` to latest current PostgreSQL, presently PostgreSQL 18. Use dump/restore or `pg_upgrade` with a fresh volume, verify the web container `postgresql-client` major version matches the database server, restore-test the backup, and run the Project Utilities smoke test before retiring the PostgreSQL 16 volume.
 - Evaluate upgrading the local development virtual environment from Python 3.9 to Python 3.11 by creating a parallel venv, installing requirements, and validating faster-whisper transcription, the worker skeleton, the web app, and the full test suite before replacing `rag-env`.
 
 ## Resolved Questions

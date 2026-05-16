@@ -1,5 +1,12 @@
 # Revision History
 
+## v0.4.10 - 5/16/2026
+
+Added the PostgreSQL 18 upgrade task to Data Management.
+
+- Docs: Added a planned major-version upgrade from `postgres:16` to PostgreSQL 18.
+- Docs: Captured dump/restore or `pg_upgrade`, fresh-volume, matching-client, restore-test, and smoke-test guardrails.
+
 ## v0.4.9 - 5/16/2026
 
 Pinned the web container backup client to PostgreSQL 16.

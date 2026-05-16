@@ -1,6 +1,6 @@
 # Version
 
-v0.4.9
+v0.4.10
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.9` pins the web container backup client to PostgreSQL 16.
+`v0.4.10` adds the PostgreSQL 18 upgrade task to Data Management.
