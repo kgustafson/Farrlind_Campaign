@@ -1,6 +1,6 @@
 # Version
 
-v0.4.12
+v0.4.13
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.12` adds illustrated stat-card icons to the Campaign Timeline.
+`v0.4.13` switches archive icons to the standardized 512px artwork.

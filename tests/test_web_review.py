@@ -1327,6 +1327,7 @@ class NPCRouteTest(unittest.TestCase):
         self.assertIn("Alistair", response.text)
         self.assertIn("Coast near Catur", response.text)
         self.assertIn('href="/npcs"', response.text)
+        self.assertIn("/static/npc-registry-icon.png", response.text)
         self.assertIn("Add New", response.text)
         self.assertNotIn("Add NPC</h2>", response.text)
 
@@ -1472,6 +1473,7 @@ class ArtifactRouteTest(unittest.TestCase):
         self.assertIn('title="Given by Balrog dwarves, Session 20"', response.text)
         self.assertIn("Faban Colon", response.text)
         self.assertIn('href="/artifacts"', response.text)
+        self.assertIn("/static/artifacts-icon.png", response.text)
         self.assertIn("Add New", response.text)
         self.assertNotIn("Add Artifact</h2>", response.text)
 
@@ -1781,6 +1783,7 @@ class CombatEncounterRouteTest(unittest.TestCase):
         self.assertIn("Murder Hobo Count", response.text)
         self.assertIn(">6<", response.text)
         self.assertIn('href="/combat-encounters"', response.text)
+        self.assertIn("/static/combat-encounters-icon.png", response.text)
 
     def test_combat_encounters_api_returns_rows(self):
         with patch("web_review.services.canon.combat_encounter_rows", return_value=self.combat_rows()):
@@ -1855,9 +1858,9 @@ class CampaignTimelineRouteTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Campaign Timeline", response.text)
         self.assertIn("Known Travel Days", response.text)
-        self.assertIn("/static/timeline-sessions-icon.svg", response.text)
-        self.assertIn("/static/timeline-travel-icon.svg", response.text)
-        self.assertIn("/static/timeline-location-icon.svg", response.text)
+        self.assertIn("/static/timeline-sessions-icon.png", response.text)
+        self.assertIn("/static/timeline-travel-icon.png", response.text)
+        self.assertIn("/static/timeline-location-icon.png", response.text)
         self.assertIn("campaign-flow", response.text)
         self.assertIn('class="session-orb"', response.text)
         self.assertIn('href="#session-20-modal"', response.text)
@@ -1970,6 +1973,7 @@ class SongbookRouteTest(unittest.TestCase):
         self.assertIn("/songbook/1/audio", response.text)
         self.assertIn("/songbook/1/lyrics", response.text)
         self.assertIn('href="/songbook"', response.text)
+        self.assertIn("/static/fabans-songbook-icon.png", response.text)
         self.assertIn("Read Faban", response.text)
         self.assertIn("A bard", response.text)
 

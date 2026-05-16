@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.4.13 - 5/16/2026
+
+Switched archive icons to the standardized 512px artwork.
+
+- App: Replaced temporary SVG stat icons with final 512px PNG icons for sessions, travel days, and current location.
+- App: Added title-card icons for NPC Registry, Artifacts, Combat Encounters, and Faban's Songbook.
+- App: Kept responsive sizing so title-card and stat-card artwork remains secondary to the page text.
+- Docs: Cleaned `docs/images` down to the standardized 512px source images.
+- Tests: Updated route coverage for timeline and section-header icon assets.
+
 ## v0.4.12 - 5/16/2026
 
 Added illustrated stat-card icons to the Campaign Timeline.

@@ -188,6 +188,25 @@ main {
   gap: 16px;
   margin-bottom: 18px;
 }
+.archive-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.archive-section-title > div {
+  min-width: 0;
+}
+.archive-section-icon {
+  flex: 0 0 auto;
+  width: clamp(78px, 9vw, 116px);
+  height: clamp(78px, 9vw, 116px);
+  object-fit: contain;
+  opacity: .9;
+  filter: sepia(.12) saturate(.9) contrast(.98);
+}
 h1 {
   margin: 0;
   font-size: 24px;
@@ -1310,14 +1329,15 @@ dd { margin: 0; }
 .timeline-stat-card {
   display: grid;
   align-content: start;
-  min-height: 250px;
+  min-height: 300px;
 }
 .timeline-stat-icon {
   position: relative;
   z-index: 1;
   display: block;
-  width: min(190px, 72%);
-  height: 88px;
+  width: min(150px, 58%);
+  height: auto;
+  max-height: 150px;
   margin: -2px auto 12px;
   object-fit: contain;
   opacity: .9;
@@ -1802,8 +1822,8 @@ dd { margin: 0; }
     min-height: 0;
   }
   .timeline-stat-icon {
-    width: min(170px, 58%);
-    height: 78px;
+    width: min(136px, 48%);
+    max-height: 136px;
   }
   .timeline-modal-meta {
     grid-template-columns: 1fr;
@@ -1844,6 +1864,13 @@ dd { margin: 0; }
   .archive-section-head {
     align-items: flex-start;
     flex-direction: column;
+  }
+  .archive-section-title {
+    align-items: flex-start;
+  }
+  .archive-section-icon {
+    width: 74px;
+    height: 74px;
   }
   .add-new-link {
     align-self: flex-start;

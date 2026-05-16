@@ -3,10 +3,13 @@
 {% block body_class %}archive-dashboard{% endblock %}
 {% block content %}
 <section class="page-head archive-section-head">
-  <div>
-    <p class="eyebrow">Relics, Tools, and Dangerous Keepsakes</p>
-    <h1>Artifacts</h1>
-    <p>Canon artifacts known to the campaign database, including discovery, lore weight, flags, and current holder.</p>
+  <div class="archive-section-title">
+    <div>
+      <p class="eyebrow">Relics, Tools, and Dangerous Keepsakes</p>
+      <h1>Artifacts</h1>
+      <p>Canon artifacts known to the campaign database, including discovery, lore weight, flags, and current holder.</p>
+    </div>
+    <img class="archive-section-icon" src="/static/artifacts-icon.png" alt="" aria-hidden="true">
   </div>
   {% if can_edit() %}<a class="icon-link add-new-link" href="/artifacts?modal=add">Add New</a>{% endif %}
 </section>

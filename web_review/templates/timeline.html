@@ -12,19 +12,19 @@
 
 <section class="archive-stat-row timeline-stats" aria-label="Campaign timeline statistics">
   <div class="archive-stat-card timeline-stat-card">
-    <img class="timeline-stat-icon" src="/static/timeline-sessions-icon.svg" alt="" aria-hidden="true">
+    <img class="timeline-stat-icon" src="/static/timeline-sessions-icon.png" alt="" aria-hidden="true">
     <span class="stat-label">Reviewed Sessions</span>
     <strong>{{ timeline.stats.session_count }}</strong>
     <span class="stat-note">{{ timeline.stats.first_in_game_date or "unknown" }} to {{ timeline.stats.latest_in_game_date or "unknown" }}</span>
   </div>
   <div class="archive-stat-card timeline-stat-card">
-    <img class="timeline-stat-icon" src="/static/timeline-travel-icon.svg" alt="" aria-hidden="true">
+    <img class="timeline-stat-icon" src="/static/timeline-travel-icon.png" alt="" aria-hidden="true">
     <span class="stat-label">Known Travel Days</span>
     <strong>{{ timeline.stats.total_travel_days }}</strong>
     <span class="stat-note">{{ timeline.stats.known_travel_segments }} dated or inferred travel segments</span>
   </div>
   <div class="archive-stat-card timeline-stat-card">
-    <img class="timeline-stat-icon" src="/static/timeline-location-icon.svg" alt="" aria-hidden="true">
+    <img class="timeline-stat-icon" src="/static/timeline-location-icon.png" alt="" aria-hidden="true">
     <span class="stat-label">Current Canon Location</span>
     <strong>{{ timeline.stats.current_location or "unknown" }}</strong>
     <span class="stat-note">Taken from the latest reviewed session primary location.</span>
