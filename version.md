@@ -1,6 +1,6 @@
 # Version
 
-v0.4.20
+v0.4.21
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.20` adds Project Utilities session initiation for new workflow runs.
+`v0.4.21` adds a shared World Map modal to the edit and archive interfaces.

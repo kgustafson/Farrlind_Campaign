@@ -321,6 +321,17 @@ class WebReviewAppTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(f"Farrlind Campaign {app_version()}", response.text)
 
+    def test_dashboard_renders_world_map_modal_link(self):
+        with patch.object(reviews, "dashboard_rows", return_value=[]):
+            client = TestClient(app)
+            response = client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('href="#world-map-modal"', response.text)
+        self.assertIn("World Map", response.text)
+        self.assertIn("/static/farrlind-world-map.png", response.text)
+        self.assertIn("Farrlind World Map", response.text)
+
     def test_print_view_renders_source_markdown(self):
         client = TestClient(app)
         response = client.get("/sessions/session20/review?source=final&view=print")
@@ -2595,6 +2606,8 @@ class WorkflowRouteTest(unittest.TestCase):
 
         self.assertEqual(dashboard_response.status_code, 200)
         self.assertIn("Published Archive", dashboard_response.text)
+        self.assertIn("World Map", dashboard_response.text)
+        self.assertIn("/static/farrlind-world-map.png", dashboard_response.text)
         self.assertNotIn("Workflow Status", dashboard_response.text)
         self.assertNotIn("Validation Queue", dashboard_response.text)
         self.assertNotIn('href="/workflow"', dashboard_response.text)

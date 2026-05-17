@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.4.21 - 5/17/2026
+
+Added a shared Farrlind World Map modal.
+
+- App: Added a World Map link to the shared archive sidebar for both edit and archive modes.
+- App: Added a large responsive map modal using the Farrlind map PNG.
+- App: Copied the map image into web static assets for reliable container serving.
+- Tests: Added dashboard coverage for the World Map link and modal asset in edit and archive modes.
+
 ## v0.4.20 - 5/17/2026
 
 Added Project Utilities session initiation.

@@ -31,6 +31,7 @@
         <a class="sidebar-link {% if request.url.path.startswith('/combat-encounters') %}active{% endif %}" href="/combat-encounters">Combat Encounters</a>
         <a class="sidebar-link {% if request.url.path.startswith('/open-threads') %}active{% endif %}" href="/open-threads">Open Threads</a>
         <a class="sidebar-link {% if request.url.path.startswith('/songbook') %}active{% endif %}" href="/songbook">Faban&rsquo;s Songbook</a>
+        <a class="sidebar-link world-map-link" href="#world-map-modal">World Map</a>
         {% if can_edit() %}
         <a class="sidebar-link {% if request.url.path.startswith('/project-utilities') %}active{% endif %}" href="/project-utilities">Project Utilities</a>
         <span class="sidebar-link disabled" aria-disabled="true">Validation Queue</span>
@@ -43,5 +44,16 @@
       <footer class="app-version">Farrlind Campaign {{ app_version() }}</footer>
     </main>
   </div>
+  <section id="world-map-modal" class="world-map-modal-backdrop" aria-labelledby="world-map-title">
+    <div class="world-map-modal" role="dialog" aria-modal="true">
+      <div class="modal-head world-map-head">
+        <h2 id="world-map-title">Farrlind World Map</h2>
+        <a class="modal-close" href="{{ request.url.path }}" aria-label="Close world map">x</a>
+      </div>
+      <div class="world-map-frame">
+        <img src="/static/farrlind-world-map.png" alt="Map of Farrlind">
+      </div>
+    </div>
+  </section>
 </body>
 </html>

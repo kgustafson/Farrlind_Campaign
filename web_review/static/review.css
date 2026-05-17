@@ -1207,6 +1207,52 @@ dd { margin: 0; }
   line-height: 1;
   text-decoration: none;
 }
+.world-map-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: none;
+  place-items: center;
+  padding: clamp(12px, 2vw, 28px);
+  background: rgba(24, 17, 10, .76);
+  backdrop-filter: blur(3px);
+}
+.world-map-modal-backdrop:target {
+  display: grid;
+}
+.world-map-modal {
+  width: min(1296px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  padding: 14px;
+  border: 1px solid rgba(197, 149, 64, .55);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 245, 210, .82), rgba(198, 151, 73, .24)),
+    var(--parchment);
+  box-shadow: 0 28px 80px rgba(10, 6, 3, .58);
+}
+.world-map-head {
+  margin-bottom: 12px;
+}
+.world-map-frame {
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  border: 1px solid rgba(110, 67, 24, .28);
+  background: rgba(44, 28, 14, .18);
+}
+.world-map-frame img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100vh - 130px);
+  object-fit: contain;
+}
 .field-block input,
 .field-block select,
 .field-block textarea {
