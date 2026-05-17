@@ -1,5 +1,12 @@
 # Revision History
 
+## v0.4.23 - 5/17/2026
+
+Fixed audio-registration workflow updates for session initiation.
+
+- Workflow: Qualified workflow-step timestamp columns when marking source audio registration complete.
+- App: Verified session 21 can be re-registered with `audio/session21.wav` and the workflow moves Source Audio Registered to complete.
+
 ## v0.4.22 - 5/17/2026
 
 Preserved the editable Farrlind world map source artwork.

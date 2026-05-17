@@ -123,8 +123,8 @@ def initiate_session(values: dict[str, Any]) -> int:
             UPDATE workflow_step_state wss
             SET
                 status = :status,
-                started_at = COALESCE(started_at, CASE WHEN :status = 'complete' THEN NOW() ELSE started_at END),
-                completed_at = CASE WHEN :status = 'complete' THEN COALESCE(completed_at, NOW()) ELSE completed_at END,
+                started_at = COALESCE(wss.started_at, CASE WHEN :status = 'complete' THEN NOW() ELSE wss.started_at END),
+                completed_at = CASE WHEN :status = 'complete' THEN COALESCE(wss.completed_at, NOW()) ELSE wss.completed_at END,
                 summary_comment = :summary_comment,
                 inputs = CAST(:artifacts AS jsonb),
                 outputs = CAST(:artifacts AS jsonb),

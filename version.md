@@ -1,6 +1,6 @@
 # Version
 
-v0.4.22
+v0.4.23
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.22` preserves the editable Farrlind world map source artwork.
+`v0.4.23` fixes audio-registration workflow updates for session initiation.
