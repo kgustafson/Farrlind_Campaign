@@ -67,7 +67,51 @@
     <p>Manage controlled reference values for canon editing and workflow state.</p>
     <a class="icon-link" href="/project-utilities/lookups">Manage Lookups</a>
   </article>
+  <article class="utility-card">
+    <h2>Initiate Session</h2>
+    <p>Register a new session and seed its workflow ledger from the campaign pipeline.</p>
+    <a class="icon-link" href="/project-utilities?modal=initiate-session">Start Session</a>
+  </article>
 </section>
+
+{% if show_session_modal %}
+<section class="modal-backdrop" role="presentation">
+  <div class="archive-modal" role="dialog" aria-modal="true" aria-labelledby="session-init-modal-title">
+    <div class="modal-head">
+      <h2 id="session-init-modal-title">Initiate Session Workflow</h2>
+      <a class="modal-close" href="/project-utilities" aria-label="Close session initiation form">x</a>
+    </div>
+    <form method="post" action="/project-utilities/initiate-session">
+      <div class="form-grid two-col">
+        <label class="field-block">
+          <span>Session Number</span>
+          <input type="number" name="session_number" min="0" value="{{ next_session_number }}" required>
+        </label>
+        <label class="field-block">
+          <span>Real Session Date</span>
+          <input type="date" name="session_date" value="{{ today }}">
+        </label>
+      </div>
+      <label class="field-block">
+        <span>Title</span>
+        <input type="text" name="title" value="Session {{ "%02d"|format(next_session_number) }}">
+      </label>
+      <label class="field-block">
+        <span>Audio File Path</span>
+        <input type="text" name="audio_file_path" placeholder="/Volumes/T7_WORK/.../session{{ "%02d"|format(next_session_number) }}.wav">
+      </label>
+      <label class="field-block">
+        <span>Operator Notes</span>
+        <textarea name="notes" rows="4" placeholder="Anything useful about source files, recording quality, or session setup."></textarea>
+      </label>
+      <div class="form-actions">
+        <button type="submit">Initiate Workflow</button>
+        <a class="icon-link secondary-link" href="/project-utilities">Cancel</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endif %}
 
 <section class="source-pane project-doc-viewer" aria-label="{{ active_document.filename }} viewer">
   <div class="document-viewer-head">

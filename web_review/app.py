@@ -1,4 +1,5 @@
 import os
+from datetime import date
 from uuid import uuid4
 from typing import Optional
 
@@ -176,6 +177,16 @@ def lookup_form_values(form) -> dict[str, str]:
     return {
         "value": (form.get("value") or "").strip(),
         "description": (form.get("description") or "").strip(),
+    }
+
+
+def session_initiation_form_values(form) -> dict:
+    return {
+        "session_number": (form.get("session_number") or "").strip(),
+        "session_date": (form.get("session_date") or "").strip(),
+        "title": (form.get("title") or "").strip(),
+        "audio_file_path": (form.get("audio_file_path") or "").strip(),
+        "notes": (form.get("notes") or "").strip(),
     }
 
 
@@ -813,13 +824,17 @@ def timeline_index(request: Request):
 
 
 @app.get("/project-utilities", response_class=HTMLResponse)
-def project_utilities(request: Request, document: str = "todo", command_result: str = "", backup: str = ""):
+def project_utilities(request: Request, document: str = "todo", command_result: str = "", backup: str = "", modal: str = ""):
     if not can_edit():
         raise HTTPException(status_code=404, detail="Project utilities are not available in archive mode.")
     try:
         active_document = project_document(document)
     except OSError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
+    try:
+        next_session = workflow.next_session_number()
+    except workflow.WorkflowReadError:
+        next_session = 0
     return templates.TemplateResponse(
         request,
         "project_utilities.html",
@@ -827,8 +842,25 @@ def project_utilities(request: Request, document: str = "todo", command_result: 
             "active_document": active_document,
             "command_result": COMMAND_RESULTS.get(command_result) if command_result else None,
             "backup": BACKUP_DOWNLOADS.get(backup) if backup else None,
+            "next_session_number": next_session,
+            "today": date.today().isoformat(),
+            "show_session_modal": modal == "initiate-session",
         },
     )
+
+
+@app.post("/project-utilities/initiate-session")
+async def project_utilities_initiate_session(request: Request):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Project utilities are not available in archive mode.")
+    form = await request.form()
+    values = session_initiation_form_values(form)
+    try:
+        session_number = workflow.initiate_session(values)
+    except workflow.WorkflowWriteError as exc:
+        token = store_command_result("Initiate Session", commands.CommandResult(1, "", str(exc)))
+        return RedirectResponse(url=f"/project-utilities?command_result={token}&modal=initiate-session", status_code=303)
+    return RedirectResponse(url=f"/workflow?session={session_number}", status_code=303)
 
 
 @app.get("/project-utilities/lookups", response_class=HTMLResponse)

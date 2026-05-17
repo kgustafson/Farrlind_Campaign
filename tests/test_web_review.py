@@ -1943,8 +1943,9 @@ class ProjectUtilitiesRouteTest(unittest.TestCase):
         BACKUP_DOWNLOADS.clear()
 
     def test_project_utilities_page_renders_todo_viewer(self):
-        client = TestClient(app)
-        response = client.get("/project-utilities")
+        with patch("web_review.services.workflow.next_session_number", return_value=21):
+            client = TestClient(app)
+            response = client.get("/project-utilities")
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Project Utilities", response.text)
@@ -1952,10 +1953,49 @@ class ProjectUtilitiesRouteTest(unittest.TestCase):
         self.assertIn("Backup Database", response.text)
         self.assertIn("Run Smoke Test", response.text)
         self.assertIn("Lookup Tables", response.text)
+        self.assertIn("Initiate Session", response.text)
         self.assertIn('href="/project-utilities/lookups"', response.text)
+        self.assertIn('href="/project-utilities?modal=initiate-session"', response.text)
         self.assertIn("/static/project-utilities-icon.png", response.text)
         self.assertIn("todo.md", response.text)
         self.assertIn('href="/project-utilities"', response.text)
+
+    def test_project_utilities_session_initiation_modal_renders_defaults(self):
+        with patch("web_review.services.workflow.next_session_number", return_value=21):
+            client = TestClient(app)
+            response = client.get("/project-utilities?modal=initiate-session")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Initiate Session Workflow", response.text)
+        self.assertIn('name="session_number"', response.text)
+        self.assertIn('value="21"', response.text)
+        self.assertIn('name="audio_file_path"', response.text)
+        self.assertIn("/project-utilities/initiate-session", response.text)
+
+    def test_project_utilities_session_initiation_posts_to_workflow(self):
+        with patch("web_review.services.workflow.initiate_session", return_value=21) as initiate:
+            client = TestClient(app)
+            response = client.post(
+                "/project-utilities/initiate-session",
+                data={
+                    "session_number": "21",
+                    "session_date": "2026-05-17",
+                    "title": "Storm over Catur",
+                    "audio_file_path": "/tmp/session21.wav",
+                    "notes": "Fresh session.",
+                },
+                follow_redirects=False,
+            )
+
+        self.assertEqual(response.status_code, 303)
+        self.assertEqual(response.headers["location"], "/workflow?session=21")
+        initiate.assert_called_once_with({
+            "session_number": "21",
+            "session_date": "2026-05-17",
+            "title": "Storm over Catur",
+            "audio_file_path": "/tmp/session21.wav",
+            "notes": "Fresh session.",
+        })
 
     def lookup_context_patches(self, editing=None):
         return (
@@ -2048,8 +2088,9 @@ class ProjectUtilitiesRouteTest(unittest.TestCase):
         delete.assert_called_once_with("combat-outcomes", 4)
 
     def test_project_utilities_page_renders_revision_viewer(self):
-        client = TestClient(app)
-        response = client.get("/project-utilities?document=revision")
+        with patch("web_review.services.workflow.next_session_number", return_value=21):
+            client = TestClient(app)
+            response = client.get("/project-utilities?document=revision")
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("revision.md", response.text)
@@ -2198,6 +2239,53 @@ class WellsLoreRouteTest(unittest.TestCase):
 
 
 class WorkflowServiceTest(unittest.TestCase):
+    def test_next_session_number_reads_max_session(self):
+        with patch("web_review.db.fetch_all", return_value=[{"next_session_number": 21}]) as fetch:
+            loaded = workflow.next_session_number()
+
+        self.assertEqual(loaded, 21)
+        self.assertIn("MAX(session_number)", fetch.call_args.args[0])
+
+    def test_initiate_session_seeds_workflow_and_audio_step(self):
+        definition = {
+            "workflow": {
+                "id": "farrlind_session_canon",
+                "version": 1,
+                "display_name": "Farrlind Session Canon Workflow",
+                "definition_format": "test",
+                "scope": "per_session",
+                "state_persistence": "database",
+            },
+            "steps": [{
+                "id": "source_audio_registered",
+                "display_name": "Source Audio Registered",
+                "lane": "intake",
+                "expected_inputs": ["audio/sessionXX.wav"],
+                "expected_outputs": ["audio/sessionXX.wav"],
+                "dependencies": [],
+            }],
+        }
+        with tempfile.NamedTemporaryFile(suffix=".wav") as audio, \
+             patch("raglib.workflow_state.load_workflow_definition", return_value=definition), \
+             patch("web_review.services.workflow._execute_transaction") as execute:
+            loaded = workflow.initiate_session({
+                "session_number": "21",
+                "session_date": "2026-05-17",
+                "title": "Storm over Catur",
+                "audio_file_path": audio.name,
+                "notes": "Fresh session.",
+            })
+
+        self.assertEqual(loaded, 21)
+        statements = execute.call_args.args[0]
+        joined_sql = "\n".join(statement for statement, _ in statements)
+        self.assertIn("CREATE TABLE IF NOT EXISTS workflow_run", joined_sql)
+        self.assertIn("INSERT INTO workflow_run", joined_sql)
+        self.assertIn("UPDATE session", joined_sql)
+        self.assertIn("source_audio_registered", joined_sql)
+        self.assertEqual(statements[-1][1]["status"], "complete")
+        self.assertEqual(statements[-1][1]["artifacts"], f'["{audio.name}"]')
+
     def test_workflow_rows_reads_aggregate_progress(self):
         rows = [{
             "session_number": 20,

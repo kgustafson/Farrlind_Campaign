@@ -1,6 +1,6 @@
 # Version
 
-v0.4.19
+v0.4.20
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.19` adds edit modal icons for NPCs, Locations, and Artifacts.
+`v0.4.20` adds Project Utilities session initiation for new workflow runs.

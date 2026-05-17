@@ -1,5 +1,16 @@
 # Revision History
 
+## v0.4.20 - 5/17/2026
+
+Added Project Utilities session initiation.
+
+- App: Added an Initiate Session card and modal form under Project Utilities for edit mode.
+- Workflow: Added a database-backed workflow initiation service that seeds the session workflow from `workflows/session_workflow.yaml`.
+- Workflow: Captures real session date, optional audio file path, and operator notes without overwriting reviewed canon.
+- Workflow: Marks source audio registration complete only when the supplied audio file exists; otherwise the workflow remains pending for that step.
+- Tests: Added route and workflow-service coverage for session initiation and next-session defaults.
+- Runtime: Added missing `requests` and `httpx` dependencies so the existing tests and script imports work after container rebuilds.
+
 ## v0.4.19 - 5/16/2026
 
 Added edit modal icons for NPCs, Locations, and Artifacts.

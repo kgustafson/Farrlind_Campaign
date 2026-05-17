@@ -1,6 +1,11 @@
+import json
+from pathlib import Path
 from typing import Any, Optional
+
+from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
+from raglib import workflow_state
 from web_review import db
 from web_review.services import reviews
 
@@ -9,11 +14,142 @@ class WorkflowReadError(RuntimeError):
     pass
 
 
+class WorkflowWriteError(RuntimeError):
+    pass
+
+
 def _fetch(sql: str, params: Optional[dict[str, Any]] = None) -> list[dict[str, Any]]:
     try:
         return db.fetch_all(sql, params)
     except SQLAlchemyError as exc:
         raise WorkflowReadError(str(exc)) from exc
+
+
+def _execute_transaction(statements: list[tuple[str, dict[str, Any]]]) -> None:
+    try:
+        engine = db.make_engine()
+        with engine.begin() as connection:
+            for sql, params in statements:
+                connection.execute(text(sql), params)
+    except SQLAlchemyError as exc:
+        raise WorkflowWriteError(str(exc)) from exc
+
+
+def _split_sql(sql: str) -> list[str]:
+    return [statement.strip() for statement in sql.split(";") if statement.strip()]
+
+
+def next_session_number() -> int:
+    rows = _fetch("SELECT COALESCE(MAX(session_number), -1) + 1 AS next_session_number FROM session;")
+    return int(rows[0]["next_session_number"]) if rows else 0
+
+
+def initiate_session(values: dict[str, Any]) -> int:
+    try:
+        session_number = workflow_state.parse_session_number(values["session_number"])
+    except (KeyError, ValueError) as exc:
+        raise WorkflowWriteError(str(exc)) from exc
+
+    title = (values.get("title") or f"Session {session_number:02d}").strip()
+    session_date = (values.get("session_date") or "").strip() or None
+    audio_path = (values.get("audio_file_path") or "").strip()
+    notes = (values.get("notes") or "").strip()
+    definition = workflow_state.load_workflow_definition()
+
+    metadata = {
+        "initiated_from": "project_utilities",
+        "real_session_date": session_date,
+        "audio_file_path": audio_path or None,
+    }
+    if audio_path:
+        metadata["audio_file_exists_at_initiation"] = Path(audio_path).expanduser().exists()
+
+    summary_comment = "Session workflow initiated from Project Utilities."
+    if audio_path:
+        summary_comment += f" Audio path registered: {audio_path}."
+    if notes:
+        summary_comment += f" {notes}"
+
+    statements: list[tuple[str, dict[str, Any]]] = []
+    statements.extend((statement, {}) for statement in _split_sql(workflow_state.workflow_state_schema_sql()))
+    statements.extend((statement, {}) for statement in _split_sql(workflow_state.workflow_init_body_sql(session_number, definition)))
+    statements.append((
+        """
+        UPDATE session
+        SET
+            session_date = COALESCE(CAST(:session_date AS date), session_date),
+            title = :title,
+            audio_file_path = COALESCE(NULLIF(:audio_file_path, ''), audio_file_path),
+            notes = CASE
+                WHEN NULLIF(:notes, '') IS NULL THEN notes
+                WHEN notes IS NULL OR notes = '' THEN :notes
+                ELSE notes || E'\n' || :notes
+            END
+        WHERE session_number = :session_number;
+        """,
+        {
+            "session_number": session_number,
+            "session_date": session_date,
+            "title": title,
+            "audio_file_path": audio_path,
+            "notes": notes,
+        },
+    ))
+    statements.append((
+        """
+        UPDATE workflow_run wr
+        SET
+            summary_comment = :summary_comment,
+            metadata = wr.metadata || CAST(:metadata AS jsonb)
+        FROM session s
+        WHERE wr.session_id = s.id
+          AND s.session_number = :session_number
+          AND wr.workflow_id = :workflow_id
+          AND wr.workflow_version = :workflow_version;
+        """,
+        {
+            "session_number": session_number,
+            "workflow_id": definition["workflow"]["id"],
+            "workflow_version": int(definition["workflow"]["version"]),
+            "summary_comment": summary_comment,
+            "metadata": json.dumps(metadata),
+        },
+    ))
+
+    if audio_path:
+        audio_exists = Path(audio_path).expanduser().exists()
+        statements.append((
+            """
+            UPDATE workflow_step_state wss
+            SET
+                status = :status,
+                started_at = COALESCE(started_at, CASE WHEN :status = 'complete' THEN NOW() ELSE started_at END),
+                completed_at = CASE WHEN :status = 'complete' THEN COALESCE(completed_at, NOW()) ELSE completed_at END,
+                summary_comment = :summary_comment,
+                inputs = CAST(:artifacts AS jsonb),
+                outputs = CAST(:artifacts AS jsonb),
+                metadata = wss.metadata || CAST(:metadata AS jsonb)
+            FROM workflow_run wr
+            JOIN session s ON s.id = wr.session_id
+            WHERE wss.workflow_run_id = wr.id
+              AND s.session_number = :session_number
+              AND wr.workflow_id = :workflow_id
+              AND wr.workflow_version = :workflow_version
+              AND wss.step_id = 'source_audio_registered';
+            """,
+            {
+                "session_number": session_number,
+                "workflow_id": definition["workflow"]["id"],
+                "workflow_version": int(definition["workflow"]["version"]),
+                "status": "complete" if audio_exists else "pending",
+                "summary_comment": f"Audio path registered: {audio_path} ({'file exists' if audio_exists else 'file not found yet'}).",
+                "artifacts": json.dumps([audio_path]),
+                "metadata": json.dumps({"audio_file_path": audio_path, "audio_file_exists": audio_exists}),
+            },
+        ))
+
+    _execute_transaction(statements)
+    return session_number
 
 
 def workflow_rows() -> list[dict[str, Any]]:
