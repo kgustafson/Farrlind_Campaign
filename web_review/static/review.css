@@ -1175,6 +1175,20 @@ dd { margin: 0; }
   padding-bottom: 10px;
   border-bottom: 1px solid rgba(110, 67, 24, .24);
 }
+.modal-title-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.modal-title-icon {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  opacity: .9;
+  filter: sepia(.12) saturate(.9) contrast(.98);
+}
 .location-modal h2,
 .archive-modal h2 {
   margin: 0;

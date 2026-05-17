@@ -1234,6 +1234,7 @@ class LocationRouteTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Add Location", response.text)
+        self.assertIn("/static/location-edit-icon.png", response.text)
         self.assertIn('role="dialog"', response.text)
         self.assertIn('action="/locations"', response.text)
 
@@ -1294,6 +1295,7 @@ class LocationRouteTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Edit Location", response.text)
+        self.assertIn("/static/location-edit-icon.png", response.text)
         self.assertIn('role="dialog"', response.text)
         self.assertIn("Starting city.", response.text)
 
@@ -1387,6 +1389,7 @@ class NPCRouteTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Add NPC", response.text)
+        self.assertIn("/static/npc-edit-icon.png", response.text)
         self.assertIn('role="dialog"', response.text)
         self.assertIn('action="/npcs"', response.text)
 
@@ -1455,6 +1458,7 @@ class NPCRouteTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Edit NPC", response.text)
+        self.assertIn("/static/npc-edit-icon.png", response.text)
         self.assertIn('role="dialog"', response.text)
         self.assertIn("Coastal boat contact.", response.text)
 
@@ -1530,6 +1534,7 @@ class ArtifactRouteTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Add Artifact", response.text)
+        self.assertIn("/static/artifact-edit-icon.png", response.text)
         self.assertIn('role="dialog"', response.text)
         self.assertIn('action="/artifacts"', response.text)
 
@@ -1591,6 +1596,7 @@ class ArtifactRouteTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Edit Artifact", response.text)
+        self.assertIn("/static/artifact-edit-icon.png", response.text)
         self.assertIn('role="dialog"', response.text)
         self.assertIn("Matte black blade.", response.text)
 

@@ -1,6 +1,6 @@
 # Version
 
-v0.4.18
+v0.4.19
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.18` adds Project Utilities and Workflow Status title-card icons.
+`v0.4.19` adds edit modal icons for NPCs, Locations, and Artifacts.

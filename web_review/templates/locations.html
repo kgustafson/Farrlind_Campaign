@@ -78,7 +78,10 @@
 <section class="modal-backdrop" role="presentation">
   <div class="location-modal" role="dialog" aria-modal="true" aria-labelledby="location-modal-title">
     <div class="modal-head">
-      <h2 id="location-modal-title">{% if editing %}Edit Location{% else %}Add Location{% endif %}</h2>
+      <div class="modal-title-with-icon">
+        <img class="modal-title-icon" src="/static/location-edit-icon.png" alt="" aria-hidden="true">
+        <h2 id="location-modal-title">{% if editing %}Edit Location{% else %}Add Location{% endif %}</h2>
+      </div>
       <a class="modal-close" href="/locations" aria-label="Close location form">×</a>
     </div>
     <form method="post" action="{% if editing %}/locations/{{ editing.id }}{% else %}/locations{% endif %}">

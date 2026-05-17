@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.4.19 - 5/16/2026
+
+Added edit modal icons for NPCs, Locations, and Artifacts.
+
+- App: Added standardized 512px source and static icons for NPC, Location, and Artifact add/edit modals.
+- App: Wired the icons into the shared Add New and Edit modal headers for each section.
+- Tests: Added route coverage for the add and edit modal icon assets.
+
 ## v0.4.18 - 5/16/2026
 
 Added Project Utilities and Workflow Status title-card icons.
