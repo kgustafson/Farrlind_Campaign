@@ -1,5 +1,12 @@
 # Revision History
 
+## v0.4.22 - 5/17/2026
+
+Preserved the editable Farrlind world map source artwork.
+
+- Docs: Added the Photoshop source file for the Farrlind world map alongside the exported PNG artwork.
+- Canon: Confirmed the Wells of Magic lore file has no remaining uncommitted content changes after line-ending normalization.
+
 ## v0.4.21 - 5/17/2026
 
 Added a shared Farrlind World Map modal.
