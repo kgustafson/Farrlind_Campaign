@@ -4,6 +4,7 @@
 <form method="post" action="/sessions/{{ session_key }}/review/save" class="review-form{% if not can_edit() %} archive-review-form{% endif %}">
 <input type="hidden" name="source" value="{{ source }}">
 <input type="hidden" name="view" value="{{ source_view }}">
+<input type="hidden" name="bucket" value="{{ selected_bucket }}">
 <section class="workspace-head">
   <div>
     <h1>{% if can_edit() %}{{ session_key }} Review{% else %}{{ session_key }} Archive{% endif %}</h1>
@@ -124,9 +125,9 @@
   <aside class="source-pane">
     {% if can_edit() %}
       <div class="segmented" aria-label="Source selector">
-        <a class="{% if source == "diary" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=diary&view={{ source_view }}">Diary</a>
-        <a class="{% if source == "draft" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=draft&view={{ source_view }}">Draft Summary</a>
-        <a class="{% if source == "final" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=final&view={{ source_view }}">Final Summary</a>
+        <a class="{% if source == "diary" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=diary&view={{ source_view }}&bucket={{ selected_bucket }}">Diary</a>
+        <a class="{% if source == "draft" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=draft&view={{ source_view }}&bucket={{ selected_bucket }}">Draft Summary</a>
+        <a class="{% if source == "final" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=final&view={{ source_view }}&bucket={{ selected_bucket }}">Final Summary</a>
       </div>
     {% else %}
       <div class="segmented archive-source-tabs" aria-label="Archive source selector">
@@ -138,8 +139,8 @@
       <h2>{% if not can_edit() and source == "final" %}Summary{% else %}{{ source_label }}{% endif %}</h2>
       {% if can_edit() %}
         <div class="segmented compact" aria-label="Source view selector">
-          <a class="{% if source_view == "raw" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source={{ source }}&view=raw">Source</a>
-          <a class="{% if source_view == "print" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source={{ source }}&view=print">Print</a>
+          <a class="{% if source_view == "raw" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source={{ source }}&view=raw&bucket={{ selected_bucket }}">Source</a>
+          <a class="{% if source_view == "print" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source={{ source }}&view=print&bucket={{ selected_bucket }}">Print</a>
         </div>
       {% endif %}
     </div>
@@ -159,7 +160,7 @@
     <section class="review-tools">
       <div>
         <h2>Batch Decisions</h2>
-        <p>Select rows, choose an outcome, and save the batch. Pending items stay at the top.</p>
+        <p>First bucket selected rows or reject them. Then resolve each bucket event by event.</p>
       </div>
       <label>
         <span>Outcome</span>
@@ -176,7 +177,7 @@
         <select name="batch_macro_event_id" {% if review_locked %}disabled{% endif %}>
           <option value="">none</option>
           {% for macro in macro_events %}
-            <option value="{{ macro.id }}">{{ macro.order }}. {{ macro.description }}</option>
+            <option value="{{ macro.id }}" {% if selected_bucket == macro.id %}selected{% endif %}>{{ macro.order }}. {{ macro.description }}</option>
           {% endfor %}
         </select>
       </label>
@@ -186,6 +187,9 @@
       </label>
       <button type="submit" formaction="/sessions/{{ session_key }}/review/batch" formmethod="post" {% if review_locked %}disabled{% endif %}>Save Batch</button>
     </section>
+    {% endif %}
+    {% if selected_bucket != "all" %}
+      <div class="flash muted-flash">Showing {{ items|length }} item{{ "s" if items|length != 1 else "" }} for this review bucket.</div>
     {% endif %}
     {% for item in items %}
     <article class="review-item editable-item">
@@ -327,7 +331,7 @@
     <section>
       <h2>High-Level Event Order</h2>
       <p class="muted">Build the session spine first, then bucket fragments into it.</p>
-      <a class="icon-link macro-edit-link" href="/sessions/{{ session_key }}/review?source={{ source }}&view={{ source_view }}&macro_modal=1">Edit High-Level Event Order</a>
+      <a class="icon-link macro-edit-link" href="/sessions/{{ session_key }}/review?source={{ source }}&view={{ source_view }}&bucket={{ selected_bucket }}&macro_modal=1">Edit High-Level Event Order</a>
       <dl class="meta-list macro-summary">
         <div><dt>Buckets</dt><dd>{{ macro_events|length }}</dd></div>
         {% if macro_events %}
@@ -335,6 +339,14 @@
           <div><dt>Last</dt><dd>{{ macro_events[-1].description }}</dd></div>
         {% endif %}
       </dl>
+      <nav class="bucket-nav" aria-label="Review buckets">
+        <a class="{% if selected_bucket == "all" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source={{ source }}&view={{ source_view }}&bucket=all">All <span>{{ bucket_counts.all }}</span></a>
+        <a class="{% if selected_bucket == "unbucketed" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source={{ source }}&view={{ source_view }}&bucket=unbucketed">Unbucketed <span>{{ bucket_counts.unbucketed }}</span></a>
+        {% for macro in macro_events %}
+          <a class="{% if selected_bucket == macro.id %}active{% endif %}" href="/sessions/{{ session_key }}/review?source={{ source }}&view={{ source_view }}&bucket={{ macro.id }}">{{ macro.order }}. {{ macro.description }} <span>{{ bucket_counts.get(macro.id, 0) }}</span></a>
+        {% endfor %}
+        <a class="{% if selected_bucket == "rejected" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source={{ source }}&view={{ source_view }}&bucket=rejected">Rejected <span>{{ bucket_counts.rejected }}</span></a>
+      </nav>
     </section>
     <section>
       <h2>Validation</h2>
@@ -422,7 +434,7 @@
         <h2 id="macro-modal-title">High-Level Event Order</h2>
         <p>Use decimals to insert between rows. Saving renumbers the order from 1 to N.</p>
       </div>
-      <a class="modal-close" href="/sessions/{{ session_key }}/review?source={{ source }}&view={{ source_view }}" aria-label="Close high-level event order">x</a>
+      <a class="modal-close" href="/sessions/{{ session_key }}/review?source={{ source }}&view={{ source_view }}&bucket={{ selected_bucket }}" aria-label="Close high-level event order">x</a>
     </div>
 
     <section class="macro-add-row" aria-label="Add high-level event">

@@ -85,9 +85,10 @@ def project_document(document: str) -> dict[str, str]:
     }
 
 
-def redirect_to_review(session_number: int, source: str, view: str, flag: str) -> RedirectResponse:
+def redirect_to_review(session_number: int, source: str, view: str, flag: str, bucket: str = "") -> RedirectResponse:
+    bucket_param = f"&bucket={bucket}" if bucket else ""
     return RedirectResponse(
-        url=f"/sessions/{reviews.session_key(session_number)}/review?source={source}&view={view}&{flag}",
+        url=f"/sessions/{reviews.session_key(session_number)}/review?source={source}&view={view}{bucket_param}&{flag}",
         status_code=303,
     )
 
@@ -259,7 +260,7 @@ def workflow_index(request: Request, session: Optional[int] = None):
 
 
 @app.get("/sessions/{session}/review", response_class=HTMLResponse)
-def session_review(request: Request, session: str, source: str = "diary", view: str = "raw"):
+def session_review(request: Request, session: str, source: str = "diary", view: str = "raw", bucket: str = ""):
     try:
         session_number = reviews.parse_session_ref(session)
     except ValueError as exc:
@@ -270,7 +271,7 @@ def session_review(request: Request, session: str, source: str = "diary", view: 
             source = "final"
         elif source not in {"diary", "final"}:
             source = "diary"
-    workspace = reviews.session_workspace(session_number, source, view)
+    workspace = reviews.session_workspace(session_number, source, view, bucket)
     workspace["locations"] = canon_location_names()
     try:
         workspace["location_types"] = canon.location_types()
@@ -303,7 +304,7 @@ async def save_session_review(request: Request, session: str):
     form_values = {key: form.getlist(key) for key in form.keys()}
     known_locations = canon_location_names()
     if location_confirmation_failed(form_values, form, known_locations):
-        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_confirm_failed=1")
+        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_confirm_failed=1", form.get("bucket") or "")
     updated = reviews.update_review_document_from_form(document, form_values)
     try:
         reviews.save_review_document(session_number, updated)
@@ -312,7 +313,7 @@ async def save_session_review(request: Request, session: str):
 
     source = form.get("source") or "diary"
     view = form.get("view") or "raw"
-    return redirect_to_review(session_number, source, view, "saved=1")
+    return redirect_to_review(session_number, source, view, "saved=1", form.get("bucket") or "")
 
 
 @app.post("/sessions/{session}/review/save-item")
@@ -332,14 +333,14 @@ async def save_session_review_item(request: Request, session: str):
     form_values = {key: form.getlist(key) for key in form.keys()}
     known_locations = canon_location_names()
     if location_confirmation_failed(form_values, form, known_locations):
-        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_confirm_failed=1")
+        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_confirm_failed=1", form.get("bucket") or "")
     updated = reviews.update_single_review_item_from_form(document, form_values, form.get("save_item_id") or "")
     try:
         reviews.save_review_document(session_number, updated)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
 
-    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "item_saved=1")
+    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "item_saved=1", form.get("bucket") or "")
 
 
 @app.post("/sessions/{session}/review/batch")
@@ -370,7 +371,7 @@ async def batch_session_review_items(request: Request, session: str):
             raise HTTPException(status_code=404, detail=str(exc))
 
     flag = "batch_saved=1" if not errors else "batch_failed=1"
-    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", flag)
+    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", flag, form.get("bucket") or "")
 
 
 @app.post("/sessions/{session}/review/macros")
@@ -391,14 +392,14 @@ async def save_session_review_macros(request: Request, session: str):
     known_locations = canon_location_names()
     macro_locations = form_values.get("macro_location", []) + form_values.get("new_macro_location", [])
     if not create_missing_review_locations(macro_locations, known_locations, session_number, "Added from high-level event order."):
-        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_add_failed=1&macro_modal=1")
+        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_add_failed=1&macro_modal=1", form.get("bucket") or "")
     updated = reviews.update_macro_events_from_form(document, form_values)
     try:
         reviews.save_review_document(session_number, updated)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
 
-    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "macros_saved=1&macro_modal=1")
+    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "macros_saved=1&macro_modal=1", form.get("bucket") or "")
 
 
 @app.post("/sessions/{session}/review/apply-macros")
@@ -425,7 +426,7 @@ async def apply_session_review_macros(request: Request, session: str):
             raise HTTPException(status_code=404, detail=str(exc))
 
     flag = "macros_applied=1" if not errors else "macros_apply_failed=1&macro_modal=1"
-    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", flag)
+    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", flag, form.get("bucket") or "")
 
 
 @app.post("/sessions/{session}/review/merge")

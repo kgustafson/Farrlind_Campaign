@@ -223,6 +223,9 @@ class WebReviewServiceTest(unittest.TestCase):
 
     def test_update_batch_decision_can_assign_bucket_without_decision(self):
         document = {
+            "macro_events": [
+                {"id": "macro-001", "order": 1, "description": "Plan", "location": "Western Coast"},
+            ],
             "items": [
                 {"id": "event-001", "decision": "pending", "applied_status": "pending"},
                 {"id": "event-002", "decision": "pending", "applied_status": "pending"},
@@ -235,7 +238,46 @@ class WebReviewServiceTest(unittest.TestCase):
         self.assertEqual(errors, [])
         self.assertEqual(updated["items"][0]["decision"], "pending")
         self.assertEqual(updated["items"][0]["macro_event_id"], "macro-001")
+        self.assertEqual(updated["items"][0]["location"], "Western Coast")
         self.assertNotIn("macro_event_id", updated["items"][1])
+
+    def test_update_review_document_inherits_bucket_location(self):
+        document = {
+            "macro_events": [
+                {"id": "macro-001", "order": 1, "description": "Audience", "location": "Catur"},
+            ],
+            "items": [
+                {"id": "event-001", "sequence": 1, "decision": "pending", "location": "", "applied_status": "pending"},
+            ],
+            "added_items": [],
+        }
+
+        updated = reviews.update_review_document_from_form(document, {
+            "item_id": ["event-001"],
+            "section": ["items"],
+            "sequence": ["1"],
+            "decision": ["pending"],
+            "canonical_text": [""],
+            "event_type": [""],
+            "location": [""],
+            "significance": [""],
+            "reason": [""],
+            "macro_event_id": ["macro-001"],
+        })
+
+        self.assertEqual(updated["items"][0]["macro_event_id"], "macro-001")
+        self.assertEqual(updated["items"][0]["location"], "Catur")
+
+    def test_filtered_review_items_supports_bucket_workflow(self):
+        items = [
+            {"id": "event-001", "macro_event_id": "macro-001", "decision": "pending"},
+            {"id": "event-002", "decision": "pending"},
+            {"id": "event-003", "macro_event_id": "macro-001", "decision": "rejected"},
+        ]
+
+        self.assertEqual([item["id"] for item in reviews.filtered_review_items(items, "macro-001")], ["event-001", "event-003"])
+        self.assertEqual([item["id"] for item in reviews.filtered_review_items(items, "unbucketed")], ["event-002"])
+        self.assertEqual([item["id"] for item in reviews.filtered_review_items(items, "rejected")], ["event-003"])
 
     def test_update_macro_events_from_form_adds_and_removes_buckets(self):
         document = {

@@ -205,6 +205,19 @@ def sorted_review_items(document: dict[str, Any]) -> list[dict[str, Any]]:
     return sorted(combined, key=lambda item: (decision_rank(item), sequence_value(item)))
 
 
+def filtered_review_items(items: list[dict[str, Any]], bucket: str = "") -> list[dict[str, Any]]:
+    if not bucket or bucket == "all":
+        return items
+    if bucket == "unbucketed":
+        return [
+            item for item in items
+            if not item.get("macro_event_id") and (item.get("decision") or "pending") != "rejected"
+        ]
+    if bucket == "rejected":
+        return [item for item in items if (item.get("decision") or "pending") == "rejected"]
+    return [item for item in items if item.get("macro_event_id") == bucket]
+
+
 def sorted_macro_events(document: dict[str, Any]) -> list[dict[str, Any]]:
     def order_value(item: dict[str, Any]) -> float:
         try:
@@ -220,6 +233,28 @@ def normalize_macro_event_orders(macro_events: list[dict[str, Any]]) -> list[dic
     for index, item in enumerate(sorted_macro_events({"macro_events": macro_events}), start=1):
         normalized.append({**item, "order": index})
     return normalized
+
+
+def macro_event_map(document: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {item["id"]: item for item in sorted_macro_events(document) if item.get("id")}
+
+
+def bucket_counts(document: dict[str, Any]) -> dict[str, int]:
+    counts = {"all": 0, "unbucketed": 0, "rejected": 0}
+    for macro in sorted_macro_events(document):
+        counts[macro["id"]] = 0
+    for item in all_review_items(document):
+        counts["all"] += 1
+        decision = item.get("decision") or "pending"
+        if decision == "rejected":
+            counts["rejected"] += 1
+            continue
+        macro_id = item.get("macro_event_id") or ""
+        if macro_id in counts:
+            counts[macro_id] += 1
+        else:
+            counts["unbucketed"] += 1
+    return counts
 
 
 def source_text(session_number: int, source: str) -> tuple[str, str]:
@@ -244,16 +279,19 @@ def render_markdown(text: str) -> str:
     )
 
 
-def session_workspace(session_number: int, source: str = "diary", source_view: str = "raw") -> dict[str, Any]:
+def session_workspace(session_number: int, source: str = "diary", source_view: str = "raw", bucket: str = "") -> dict[str, Any]:
     document = load_review_document(session_number)
     label, text = source_text(session_number, source)
+    items = sorted_review_items(document)
     return {
         "session_number": session_number,
         "session_key": session_key(session_number),
         "summary": summarize_review_document(session_number, document),
         "document": document,
-        "items": sorted_review_items(document),
+        "items": filtered_review_items(items, bucket),
         "macro_events": sorted_macro_events(document),
+        "bucket_counts": bucket_counts(document),
+        "selected_bucket": bucket or "all",
         "source": source,
         "source_label": label,
         "source_text": text,
@@ -434,6 +472,7 @@ def remove_added_item(document: dict[str, Any], item_id: str) -> tuple[dict[str,
 
 def update_review_document_from_form(document: dict[str, Any], form_values: dict[str, list[str]]) -> dict[str, Any]:
     updated = dict(document)
+    macros = macro_event_map(document)
     item_ids = form_values.get("item_id") or []
     submitted = {}
     for index, item_id in enumerate(item_ids):
@@ -457,6 +496,9 @@ def update_review_document_from_form(document: dict[str, Any], form_values: dict
             if patch:
                 changed = any(item.get(key) != value for key, value in patch.items())
                 item.update(patch)
+                macro = macros.get(item.get("macro_event_id") or "")
+                if macro and item.get("decision") != "rejected":
+                    item["location"] = macro.get("location") or item.get("location") or ""
                 if changed and item.get("applied_status") == "applied":
                     item["applied_status"] = "pending"
                     item["applied_on"] = ""
@@ -496,6 +538,7 @@ def update_batch_decision(document: dict[str, Any], item_ids: list[str], decisio
         return document, ["Select at least one review item."]
 
     updated = dict(document)
+    macro = macro_event_map(document).get(macro_event_id)
     changed = 0
     for section in ["items", "added_items"]:
         section_items = []
@@ -508,6 +551,8 @@ def update_batch_decision(document: dict[str, Any], item_ids: list[str], decisio
                     item["reason"] = reason
                 if macro_event_id:
                     item["macro_event_id"] = macro_event_id
+                    if macro and item.get("decision") != "rejected":
+                        item["location"] = macro.get("location") or item.get("location") or ""
                 if item.get("applied_status") == "applied":
                     item["applied_status"] = "pending"
                     item["applied_on"] = ""

@@ -1216,6 +1216,33 @@ dd { margin: 0; }
   justify-content: center;
   margin-top: 10px;
 }
+.bucket-nav {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+.bucket-nav a {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 8px;
+  border: 1px solid rgba(139, 95, 39, .24);
+  border-radius: 6px;
+  background: rgba(255, 247, 223, .5);
+  color: var(--ink);
+  font-size: 13px;
+  text-decoration: none;
+}
+.bucket-nav a.active {
+  border-color: rgba(76, 116, 63, .45);
+  background: rgba(76, 116, 63, .18);
+  color: #31502b;
+  font-weight: 700;
+}
+.bucket-nav span {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
 .macro-modal {
   width: min(1080px, 100%);
 }

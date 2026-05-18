@@ -1,5 +1,15 @@
 # Revision History
 
+## v0.4.30 - 5/18/2026
+
+Supported bucket-first session review with inherited locations.
+
+- App: Added bucket navigation to the review sidebar so a session can be reviewed one high-level event at a time.
+- App: Added Unbucketed and Rejected review lanes for the triage pass.
+- App: Preserves the current bucket filter across review saves, single-item saves, and batch updates.
+- Workflow: Assigning an event to a high-level bucket now immediately inherits the bucket location.
+- Tests: Added coverage for bucket filtering and location inheritance from high-level event buckets.
+
 ## v0.4.29 - 5/18/2026
 
 Moved high-level event-order editing into a modal grid.
