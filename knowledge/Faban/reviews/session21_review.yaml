@@ -8,7 +8,7 @@ review_instructions:
 - Leave applied_status as pending until an apply-review step updates the database.
 session_title: Session 21
 session_date: '2026-05-18'
-in_game_date: ''
+in_game_date: 1832 AS Namal 25
 primary_location: ''
 items:
 - id: event-001

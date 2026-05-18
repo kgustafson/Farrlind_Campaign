@@ -1,4 +1,5 @@
 Title: The Road to Sunken Catur
+In-Game Date: 1832 AS Namal 25
 
 Session Summary:
 
