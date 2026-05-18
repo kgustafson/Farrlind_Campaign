@@ -1,6 +1,6 @@
 # Version
 
-v0.4.26
+v0.4.27
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.26` initializes audio-first session reviews from merged draft events.
+`v0.4.27` adds batch, single-item, location, and merge controls to session review.

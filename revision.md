@@ -1,5 +1,17 @@
 # Revision History
 
+## v0.4.27 - 5/18/2026
+
+Made large audio-first session reviews manageable.
+
+- App: Added selected-row batch decisions for session review items.
+- App: Added per-item save buttons so one event can be decided without saving the full wall of review rows.
+- App: Added quick location creation from the review page using the existing Locations registry.
+- App: Added merge-selected review flow that creates one canonical added item and rejects the original fragments.
+- App: Pending or invalid review items now bubble to the top of the list, and validation display is capped to avoid overwhelming the page.
+- Workflow: Review validation now requires a valid event type for accepted, corrected, and added facts, while rejected items can remain otherwise incomplete.
+- Tests: Added coverage for pending-first sorting, single-item saves, batch decisions, and review-item merging.
+
 ## v0.4.26 - 5/18/2026
 
 Initialized audio-first reviews from merged draft events.

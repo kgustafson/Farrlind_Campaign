@@ -250,6 +250,10 @@ def session_review(request: Request, session: str, source: str = "diary", view: 
             source = "diary"
     workspace = reviews.session_workspace(session_number, source, view)
     workspace["locations"] = canon_location_names()
+    try:
+        workspace["location_types"] = canon.location_types()
+    except canon.CanonReadError:
+        workspace["location_types"] = []
     token = request.query_params.get("command_result")
     workspace["command_result"] = COMMAND_RESULTS.get(token) if token else None
     return templates.TemplateResponse(
@@ -287,6 +291,130 @@ async def save_session_review(request: Request, session: str):
     source = form.get("source") or "diary"
     view = form.get("view") or "raw"
     return redirect_to_review(session_number, source, view, "saved=1")
+
+
+@app.post("/sessions/{session}/review/save-item")
+async def save_session_review_item(request: Request, session: str):
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    document = reviews.load_review_document(session_number)
+    if not document:
+        raise HTTPException(status_code=404, detail="Review file has not been initialized.")
+    if document.get("status") == "applied":
+        raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
+
+    form = await request.form()
+    form_values = {key: form.getlist(key) for key in form.keys()}
+    known_locations = canon_location_names()
+    if location_confirmation_failed(form_values, form, known_locations):
+        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_confirm_failed=1")
+    updated = reviews.update_single_review_item_from_form(document, form_values, form.get("save_item_id") or "")
+    try:
+        reviews.save_review_document(session_number, updated)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "item_saved=1")
+
+
+@app.post("/sessions/{session}/review/batch")
+async def batch_session_review_items(request: Request, session: str):
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    document = reviews.load_review_document(session_number)
+    if not document:
+        raise HTTPException(status_code=404, detail="Review file has not been initialized.")
+    if document.get("status") == "applied":
+        raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
+
+    form = await request.form()
+    updated, errors = reviews.update_batch_decision(
+        document,
+        form.getlist("selected_item_id"),
+        form.get("batch_decision") or "",
+        form.get("batch_reason") or "",
+    )
+    if not errors:
+        try:
+            reviews.save_review_document(session_number, updated)
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=str(exc))
+
+    flag = "batch_saved=1" if not errors else "batch_failed=1"
+    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", flag)
+
+
+@app.post("/sessions/{session}/review/merge")
+async def merge_session_review_items(request: Request, session: str):
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    document = reviews.load_review_document(session_number)
+    if not document:
+        raise HTTPException(status_code=404, detail="Review file has not been initialized.")
+    if document.get("status") == "applied":
+        raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
+
+    form = await request.form()
+    known_locations = canon_location_names()
+    if location_confirmation_failed({"new_location": [form.get("merge_location") or ""]}, form, known_locations):
+        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_confirm_failed=1")
+    updated, errors = reviews.merge_review_items(
+        document,
+        form.getlist("selected_item_id"),
+        {
+            "sequence": form.get("merge_sequence") or "",
+            "canonical_text": form.get("merge_canonical_text") or "",
+            "event_type": form.get("merge_event_type") or "",
+            "location": form.get("merge_location") or "",
+            "significance": form.get("merge_significance") or "",
+            "reason": form.get("merge_reason") or "",
+        },
+    )
+    if not errors:
+        try:
+            reviews.save_review_document(session_number, updated)
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=str(exc))
+
+    flag = "merged=1" if not errors else "merge_failed=1"
+    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", flag)
+
+
+@app.post("/sessions/{session}/review/create-location")
+async def create_location_from_review(request: Request, session: str):
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    form = await request.form()
+    name = (form.get("quick_location_name") or "").strip()
+    if not name:
+        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_add_failed=1")
+    values = {
+        "name": name,
+        "location_type_id": optional_int(form.get("quick_location_type_id")),
+        "parent_location_id": None,
+        "description": (form.get("quick_location_description") or "").strip(),
+        "is_underwater": False,
+        "is_feywild": False,
+        "first_visited_session": session_number,
+        "notes": "Added from session review.",
+    }
+    try:
+        canon.create_location(values)
+    except canon.CanonWriteError:
+        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_add_failed=1")
+    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_added=1")
 
 
 @app.post("/sessions/{session}/review/reopen")

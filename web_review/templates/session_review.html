@@ -60,6 +60,21 @@
 {% if request.query_params.get("item_added") %}
   <div class="flash">Added review item.</div>
 {% endif %}
+{% if request.query_params.get("item_saved") %}
+  <div class="flash">Saved one review item.</div>
+{% endif %}
+{% if request.query_params.get("batch_saved") %}
+  <div class="flash">Batch decision saved.</div>
+{% endif %}
+{% if request.query_params.get("batch_failed") %}
+  <div class="flash error-flash">Batch update failed. Select at least one item and a final decision.</div>
+{% endif %}
+{% if request.query_params.get("merged") %}
+  <div class="flash">Merged selected fragments into a new review item.</div>
+{% endif %}
+{% if request.query_params.get("merge_failed") %}
+  <div class="flash error-flash">Merge failed. Select at least two items and provide the required merged-item fields.</div>
+{% endif %}
 {% if request.query_params.get("item_add_failed") %}
   <div class="flash error-flash">Item was not added. Fill every Add Item field.</div>
 {% endif %}
@@ -71,6 +86,12 @@
 {% endif %}
 {% if request.query_params.get("location_confirm_failed") %}
   <div class="flash error-flash">New location detected. Check "Confirm newly typed locations" before saving.</div>
+{% endif %}
+{% if request.query_params.get("location_added") %}
+  <div class="flash">Location added to the registry.</div>
+{% endif %}
+{% if request.query_params.get("location_add_failed") %}
+  <div class="flash error-flash">Location was not added. It may already exist or be missing a name.</div>
 {% endif %}
 {% if command_result %}
   <section class="command-log">
@@ -125,11 +146,37 @@
     {% if not document %}
       <div class="empty-state">Review file has not been initialized.</div>
     {% endif %}
+    {% if document %}
+    <section class="review-tools">
+      <div>
+        <h2>Batch Decisions</h2>
+        <p>Select rows, choose an outcome, and save the batch. Pending items stay at the top.</p>
+      </div>
+      <label>
+        <span>Outcome</span>
+        <select name="batch_decision" {% if review_locked %}disabled{% endif %}>
+          <option value="">choose</option>
+          <option value="accepted">accepted</option>
+          <option value="rejected">rejected</option>
+          <option value="corrected">corrected</option>
+          <option value="added">added</option>
+        </select>
+      </label>
+      <label class="batch-reason">
+        <span>Reason</span>
+        <input name="batch_reason" placeholder="Optional note for selected rows" {% if review_locked %}disabled{% endif %}>
+      </label>
+      <button type="submit" formaction="/sessions/{{ session_key }}/review/batch" formmethod="post" {% if review_locked %}disabled{% endif %}>Save Batch</button>
+    </section>
+    {% endif %}
     {% for item in items %}
     <article class="review-item editable-item">
       <input type="hidden" name="item_id" value="{{ item.id }}">
       <input type="hidden" name="section" value="{{ item.section }}">
       <div class="item-topline">
+        <label class="item-select" title="Select for batch update or merge">
+          <input type="checkbox" name="selected_item_id" value="{{ item.id }}" {% if review_locked %}disabled{% endif %}>
+        </label>
         <span class="item-id">{{ item.id }}</span>
         <label class="compact-field sequence-field">
           <span>Seq</span>
@@ -177,6 +224,9 @@
         <span>Reason</span>
         <input name="reason" value="{{ item.reason or "" }}" {% if review_locked or not can_edit() %}disabled{% endif %}>
       </label>
+      <div class="panel-actions">
+        <button type="submit" formaction="/sessions/{{ session_key }}/review/save-item" formmethod="post" name="save_item_id" value="{{ item.id }}" {% if review_locked %}disabled{% endif %}>Save This Item</button>
+      </div>
       {% if item.section == "added_items" and can_edit() %}
       <div class="panel-actions">
         <button type="submit" formaction="/sessions/{{ session_key }}/review/remove-added-item" formmethod="post" name="remove_item_id" value="{{ item.id }}" {% if review_locked %}disabled{% endif %}>Remove Added Item</button>
@@ -249,7 +299,12 @@
     <section>
       <h2>Validation</h2>
       <ul class="validation-list">
-        {% for note in validation %}<li>{{ note }}</li>{% endfor %}
+        {% for note in validation %}
+          {% if loop.index <= 12 %}<li>{{ note }}</li>{% endif %}
+        {% endfor %}
+        {% if validation|length > 12 %}
+          <li class="muted">Plus {{ validation|length - 12 }} more validation note{{ "s" if validation|length - 12 != 1 else "" }}.</li>
+        {% endif %}
       </ul>
     </section>
     <section>
@@ -258,6 +313,62 @@
         <input type="checkbox" name="confirm_new_locations" value="1" {% if review_locked or not can_edit() %}disabled{% endif %}>
         <span>Confirm newly typed locations</span>
       </label>
+      <div class="quick-location">
+        <label>
+          <span>Add Location</span>
+          <input name="quick_location_name" list="location-options" placeholder="New location name" {% if review_locked %}disabled{% endif %}>
+        </label>
+        <label>
+          <span>Type</span>
+          <select name="quick_location_type_id" {% if review_locked %}disabled{% endif %}>
+            <option value="">unset</option>
+            {% for location_type in location_types %}
+              <option value="{{ location_type.id }}">{{ location_type.type_name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span>Description</span>
+          <input name="quick_location_description" placeholder="Optional short description" {% if review_locked %}disabled{% endif %}>
+        </label>
+        <button type="submit" formaction="/sessions/{{ session_key }}/review/create-location" formmethod="post" {% if review_locked %}disabled{% endif %}>Add Location</button>
+      </div>
+    </section>
+    <section>
+      <h2>Merge Selected</h2>
+      <p class="muted">Select two or more fragments. The originals will be rejected and linked to the new merged item.</p>
+      <label class="field-block">
+        <span>Merged Canonical Text</span>
+        <textarea name="merge_canonical_text" rows="4" {% if review_locked %}disabled{% endif %}></textarea>
+      </label>
+      <div class="merge-grid">
+        <label>
+          <span>Seq</span>
+          <input name="merge_sequence" inputmode="decimal" {% if review_locked %}disabled{% endif %}>
+        </label>
+        <label>
+          <span>Type</span>
+          <select name="merge_event_type" {% if review_locked %}disabled{% endif %}>
+            <option value="">auto</option>
+            {% for event_type in event_types %}
+              <option value="{{ event_type }}">{{ event_type }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span>Significance</span>
+          <input name="merge_significance" type="number" min="1" max="5" {% if review_locked %}disabled{% endif %}>
+        </label>
+      </div>
+      <label>
+        <span>Location</span>
+        <input name="merge_location" list="location-options" {% if review_locked %}disabled{% endif %}>
+      </label>
+      <label>
+        <span>Reason</span>
+        <input name="merge_reason" placeholder="Why these fragments belong together" {% if review_locked %}disabled{% endif %}>
+      </label>
+      <button type="submit" formaction="/sessions/{{ session_key }}/review/merge" formmethod="post" {% if review_locked %}disabled{% endif %}>Merge Selected</button>
     </section>
   </aside>
   {% endif %}

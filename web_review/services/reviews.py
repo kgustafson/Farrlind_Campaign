@@ -188,13 +188,21 @@ def sorted_review_items(document: dict[str, Any]) -> list[dict[str, Any]]:
         except (TypeError, ValueError):
             return 0.0
 
+    def decision_rank(item: dict[str, Any]) -> int:
+        decision = item.get("decision") or "pending"
+        if decision == "pending":
+            return 0
+        if decision not in VALID_DECISIONS:
+            return 1
+        return 2
+
     combined = []
     for section in ["items", "added_items"]:
         for item in document.get(section) or []:
             clone = dict(item)
             clone["section"] = section
             combined.append(clone)
-    return sorted(combined, key=sequence_value)
+    return sorted(combined, key=lambda item: (decision_rank(item), sequence_value(item)))
 
 
 def source_text(session_number: int, source: str) -> tuple[str, str]:
@@ -380,6 +388,95 @@ def update_review_document_from_form(document: dict[str, Any], form_values: dict
     return updated
 
 
+def update_single_review_item_from_form(document: dict[str, Any], form_values: dict[str, list[str]], item_id: str) -> dict[str, Any]:
+    filtered = {"item_id": [], "section": [], "sequence": [], "decision": [], "canonical_text": [], "event_type": [], "location": [], "significance": [], "reason": []}
+    for index, submitted_id in enumerate(form_values.get("item_id") or []):
+        if submitted_id != item_id:
+            continue
+        for key in filtered:
+            filtered[key].append(_first(form_values, key, index))
+        break
+    if not filtered["item_id"]:
+        return document
+    return update_review_document_from_form(document, filtered)
+
+
+def find_review_item(document: dict[str, Any], item_id: str) -> Optional[tuple[str, dict[str, Any]]]:
+    for section in ["items", "added_items"]:
+        for item in document.get(section) or []:
+            if item.get("id") == item_id:
+                return section, item
+    return None
+
+
+def update_batch_decision(document: dict[str, Any], item_ids: list[str], decision: str, reason: str = "") -> tuple[dict[str, Any], list[str]]:
+    if decision not in VALID_DECISIONS - {"pending"}:
+        return document, ["Choose an accepted, rejected, corrected, or added decision."]
+    selected = {item_id for item_id in item_ids if item_id}
+    if not selected:
+        return document, ["Select at least one review item."]
+
+    updated = dict(document)
+    changed = 0
+    for section in ["items", "added_items"]:
+        section_items = []
+        for item in updated.get(section) or []:
+            item = dict(item)
+            if item.get("id") in selected:
+                item["decision"] = decision
+                if reason:
+                    item["reason"] = reason
+                if item.get("applied_status") == "applied":
+                    item["applied_status"] = "pending"
+                    item["applied_on"] = ""
+                changed += 1
+            section_items.append(item)
+        updated[section] = section_items
+    if not changed:
+        return document, ["Selected review items were not found."]
+    return updated, []
+
+
+def merge_review_items(document: dict[str, Any], item_ids: list[str], values: dict[str, Any], merged_on: Optional[str] = None) -> tuple[dict[str, Any], list[str]]:
+    selected = []
+    for item_id in item_ids:
+        found = find_review_item(document, item_id)
+        if found:
+            selected.append(found[1])
+    if len(selected) < 2:
+        return document, ["Select at least two review items to merge."]
+
+    sequence_values = [_coerce_sequence(item.get("sequence")) for item in selected]
+    numeric_sequences = [value for value in sequence_values if isinstance(value, (int, float))]
+    merged_values = {
+        "sequence": values.get("sequence") or (min(numeric_sequences) if numeric_sequences else ""),
+        "canonical_text": values.get("canonical_text") or " ".join(item.get("canonical_text") or item.get("source_text") or "" for item in selected).strip(),
+        "event_type": values.get("event_type") or next((item.get("event_type") for item in selected if item.get("event_type")), ""),
+        "location": values.get("location") or next((item.get("location") for item in selected if item.get("location")), ""),
+        "significance": values.get("significance") or max((item.get("significance") or 0 for item in selected), default=""),
+        "reason": values.get("reason") or f"Merged from {', '.join(item.get('id') or 'unknown' for item in selected)}.",
+    }
+    updated, errors = add_review_item(document, merged_values, added_on=merged_on)
+    if errors:
+        return document, errors
+
+    merged_id = (updated.get("added_items") or [])[-1]["id"]
+    selected_ids = {item.get("id") for item in selected}
+    for section in ["items", "added_items"]:
+        section_items = []
+        for item in updated.get(section) or []:
+            item = dict(item)
+            if item.get("id") in selected_ids:
+                item["decision"] = "rejected"
+                item["reason"] = f"Merged into {merged_id}."
+                if item.get("applied_status") == "applied":
+                    item["applied_status"] = "pending"
+                    item["applied_on"] = ""
+            section_items.append(item)
+        updated[section] = section_items
+    return updated, []
+
+
 def reopen_review_document(document: dict[str, Any], reopened_on: Optional[str] = None) -> dict[str, Any]:
     if not document:
         return document
@@ -455,8 +552,10 @@ def validate_review_document(document: dict[str, Any]) -> list[str]:
             notes.append(f"{item_id or 'Item'} has unknown decision: {decision}.")
         if decision == "pending":
             notes.append(f"{item_id or 'Item'} still has a pending decision.")
+        if decision not in {"pending", "rejected"} and item.get("event_type") not in EVENT_TYPES:
+            notes.append(f"{item_id or 'Item'} has decision {decision} but is missing a valid event type.")
         if decision in {"corrected", "added"}:
-            for field in ["canonical_text", "event_type", "location", "significance", "reason"]:
+            for field in ["canonical_text", "significance", "reason"]:
                 if item.get(field) in {None, ""}:
                     notes.append(f"{item_id or 'Item'} is {decision} but missing {field}.")
 

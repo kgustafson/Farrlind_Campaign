@@ -72,8 +72,8 @@ class WebReviewServiceTest(unittest.TestCase):
                 "status": "applied",
                 "session_title": "Fey Woods",
                 "items": [
-                    {"id": "event-002", "sequence": 2, "decision": "accepted", "applied_status": "applied"},
-                    {"id": "event-001", "sequence": 1, "decision": "accepted", "applied_status": "applied"},
+                    {"id": "event-002", "sequence": 2, "decision": "accepted", "event_type": "travel", "applied_status": "applied"},
+                    {"id": "event-001", "sequence": 1, "decision": "accepted", "event_type": "social", "applied_status": "applied"},
                 ],
                 "added_items": [
                     {"id": "added-001", "sequence": 1.5, "decision": "added", "canonical_text": "Added", "event_type": "social", "location": "Fey Woods", "significance": 3, "reason": "Important", "applied_status": "applied"},
@@ -108,7 +108,7 @@ class WebReviewServiceTest(unittest.TestCase):
         })
 
         self.assertIn("event-001 is corrected but missing canonical_text.", notes)
-        self.assertIn("event-001 is corrected but missing location.", notes)
+        self.assertIn("event-001 has decision corrected but is missing a valid event type.", notes)
 
     def test_update_review_document_from_form_updates_existing_items(self):
         document = {
@@ -165,6 +165,86 @@ class WebReviewServiceTest(unittest.TestCase):
         item = updated["items"][0]
         self.assertEqual(item["applied_status"], "pending")
         self.assertEqual(item["applied_on"], "")
+
+    def test_sorted_review_items_bubbles_pending_to_top(self):
+        document = {
+            "items": [
+                {"id": "event-001", "sequence": 1, "decision": "accepted"},
+                {"id": "event-002", "sequence": 2, "decision": "pending"},
+            ],
+            "added_items": [
+                {"id": "added-001", "sequence": 1.5, "decision": "corrected"},
+            ],
+        }
+
+        items = reviews.sorted_review_items(document)
+
+        self.assertEqual([item["id"] for item in items], ["event-002", "event-001", "added-001"])
+
+    def test_update_single_review_item_only_changes_target(self):
+        document = {
+            "items": [
+                {"id": "event-001", "sequence": 1, "decision": "pending", "applied_status": "pending"},
+                {"id": "event-002", "sequence": 2, "decision": "pending", "applied_status": "pending"},
+            ],
+            "added_items": [],
+        }
+        updated = reviews.update_single_review_item_from_form(document, {
+            "item_id": ["event-001", "event-002"],
+            "section": ["items", "items"],
+            "sequence": ["1", "2"],
+            "decision": ["accepted", "rejected"],
+            "canonical_text": ["", ""],
+            "event_type": ["travel", ""],
+            "location": ["Road", ""],
+            "significance": ["3", ""],
+            "reason": ["", "Wrong"],
+        }, "event-002")
+
+        self.assertEqual(updated["items"][0]["decision"], "pending")
+        self.assertEqual(updated["items"][1]["decision"], "rejected")
+        self.assertEqual(updated["items"][1]["reason"], "Wrong")
+
+    def test_update_batch_decision_updates_selected_items(self):
+        document = {
+            "items": [
+                {"id": "event-001", "decision": "pending", "applied_status": "pending"},
+                {"id": "event-002", "decision": "pending", "applied_status": "pending"},
+            ],
+            "added_items": [],
+        }
+
+        updated, errors = reviews.update_batch_decision(document, ["event-001"], "rejected", "Table talk.")
+
+        self.assertEqual(errors, [])
+        self.assertEqual(updated["items"][0]["decision"], "rejected")
+        self.assertEqual(updated["items"][0]["reason"], "Table talk.")
+        self.assertEqual(updated["items"][1]["decision"], "pending")
+
+    def test_merge_review_items_adds_merged_item_and_rejects_originals(self):
+        document = {
+            "items": [
+                {"id": "event-001", "sequence": 1, "decision": "pending", "source_text": "Fragment one.", "event_type": "social", "location": "Catur", "significance": 2, "applied_status": "pending"},
+                {"id": "event-002", "sequence": 2, "decision": "pending", "source_text": "Fragment two.", "event_type": "social", "location": "Catur", "significance": 4, "applied_status": "pending"},
+            ],
+            "added_items": [],
+        }
+
+        updated, errors = reviews.merge_review_items(document, ["event-001", "event-002"], {
+            "canonical_text": "One coherent event.",
+            "event_type": "social",
+            "location": "Catur",
+            "significance": "4",
+            "reason": "Same conversation.",
+        }, merged_on="2026-05-18")
+
+        self.assertEqual(errors, [])
+        self.assertEqual(updated["items"][0]["decision"], "rejected")
+        self.assertEqual(updated["items"][0]["reason"], "Merged into added-001.")
+        self.assertEqual(updated["items"][1]["decision"], "rejected")
+        self.assertEqual(updated["added_items"][0]["id"], "added-001")
+        self.assertEqual(updated["added_items"][0]["canonical_text"], "One coherent event.")
+        self.assertEqual(updated["added_items"][0]["decision"], "added")
 
     def test_add_review_item_appends_valid_added_item(self):
         document = {
@@ -296,7 +376,7 @@ class WebReviewServiceTest(unittest.TestCase):
             "session": "session01",
             "status": "in_review",
             "items": [
-                {"id": "event-001", "sequence": 1, "decision": "accepted"},
+                {"id": "event-001", "sequence": 1, "decision": "accepted", "event_type": "travel"},
             ],
             "added_items": [],
         }
