@@ -261,9 +261,33 @@ class WebReviewServiceTest(unittest.TestCase):
         })
 
         self.assertEqual([item["id"] for item in updated["macro_events"]], ["macro-001", "macro-003"])
+        self.assertEqual([item["order"] for item in updated["macro_events"]], [1, 2])
         self.assertEqual(updated["macro_events"][0]["description"], "Party makes a plan")
         self.assertEqual(updated["macro_events"][1]["description"], "Party dives to Catur")
         self.assertNotIn("macro_event_id", updated["items"][0])
+
+    def test_update_macro_events_from_form_renumbers_decimal_insertions(self):
+        document = {
+            "macro_events": [
+                {"id": "macro-001", "order": 1, "description": "First", "location": "Road"},
+                {"id": "macro-002", "order": 2, "description": "Second", "location": "Boat"},
+            ],
+            "items": [],
+            "added_items": [],
+        }
+
+        updated = reviews.update_macro_events_from_form(document, {
+            "macro_id": ["macro-001", "macro-002"],
+            "macro_order": ["1", "2"],
+            "macro_description": ["First", "Second"],
+            "macro_location": ["Road", "Boat"],
+            "new_macro_order": ["1.5"],
+            "new_macro_description": ["Between"],
+            "new_macro_location": ["Underwater"],
+        })
+
+        self.assertEqual([item["description"] for item in updated["macro_events"]], ["First", "Between", "Second"])
+        self.assertEqual([item["order"] for item in updated["macro_events"]], [1, 2, 3])
 
     def test_apply_macro_event_order_assigns_locations_and_contiguous_sequences(self):
         document = {
@@ -654,7 +678,8 @@ class WebReviewAppTest(unittest.TestCase):
             with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
                  patch.object(reviews, "CLEAN_DIR", clean), \
                  patch.object(reviews, "FINAL_DIR", final), \
-                 patch("web_review.services.canon.locations", return_value=["Western Coast", "Boat"]):
+                 patch("web_review.services.canon.locations", return_value=["Western Coast", "Boat"]), \
+                 patch("web_review.services.canon.create_location") as create_location:
                 client = TestClient(app)
                 response = client.post("/sessions/session21/review/macros", data={
                     "source": "diary",
@@ -664,6 +689,8 @@ class WebReviewAppTest(unittest.TestCase):
                     "new_macro_location": "Western Coast",
                 }, follow_redirects=False)
                 self.assertEqual(response.status_code, 303)
+                self.assertIn("macro_modal=1", response.headers["location"])
+                create_location.assert_not_called()
                 saved = yaml.safe_load(path.read_text(encoding="utf-8"))
                 macro_id = saved["macro_events"][0]["id"]
                 response = client.post("/sessions/session21/review/apply-macros", data={
@@ -687,6 +714,47 @@ class WebReviewAppTest(unittest.TestCase):
             self.assertEqual(saved["items"][0]["sequence"], 1)
             self.assertEqual(saved["items"][1]["sequence"], 2)
             self.assertEqual(saved["items"][0]["location"], "Western Coast")
+
+    def test_macro_route_auto_creates_unknown_bucket_location(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session21_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session21",
+                "status": "in_review",
+                "macro_events": [],
+                "items": [],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final), \
+                 patch("web_review.services.canon.locations", return_value=[]), \
+                 patch("web_review.services.canon.create_location") as create_location:
+                client = TestClient(app)
+                response = client.post("/sessions/session21/review/macros", data={
+                    "source": "diary",
+                    "view": "raw",
+                    "new_macro_order": "1",
+                    "new_macro_description": "Party discusses plan",
+                    "new_macro_location": "Western Coast of Farrlind",
+                }, follow_redirects=False)
+
+            self.assertEqual(response.status_code, 303)
+            self.assertIn("macros_saved=1", response.headers["location"])
+            create_location.assert_called_once()
+            values = create_location.call_args.args[0]
+            self.assertEqual(values["name"], "Western Coast of Farrlind")
+            self.assertEqual(values["first_visited_session"], 21)
+            saved = yaml.safe_load(path.read_text(encoding="utf-8"))
+            self.assertEqual(saved["macro_events"][0]["location"], "Western Coast of Farrlind")
 
     def test_save_review_route_rejects_applied_review(self):
         with tempfile.TemporaryDirectory() as tmp:

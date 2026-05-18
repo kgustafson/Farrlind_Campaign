@@ -215,6 +215,13 @@ def sorted_macro_events(document: dict[str, Any]) -> list[dict[str, Any]]:
     return sorted([dict(item) for item in document.get("macro_events") or []], key=order_value)
 
 
+def normalize_macro_event_orders(macro_events: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    normalized = []
+    for index, item in enumerate(sorted_macro_events({"macro_events": macro_events}), start=1):
+        normalized.append({**item, "order": index})
+    return normalized
+
+
 def source_text(session_number: int, source: str) -> tuple[str, str]:
     choices = {
         "diary": ("Diary", diary_path(session_number)),
@@ -341,7 +348,7 @@ def update_macro_events_from_form(document: dict[str, Any], form_values: dict[st
                 item.pop("macro_event_id", None)
             section_items.append(item)
         updated[section] = section_items
-    updated["macro_events"] = sorted_macro_events({"macro_events": macro_events})
+    updated["macro_events"] = normalize_macro_event_orders(macro_events)
     return updated
 
 

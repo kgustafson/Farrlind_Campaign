@@ -327,47 +327,14 @@
     <section>
       <h2>High-Level Event Order</h2>
       <p class="muted">Build the session spine first, then bucket fragments into it.</p>
-      <div class="macro-list">
-        {% for macro in macro_events %}
-        <div class="macro-row">
-          <input type="hidden" name="macro_id" value="{{ macro.id }}">
-          <label>
-            <span>Order</span>
-            <input name="macro_order" value="{{ macro.order }}" inputmode="decimal" {% if review_locked %}disabled{% endif %}>
-          </label>
-          <label>
-            <span>Description</span>
-            <input name="macro_description" value="{{ macro.description }}" {% if review_locked %}disabled{% endif %}>
-          </label>
-          <label>
-            <span>Location</span>
-            <input name="macro_location" list="location-options" value="{{ macro.location }}" {% if review_locked %}disabled{% endif %}>
-          </label>
-          <label class="check-row">
-            <input type="checkbox" name="remove_macro_id" value="{{ macro.id }}" {% if review_locked %}disabled{% endif %}>
-            <span>Remove</span>
-          </label>
-        </div>
-        {% endfor %}
-        <div class="macro-row macro-new">
-          <label>
-            <span>Order</span>
-            <input name="new_macro_order" inputmode="decimal" placeholder="1" {% if review_locked %}disabled{% endif %}>
-          </label>
-          <label>
-            <span>Description</span>
-            <input name="new_macro_description" placeholder="Party travels to Catur by boat" {% if review_locked %}disabled{% endif %}>
-          </label>
-          <label>
-            <span>Location</span>
-            <input name="new_macro_location" list="location-options" placeholder="Boat" {% if review_locked %}disabled{% endif %}>
-          </label>
-        </div>
-      </div>
-      <div class="panel-actions stacked-actions">
-        <button type="submit" formaction="/sessions/{{ session_key }}/review/macros" formmethod="post" {% if review_locked %}disabled{% endif %}>Save Event Order</button>
-        <button type="submit" formaction="/sessions/{{ session_key }}/review/apply-macros" formmethod="post" {% if review_locked %}disabled{% endif %}>Apply Buckets</button>
-      </div>
+      <a class="icon-link macro-edit-link" href="/sessions/{{ session_key }}/review?source={{ source }}&view={{ source_view }}&macro_modal=1">Edit High-Level Event Order</a>
+      <dl class="meta-list macro-summary">
+        <div><dt>Buckets</dt><dd>{{ macro_events|length }}</dd></div>
+        {% if macro_events %}
+          <div><dt>First</dt><dd>{{ macro_events[0].description }}</dd></div>
+          <div><dt>Last</dt><dd>{{ macro_events[-1].description }}</dd></div>
+        {% endif %}
+      </dl>
     </section>
     <section>
       <h2>Validation</h2>
@@ -447,6 +414,61 @@
   {% endif %}
 </section>
 {% if can_edit() %}
+{% if request.query_params.get("macro_modal") %}
+<section class="modal-backdrop" role="presentation">
+  <div class="archive-modal macro-modal" role="dialog" aria-modal="true" aria-labelledby="macro-modal-title">
+    <div class="modal-head">
+      <div>
+        <h2 id="macro-modal-title">High-Level Event Order</h2>
+        <p>Use decimals to insert between rows. Saving renumbers the order from 1 to N.</p>
+      </div>
+      <a class="modal-close" href="/sessions/{{ session_key }}/review?source={{ source }}&view={{ source_view }}" aria-label="Close high-level event order">x</a>
+    </div>
+
+    <section class="macro-add-row" aria-label="Add high-level event">
+      <h3>Add Row</h3>
+      <label>
+        <span>Order</span>
+        <input name="new_macro_order" inputmode="decimal" placeholder="1.5" {% if review_locked %}disabled{% endif %}>
+      </label>
+      <label>
+        <span>Description</span>
+        <input name="new_macro_description" placeholder="Party travels to Catur by boat" {% if review_locked %}disabled{% endif %}>
+      </label>
+      <label>
+        <span>Location</span>
+        <input name="new_macro_location" list="location-options" placeholder="Boat" {% if review_locked %}disabled{% endif %}>
+      </label>
+    </section>
+
+    <section class="macro-sheet" aria-label="High-level event rows">
+      <div class="macro-sheet-head">
+        <span>Order</span>
+        <span>Description</span>
+        <span>Location</span>
+        <span></span>
+      </div>
+      {% for macro in macro_events %}
+      <div class="macro-sheet-row">
+        <input type="hidden" name="macro_id" value="{{ macro.id }}">
+        <input name="macro_order" value="{{ macro.order }}" inputmode="decimal" aria-label="Order for {{ macro.description }}" {% if review_locked %}disabled{% endif %}>
+        <input name="macro_description" value="{{ macro.description }}" aria-label="Description for {{ macro.description }}" {% if review_locked %}disabled{% endif %}>
+        <input name="macro_location" list="location-options" value="{{ macro.location }}" aria-label="Location for {{ macro.description }}" {% if review_locked %}disabled{% endif %}>
+        <label class="macro-remove" title="Remove {{ macro.description }}">
+          <input type="checkbox" name="remove_macro_id" value="{{ macro.id }}" {% if review_locked %}disabled{% endif %}>
+          <span aria-hidden="true">x</span>
+        </label>
+      </div>
+      {% endfor %}
+    </section>
+
+    <div class="panel-actions macro-modal-actions">
+      <button type="submit" formaction="/sessions/{{ session_key }}/review/macros" formmethod="post" {% if review_locked %}disabled{% endif %}>Save Event Order</button>
+      <button type="submit" formaction="/sessions/{{ session_key }}/review/apply-macros" formmethod="post" {% if review_locked %}disabled{% endif %}>Apply Buckets</button>
+    </div>
+  </div>
+</section>
+{% endif %}
 <datalist id="location-options">
   {% for location in locations %}<option value="{{ location }}"></option>{% endfor %}
 </datalist>

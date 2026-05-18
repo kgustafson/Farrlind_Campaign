@@ -1,6 +1,6 @@
 # Version
 
-v0.4.28
+v0.4.29
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.28` adds high-level event-order buckets to session review.
+`v0.4.29` moves high-level event-order editing into a modal grid.

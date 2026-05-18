@@ -105,6 +105,28 @@ def location_confirmation_failed(form_values: dict[str, list[str]], form, known_
     return bool(reviews.unknown_locations(reviews.form_locations(form_values), known_locations))
 
 
+def create_missing_review_locations(names: list[str], known_locations: list[str], session_number: int, notes: str) -> bool:
+    created_or_existing = set(known_locations)
+    for name in reviews.unknown_locations(names, list(created_or_existing)):
+        values = {
+            "name": name,
+            "location_type_id": None,
+            "parent_location_id": None,
+            "description": "",
+            "is_underwater": False,
+            "is_feywild": False,
+            "first_visited_session": session_number,
+            "notes": notes,
+        }
+        try:
+            canon.create_location(values)
+        except canon.CanonWriteError:
+            if name not in canon_location_names():
+                return False
+        created_or_existing.add(name)
+    return True
+
+
 def optional_int(value: Optional[str]) -> Optional[int]:
     value = (value or "").strip()
     return int(value) if value else None
@@ -367,15 +389,16 @@ async def save_session_review_macros(request: Request, session: str):
     form = await request.form()
     form_values = {key: form.getlist(key) for key in form.keys()}
     known_locations = canon_location_names()
-    if location_confirmation_failed({"location": form_values.get("macro_location", []) + form_values.get("new_macro_location", [])}, form, known_locations):
-        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_confirm_failed=1")
+    macro_locations = form_values.get("macro_location", []) + form_values.get("new_macro_location", [])
+    if not create_missing_review_locations(macro_locations, known_locations, session_number, "Added from high-level event order."):
+        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_add_failed=1&macro_modal=1")
     updated = reviews.update_macro_events_from_form(document, form_values)
     try:
         reviews.save_review_document(session_number, updated)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
 
-    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "macros_saved=1")
+    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "macros_saved=1&macro_modal=1")
 
 
 @app.post("/sessions/{session}/review/apply-macros")
@@ -401,7 +424,7 @@ async def apply_session_review_macros(request: Request, session: str):
         except FileNotFoundError as exc:
             raise HTTPException(status_code=404, detail=str(exc))
 
-    flag = "macros_applied=1" if not errors else "macros_apply_failed=1"
+    flag = "macros_applied=1" if not errors else "macros_apply_failed=1&macro_modal=1"
     return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", flag)
 
 

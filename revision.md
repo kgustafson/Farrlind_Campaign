@@ -1,5 +1,16 @@
 # Revision History
 
+## v0.4.29 - 5/18/2026
+
+Moved high-level event-order editing into a modal grid.
+
+- App: Replaced the cramped sidebar high-level event editor with a modal spreadsheet-style grid.
+- App: Added top-of-modal controls for inserting a new high-level event row.
+- App: Added per-row remove controls using a compact `x` affordance.
+- App: Decimal insertion orders such as `1.5` are sorted into place and renumbered as a clean `1..N` sequence when saved.
+- App: High-level event locations now auto-create basic Location records when the macro order is saved.
+- Tests: Added coverage for decimal insertion renumbering and automatic Location creation from high-level event buckets.
+
 ## v0.4.28 - 5/18/2026
 
 Added high-level event-order buckets to session review.
