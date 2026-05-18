@@ -19,6 +19,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 CANON_DECISIONS_PATH = REPO_ROOT / "knowledge" / "Faban" / "canon_decisions.yaml"
 REVIEWS_DIR = REPO_ROOT / "knowledge" / "Faban" / "reviews"
 FINAL_DIR = REPO_ROOT / "knowledge" / "Faban" / "final"
+CLEAN_DIR = REPO_ROOT / "knowledge" / "Faban" / "clean"
 
 
 def bounded_int(value: str, minimum: int = 1, maximum: int = MAX_LIMIT) -> int:
@@ -511,6 +512,10 @@ def final_summary_path(session_number: int) -> Path:
     return FINAL_DIR / f"{session_key(session_number)}_summary.md"
 
 
+def merged_events_path(session_number: int) -> Path:
+    return CLEAN_DIR / f"{session_key(session_number)}_merged.md"
+
+
 def load_review_file(path: Path) -> dict:
     with open(path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
@@ -638,7 +643,7 @@ def review_item_from_event(event: dict) -> dict:
     return {
         "id": f"event-{sequence_number:03d}",
         "sequence": sequence_number,
-        "source_type": "db_event",
+        "source_type": event.get("source_type") or "db_event",
         "source_text": event.get("description") or "",
         "decision": "pending",
         "canonical_text": "",
@@ -651,6 +656,66 @@ def review_item_from_event(event: dict) -> dict:
         "applied_status": "pending",
         "applied_on": "",
     }
+
+
+def significance_from_importance(value: Optional[str]) -> Optional[int]:
+    importance = (value or "").strip().lower()
+    if importance == "high":
+        return 5
+    if importance == "medium":
+        return 3
+    if importance == "low":
+        return 1
+    return None
+
+
+def normalize_draft_location(value: Optional[str]) -> str:
+    location = (value or "").strip()
+    if location.lower() in {"", "none", "not specified", "undetermined"}:
+        return ""
+    return location
+
+
+def parse_merged_event_block(sequence: int, body: str) -> dict:
+    fields = {}
+    for line in body.splitlines():
+        match = re.match(r"^-\s+([a-zA-Z_]+):\s*(.*)$", line)
+        if match:
+            fields[match.group(1).strip().lower()] = match.group(2).strip()
+
+    description = fields.get("summary") or ""
+    outcome = fields.get("outcome") or ""
+    if outcome and outcome.lower() not in {"none", "not specified"}:
+        description = f"{description} Outcome: {outcome}" if description else outcome
+
+    return {
+        "sequence_order": str(sequence),
+        "event_type": fields.get("lane") or "",
+        "location": normalize_draft_location(fields.get("location")),
+        "description": description,
+        "significance": significance_from_importance(fields.get("importance")),
+        "source_type": "draft_merged_event",
+    }
+
+
+def parse_merged_events(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+
+    text = path.read_text(encoding="utf-8")
+    matches = list(re.finditer(r"^## Event\s+(\d+):[^\n]*\n", text, flags=re.MULTILINE))
+    events = []
+    for index, match in enumerate(matches):
+        start = match.end()
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        events.append(parse_merged_event_block(int(match.group(1)), text[start:end]))
+    return [event for event in events if event.get("description")]
+
+
+def review_events_for_init(args, session_number: int, db_events: list[dict]) -> list[dict]:
+    if db_events:
+        return db_events
+    return parse_merged_events(merged_events_path(session_number))
 
 
 def build_review_document(session: dict, events: list[dict]) -> dict:
@@ -847,7 +912,8 @@ def init_review(args):
     if not session:
         raise SystemExit(f"No session found for session{session_number:02d}")
 
-    document = build_review_document(session, review["events"])
+    events = review_events_for_init(args, session_number, review["events"])
+    document = build_review_document(session, events)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(
         yaml.safe_dump(document, sort_keys=False, allow_unicode=True),

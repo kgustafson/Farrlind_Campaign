@@ -5,6 +5,7 @@ import io
 import subprocess
 import sys
 import tempfile
+import textwrap
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -355,6 +356,81 @@ class DmQueryTest(unittest.TestCase):
         self.assertEqual(document["items"][0]["applied_status"], "pending")
         self.assertIn("Use sequence", document["review_instructions"][2])
         self.assertEqual(document["added_items"], [])
+
+    def test_parse_merged_events_converts_draft_events_to_review_rows(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            merged_path = Path(tmp) / "session21_merged.md"
+            merged_path.write_text(
+                textwrap.dedent(
+                    """\
+                    # Merged Session Events
+
+                    ## Event 1: Enters Catur
+
+                    - timestamps: 00:04:15
+                    - summary: The party enters the hallway beneath Catur.
+                    - location: Hallway of the city
+                    - lane: exploration
+                    - outcome: The group sees the city's unusual architecture.
+                    - importance: high
+                    - confidence: high
+
+                    ## Event 2: Table Talk
+
+                    - summary: A rules question is answered.
+                    - location: Not specified
+                    - lane: story
+                    - outcome: None
+                    - importance: low
+                    """
+                ),
+                encoding="utf-8",
+            )
+
+            events = dm_query.parse_merged_events(merged_path)
+
+        self.assertEqual(len(events), 2)
+        self.assertEqual(events[0]["sequence_order"], "1")
+        self.assertEqual(events[0]["event_type"], "exploration")
+        self.assertEqual(events[0]["location"], "Hallway of the city")
+        self.assertEqual(events[0]["significance"], 5)
+        self.assertEqual(events[0]["source_type"], "draft_merged_event")
+        self.assertIn("Outcome: The group sees", events[0]["description"])
+        self.assertEqual(events[1]["location"], "")
+        self.assertEqual(events[1]["significance"], 1)
+
+    def test_review_events_for_init_prefers_db_events(self):
+        db_events = [{"sequence_order": "1", "description": "Loaded canon draft"}]
+
+        selected = dm_query.review_events_for_init(args(), 21, db_events)
+
+        self.assertEqual(selected, db_events)
+
+    def test_review_events_for_init_falls_back_to_merged_draft(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            merged_path = Path(tmp) / "session21_merged.md"
+            merged_path.write_text(
+                textwrap.dedent(
+                    """\
+                    # Merged Session Events
+
+                    ## Event 1: New Draft
+
+                    - summary: A draft event awaits human review.
+                    - location: Catur
+                    - lane: lore
+                    - importance: medium
+                    """
+                ),
+                encoding="utf-8",
+            )
+            with patch("dm_query.merged_events_path", return_value=merged_path):
+                selected = dm_query.review_events_for_init(args(), 21, [])
+
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(selected[0]["description"], "A draft event awaits human review.")
+        self.assertEqual(selected[0]["event_type"], "lore")
+        self.assertEqual(selected[0]["significance"], 3)
 
     def test_init_review_writes_yaml_and_refuses_overwrite(self):
         review_data = {

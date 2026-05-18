@@ -1,5 +1,13 @@
 # Revision History
 
+## v0.4.26 - 5/18/2026
+
+Initialized audio-first reviews from merged draft events.
+
+- Workflow: `init-review` now falls back to `knowledge/Faban/clean/sessionXX_merged.md` when a new audio session has no canonical DB events yet.
+- Workflow: Draft merged events become pending review items tagged as `draft_merged_event`, preserving the human review gate before canon is applied.
+- Tests: Added coverage for merged-event parsing and the DB-preferred review initialization fallback.
+
 ## v0.4.25 - 5/17/2026
 
 Queued automatic session intake through the human-review gate.

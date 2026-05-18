@@ -1,6 +1,6 @@
 # Version
 
-v0.4.25
+v0.4.26
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.25` queues automatic session intake through the human-review gate.
+`v0.4.26` initializes audio-first session reviews from merged draft events.
