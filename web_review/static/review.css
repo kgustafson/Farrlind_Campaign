@@ -631,6 +631,41 @@ button:disabled {
   color: var(--muted);
   font-size: 13px;
 }
+.workflow-step-state-ledger {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 10px;
+  border: 1px solid rgba(110, 67, 24, .22);
+  border-radius: 8px;
+  background: rgba(255, 247, 223, .45);
+}
+.workflow-step-state-ledger div {
+  min-width: 0;
+}
+.workflow-step-state-ledger .wide-field {
+  grid-column: 1 / -1;
+}
+.workflow-step-state-ledger dt {
+  color: var(--brass-dark);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.workflow-step-state-ledger dd {
+  margin: 2px 0 0;
+  color: var(--ink);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.workflow-artifact-list {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  padding-left: 16px;
+}
 .workflow-step-meta {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2005,6 +2040,7 @@ dd { margin: 0; }
   .status-table .icon-link {
     justify-self: start;
   }
+  .workflow-step-state-ledger,
   .workflow-step-meta {
     grid-template-columns: 1fr;
   }

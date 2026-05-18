@@ -90,6 +90,52 @@
             <span class="badge workflow-{{ step.status }}">{{ step.status }}</span>
           </div>
           <p>{{ step.summary_comment or "No step comment recorded." }}</p>
+          <dl class="workflow-step-state-ledger" aria-label="Step state fields">
+            <div>
+              <dt>Status</dt>
+              <dd><span class="badge workflow-{{ step.status }}">{{ step.status }}</span></dd>
+            </div>
+            <div>
+              <dt>Started</dt>
+              <dd>{{ step.started_at or "not started" }}</dd>
+            </div>
+            <div>
+              <dt>Completed</dt>
+              <dd>{{ step.completed_at or "not completed" }}</dd>
+            </div>
+            <div class="wide-field">
+              <dt>Comment</dt>
+              <dd>{{ step.summary_comment or "No step comment recorded." }}</dd>
+            </div>
+            <div class="wide-field">
+              <dt>Inputs</dt>
+              <dd>
+                {% if step.inputs %}
+                <ul class="workflow-artifact-list">
+                  {% for item in step.inputs %}
+                  <li>{{ item }}</li>
+                  {% endfor %}
+                </ul>
+                {% else %}
+                <span class="muted">none recorded</span>
+                {% endif %}
+              </dd>
+            </div>
+            <div class="wide-field">
+              <dt>Outputs</dt>
+              <dd>
+                {% if step.outputs %}
+                <ul class="workflow-artifact-list">
+                  {% for item in step.outputs %}
+                  <li>{{ item }}</li>
+                  {% endfor %}
+                </ul>
+                {% else %}
+                <span class="muted">none recorded</span>
+                {% endif %}
+              </dd>
+            </div>
+          </dl>
           <dl class="workflow-step-meta">
             <div>
               <dt>Lane</dt>

@@ -1,6 +1,6 @@
 # Version
 
-v0.4.23
+v0.4.24
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.23` fixes audio-registration workflow updates for session initiation.
+`v0.4.24` surfaces workflow step state fields in Workflow Status.

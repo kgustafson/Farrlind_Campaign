@@ -1261,7 +1261,7 @@ class LocationRouteTest(unittest.TestCase):
         self.assertNotIn("Add New", response.text)
         self.assertNotIn("Edit</a>", response.text)
         self.assertNotIn("Delete</button>", response.text)
-        self.assertNotIn('role="dialog"', response.text)
+        self.assertNotIn("workflow-detail-modal", response.text)
 
     def test_create_location_route_writes_form_values(self):
         with patch("web_review.services.canon.create_location") as create:
@@ -1418,7 +1418,7 @@ class NPCRouteTest(unittest.TestCase):
         self.assertNotIn("Add New", response.text)
         self.assertNotIn("Edit</a>", response.text)
         self.assertNotIn("Delete</button>", response.text)
-        self.assertNotIn('role="dialog"', response.text)
+        self.assertNotIn("workflow-detail-modal", response.text)
 
     def test_create_npc_route_writes_form_values(self):
         with patch("web_review.services.canon.create_npc") as create:
@@ -1560,7 +1560,7 @@ class ArtifactRouteTest(unittest.TestCase):
         self.assertNotIn("Add New", response.text)
         self.assertNotIn("Edit</a>", response.text)
         self.assertNotIn("Delete</button>", response.text)
-        self.assertNotIn('role="dialog"', response.text)
+        self.assertNotIn("workflow-detail-modal", response.text)
 
     def test_create_artifact_route_writes_form_values(self):
         with patch("web_review.services.canon.create_artifact") as create:
@@ -1706,7 +1706,7 @@ class OpenThreadRouteTest(unittest.TestCase):
         self.assertNotIn("Add New", response.text)
         self.assertNotIn("Edit</a>", response.text)
         self.assertNotIn("Delete</button>", response.text)
-        self.assertNotIn('role="dialog"', response.text)
+        self.assertNotIn("workflow-detail-modal", response.text)
 
     def test_create_open_thread_route_writes_form_values(self):
         with patch("web_review.services.canon.create_open_thread") as create:
@@ -2475,8 +2475,8 @@ class WorkflowRouteTest(unittest.TestCase):
                 "display_name": "Source Audio Registered",
                 "lane": "intake",
                 "status": "complete",
-                "started_at": None,
-                "completed_at": None,
+                "started_at": "2026-05-17 19:43:00",
+                "completed_at": "2026-05-17 19:44:00",
                 "summary_comment": "Audio exists.",
                 "inputs": ["audio/session20.wav"],
                 "outputs": ["audio/session20.wav"],
@@ -2569,7 +2569,7 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertIn("Session Workflow Ledger", response.text)
         self.assertIn("Session 20", response.text)
         self.assertIn('href="/workflow?session=20"', response.text)
-        self.assertNotIn('role="dialog"', response.text)
+        self.assertNotIn("workflow-detail-modal", response.text)
         detail.assert_not_called()
 
     def test_workflow_page_renders_detail_modal_when_session_selected(self):
@@ -2587,6 +2587,15 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertIn("Session 20", response.text)
         self.assertIn("Source Audio Registered", response.text)
         self.assertIn("Edit Review Decisions", response.text)
+        self.assertIn("Started", response.text)
+        self.assertIn("Completed", response.text)
+        self.assertIn("Comment", response.text)
+        self.assertIn("Inputs", response.text)
+        self.assertIn("Outputs", response.text)
+        self.assertIn("2026-05-17 19:43:00", response.text)
+        self.assertIn("2026-05-17 19:44:00", response.text)
+        self.assertIn("audio/session20.wav", response.text)
+        self.assertIn("not completed", response.text)
         self.assertIn("Needs Attention", response.text)
         self.assertIn("Missing output artifact knowledge/Faban/raw/session21_transcript.txt.", response.text)
         self.assertIn("Historical timestamps are estimated", response.text)

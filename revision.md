@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.4.24 - 5/17/2026
+
+Surfaced workflow step state fields in Workflow Status.
+
+- App: Added a per-step state ledger to the Workflow Status detail modal.
+- App: Shows status, started timestamp, completed timestamp, summary comment, inputs, and outputs for each workflow step.
+- App: Styled long input/output artifacts so they remain readable in the workflow modal.
+- Tests: Updated workflow route coverage for the displayed step state fields.
+
 ## v0.4.23 - 5/17/2026
 
 Fixed audio-registration workflow updates for session initiation.
