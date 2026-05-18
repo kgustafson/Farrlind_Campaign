@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.4.28 - 5/18/2026
+
+Added high-level event-order buckets to session review.
+
+- App: Added editable high-level event buckets with order, description, and location fields in the session review page.
+- App: Review items can now be assigned to high-level buckets individually or in batches.
+- App: Added an Apply Buckets action that gives bucketed review items the bucket location and renumbers them contiguously by macro event order.
+- Tests: Added coverage for macro bucket creation, removal, batch assignment, route wiring, and bucket-order application.
+
 ## v0.4.27 - 5/18/2026
 
 Made large audio-first session reviews manageable.

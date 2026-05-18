@@ -339,6 +339,7 @@ async def batch_session_review_items(request: Request, session: str):
         form.getlist("selected_item_id"),
         form.get("batch_decision") or "",
         form.get("batch_reason") or "",
+        form.get("batch_macro_event_id") or "",
     )
     if not errors:
         try:
@@ -347,6 +348,60 @@ async def batch_session_review_items(request: Request, session: str):
             raise HTTPException(status_code=404, detail=str(exc))
 
     flag = "batch_saved=1" if not errors else "batch_failed=1"
+    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", flag)
+
+
+@app.post("/sessions/{session}/review/macros")
+async def save_session_review_macros(request: Request, session: str):
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    document = reviews.load_review_document(session_number)
+    if not document:
+        raise HTTPException(status_code=404, detail="Review file has not been initialized.")
+    if document.get("status") == "applied":
+        raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
+
+    form = await request.form()
+    form_values = {key: form.getlist(key) for key in form.keys()}
+    known_locations = canon_location_names()
+    if location_confirmation_failed({"location": form_values.get("macro_location", []) + form_values.get("new_macro_location", [])}, form, known_locations):
+        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_confirm_failed=1")
+    updated = reviews.update_macro_events_from_form(document, form_values)
+    try:
+        reviews.save_review_document(session_number, updated)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "macros_saved=1")
+
+
+@app.post("/sessions/{session}/review/apply-macros")
+async def apply_session_review_macros(request: Request, session: str):
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    document = reviews.load_review_document(session_number)
+    if not document:
+        raise HTTPException(status_code=404, detail="Review file has not been initialized.")
+    if document.get("status") == "applied":
+        raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
+
+    form = await request.form()
+    form_values = {key: form.getlist(key) for key in form.keys()}
+    updated = reviews.update_review_document_from_form(document, form_values)
+    updated, errors = reviews.apply_macro_event_order(updated)
+    if not errors:
+        try:
+            reviews.save_review_document(session_number, updated)
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=str(exc))
+
+    flag = "macros_applied=1" if not errors else "macros_apply_failed=1"
     return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", flag)
 
 

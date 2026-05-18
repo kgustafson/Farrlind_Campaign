@@ -221,6 +221,74 @@ class WebReviewServiceTest(unittest.TestCase):
         self.assertEqual(updated["items"][0]["reason"], "Table talk.")
         self.assertEqual(updated["items"][1]["decision"], "pending")
 
+    def test_update_batch_decision_can_assign_bucket_without_decision(self):
+        document = {
+            "items": [
+                {"id": "event-001", "decision": "pending", "applied_status": "pending"},
+                {"id": "event-002", "decision": "pending", "applied_status": "pending"},
+            ],
+            "added_items": [],
+        }
+
+        updated, errors = reviews.update_batch_decision(document, ["event-001"], "", "", "macro-001")
+
+        self.assertEqual(errors, [])
+        self.assertEqual(updated["items"][0]["decision"], "pending")
+        self.assertEqual(updated["items"][0]["macro_event_id"], "macro-001")
+        self.assertNotIn("macro_event_id", updated["items"][1])
+
+    def test_update_macro_events_from_form_adds_and_removes_buckets(self):
+        document = {
+            "macro_events": [
+                {"id": "macro-001", "order": 1, "description": "Old", "location": "Road"},
+                {"id": "macro-002", "order": 2, "description": "Remove me", "location": "Boat"},
+            ],
+            "items": [
+                {"id": "event-001", "macro_event_id": "macro-002"},
+            ],
+            "added_items": [],
+        }
+
+        updated = reviews.update_macro_events_from_form(document, {
+            "macro_id": ["macro-001", "macro-002"],
+            "macro_order": ["1", "2"],
+            "macro_description": ["Party makes a plan", "Remove me"],
+            "macro_location": ["Western Coast", "Boat"],
+            "remove_macro_id": ["macro-002"],
+            "new_macro_order": ["3"],
+            "new_macro_description": ["Party dives to Catur"],
+            "new_macro_location": ["Underwater"],
+        })
+
+        self.assertEqual([item["id"] for item in updated["macro_events"]], ["macro-001", "macro-003"])
+        self.assertEqual(updated["macro_events"][0]["description"], "Party makes a plan")
+        self.assertEqual(updated["macro_events"][1]["description"], "Party dives to Catur")
+        self.assertNotIn("macro_event_id", updated["items"][0])
+
+    def test_apply_macro_event_order_assigns_locations_and_contiguous_sequences(self):
+        document = {
+            "macro_events": [
+                {"id": "macro-002", "order": 2, "description": "Boat", "location": "Boat"},
+                {"id": "macro-001", "order": 1, "description": "Plan", "location": "Western Coast"},
+            ],
+            "items": [
+                {"id": "event-001", "sequence": 10, "macro_event_id": "macro-001", "location": ""},
+                {"id": "event-002", "sequence": 3, "macro_event_id": "macro-002", "location": ""},
+                {"id": "event-003", "sequence": 2, "macro_event_id": "macro-001", "location": ""},
+            ],
+            "added_items": [],
+        }
+
+        updated, errors = reviews.apply_macro_event_order(document)
+
+        self.assertEqual(errors, [])
+        by_id = {item["id"]: item for item in updated["items"]}
+        self.assertEqual(by_id["event-003"]["sequence"], 1)
+        self.assertEqual(by_id["event-001"]["sequence"], 2)
+        self.assertEqual(by_id["event-002"]["sequence"], 3)
+        self.assertEqual(by_id["event-001"]["location"], "Western Coast")
+        self.assertEqual(by_id["event-002"]["location"], "Boat")
+
     def test_merge_review_items_adds_merged_item_and_rejects_originals(self):
         document = {
             "items": [
@@ -561,6 +629,64 @@ class WebReviewAppTest(unittest.TestCase):
             self.assertIn("location_confirm_failed=1", response.headers["location"])
             saved = yaml.safe_load(path.read_text(encoding="utf-8"))
             self.assertEqual(saved["items"][0]["location"], "Bentrios")
+
+    def test_macro_routes_save_and_apply_bucket_order(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session21_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session21",
+                "status": "in_review",
+                "macro_events": [],
+                "items": [
+                    {"id": "event-001", "sequence": 10, "decision": "pending", "location": "", "applied_status": "pending"},
+                    {"id": "event-002", "sequence": 20, "decision": "pending", "location": "", "applied_status": "pending"},
+                ],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final), \
+                 patch("web_review.services.canon.locations", return_value=["Western Coast", "Boat"]):
+                client = TestClient(app)
+                response = client.post("/sessions/session21/review/macros", data={
+                    "source": "diary",
+                    "view": "raw",
+                    "new_macro_order": "1",
+                    "new_macro_description": "Party discusses plan",
+                    "new_macro_location": "Western Coast",
+                }, follow_redirects=False)
+                self.assertEqual(response.status_code, 303)
+                saved = yaml.safe_load(path.read_text(encoding="utf-8"))
+                macro_id = saved["macro_events"][0]["id"]
+                response = client.post("/sessions/session21/review/apply-macros", data={
+                    "source": "diary",
+                    "view": "raw",
+                    "item_id": ["event-001", "event-002"],
+                    "section": ["items", "items"],
+                    "sequence": ["10", "20"],
+                    "decision": ["pending", "pending"],
+                    "canonical_text": ["", ""],
+                    "event_type": ["", ""],
+                    "location": ["", ""],
+                    "significance": ["", ""],
+                    "reason": ["", ""],
+                    "macro_event_id": [macro_id, macro_id],
+                }, follow_redirects=False)
+
+            self.assertEqual(response.status_code, 303)
+            self.assertIn("macros_applied=1", response.headers["location"])
+            saved = yaml.safe_load(path.read_text(encoding="utf-8"))
+            self.assertEqual(saved["items"][0]["sequence"], 1)
+            self.assertEqual(saved["items"][1]["sequence"], 2)
+            self.assertEqual(saved["items"][0]["location"], "Western Coast")
 
     def test_save_review_route_rejects_applied_review(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -69,6 +69,15 @@
 {% if request.query_params.get("batch_failed") %}
   <div class="flash error-flash">Batch update failed. Select at least one item and a final decision.</div>
 {% endif %}
+{% if request.query_params.get("macros_saved") %}
+  <div class="flash">High-level event order saved.</div>
+{% endif %}
+{% if request.query_params.get("macros_applied") %}
+  <div class="flash">Buckets applied to review item locations and ordering.</div>
+{% endif %}
+{% if request.query_params.get("macros_apply_failed") %}
+  <div class="flash error-flash">Bucket application failed. Create at least one high-level event bucket.</div>
+{% endif %}
 {% if request.query_params.get("merged") %}
   <div class="flash">Merged selected fragments into a new review item.</div>
 {% endif %}
@@ -162,6 +171,15 @@
           <option value="added">added</option>
         </select>
       </label>
+      <label>
+        <span>Bucket</span>
+        <select name="batch_macro_event_id" {% if review_locked %}disabled{% endif %}>
+          <option value="">none</option>
+          {% for macro in macro_events %}
+            <option value="{{ macro.id }}">{{ macro.order }}. {{ macro.description }}</option>
+          {% endfor %}
+        </select>
+      </label>
       <label class="batch-reason">
         <span>Reason</span>
         <input name="batch_reason" placeholder="Optional note for selected rows" {% if review_locked %}disabled{% endif %}>
@@ -219,6 +237,16 @@
           <input name="significance" type="number" min="1" max="5" value="{{ item.significance or "" }}" {% if review_locked or not can_edit() %}disabled{% endif %}>
         </label>
       </div>
+
+      <label class="field-block">
+        <span>High-Level Bucket</span>
+        <select name="macro_event_id" {% if review_locked or not can_edit() %}disabled{% endif %}>
+          <option value="">unbucketed</option>
+          {% for macro in macro_events %}
+            <option value="{{ macro.id }}" {% if item.macro_event_id == macro.id %}selected{% endif %}>{{ macro.order }}. {{ macro.description }}{% if macro.location %} - {{ macro.location }}{% endif %}</option>
+          {% endfor %}
+        </select>
+      </label>
 
       <label class="field-block">
         <span>Reason</span>
@@ -295,6 +323,51 @@
         <div><dt>Location</dt><dd>{{ document.primary_location or "unknown" }}</dd></div>
         <div><dt>Items</dt><dd>{{ summary.total_items }}</dd></div>
       </dl>
+    </section>
+    <section>
+      <h2>High-Level Event Order</h2>
+      <p class="muted">Build the session spine first, then bucket fragments into it.</p>
+      <div class="macro-list">
+        {% for macro in macro_events %}
+        <div class="macro-row">
+          <input type="hidden" name="macro_id" value="{{ macro.id }}">
+          <label>
+            <span>Order</span>
+            <input name="macro_order" value="{{ macro.order }}" inputmode="decimal" {% if review_locked %}disabled{% endif %}>
+          </label>
+          <label>
+            <span>Description</span>
+            <input name="macro_description" value="{{ macro.description }}" {% if review_locked %}disabled{% endif %}>
+          </label>
+          <label>
+            <span>Location</span>
+            <input name="macro_location" list="location-options" value="{{ macro.location }}" {% if review_locked %}disabled{% endif %}>
+          </label>
+          <label class="check-row">
+            <input type="checkbox" name="remove_macro_id" value="{{ macro.id }}" {% if review_locked %}disabled{% endif %}>
+            <span>Remove</span>
+          </label>
+        </div>
+        {% endfor %}
+        <div class="macro-row macro-new">
+          <label>
+            <span>Order</span>
+            <input name="new_macro_order" inputmode="decimal" placeholder="1" {% if review_locked %}disabled{% endif %}>
+          </label>
+          <label>
+            <span>Description</span>
+            <input name="new_macro_description" placeholder="Party travels to Catur by boat" {% if review_locked %}disabled{% endif %}>
+          </label>
+          <label>
+            <span>Location</span>
+            <input name="new_macro_location" list="location-options" placeholder="Boat" {% if review_locked %}disabled{% endif %}>
+          </label>
+        </div>
+      </div>
+      <div class="panel-actions stacked-actions">
+        <button type="submit" formaction="/sessions/{{ session_key }}/review/macros" formmethod="post" {% if review_locked %}disabled{% endif %}>Save Event Order</button>
+        <button type="submit" formaction="/sessions/{{ session_key }}/review/apply-macros" formmethod="post" {% if review_locked %}disabled{% endif %}>Apply Buckets</button>
+      </div>
     </section>
     <section>
       <h2>Validation</h2>

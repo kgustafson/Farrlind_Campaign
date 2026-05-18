@@ -205,6 +205,16 @@ def sorted_review_items(document: dict[str, Any]) -> list[dict[str, Any]]:
     return sorted(combined, key=lambda item: (decision_rank(item), sequence_value(item)))
 
 
+def sorted_macro_events(document: dict[str, Any]) -> list[dict[str, Any]]:
+    def order_value(item: dict[str, Any]) -> float:
+        try:
+            return float(item.get("order") or 0)
+        except (TypeError, ValueError):
+            return 0.0
+
+    return sorted([dict(item) for item in document.get("macro_events") or []], key=order_value)
+
+
 def source_text(session_number: int, source: str) -> tuple[str, str]:
     choices = {
         "diary": ("Diary", diary_path(session_number)),
@@ -236,6 +246,7 @@ def session_workspace(session_number: int, source: str = "diary", source_view: s
         "summary": summarize_review_document(session_number, document),
         "document": document,
         "items": sorted_review_items(document),
+        "macro_events": sorted_macro_events(document),
         "source": source,
         "source_label": label,
         "source_text": text,
@@ -274,6 +285,64 @@ def _first(values: dict[str, list[str]], key: str, index: int, default: str = ""
     if index >= len(items):
         return default
     return items[index]
+
+
+def _coerce_macro_order(value: Any) -> Any:
+    return _coerce_sequence(value)
+
+
+def next_macro_event_id(document: dict[str, Any]) -> str:
+    highest = 0
+    for item in document.get("macro_events") or []:
+        match = re.search(r"macro-(\d+)$", str(item.get("id") or ""))
+        if match:
+            highest = max(highest, int(match.group(1)))
+    return f"macro-{highest + 1:03d}"
+
+
+def update_macro_events_from_form(document: dict[str, Any], form_values: dict[str, list[str]]) -> dict[str, Any]:
+    updated = dict(document)
+    existing = {item.get("id"): dict(item) for item in document.get("macro_events") or [] if item.get("id")}
+    macro_ids = form_values.get("macro_id") or []
+    macro_events = []
+    remove_ids = set(form_values.get("remove_macro_id") or [])
+
+    for index, macro_id in enumerate(macro_ids):
+        description = _first(form_values, "macro_description", index).strip()
+        location = _first(form_values, "macro_location", index).strip()
+        order = _coerce_macro_order(_first(form_values, "macro_order", index))
+        if macro_id in remove_ids or not (description or location or order):
+            continue
+        macro_events.append({
+            **existing.get(macro_id, {}),
+            "id": macro_id,
+            "order": order,
+            "description": description,
+            "location": location,
+        })
+
+    new_description = _first(form_values, "new_macro_description", 0).strip()
+    new_location = _first(form_values, "new_macro_location", 0).strip()
+    new_order = _coerce_macro_order(_first(form_values, "new_macro_order", 0))
+    if new_description or new_location or new_order:
+        macro_events.append({
+            "id": next_macro_event_id(document),
+            "order": new_order,
+            "description": new_description,
+            "location": new_location,
+        })
+
+    valid_ids = {item["id"] for item in macro_events}
+    for section in ["items", "added_items"]:
+        section_items = []
+        for item in updated.get(section) or []:
+            item = dict(item)
+            if item.get("macro_event_id") not in valid_ids:
+                item.pop("macro_event_id", None)
+            section_items.append(item)
+        updated[section] = section_items
+    updated["macro_events"] = sorted_macro_events({"macro_events": macro_events})
+    return updated
 
 
 def next_added_item_id(document: dict[str, Any]) -> str:
@@ -370,6 +439,7 @@ def update_review_document_from_form(document: dict[str, Any], form_values: dict
             "location": _first(form_values, "location", index),
             "significance": _coerce_significance(_first(form_values, "significance", index)),
             "reason": _first(form_values, "reason", index),
+            "macro_event_id": _first(form_values, "macro_event_id", index),
         }
 
     for section in ["items", "added_items"]:
@@ -389,7 +459,7 @@ def update_review_document_from_form(document: dict[str, Any], form_values: dict
 
 
 def update_single_review_item_from_form(document: dict[str, Any], form_values: dict[str, list[str]], item_id: str) -> dict[str, Any]:
-    filtered = {"item_id": [], "section": [], "sequence": [], "decision": [], "canonical_text": [], "event_type": [], "location": [], "significance": [], "reason": []}
+    filtered = {"item_id": [], "section": [], "sequence": [], "decision": [], "canonical_text": [], "event_type": [], "location": [], "significance": [], "reason": [], "macro_event_id": []}
     for index, submitted_id in enumerate(form_values.get("item_id") or []):
         if submitted_id != item_id:
             continue
@@ -409,9 +479,11 @@ def find_review_item(document: dict[str, Any], item_id: str) -> Optional[tuple[s
     return None
 
 
-def update_batch_decision(document: dict[str, Any], item_ids: list[str], decision: str, reason: str = "") -> tuple[dict[str, Any], list[str]]:
-    if decision not in VALID_DECISIONS - {"pending"}:
+def update_batch_decision(document: dict[str, Any], item_ids: list[str], decision: str, reason: str = "", macro_event_id: str = "") -> tuple[dict[str, Any], list[str]]:
+    if decision and decision not in VALID_DECISIONS - {"pending"}:
         return document, ["Choose an accepted, rejected, corrected, or added decision."]
+    if not decision and not macro_event_id:
+        return document, ["Choose a decision or bucket."]
     selected = {item_id for item_id in item_ids if item_id}
     if not selected:
         return document, ["Select at least one review item."]
@@ -423,9 +495,12 @@ def update_batch_decision(document: dict[str, Any], item_ids: list[str], decisio
         for item in updated.get(section) or []:
             item = dict(item)
             if item.get("id") in selected:
-                item["decision"] = decision
+                if decision:
+                    item["decision"] = decision
                 if reason:
                     item["reason"] = reason
+                if macro_event_id:
+                    item["macro_event_id"] = macro_event_id
                 if item.get("applied_status") == "applied":
                     item["applied_status"] = "pending"
                     item["applied_on"] = ""
@@ -434,6 +509,44 @@ def update_batch_decision(document: dict[str, Any], item_ids: list[str], decisio
         updated[section] = section_items
     if not changed:
         return document, ["Selected review items were not found."]
+    return updated, []
+
+
+def apply_macro_event_order(document: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
+    macros = sorted_macro_events(document)
+    if not macros:
+        return document, ["Create at least one high-level event bucket."]
+
+    macro_by_id = {item["id"]: item for item in macros}
+    updated = dict(document)
+    sequence = 1
+    assigned_ids = set()
+
+    for macro in macros:
+        bucket_items = []
+        for section in ["items", "added_items"]:
+            for item in updated.get(section) or []:
+                if item.get("macro_event_id") == macro["id"]:
+                    bucket_items.append(item)
+        bucket_items = sorted(bucket_items, key=lambda item: float(item.get("sequence") or 0))
+        for bucket_item in bucket_items:
+            bucket_item["sequence"] = sequence
+            bucket_item["location"] = macro.get("location") or bucket_item.get("location") or ""
+            bucket_item["macro_event_order"] = macro.get("order")
+            assigned_ids.add(bucket_item.get("id"))
+            sequence += 1
+
+    for section in ["items", "added_items"]:
+        section_items = []
+        for item in updated.get(section) or []:
+            item = dict(item)
+            if item.get("id") in assigned_ids:
+                macro = macro_by_id.get(item.get("macro_event_id"))
+                if macro:
+                    item["macro_event_order"] = macro.get("order")
+                    item["location"] = macro.get("location") or item.get("location") or ""
+            section_items.append(item)
+        updated[section] = section_items
     return updated, []
 
 
