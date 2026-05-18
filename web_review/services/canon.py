@@ -1,7 +1,9 @@
 import re
+from datetime import date
 from pathlib import Path
 from typing import Any, Optional
 
+import yaml
 from sqlalchemy.exc import SQLAlchemyError
 
 from web_review import db
@@ -16,6 +18,7 @@ class CanonWriteError(RuntimeError):
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+CANON_DECISIONS_PATH = REPO_ROOT / "knowledge" / "Faban" / "canon_decisions.yaml"
 FARRLIND_MONTH_ORDER = {
     "Sha'al": 1,
     "Amoral": 2,
@@ -610,6 +613,7 @@ def open_thread_detail(thread_id: int) -> Optional[dict[str, Any]]:
 
 
 def create_open_thread(values: dict[str, Any]) -> None:
+    _unsuppress_open_thread_title(values["title"])
     _execute("""
         INSERT INTO open_thread (
             title, thread_type, status, first_session_id, last_session_id,
@@ -625,6 +629,7 @@ def create_open_thread(values: dict[str, Any]) -> None:
 
 
 def update_open_thread(thread_id: int, values: dict[str, Any]) -> None:
+    _unsuppress_open_thread_title(values["title"])
     params = {**values, "id": thread_id}
     _execute("""
         UPDATE open_thread
@@ -643,7 +648,58 @@ def update_open_thread(thread_id: int, values: dict[str, Any]) -> None:
 
 
 def delete_open_thread(thread_id: int) -> None:
+    detail = open_thread_detail(thread_id)
     _execute("DELETE FROM open_thread WHERE id = :id;", {"id": thread_id})
+    if detail and detail.get("title"):
+        _suppress_open_thread_title(detail["title"])
+
+
+def _load_canon_decisions() -> dict[str, Any]:
+    if not CANON_DECISIONS_PATH.exists():
+        return {}
+    return yaml.safe_load(CANON_DECISIONS_PATH.read_text(encoding="utf-8")) or {}
+
+
+def _save_canon_decisions(data: dict[str, Any]) -> None:
+    CANON_DECISIONS_PATH.write_text(
+        yaml.safe_dump(data, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+
+
+def _suppress_open_thread_title(title: str) -> None:
+    title = title.strip()
+    if not title:
+        return
+    data = _load_canon_decisions()
+    suppressed = data.setdefault("suppressed_open_threads", [])
+    for item in suppressed:
+        if item.get("title") == title:
+            item["status"] = "deleted"
+            item["applied_on"] = date.today().isoformat()
+            _save_canon_decisions(data)
+            return
+    suppressed.append({
+        "title": title,
+        "status": "deleted",
+        "reason": "Deleted from Open Threads UI; prevent canonical seed reload from resurrecting it.",
+        "decided_from": "web_review",
+        "applied_on": date.today().isoformat(),
+    })
+    _save_canon_decisions(data)
+
+
+def _unsuppress_open_thread_title(title: str) -> None:
+    title = title.strip()
+    if not title or not CANON_DECISIONS_PATH.exists():
+        return
+    data = _load_canon_decisions()
+    suppressed = data.get("suppressed_open_threads") or []
+    filtered = [item for item in suppressed if item.get("title") != title]
+    if len(filtered) == len(suppressed):
+        return
+    data["suppressed_open_threads"] = filtered
+    _save_canon_decisions(data)
 
 
 def _session_span_label(session_number: int, outcome: str) -> str:

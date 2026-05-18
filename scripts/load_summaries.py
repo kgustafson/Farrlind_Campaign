@@ -404,20 +404,22 @@ CANON_OPEN_THREADS = [
     {
         "title": "What will happen at the sunken city of Catur?",
         "thread_type": "pending_quest",
-        "status": "open",
+        "status": "resolved",
         "first_session": 13,
-        "last_session": 20,
+        "last_session": 21,
         "location": "Catur",
         "description": "Catur is one of the known Wells. The party has reached the coast, gained a boat, and is preparing to descend, while locals warn that Catur's peoples distrust strangers.",
+        "resolution": "Resolved in session21: the party reached underwater Catur, gained an audience with the queen, entered the well chamber, and ended in a flooding crisis.",
     },
     {
         "title": "What is the large intelligence or force beneath the waters near Catur?",
         "thread_type": "dm_foreshadowing",
-        "status": "open",
+        "status": "resolved",
         "first_session": 20,
-        "last_session": 20,
+        "last_session": 21,
         "location": "Coast near Catur",
         "description": "The fishermen report missing boats, lights under the water, and something thought-large beneath. This appears to be immediate next-session foreshadowing.",
+        "resolution": "Resolved in session21: an aboleth-like entity called Niebain or Nebain appeared near Catur's well and warned that danger had already arrived.",
     },
     {
         "title": "Can the Cataclysm be stopped, or only softened?",
@@ -1087,6 +1089,15 @@ def canon_event_decisions(decisions: dict) -> dict[int, list[dict]]:
     return entries
 
 
+def suppressed_open_thread_titles(decisions: dict) -> set[str]:
+    return {
+        str(item.get("title") or "").strip()
+        for item in decisions.get("suppressed_open_threads", []) or []
+        if str(item.get("title") or "").strip()
+        and item.get("status") in {"deleted", "suppressed", "applied"}
+    }
+
+
 def load_review_documents() -> dict[int, dict]:
     if not REVIEWS_DIR.exists():
         return {}
@@ -1727,18 +1738,37 @@ VALUES (
 )
 ON CONFLICT (title) DO UPDATE SET
     thread_type = EXCLUDED.thread_type,
-    status = EXCLUDED.status,
     first_session_id = EXCLUDED.first_session_id,
     last_session_id = EXCLUDED.last_session_id,
     related_location_id = EXCLUDED.related_location_id,
     description = EXCLUDED.description,
-    resolution = EXCLUDED.resolution,
-    notes = EXCLUDED.notes;
+    status = CASE
+        WHEN open_thread.status <> 'open' THEN open_thread.status
+        ELSE EXCLUDED.status
+    END,
+    resolution = CASE
+        WHEN open_thread.resolution IS NULL OR open_thread.resolution = ''
+        THEN EXCLUDED.resolution
+        ELSE open_thread.resolution
+    END,
+    notes = CASE
+        WHEN open_thread.notes = 'Loaded from approved open threads pass.'
+             OR open_thread.notes IS NULL
+             OR open_thread.notes = ''
+        THEN EXCLUDED.notes
+        ELSE open_thread.notes
+    END;
 """.strip()
 
 
 def canon_open_threads_sql() -> str:
-    return "\n\n".join(canon_open_thread_sql(thread) for thread in CANON_OPEN_THREADS)
+    decisions = load_canon_decisions()
+    suppressed_titles = suppressed_open_thread_titles(decisions)
+    return "\n\n".join(
+        canon_open_thread_sql(thread)
+        for thread in CANON_OPEN_THREADS
+        if thread["title"] not in suppressed_titles
+    )
 
 
 def pipeline_run_sql(session_count: int, event_count: int) -> str:
