@@ -1,0 +1,3522 @@
+session: session21
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: Session 21
+session_date: '2026-05-18'
+in_game_date: ''
+primary_location: ''
+items:
+- id: event-001
+  sequence: 1
+  source_type: draft_merged_event
+  source_text: 'Mikani introduces himself as an emissary from the Celestial Isles.
+    Outcome: Mikani gains access to the captain and begins his mission.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-004
+- id: event-002
+  sequence: 2
+  source_type: draft_merged_event
+  source_text: Identifies staff of defense
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western Coast of Farrlind
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-003
+  sequence: 3
+  source_type: draft_merged_event
+  source_text: Discusses rapier of astir
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western Coast of Farrlind
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-004
+  sequence: 4
+  source_type: draft_merged_event
+  source_text: Discusses cap of water breathing and Acheron blade; Character advises
+    taking mushrooms to avoid losing breath.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western Coast of Farrlind
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-005
+  sequence: 5
+  source_type: draft_merged_event
+  source_text: 'Kuwatoa appears and speaks to the Captain. Outcome: The gate opens,
+    and Mikani leads the group into the city.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-004
+- id: event-006
+  sequence: 6
+  source_type: draft_merged_event
+  source_text: 'Group enters the hallway and watches as Kuwatoa transforms into a
+    humanoid form. Outcome: The group sees the city and its unique architecture.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-004
+- id: event-007
+  sequence: 7
+  source_type: draft_merged_event
+  source_text: Player asks if anyone ever has to ask them to speak for them.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-008
+  sequence: 8
+  source_type: draft_merged_event
+  source_text: Plus one attack and damage is mentioned.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-009
+  sequence: 9
+  source_type: draft_merged_event
+  source_text: Ability to cast is mentioned.
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: ''
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-010
+  sequence: 10
+  source_type: draft_merged_event
+  source_text: Rules for wielding the sword and giving temp HP are recapped.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-011
+  sequence: 11
+  source_type: draft_merged_event
+  source_text: Player asks if they can use an action to give themselves temp HP.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-012
+  sequence: 12
+  source_type: draft_merged_event
+  source_text: Player asks if they can give someone dread when hitting with an attack.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-013
+  sequence: 13
+  source_type: draft_merged_event
+  source_text: Disheartening Strike and Dark Blessing abilities are introduced.
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: ''
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-014
+  sequence: 14
+  source_type: draft_merged_event
+  source_text: 'Review of prior events and decisions Outcome: Information sharing'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western coast of Kator
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-015
+  sequence: 15
+  source_type: draft_merged_event
+  source_text: 'Description of the western coast of Kator Outcome: Setting established'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western coast of Kator
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-016
+  sequence: 16
+  source_type: draft_merged_event
+  source_text: 'Encounter with a giant fisherman Outcome: Helpful information shared'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western coast of Kator
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-017
+  sequence: 17
+  source_type: draft_merged_event
+  source_text: 'Discussion about mushrooms and breathing underwater Outcome: Information
+    sharing'
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Western coast of Kator
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-018
+  sequence: 18
+  source_type: draft_merged_event
+  source_text: 'Decision to disguise oneself and proceed to the city Outcome: Decision
+    made'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western Coast of Farrlind
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-019
+  sequence: 19
+  source_type: draft_merged_event
+  source_text: No sense of large threats.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-020
+  sequence: 20
+  source_type: draft_merged_event
+  source_text: Allister, a merchant, talks to Faban.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: City
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-021
+  sequence: 21
+  source_type: draft_merged_event
+  source_text: Planning to get "safe passage" in the city.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western Coast of Farrlind
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-022
+  sequence: 22
+  source_type: draft_merged_event
+  source_text: Mikani will go as an emissary from the Celestial Isles.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western Coast of Farrlind
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-023
+  sequence: 23
+  source_type: draft_merged_event
+  source_text: 'Discussion about the oath of devotion and potential betrayal. Outcome:
+    Unknown'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western Coast of Farrlind
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-024
+  sequence: 24
+  source_type: draft_merged_event
+  source_text: 'Paladin Corvinas should not actively say anything to avoid potentially
+    betraying the oath. Outcome: Unknown'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western Coast of Farrlind
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-025
+  sequence: 25
+  source_type: draft_merged_event
+  source_text: 'Paladin Corvinas has his oath written down in a book. Outcome: Unknown'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western Coast of Farrlind
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-026
+  sequence: 26
+  source_type: draft_merged_event
+  source_text: 'The oath of devotion is discussed and its tenets are listed. Outcome:
+    Unknown'
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Western Coast of Farrlind
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-027
+  sequence: 27
+  source_type: draft_merged_event
+  source_text: 'The party should not actively say anything to avoid potentially betraying
+    the oath. Outcome: Unknown'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western Coast of Farrlind
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-028
+  sequence: 28
+  source_type: draft_merged_event
+  source_text: Reiteration of previous conversation
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-029
+  sequence: 29
+  source_type: draft_merged_event
+  source_text: Boat ride to the approximate location
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-030
+  sequence: 30
+  source_type: draft_merged_event
+  source_text: 'Party agrees on plan to get into Catur and talk to the well. Outcome:
+    Plan agreed upon'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western Coast of Farrlind
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-031
+  sequence: 31
+  source_type: draft_merged_event
+  source_text: 'Bard explains the party''s goal in Catur. Outcome: Understanding of
+    party''s goal'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western Coast of Farrlind
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-032
+  sequence: 32
+  source_type: draft_merged_event
+  source_text: 'Party considers bribing the well with potions and mushrooms. Outcome:
+    Possibility of bribery'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-033
+  sequence: 33
+  source_type: draft_merged_event
+  source_text: 'NPC conversation about making timber and discussing the well Outcome:
+    Decision to make timber and check on the well'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Forest not too far from Catur
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-034
+  sequence: 34
+  source_type: draft_merged_event
+  source_text: 'Discussion about the well and potential evil involvement Outcome:
+    Revelation of potential evil involvement in the well'
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Western Coast of Farrlind
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-035
+  sequence: 35
+  source_type: draft_merged_event
+  source_text: 'Party decides to check on the well and ensure its safety Outcome:
+    Decision to proceed with checking the well'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western Coast of Farrlind
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-036
+  sequence: 36
+  source_type: draft_merged_event
+  source_text: 'Character discusses disguise kit and makeup options to appear water-touched.
+    Outcome: No outcome stated'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western Coast of Farrlind
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-037
+  sequence: 37
+  source_type: draft_merged_event
+  source_text: 'Character decides to look for a hair tie and sandals below decks.
+    Outcome: No outcome stated'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-038
+  sequence: 38
+  source_type: draft_merged_event
+  source_text: 'Character asks about Sam and who has people to see with water. Outcome:
+    No outcome stated'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-039
+  sequence: 39
+  source_type: draft_merged_event
+  source_text: 'Player is proficient with land vehicles. Outcome: N/A'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Western Coast of Farrlind
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-001
+- id: event-040
+  sequence: 40
+  source_type: draft_merged_event
+  source_text: 'Roon is tasked with making a Dexterity check. Outcome: Successful
+    navigation'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-041
+  sequence: 41
+  source_type: draft_merged_event
+  source_text: 'Player successfully navigates the ship. Outcome: Safe passage'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-042
+  sequence: 42
+  source_type: draft_merged_event
+  source_text: 'Another player makes a Con check to avoid seasickness. Outcome: Successful
+    avoidance of seasickness'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Ship
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-043
+  sequence: 43
+  source_type: draft_merged_event
+  source_text: 'Character uses perception skill to look out for anything. Outcome:
+    Nothing notable happens during the perception check.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-044
+  sequence: 44
+  source_type: draft_merged_event
+  source_text: 'Character puts on a medallion and tries to look like an emissary of
+    the Celestial Isles. Outcome: The character successfully puts on a stoic demeanor.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-045
+  sequence: 45
+  source_type: draft_merged_event
+  source_text: Discussing Celestial Isles lore
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-046
+  sequence: 46
+  source_type: draft_merged_event
+  source_text: Describing people in the Celestial Isles as mostly draconic
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-047
+  sequence: 47
+  source_type: draft_merged_event
+  source_text: Discussing the justice society on the Celestial Isles
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-048
+  sequence: 48
+  source_type: draft_merged_event
+  source_text: Confirming the High Clan of Men-sen controls the Celestial Isles
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-049
+  sequence: 49
+  source_type: draft_merged_event
+  source_text: Describing a human settlement on the Outer Rim as a pirate settlement
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-050
+  sequence: 50
+  source_type: draft_merged_event
+  source_text: Discussion about trade and appraisal in Celestial Isles.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-051
+  sequence: 51
+  source_type: draft_merged_event
+  source_text: Introduction to Wreck Way Cove and its history.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-052
+  sequence: 52
+  source_type: draft_merged_event
+  source_text: Characters discuss their situation and hear thunder and lightning.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-053
+  sequence: 53
+  source_type: draft_merged_event
+  source_text: Thunderbolts and lightning (repeated)
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-054
+  sequence: 54
+  source_type: draft_merged_event
+  source_text: Party is getting turned around and unsure of their location.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-055
+  sequence: 55
+  source_type: draft_merged_event
+  source_text: Character is considering making a major change by nature.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-056
+  sequence: 56
+  source_type: draft_merged_event
+  source_text: Character is willing to commune with the party leader.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-057
+  sequence: 57
+  source_type: draft_merged_event
+  source_text: Party leader agrees to do something.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-058
+  sequence: 58
+  source_type: draft_merged_event
+  source_text: 'Review of previous exploration and discovery of the storm''s direction.
+    Outcome: Determination of the storm''s direction and preparation for entry.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-059
+  sequence: 59
+  source_type: draft_merged_event
+  source_text: 'The party decides to make a Dexterity save due to the boat being flung
+    to the side in the eye of the storm. Outcome: The party must make a Dexterity
+    save to navigate the storm.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-060
+  sequence: 60
+  source_type: draft_merged_event
+  source_text: Initiative begins
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 5
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-061
+  sequence: 61
+  source_type: draft_merged_event
+  source_text: Mikani is overboard and struggling in freezing water
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-062
+  sequence: 62
+  source_type: draft_merged_event
+  source_text: 'Player considers using levitate on someone. Outcome: Not used in this
+    case'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Unspecified location
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-063
+  sequence: 63
+  source_type: draft_merged_event
+  source_text: 'Player starts pulling but finds it hard. Outcome: Need help to continue
+    pulling'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-064
+  sequence: 64
+  source_type: draft_merged_event
+  source_text: 'Player rolls strength and gets a 13. Outcome: Gained 7 points of strength'
+  decision: rejected
+  canonical_text: ''
+  event_type: combat
+  location: Unspecified location
+  significance: 5
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-065
+  sequence: 65
+  source_type: draft_merged_event
+  source_text: 'Player considers using levitate again. Outcome: Not used in this case'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-066
+  sequence: 66
+  source_type: draft_merged_event
+  source_text: Players discuss levitation spell and its applications.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-067
+  sequence: 67
+  source_type: draft_merged_event
+  source_text: Mikani comes up and helps understand how the boat works.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat in stormy weather
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-068
+  sequence: 68
+  source_type: draft_merged_event
+  source_text: Character expresses concern about water temperature and suggests using
+    mushrooms to adapt.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-069
+  sequence: 69
+  source_type: draft_merged_event
+  source_text: Character expresses uncertainty about holding on in the water.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-070
+  sequence: 70
+  source_type: draft_merged_event
+  source_text: Character notes that water is still frigid but can be acclimatized
+    to.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-071
+  sequence: 71
+  source_type: draft_merged_event
+  source_text: Character asks if they took time to make potions with all mushrooms.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-072
+  sequence: 72
+  source_type: draft_merged_event
+  source_text: Character suggests starting with potions before using mushrooms.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-073
+  sequence: 73
+  source_type: draft_merged_event
+  source_text: 'Player takes a mushroom and is considering side effects. Outcome:
+    The player has taken one mushroom and is aware of the potential side effects.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-003
+- id: event-074
+  sequence: 74
+  source_type: draft_merged_event
+  source_text: 'Player decides to tie off with a rope to prevent wandering off while
+    under the influence of the mushroom. Outcome: The player will be tied off to prevent
+    wandering off.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Boat
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-002
+- id: event-075
+  sequence: 75
+  source_type: draft_merged_event
+  source_text: 'PC takes the mushroom and experiences its effects Outcome: PC can
+    breathe underwater, feels natural and almost like a normal experience for some
+    players'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-003
+- id: event-076
+  sequence: 76
+  source_type: draft_merged_event
+  source_text: 'NPC describes the mushroom''s taste and texture Outcome: PC gains
+    insight into the mushroom''s properties'
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Underwater
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-003
+- id: event-077
+  sequence: 77
+  source_type: draft_merged_event
+  source_text: 'Party decides to grab what they need and move on Outcome: Party moves
+    forward in the story'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater location
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-078
+  sequence: 78
+  source_type: draft_merged_event
+  source_text: 'Recap of events and situation Outcome: Party is aware of their surroundings
+    and the storm''s proximity'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater location
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-079
+  sequence: 79
+  source_type: draft_merged_event
+  source_text: 'Description of the underwater environment Outcome: Party is immersed
+    in the underwater world'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-003
+- id: event-080
+  sequence: 80
+  source_type: draft_merged_event
+  source_text: 'Character is exploring the environment, looking around and using Perception
+    to gather information. Outcome: Character has a sense of unease due to the eerie
+    quiet and lack of natural creatures swimming.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-004
+- id: event-081
+  sequence: 81
+  source_type: draft_merged_event
+  source_text: 'NPCs are having a conversation about being okay, waiting and listening.
+    Outcome: The party is preparing to continue their journey.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: '[underwater]'
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-082
+  sequence: 82
+  source_type: draft_merged_event
+  source_text: 'Character is getting a snack, sharing food with the party. Outcome:
+    The party has access to snacks and can share them among themselves.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: '[underwater]'
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-083
+  sequence: 83
+  source_type: draft_merged_event
+  source_text: Observing innocent types (swimming, family picnics)
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-003
+- id: event-084
+  sequence: 84
+  source_type: draft_merged_event
+  source_text: Discussing approach to the city's main entrance
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-003
+- id: event-085
+  sequence: 85
+  source_type: draft_merged_event
+  source_text: Deciding to enter the city through the eastern entrance
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-003
+- id: event-086
+  sequence: 86
+  source_type: draft_merged_event
+  source_text: 'Player gives a kelp costume to another player Outcome: Gift given'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Shadow
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-087
+  sequence: 87
+  source_type: draft_merged_event
+  source_text: 'Party decides to let a character in front of the group Outcome: Decision
+    made'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-003
+- id: event-088
+  sequence: 88
+  source_type: draft_merged_event
+  source_text: 'Character tries to heal Mikani using pure wounds at level 2 Outcome:
+    Healing successful'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Shadow
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-089
+  sequence: 89
+  source_type: draft_merged_event
+  source_text: 'Players discuss the possibility of speaking celestial language Outcome:
+    Discussion initiated'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Shadow
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-090
+  sequence: 90
+  source_type: draft_merged_event
+  source_text: 'Conversation with an NPC begins. Outcome: Ongoing conversation'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-004
+- id: event-091
+  sequence: 91
+  source_type: draft_merged_event
+  source_text: 'The party arrives at a large building in the city. Outcome: New environment'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-004
+- id: event-092
+  sequence: 92
+  source_type: draft_merged_event
+  source_text: 'The guide warns the party to avoid the queen. Outcome: Warning given'
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-004
+- id: event-093
+  sequence: 93
+  source_type: draft_merged_event
+  source_text: 'The party learns why the guide didn''t lose their job. Outcome: Information
+    given'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: The city, larger building
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-094
+  sequence: 94
+  source_type: draft_merged_event
+  source_text: 'The party decides to step into a potentially dangerous situation.
+    Outcome: Ongoing situation'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-004
+- id: event-095
+  sequence: 95
+  source_type: draft_merged_event
+  source_text: 'NPC conversation about mutual help and alliance against the situation
+    in the Celestial Isles. Outcome: Discussion is kept within the walls of the chamber.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-005
+- id: event-096
+  sequence: 96
+  source_type: draft_merged_event
+  source_text: Description of the King's Chamber as a trial chamber.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-005
+- id: event-097
+  sequence: 97
+  source_type: draft_merged_event
+  source_text: Celestial Isles emissaries introduce themselves
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-005
+- id: event-098
+  sequence: 98
+  source_type: draft_merged_event
+  source_text: Celestial Isles emissary explains their presence
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-005
+- id: event-099
+  sequence: 99
+  source_type: draft_merged_event
+  source_text: Celestial Isles emissary makes a connection to the Mensen clan
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-005
+- id: event-100
+  sequence: 100
+  source_type: draft_merged_event
+  source_text: Local talks about past business with the Celestial Isles
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-005
+- id: event-101
+  sequence: 101
+  source_type: draft_merged_event
+  source_text: Party recognizes Reckway Cove as a familiar location.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-005
+- id: event-102
+  sequence: 102
+  source_type: draft_merged_event
+  source_text: NPCs seek alliance and counsel from the party.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-005
+- id: event-103
+  sequence: 103
+  source_type: draft_merged_event
+  source_text: Party learns about the importance of magic and its preservation.
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Sunken City
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-104
+  sequence: 104
+  source_type: draft_merged_event
+  source_text: 'Party''s intent is to make sure they''re doing the right things when
+    entering the city. Outcome: Triton is being transparent about their intent.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-005
+- id: event-105
+  sequence: 105
+  source_type: draft_merged_event
+  source_text: 'Party suspects outside entities may be infernal in nature, possibly
+    demons or demon lords. Outcome: Party shares their suspicions about the external
+    influence.'
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-005
+- id: event-106
+  sequence: 106
+  source_type: draft_merged_event
+  source_text: 'Triton is being transparent about his group''s intent and asking to
+    wait for a few hours. Outcome: Triton asks permission to wait in the courtyard.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-005
+- id: event-107
+  sequence: 107
+  source_type: draft_merged_event
+  source_text: 'Party is given permission to wait and asked to take some time to speak
+    with common folk. Outcome: Party is allowed to wait and mingle with the common
+    folk.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-006
+- id: event-108
+  sequence: 108
+  source_type: draft_merged_event
+  source_text: 'Party member discusses formal address with ambassador. Outcome: Polymio
+    is the queen''s name.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-006
+- id: event-109
+  sequence: 109
+  source_type: draft_merged_event
+  source_text: 'Queen''s name revealed. Outcome: Polymio is the queen''s name.'
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-006
+- id: event-110
+  sequence: 110
+  source_type: draft_merged_event
+  source_text: 'Party member suggests having a gift ready for the queen. Outcome:
+    Gift preparation suggested.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-006
+- id: event-111
+  sequence: 111
+  source_type: draft_merged_event
+  source_text: 'Party member reveals blacksmithing skills. Outcome: Party member has
+    blacksmithing skills.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-006
+- id: event-112
+  sequence: 112
+  source_type: draft_merged_event
+  source_text: 'Party member offers to help with gift preparation. Outcome: Gift preparation
+    offered.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-006
+- id: event-113
+  sequence: 113
+  source_type: draft_merged_event
+  source_text: Party is in a courtyard with various types of plants and coral.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-006
+- id: event-114
+  sequence: 114
+  source_type: draft_merged_event
+  source_text: Party is free to explore the courtyard.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-006
+- id: event-115
+  sequence: 115
+  source_type: draft_merged_event
+  source_text: Party is free to explore the courtyard and see various plants.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Courtyard
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-116
+  sequence: 116
+  source_type: draft_merged_event
+  source_text: Party sees gardeners tending to delicate flowers.
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Courtyard
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-117
+  sequence: 117
+  source_type: draft_merged_event
+  source_text: Party is free to explore the courtyard and learn about underwater skills.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Courtyard
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-118
+  sequence: 118
+  source_type: draft_merged_event
+  source_text: Party learns the name of the gentleman who runs the smithy.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-006
+- id: event-119
+  sequence: 119
+  source_type: draft_merged_event
+  source_text: Party decides on next steps and discusses going to the tavern.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Courtyard
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-120
+  sequence: 120
+  source_type: draft_merged_event
+  source_text: 'Roon''s plan is discussed Outcome: Decision to split party and have
+    some members go with emissary'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-006
+- id: event-121
+  sequence: 121
+  source_type: draft_merged_event
+  source_text: 'Party discusses splitting up and going with emissary Outcome: Decision
+    to split party and have some members go with emissary'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Unknown (assuming same location as previous events)
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-122
+  sequence: 122
+  source_type: draft_merged_event
+  source_text: 'Party asks passing guard about getting to blacksmith shop. Outcome:
+    Received directions from the guard.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-123
+  sequence: 123
+  source_type: draft_merged_event
+  source_text: 'Party member (Rude Florian) introduces himself to the forge keeper.
+    Outcome: Introduces his skills and intentions to the forge keeper.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-124
+  sequence: 124
+  source_type: draft_merged_event
+  source_text: 'Rude Florian shares information about his duty as a protector of the
+    ambassador from the Celestial Isles. Outcome: Shares context about their mission
+    and purpose.'
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-125
+  sequence: 125
+  source_type: draft_merged_event
+  source_text: 'Request for assistance Outcome: Discussion of potential assistance'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: City
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-126
+  sequence: 126
+  source_type: draft_merged_event
+  source_text: 'Information sharing Outcome: Sharing of knowledge about the Water
+    Shields'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-127
+  sequence: 127
+  source_type: draft_merged_event
+  source_text: 'Meeting with city guard Outcome: Discussion of permission to be in
+    the city'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-128
+  sequence: 128
+  source_type: draft_merged_event
+  source_text: Forging process explained
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-129
+  sequence: 129
+  source_type: draft_merged_event
+  source_text: Character gets to work in the forge
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-130
+  sequence: 130
+  source_type: draft_merged_event
+  source_text: Orc is introduced, described as big.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-131
+  sequence: 131
+  source_type: draft_merged_event
+  source_text: PC offers skills to the group.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: City
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-132
+  sequence: 132
+  source_type: draft_merged_event
+  source_text: Orc gives the PC a piece of hardened water steel to work with.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-133
+  sequence: 133
+  source_type: draft_merged_event
+  source_text: PC decides to make a shiv.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: City
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-134
+  sequence: 134
+  source_type: draft_merged_event
+  source_text: PC decides to make a small shield.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-135
+  sequence: 135
+  source_type: draft_merged_event
+  source_text: 'Player chooses strength for a check Outcome: player''s choice made'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: not applicable
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-136
+  sequence: 136
+  source_type: draft_merged_event
+  source_text: 'Player discovers their proficiency bonus is +3 Outcome: player''s
+    understanding updated'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: not applicable
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-137
+  sequence: 137
+  source_type: draft_merged_event
+  source_text: 'Player decides to work with the half-orc Outcome: party dynamic updated'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: not applicable
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-138
+  sequence: 138
+  source_type: draft_merged_event
+  source_text: 'Player discovers the crest of the city can be used for design inspiration
+    Outcome: player''s creativity sparked'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-139
+  sequence: 139
+  source_type: draft_merged_event
+  source_text: The party is in a forge, trying to make a shield.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-140
+  sequence: 140
+  source_type: draft_merged_event
+  source_text: The party decides to present the shield.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-141
+  sequence: 141
+  source_type: draft_merged_event
+  source_text: The party talks to the smith, Utgar.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-142
+  sequence: 142
+  source_type: draft_merged_event
+  source_text: Character asks about sketching kit.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-143
+  sequence: 143
+  source_type: draft_merged_event
+  source_text: Roon teaches proper technique for sword forging.
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-144
+  sequence: 144
+  source_type: draft_merged_event
+  source_text: Character decides to sing and busk.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-006
+- id: event-145
+  sequence: 145
+  source_type: draft_merged_event
+  source_text: 'The group discusses Roon and Corvinas'' whereabouts and potential
+    reasons for the queen''s early arrival. Outcome: Discussion and speculation about
+    the queen''s early arrival'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-006
+- id: event-146
+  sequence: 146
+  source_type: draft_merged_event
+  source_text: 'The narrator receives directions to the forge from one of the guards.
+    Outcome: Directions are obtained for the narrator'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-006
+- id: event-147
+  sequence: 147
+  source_type: draft_merged_event
+  source_text: 'The group recalls King''s concerns about finding someone who could
+    forge and their discovery that Roon could. Outcome: Recap of previous events and
+    decisions'
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-148
+  sequence: 148
+  source_type: draft_merged_event
+  source_text: Warning about someone
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-149
+  sequence: 149
+  source_type: draft_merged_event
+  source_text: Seeing a guard
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-150
+  sequence: 150
+  source_type: draft_merged_event
+  source_text: 'Deciding what to do with the Queen''s arrival Outcome: Decision made'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-006
+- id: event-151
+  sequence: 151
+  source_type: draft_merged_event
+  source_text: 'Heading to the chamber Outcome: Arrival at the chamber'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-152
+  sequence: 152
+  source_type: draft_merged_event
+  source_text: 'Seeing Triton and guards Outcome: Observing the scene'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-153
+  sequence: 153
+  source_type: draft_merged_event
+  source_text: 'Sending a guard to get another party member Outcome: Decision made'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-154
+  sequence: 154
+  source_type: draft_merged_event
+  source_text: Party is sending their scout to retrieve two other party members from
+    the forge.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-155
+  sequence: 155
+  source_type: draft_merged_event
+  source_text: The queen's lady sends a messenger to fetch the party.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-156
+  sequence: 156
+  source_type: draft_merged_event
+  source_text: Party decides to leave the forge and head back to the town square.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-157
+  sequence: 157
+  source_type: draft_merged_event
+  source_text: Party decides not to take anything from the forge.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-007
+- id: event-158
+  sequence: 158
+  source_type: draft_merged_event
+  source_text: Party heads back to the throne room to meet the king.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-159
+  sequence: 159
+  source_type: draft_merged_event
+  source_text: 'Party decides not to go to a tavern and instead returns to where they
+    met the king. Outcome: Decision made, party continues on their journey'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Meeting area
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-160
+  sequence: 160
+  source_type: draft_merged_event
+  source_text: 'Party sees a procession walking through the halls. Outcome: Party
+    is aware of the procession'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-161
+  sequence: 161
+  source_type: draft_merged_event
+  source_text: 'Party decides to bow in reverence to the procession. Outcome: Party
+    shows respect to the procession'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Meeting area
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-162
+  sequence: 162
+  source_type: draft_merged_event
+  source_text: 'Party has a decision about what to do in regards to hiding or showing
+    respect. Outcome: Party has options and can choose their approach'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Meeting area
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-163
+  sequence: 163
+  source_type: draft_merged_event
+  source_text: 'Party discusses outsiders being led into their kingdom. Outcome: Discussion
+    and concern about the situation'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Their kingdom
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-164
+  sequence: 164
+  source_type: draft_merged_event
+  source_text: 'Queen Polamio''s response to the party''s request for an alliance.
+    Outcome: The queen agrees to consider their proposal.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-165
+  sequence: 165
+  source_type: draft_merged_event
+  source_text: 'Discussion of the Wells of Magic and their importance. Outcome: The
+    docent shares concerns about the safety of the wells.'
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-166
+  sequence: 166
+  source_type: draft_merged_event
+  source_text: 'Docent Mikani''s warning about forces working against magical places.
+    Outcome: The docent expresses concerns about the threat to the city.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-167
+  sequence: 167
+  source_type: draft_merged_event
+  source_text: 'Concern for the city''s well and its potential disruption. Outcome:
+    The docent expresses worry about the consequences of disrupting the well.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-168
+  sequence: 168
+  source_type: draft_merged_event
+  source_text: 'Player makes a persuasion roll. Outcome: The player''s persuasion
+    attempt is successful.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 5
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-169
+  sequence: 169
+  source_type: draft_merged_event
+  source_text: 'Player decides to play a song to themselves. Outcome: The player''s
+    emotions are conveyed through their actions.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-170
+  sequence: 170
+  source_type: draft_merged_event
+  source_text: 'Player convinces the NPC to help them. Outcome: The NPC agrees to
+    help the player.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 5
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-171
+  sequence: 171
+  source_type: draft_merged_event
+  source_text: 'Player decides to cover their medallion. Outcome: The player''s actions
+    are driven by caution and secrecy.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-172
+  sequence: 172
+  source_type: draft_merged_event
+  source_text: 'Discussion about searching for an ancient book Outcome: Continued
+    discussion and investigation'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-173
+  sequence: 173
+  source_type: draft_merged_event
+  source_text: 'Disturbance in the force Outcome: Continued discussion and investigation'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Unspecified location
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-174
+  sequence: 174
+  source_type: draft_merged_event
+  source_text: 'Discussion about sharing knowledge or not Outcome: Continued discussion
+    and investigation'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-175
+  sequence: 175
+  source_type: draft_merged_event
+  source_text: 'Discussion about the book''s properties Outcome: Continued discussion
+    and investigation'
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-176
+  sequence: 176
+  source_type: draft_merged_event
+  source_text: 'Offer to help with human issues (poachers, hunters) Outcome: Continued
+    discussion and investigation'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-177
+  sequence: 177
+  source_type: draft_merged_event
+  source_text: 'Discussion about a song and the book''s name Outcome: Continued discussion
+    and investigation'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-178
+  sequence: 178
+  source_type: draft_merged_event
+  source_text: 'Rumors of powerful forces searching for a book Outcome: Party is aware
+    of the rumors'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-179
+  sequence: 179
+  source_type: draft_merged_event
+  source_text: 'Party has the book of nature carnage Outcome: Party knows they have
+    the book'
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Unspecified location
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-180
+  sequence: 180
+  source_type: draft_merged_event
+  source_text: 'NPCs discuss their situation and feelings about Ergen/Jennifer Outcome:
+    Party is aware of the discussion'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-008
+- id: event-181
+  sequence: 181
+  source_type: draft_merged_event
+  source_text: Session recap
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-182
+  sequence: 182
+  source_type: draft_merged_event
+  source_text: Description of underwater cave
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater cave
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-183
+  sequence: 183
+  source_type: draft_merged_event
+  source_text: Description of underwater cave and well
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-184
+  sequence: 184
+  source_type: draft_merged_event
+  source_text: Character says to make sure no one else comes down
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-185
+  sequence: 185
+  source_type: draft_merged_event
+  source_text: Character recommends approaching the well and invokes Safi's name
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-186
+  sequence: 186
+  source_type: draft_merged_event
+  source_text: 'Party decides to stay back. Outcome: High'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 5
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-187
+  sequence: 187
+  source_type: draft_merged_event
+  source_text: 'Oh, great magic in the well. Outcome: Medium'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-188
+  sequence: 188
+  source_type: draft_merged_event
+  source_text: 'Korog is mentioned. Outcome: Low'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-189
+  sequence: 189
+  source_type: draft_merged_event
+  source_text: 'Party decides to approach the well. Outcome: High'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 5
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-190
+  sequence: 190
+  source_type: draft_merged_event
+  source_text: The party discusses the well and its magic, suggesting singing a song
+    to communicate with it.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-191
+  sequence: 191
+  source_type: draft_merged_event
+  source_text: The party decides to have the Queen speak with the well in her native
+    tongue.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-192
+  sequence: 192
+  source_type: draft_merged_event
+  source_text: A party member investigates the area around the well.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-193
+  sequence: 193
+  source_type: draft_merged_event
+  source_text: A party member sings a ballad to the well.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-194
+  sequence: 194
+  source_type: draft_merged_event
+  source_text: The party member shares their investigation findings.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 1
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-195
+  sequence: 195
+  source_type: draft_merged_event
+  source_text: Ray finds a crack in the wall and notes that it's damp.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-196
+  sequence: 196
+  source_type: draft_merged_event
+  source_text: 'Party member decides to listen in on a conversation without interrupting
+    Outcome: Party member successfully listens in without interrupting'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-197
+  sequence: 197
+  source_type: draft_merged_event
+  source_text: 'A small, arrow-like object launches out of the well and onto the ground
+    Outcome: Party member picks up the object and reads its contents'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-198
+  sequence: 198
+  source_type: draft_merged_event
+  source_text: 'Party member puts on a cap of water breathing to accompany another
+    party member into the well Outcome: Party members successfully enter the well'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-199
+  sequence: 199
+  source_type: draft_merged_event
+  source_text: 'Party decides to stop exploring. Outcome: Party stops exploring and
+    assesses situation.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater location
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-200
+  sequence: 200
+  source_type: draft_merged_event
+  source_text: 'Joannes is called over to help with an issue. Outcome: Issue is addressed
+    and the party continues.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater location
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-201
+  sequence: 201
+  source_type: draft_merged_event
+  source_text: 'Party discusses whether to keep diving. Outcome: Party decides to
+    continue diving.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-202
+  sequence: 202
+  source_type: draft_merged_event
+  source_text: 'Party hits the bottom and finds something sturdy. Outcome: Party discovers
+    a new environment.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-203
+  sequence: 203
+  source_type: draft_merged_event
+  source_text: 'Party sees three blue eyes in a column. Outcome: Party discovers a
+    new entity.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-204
+  sequence: 204
+  source_type: draft_merged_event
+  source_text: 'Party questions who is referring to as "we". Outcome: Issue is addressed
+    and the party continues.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-205
+  sequence: 205
+  source_type: draft_merged_event
+  source_text: 'Party sees a spell being cast (N-I-B-B-A-I-N). Outcome: Party observes
+    the spell.'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-206
+  sequence: 206
+  source_type: draft_merged_event
+  source_text: NPC conversation begins.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater location
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-207
+  sequence: 207
+  source_type: draft_merged_event
+  source_text: Environment event - underwater.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater location
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-208
+  sequence: 208
+  source_type: draft_merged_event
+  source_text: NPC shares concerns about the party's fate.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater location
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-209
+  sequence: 209
+  source_type: draft_merged_event
+  source_text: NPC shares information about the Wand of Wells.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-210
+  sequence: 210
+  source_type: draft_merged_event
+  source_text: NPC shares concerns about the party's well-being.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater location
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-211
+  sequence: 211
+  source_type: draft_merged_event
+  source_text: NPC warns about the theft of the Wand of Wells.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-212
+  sequence: 212
+  source_type: draft_merged_event
+  source_text: NPC shares information about the potential thief.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-213
+  sequence: 213
+  source_type: draft_merged_event
+  source_text: NPC shares concerns about the city's safety.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-214
+  sequence: 214
+  source_type: draft_merged_event
+  source_text: NPC mentions the queen and other party members.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-215
+  sequence: 215
+  source_type: draft_merged_event
+  source_text: Figure emerges and says something.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Underwater location
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-216
+  sequence: 216
+  source_type: draft_merged_event
+  source_text: 'Session recap and setup for upcoming events Outcome: Setup for a potentially
+    dangerous situation'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 5
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-010
+- id: event-217
+  sequence: 217
+  source_type: draft_merged_event
+  source_text: 'Discovery of a large sea creature (Aboleth) Outcome: Recognition of
+    the Aboleth''s presence and importance'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Catur
+  significance: 5
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-009
+- id: event-218
+  sequence: 218
+  source_type: draft_merged_event
+  source_text: Session wrap-up
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Catur
+  significance: 5
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-010
+- id: event-219
+  sequence: 219
+  source_type: draft_merged_event
+  source_text: Party prevails against the dragon and takes back the well.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: none specified
+  significance: 5
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-220
+  sequence: 220
+  source_type: draft_merged_event
+  source_text: Ancient things are needed to persuade other wells.
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: Catur
+  significance: 3
+  reason: Bypassed fragment review; canon captured in final session summary.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+  macro_event_id: macro-010
+- id: event-221
+  sequence: 221
+  source_type: draft_merged_event
+  source_text: Party has fragments of an orb of control but no whole one.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: none specified
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-222
+  sequence: 222
+  source_type: draft_merged_event
+  source_text: La La Well reports outer islands under stress.
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: none specified
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-223
+  sequence: 223
+  source_type: draft_merged_event
+  source_text: Party member acquires cap of water breathing.
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: none specified
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-224
+  sequence: 224
+  source_type: draft_merged_event
+  source_text: 'Corvinas''s weapon description Outcome: Corvinas''s weapon has additional
+    abilities'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-225
+  sequence: 225
+  source_type: draft_merged_event
+  source_text: 'Flames description Outcome: Flames have additional abilities'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-226
+  sequence: 226
+  source_type: draft_merged_event
+  source_text: 'Gildas''s staff description Outcome: Gildas''s staff has additional
+    abilities'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-227
+  sequence: 227
+  source_type: draft_merged_event
+  source_text: 'Mage Armor and Shield charges usage Outcome: Charges can be used to
+    cast spells'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: ''
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+- id: event-228
+  sequence: 228
+  source_type: draft_merged_event
+  source_text: 'NPC introduction Outcome: Introduction to NPCs and city setting'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: City
+  significance: 5
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-18'
+added_items: []
+macro_events:
+- id: macro-011
+  order: 1
+  description: Session Review
+  location: None
+- id: macro-001
+  order: 2
+  description: Party discusses plan
+  location: Western Coast of Farrlind
+- id: macro-002
+  order: 3
+  description: Party travels to Catur by boat 6 miles
+  location: Boat
+- id: macro-003
+  order: 4
+  description: Party dives to Catur
+  location: Underwater
+- id: macro-004
+  order: 5
+  description: Party enters Catur
+  location: Catur
+- id: macro-005
+  order: 6
+  description: Party talks to King
+  location: Catur
+- id: macro-006
+  order: 7
+  description: Party waits in courtyard for the Queen
+  location: Catur
+- id: macro-007
+  order: 8
+  description: Roon and Corvinas go smithing
+  location: Catur
+- id: macro-008
+  order: 9
+  description: Audience with the Queen
+  location: Catur
+- id: macro-009
+  order: 10
+  description: Audience with the Well
+  location: Catur
+- id: macro-010
+  order: 11
+  description: End of Session
+  location: Catur
+review_stage: event_resolution
+reviewed_on: '2026-05-18'
+applied_on: '2026-05-18'
+review_bypass_note: Fragment-level review bypassed by operator request after human-authored
+  canon summary was added. Session 21 canon is represented by knowledge/Faban/final/session21_summary.md.
