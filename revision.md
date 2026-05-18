@@ -1,5 +1,16 @@
 # Revision History
 
+## v0.4.31 - 5/18/2026
+
+Enforced the staged session review workflow.
+
+- App: Session review now shows only the high-level event order editor until that step is explicitly completed.
+- App: Added a dedicated bucketing stage where every loaded event is assigned to a high-level bucket or rejected.
+- App: Full event resolution fields are hidden until bucketing is complete.
+- Workflow: Bucket assignment overrides preexisting draft locations with the high-level bucket location.
+- Workflow: Reviewed and applied sessions continue to open in the final event-resolution/archive view.
+- Tests: Updated route and service coverage for the staged review flow.
+
 ## v0.4.30 - 5/18/2026
 
 Supported bucket-first session review with inherited locations.

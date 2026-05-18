@@ -268,6 +268,36 @@ class WebReviewServiceTest(unittest.TestCase):
         self.assertEqual(updated["items"][0]["macro_event_id"], "macro-001")
         self.assertEqual(updated["items"][0]["location"], "Catur")
 
+    def test_review_stage_defaults_to_high_level_order_but_preserves_applied(self):
+        self.assertEqual(reviews.review_stage({"status": "in_review"}), "high_level_order")
+        self.assertEqual(reviews.review_stage({"status": "in_review", "review_stage": "bucketing"}), "bucketing")
+        self.assertEqual(reviews.review_stage({"status": "applied"}), "event_resolution")
+
+    def test_update_bucketing_from_form_assigns_bucket_or_rejects(self):
+        document = {
+            "macro_events": [
+                {"id": "macro-001", "order": 1, "description": "Plan", "location": "Western Coast"},
+            ],
+            "items": [
+                {"id": "event-001", "sequence": 1, "decision": "pending", "location": "Old", "applied_status": "pending"},
+                {"id": "event-002", "sequence": 2, "decision": "pending", "location": "Old", "applied_status": "pending"},
+            ],
+            "added_items": [],
+        }
+
+        updated = reviews.update_bucketing_from_form(document, {
+            "bucket_item_id": ["event-001", "event-002"],
+            "bucket_section": ["items", "items"],
+            "bucket_macro_event_id": ["macro-001", ""],
+            "bucket_action": ["", "rejected"],
+            "review_stage": ["event_resolution"],
+        })
+
+        self.assertEqual(updated["review_stage"], "event_resolution")
+        self.assertEqual(updated["items"][0]["macro_event_id"], "macro-001")
+        self.assertEqual(updated["items"][0]["location"], "Western Coast")
+        self.assertEqual(updated["items"][1]["decision"], "rejected")
+
     def test_filtered_review_items_supports_bucket_workflow(self):
         items = [
             {"id": "event-001", "macro_event_id": "macro-001", "decision": "pending"},

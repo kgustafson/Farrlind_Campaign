@@ -399,7 +399,45 @@ async def save_session_review_macros(request: Request, session: str):
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
 
-    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "macros_saved=1&macro_modal=1", form.get("bucket") or "")
+    flag = "macros_saved=1"
+    if form.get("review_stage") != "bucketing":
+        flag += "&macro_modal=1"
+    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", flag, form.get("bucket") or "")
+
+
+@app.post("/sessions/{session}/review/bucketing")
+async def save_session_review_bucketing(request: Request, session: str):
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    document = reviews.load_review_document(session_number)
+    if not document:
+        raise HTTPException(status_code=404, detail="Review file has not been initialized.")
+    if document.get("status") == "applied":
+        raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
+
+    form = await request.form()
+    form_values = {key: form.getlist(key) for key in form.keys()}
+    requested_stage = form.get("review_stage") or ""
+    updated = reviews.update_bucketing_from_form(document, form_values)
+    if requested_stage == "event_resolution":
+        errors = reviews.bucketing_errors(updated)
+        if errors:
+            updated = reviews.set_review_stage(updated, "bucketing")
+            flag = "bucketing_failed=1"
+        else:
+            flag = "bucketing_done=1"
+    else:
+        flag = "bucketing_saved=1"
+
+    try:
+        reviews.save_review_document(session_number, updated)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", flag, form.get("bucket") or "")
 
 
 @app.post("/sessions/{session}/review/apply-macros")

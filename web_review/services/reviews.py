@@ -17,6 +17,7 @@ REVIEWS_DIR = KNOWLEDGE_DIR / "reviews"
 
 VALID_DECISIONS = {"pending", "accepted", "rejected", "corrected", "added"}
 VALID_STATUSES = {"in_review", "reviewed", "applied"}
+VALID_REVIEW_STAGES = {"high_level_order", "bucketing", "event_resolution"}
 EVENT_TYPES = [
     "combat",
     "discovery",
@@ -205,6 +206,21 @@ def sorted_review_items(document: dict[str, Any]) -> list[dict[str, Any]]:
     return sorted(combined, key=lambda item: (decision_rank(item), sequence_value(item)))
 
 
+def review_stage(document: dict[str, Any]) -> str:
+    if (document.get("status") or "") in {"reviewed", "applied"}:
+        return "event_resolution"
+    stage = document.get("review_stage") or "high_level_order"
+    return stage if stage in VALID_REVIEW_STAGES else "high_level_order"
+
+
+def set_review_stage(document: dict[str, Any], stage: str) -> dict[str, Any]:
+    if stage not in VALID_REVIEW_STAGES:
+        return document
+    updated = dict(document)
+    updated["review_stage"] = stage
+    return updated
+
+
 def filtered_review_items(items: list[dict[str, Any]], bucket: str = "") -> list[dict[str, Any]]:
     if not bucket or bucket == "all":
         return items
@@ -257,6 +273,13 @@ def bucket_counts(document: dict[str, Any]) -> dict[str, int]:
     return counts
 
 
+def bucketing_errors(document: dict[str, Any]) -> list[str]:
+    counts = bucket_counts(document)
+    if counts["unbucketed"]:
+        return [f"{counts['unbucketed']} item(s) still need a bucket or rejection."]
+    return []
+
+
 def source_text(session_number: int, source: str) -> tuple[str, str]:
     choices = {
         "diary": ("Diary", diary_path(session_number)),
@@ -292,6 +315,7 @@ def session_workspace(session_number: int, source: str = "diary", source_view: s
         "macro_events": sorted_macro_events(document),
         "bucket_counts": bucket_counts(document),
         "selected_bucket": bucket or "all",
+        "review_stage": review_stage(document),
         "source": source,
         "source_label": label,
         "source_text": text,
@@ -387,6 +411,50 @@ def update_macro_events_from_form(document: dict[str, Any], form_values: dict[st
             section_items.append(item)
         updated[section] = section_items
     updated["macro_events"] = normalize_macro_event_orders(macro_events)
+    next_stage = _first(form_values, "review_stage", 0)
+    if next_stage in VALID_REVIEW_STAGES:
+        updated["review_stage"] = next_stage
+    return updated
+
+
+def update_bucketing_from_form(document: dict[str, Any], form_values: dict[str, list[str]]) -> dict[str, Any]:
+    updated = dict(document)
+    macros = macro_event_map(document)
+    item_ids = form_values.get("bucket_item_id") or []
+    submitted = {}
+    for index, item_id in enumerate(item_ids):
+        submitted[item_id] = {
+            "section": _first(form_values, "bucket_section", index, "items"),
+            "macro_event_id": _first(form_values, "bucket_macro_event_id", index),
+            "action": _first(form_values, "bucket_action", index),
+        }
+
+    for section in ["items", "added_items"]:
+        section_items = []
+        for item in updated.get(section) or []:
+            item = dict(item)
+            patch = submitted.get(item.get("id"))
+            if patch and patch["section"] == section:
+                if patch["action"] == "rejected":
+                    item["decision"] = "rejected"
+                    item["reason"] = item.get("reason") or "Rejected during bucketing pass."
+                    item.pop("macro_event_id", None)
+                    item.pop("macro_event_order", None)
+                elif patch["macro_event_id"] in macros:
+                    macro = macros[patch["macro_event_id"]]
+                    item["macro_event_id"] = patch["macro_event_id"]
+                    item["location"] = macro.get("location") or ""
+                    if item.get("decision") == "rejected":
+                        item["decision"] = "pending"
+                if item.get("applied_status") == "applied":
+                    item["applied_status"] = "pending"
+                    item["applied_on"] = ""
+            section_items.append(item)
+        updated[section] = section_items
+
+    next_stage = _first(form_values, "review_stage", 0)
+    if next_stage in VALID_REVIEW_STAGES:
+        updated["review_stage"] = next_stage
     return updated
 
 

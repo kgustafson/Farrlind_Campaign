@@ -1073,6 +1073,73 @@ button:disabled {
   flex-direction: column;
   gap: 10px;
 }
+.stage-panel {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 16px;
+  border: 1px solid rgba(139, 95, 39, .34);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 226, .74), rgba(221, 190, 125, .24)),
+    var(--parchment);
+  box-shadow: 0 14px 34px rgba(52, 35, 19, .14);
+}
+.stage-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(110, 67, 24, .22);
+}
+.stage-head h2,
+.stage-head p {
+  margin: 0;
+}
+.stage-head p {
+  color: var(--muted);
+}
+.macro-sheet-page {
+  max-height: min(58vh, 680px);
+  overflow: auto;
+}
+.bucketing-list {
+  display: grid;
+  gap: 10px;
+  max-height: min(62vh, 720px);
+  overflow: auto;
+  padding-right: 4px;
+}
+.bucket-card {
+  padding: 12px;
+  border: 1px solid rgba(139, 95, 39, .25);
+  border-radius: 8px;
+  background: rgba(255, 247, 223, .7);
+}
+.bucketing-controls {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(160px, .38fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+.bucketing-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+.bucketing-controls select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  padding: 7px 8px;
+}
 .review-tools {
   display: grid;
   grid-template-columns: minmax(180px, 1fr) minmax(130px, .45fr) minmax(150px, .55fr) minmax(180px, .7fr) auto;
