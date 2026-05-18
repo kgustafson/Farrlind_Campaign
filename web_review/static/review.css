@@ -735,12 +735,15 @@ button:disabled {
   background: #e8ddbd;
 }
 .workflow-pending,
-.workflow-partially_completed {
+.workflow-partially_completed,
+.workflow-running {
   color: var(--warn);
   background: #f0dfaf;
 }
 .workflow-blocked,
 .workflow-stale,
+.workflow-failed,
+.workflow-needs_attention,
 .workflow-attention {
   color: var(--bad);
   background: #ead0c2;

@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -1984,7 +1985,8 @@ class ProjectUtilitiesRouteTest(unittest.TestCase):
         self.assertIn("/project-utilities/initiate-session", response.text)
 
     def test_project_utilities_session_initiation_posts_to_workflow(self):
-        with patch("web_review.services.workflow.initiate_session", return_value=21) as initiate:
+        with patch("web_review.services.workflow.initiate_session", return_value=21) as initiate, \
+             patch("web_review.services.workflow.enqueue_auto_intake", return_value=None) as enqueue:
             client = TestClient(app)
             response = client.post(
                 "/project-utilities/initiate-session",
@@ -2007,6 +2009,7 @@ class ProjectUtilitiesRouteTest(unittest.TestCase):
             "audio_file_path": "/tmp/session21.wav",
             "notes": "Fresh session.",
         })
+        enqueue.assert_called_once_with(21)
 
     def lookup_context_patches(self, editing=None):
         return (
@@ -2296,6 +2299,41 @@ class WorkflowServiceTest(unittest.TestCase):
         self.assertIn("source_audio_registered", joined_sql)
         self.assertEqual(statements[-1][1]["status"], "complete")
         self.assertEqual(statements[-1][1]["artifacts"], f'["{audio.name}"]')
+
+    def test_enqueue_auto_intake_writes_queue_file_for_registered_audio(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            queue_dir = root / "ops" / "workflow_queue"
+            audio = root / "audio" / "session21.wav"
+            audio.parent.mkdir(parents=True)
+            audio.write_text("audio", encoding="utf-8")
+            with patch("web_review.services.workflow.QUEUE_DIR", queue_dir), \
+                 patch("web_review.services.reviews.REPO_ROOT", root), \
+                 patch("web_review.services.workflow._fetch", return_value=[{"audio_file_path": "audio/session21.wav"}]), \
+                 patch("web_review.services.workflow._execute_transaction") as execute:
+                queued = workflow.enqueue_auto_intake(21)
+            self.assertEqual(queued, queue_dir / "session21.json")
+            payload = json.loads((queue_dir / "session21.json").read_text(encoding="utf-8"))
+            self.assertEqual(payload["session_number"], 21)
+            self.assertEqual(payload["commands"], [
+                "transcribe_audio",
+                "source_status_check",
+                "extract_events",
+                "postextract_shortcut",
+                "initialize_review",
+            ])
+        execute.assert_called_once()
+
+    def test_enqueue_auto_intake_skips_when_audio_is_not_ready(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch("web_review.services.workflow.QUEUE_DIR", Path(tmp) / "queue"), \
+                 patch("web_review.services.reviews.REPO_ROOT", Path(tmp)), \
+                 patch("web_review.services.workflow._fetch", return_value=[{"audio_file_path": "audio/session21.wav"}]), \
+                 patch("web_review.services.workflow._execute_transaction") as execute:
+                queued = workflow.enqueue_auto_intake(21)
+
+        self.assertIsNone(queued)
+        execute.assert_not_called()
 
     def test_workflow_rows_reads_aggregate_progress(self):
         rows = [{

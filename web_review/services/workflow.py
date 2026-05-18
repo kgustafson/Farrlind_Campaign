@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
@@ -8,6 +9,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from raglib import workflow_state
 from web_review import db
 from web_review.services import reviews
+
+
+QUEUE_DIR = reviews.REPO_ROOT / "ops" / "workflow_queue"
 
 
 class WorkflowReadError(RuntimeError):
@@ -150,6 +154,81 @@ def initiate_session(values: dict[str, Any]) -> int:
 
     _execute_transaction(statements)
     return session_number
+
+
+def auto_intake_enabled() -> bool:
+    return True
+
+
+def enqueue_auto_intake(session_number: int) -> Optional[Path]:
+    rows = _fetch("""
+        SELECT audio_file_path
+        FROM session
+        WHERE session_number = :session_number;
+    """, {"session_number": session_number})
+    if not rows:
+        raise WorkflowWriteError(f"Session {session_number:02d} does not exist.")
+
+    audio_path = (rows[0].get("audio_file_path") or "").strip()
+    if not audio_path:
+        return None
+
+    resolved_audio = Path(audio_path)
+    if not resolved_audio.is_absolute():
+        resolved_audio = reviews.REPO_ROOT / resolved_audio
+    if not resolved_audio.exists():
+        return None
+
+    QUEUE_DIR.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "session_number": session_number,
+        "session_name": session_key(session_number),
+        "audio_file_path": audio_path,
+        "queued_at": datetime.now(timezone.utc).isoformat(),
+        "stop_before": "edit_review_decisions",
+        "commands": [
+            "transcribe_audio",
+            "source_status_check",
+            "extract_events",
+            "postextract_shortcut",
+            "initialize_review",
+        ],
+    }
+    queue_path = QUEUE_DIR / f"{session_key(session_number)}.json"
+    temp_path = queue_path.with_suffix(".json.tmp")
+    temp_path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    temp_path.replace(queue_path)
+
+    _execute_transaction([
+        ("""
+        UPDATE workflow_run wr
+        SET
+            status = CASE WHEN wr.status = 'initialized' THEN 'pending' ELSE wr.status END,
+            summary_comment = COALESCE(wr.summary_comment || ' ', '') || :summary_comment,
+            metadata = wr.metadata || CAST(:metadata AS jsonb)
+        FROM session s
+        WHERE wr.session_id = s.id
+          AND s.session_number = :session_number;
+        """, {
+            "session_number": session_number,
+            "summary_comment": "Auto-intake queued through init-review.",
+            "metadata": json.dumps({"auto_intake_queued": True, "auto_intake_queue_path": str(queue_path.relative_to(reviews.REPO_ROOT))}),
+        }),
+        ("""
+        UPDATE workflow_step_state wss
+        SET summary_comment = :summary_comment
+        FROM workflow_run wr
+        JOIN session s ON s.id = wr.session_id
+        WHERE wss.workflow_run_id = wr.id
+          AND s.session_number = :session_number
+          AND wss.step_id = 'transcribe_audio'
+          AND wss.status = 'pending';
+        """, {
+            "session_number": session_number,
+            "summary_comment": "Queued for automatic intake after session initiation.",
+        }),
+    ])
+    return queue_path
 
 
 def workflow_rows() -> list[dict[str, Any]]:

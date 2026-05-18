@@ -30,6 +30,9 @@ farrlind/.env
 farrlind/out/
 benchmarks/
 backups/
+ops/workflow_queue/*.json
+ops/workflow_queue/done/*.json
+ops/workflow_queue/failed/*.json
 
 #OS
 .DS_Store

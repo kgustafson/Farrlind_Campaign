@@ -1,5 +1,16 @@
 # Revision History
 
+## v0.4.25 - 5/17/2026
+
+Queued automatic session intake through the human-review gate.
+
+- Workflow: Session initiation now queues auto-intake when a registered audio file exists.
+- Workflow: Added a Mac-side auto-intake worker that runs transcribe, source status, extract, postextract, and init-review, then stops for human review.
+- Workflow: The worker updates Workflow Status step timestamps, status, comments, log paths, and final run state as commands execute.
+- App: Added workflow status badge styling for running, failed, and needs-attention states.
+- Ops: Added a screen-based worker starter for local polling of queued workflow jobs.
+- Tests: Added coverage for queue creation and the auto-intake command plan.
+
 ## v0.4.24 - 5/17/2026
 
 Surfaced workflow step state fields in Workflow Status.

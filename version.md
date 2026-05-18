@@ -1,6 +1,6 @@
 # Version
 
-v0.4.24
+v0.4.25
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.24` surfaces workflow step state fields in Workflow Status.
+`v0.4.25` queues automatic session intake through the human-review gate.

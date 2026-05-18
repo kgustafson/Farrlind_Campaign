@@ -860,6 +860,12 @@ async def project_utilities_initiate_session(request: Request):
     except workflow.WorkflowWriteError as exc:
         token = store_command_result("Initiate Session", commands.CommandResult(1, "", str(exc)))
         return RedirectResponse(url=f"/project-utilities?command_result={token}&modal=initiate-session", status_code=303)
+    if workflow.auto_intake_enabled():
+        try:
+            workflow.enqueue_auto_intake(session_number)
+        except workflow.WorkflowWriteError as exc:
+            token = store_command_result("Queue Auto Intake", commands.CommandResult(1, "", str(exc)))
+            return RedirectResponse(url=f"/project-utilities?command_result={token}&modal=initiate-session", status_code=303)
     return RedirectResponse(url=f"/workflow?session={session_number}", status_code=303)
 
 
