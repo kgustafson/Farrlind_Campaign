@@ -17,7 +17,7 @@ Known Wells:
 - Ordor: Located in Paramon. Disturbed after Salazar used the Wand of Wells with lightning.
 - Saiffi: Located in Balrog. Truth-bound, wise, and currently with the party in a waterskin.
 - Open Hand: Believed to be at or near the Gale Monastery.
-- Catur: Believed to be in the sunken city of Catur.
+- Nebain: In the sunken city of Catur.
 - Hanedal: Believed to be on Hanedal Island.
 
 Open questions:
