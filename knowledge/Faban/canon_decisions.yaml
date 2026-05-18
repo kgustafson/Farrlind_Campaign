@@ -2,6 +2,17 @@
 # preserve review history, or identify corrections still needing DB updates.
 
 session_primary_locations:
+  - session: session21
+    canonical: Catur
+    aliases:
+      - Sunken Catur
+      - Catur's Well Chamber
+    decision: Session 21 primarily takes place in and beneath Catur after the party reaches the underwater city.
+    reason: The summary mentions Balrog as the source of prior gifts, but the session location is the underwater city of Catur.
+    decided_from: user
+    decided_on: "2026-05-18"
+    status: applied
+    applied_on: "2026-05-18"
   - session: session20
     canonical: Coast near Catur
     aliases:
