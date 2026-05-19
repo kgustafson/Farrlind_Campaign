@@ -1,0 +1,25 @@
+models:
+  - gemma3:latest
+  - qwen3:8b
+  - qwen3:14b
+  - qwen2.5:14b
+
+sessions:
+  session19:
+    transcript: knowledge/Faban/raw/session19_transcript.txt
+    gold_summary: null
+  session20:
+    transcript: knowledge/Faban/raw/session20_transcript.txt
+    gold_summary: null
+  session21:
+    transcript: knowledge/Faban/raw/session21_transcript.txt
+    gold_summary: model_eval/gold/session21_gold_summary.md
+
+prompts:
+  starting_prompt: model_eval/prompts/prompt_v01.md
+
+run_defaults:
+  temperature: 0.2
+  top_p: 0.9
+  num_ctx: 32768
+  max_prompt_iterations: 20

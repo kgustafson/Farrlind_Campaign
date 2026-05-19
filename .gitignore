@@ -33,6 +33,8 @@ backups/
 ops/workflow_queue/*.json
 ops/workflow_queue/done/*.json
 ops/workflow_queue/failed/*.json
+model_eval/runs/
+model_eval/scorecards/
 
 #OS
 .DS_Store
