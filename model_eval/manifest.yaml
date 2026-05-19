@@ -18,10 +18,15 @@ sessions:
     gold_summary: model_eval/gold/session21_gold_summary.md
 
 prompts:
-  starting_prompt: model_eval/prompts/prompt_v02.md
+  starting_prompt: model_eval/prompts/prompt_v03_synthesis.md
+  chunk_prompt: model_eval/prompts/prompt_v03_chunk.md
+  synthesis_prompt: model_eval/prompts/prompt_v03_synthesis.md
 
 run_defaults:
+  strategy: chunked
   temperature: 0.2
   top_p: 0.9
   num_ctx: 32768
+  chunk_size_chars: 24000
+  chunk_overlap_chars: 1500
   max_prompt_iterations: 20

@@ -24,22 +24,25 @@ Optional stretch candidate:
 The current starting prompt is:
 
 ```text
-model_eval/prompts/prompt_v02.md
+model_eval/prompts/prompt_v03_synthesis.md
 ```
 
-It asks the model to produce a coherent session packet with summaries, locations, NPCs/entities, lore, resources, artifacts, open threads, and uncertainties.
+The v3 workflow uses chunked extraction:
 
-`prompt_v01.md` is preserved for baseline comparison.
+- `model_eval/prompts/prompt_v03_chunk.md` extracts canon facts from transcript chunks.
+- `model_eval/prompts/prompt_v03_synthesis.md` merges chunk extracts into the final canon packet.
+
+`prompt_v01.md` and `prompt_v02.md` are preserved for baseline comparison.
 
 ## Run Commands
 
 Smoke test one model with a short transcript slice:
 
 ```bash
-./rag-env/bin/python scripts/model_eval_run.py --model gemma3:latest --session session21 --limit-chars 1000
+./rag-env/bin/python scripts/model_eval_run.py --model gemma4:e2b --session session21 --limit-chars 3000 --chunk-size 1200 --chunk-overlap 150
 ```
 
-Run all models against Session 21:
+Run all models against Session 21 with the default chunked v3 workflow:
 
 ```bash
 ./rag-env/bin/python scripts/model_eval_run.py --session session21
@@ -52,3 +55,15 @@ Run every configured model against every configured session:
 ```
 
 Full runs may take a long time. Generated outputs are written under `model_eval/runs/` and are ignored by git.
+
+Chunked runs write intermediate extracts under:
+
+```text
+model_eval/runs/<model>/<prompt>/session##_chunks/
+```
+
+Run an older single-pass prompt for comparison:
+
+```bash
+./rag-env/bin/python scripts/model_eval_run.py --strategy single --prompt model_eval/prompts/prompt_v02.md --session session21
+```
