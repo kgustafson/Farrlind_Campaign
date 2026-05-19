@@ -18,7 +18,7 @@ sessions:
     gold_summary: model_eval/gold/session21_gold_summary.md
 
 prompts:
-  starting_prompt: model_eval/prompts/prompt_v01.md
+  starting_prompt: model_eval/prompts/prompt_v02.md
 
 run_defaults:
   temperature: 0.2

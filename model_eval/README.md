@@ -21,13 +21,15 @@ Optional stretch candidate:
 
 ## Prompt
 
-The starting prompt is:
+The current starting prompt is:
 
 ```text
-model_eval/prompts/prompt_v01.md
+model_eval/prompts/prompt_v02.md
 ```
 
 It asks the model to produce a coherent session packet with summaries, locations, NPCs/entities, lore, resources, artifacts, open threads, and uncertainties.
+
+`prompt_v01.md` is preserved for baseline comparison.
 
 ## Run Commands
 
