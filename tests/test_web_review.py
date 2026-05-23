@@ -6,8 +6,9 @@ from unittest.mock import patch
 
 import yaml
 
-from web_review.services import canon, commands, lore, reviews, workflow
+from web_review.services import artifact_extraction_review, canon, combat_extraction_review, commands, location_extraction_review, lore, lore_item_extraction_review, npc_extraction_review, open_thread_extraction_review, reviews, workflow
 from web_review.app import BACKUP_DOWNLOADS, COMMAND_RESULTS, app, app_version
+from scripts import export_static_archive
 from scripts.load_songbook import songbook_source_sql
 from fastapi.testclient import TestClient
 
@@ -1337,6 +1338,43 @@ class CanonServiceTest(unittest.TestCase):
         self.assertIn("UPDATE artifact", execute.call_args_list[1].args[0])
         self.assertIn("DELETE FROM artifact", execute.call_args_list[2].args[0])
 
+    def test_lore_item_rows_returns_full_registry(self):
+        rows = [{
+            "id": 1,
+            "title": "Catur Distrusts Above-Folk",
+            "category": "culture",
+            "description": "Catur distrusts surface dwellers because poachers and pirates intrude on its waters.",
+            "source_npc": "Queen of Catur",
+            "discovered_session": 21,
+            "is_confirmed": True,
+            "notes": "Confirmed during the Catur audience.",
+        }]
+        with patch("web_review.db.fetch_all", return_value=rows) as fetch:
+            self.assertEqual(canon.lore_item_rows(), rows)
+        self.assertIn("FROM lore_item", fetch.call_args.args[0])
+        self.assertIn("LEFT JOIN npc", fetch.call_args.args[0])
+        self.assertIn("LEFT JOIN session ds", fetch.call_args.args[0])
+
+    def test_lore_item_crud_services_run_expected_statements(self):
+        values = {
+            "title": "New Lore",
+            "category": "magic",
+            "description": "A newly confirmed rule of magic.",
+            "source_npc_id": 2,
+            "discovered_session": 21,
+            "is_confirmed": True,
+            "notes": "",
+        }
+        with patch("web_review.db.execute") as execute:
+            canon.create_lore_item(values)
+            canon.update_lore_item(12, values)
+            canon.delete_lore_item(12)
+
+        self.assertIn("INSERT INTO lore_item", execute.call_args_list[0].args[0])
+        self.assertIn("SELECT id FROM session WHERE session_number = :discovered_session", execute.call_args_list[0].args[0])
+        self.assertIn("UPDATE lore_item", execute.call_args_list[1].args[0])
+        self.assertIn("DELETE FROM lore_item", execute.call_args_list[2].args[0])
+
     def test_combat_encounter_rows_groups_enemies_and_unknown_quantities(self):
         db_rows = [
             {
@@ -1696,6 +1734,90 @@ class LocationRouteTest(unittest.TestCase):
         create.assert_not_called()
 
 
+class LocationExtractionReviewRouteTest(unittest.TestCase):
+    def extraction(self):
+        return {
+            "path": Path("/tmp/session21_locations.json"),
+            "session_number": 21,
+            "known_location_mentions": [{
+                "location_id": 5,
+                "canonical_name": "Catur",
+                "mentioned_as": ["Catur"],
+                "new_information": "Confirmed as an underwater city.",
+                "location_type": "city",
+                "parent_location": "",
+                "is_underwater": True,
+                "is_feywild": False,
+                "confidence": "high",
+                "evidence": "Catur lies beneath the ocean.",
+            }],
+            "new_location_candidates": [{
+                "proposed_name": "Catur's Well Chamber",
+                "location_type": "chamber",
+                "description": "Underwater well chamber.",
+                "first_visited_session": 21,
+                "parent_location": "Catur",
+                "is_underwater": True,
+                "is_feywild": False,
+                "confidence": "high",
+                "evidence": "The party entered the well chamber.",
+            }],
+            "rejected_candidates": [{"text": "surface", "reason": "Generic direction."}],
+            "uncertainties": [{"candidate": "Pearl of Atlantia", "issue": "Artifact, not location."}],
+        }
+
+    def test_location_extraction_review_page_renders_decisions(self):
+        with patch.object(location_extraction_review, "available_sessions", return_value=[20, 21]), \
+             patch.object(location_extraction_review, "load_extraction", return_value=self.extraction()), \
+             patch.object(location_extraction_review, "reviewed_output_path", return_value=Path("/tmp/session21_locations_reviewed.json")):
+            client = TestClient(app)
+            response = client.get("/locations/extractions?session=21")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Location Extraction Review", response.text)
+        self.assertIn("Catur", response.text)
+        self.assertIn("Catur&#39;s Well Chamber", response.text)
+        self.assertIn('name="known_decision_0"', response.text)
+        self.assertIn('name="new_decision_0"', response.text)
+        self.assertIn("Generic direction.", response.text)
+        self.assertIn("Artifact, not location.", response.text)
+
+    def test_location_extraction_review_defaults_to_latest_available_session(self):
+        with patch.object(location_extraction_review, "available_sessions", return_value=[20, 21]), \
+             patch.object(location_extraction_review, "load_extraction", return_value=self.extraction()) as load, \
+             patch.object(location_extraction_review, "reviewed_output_path", return_value=Path("/tmp/session21_locations_reviewed.json")):
+            client = TestClient(app)
+            response = client.get("/locations/extractions")
+
+        self.assertEqual(response.status_code, 200)
+        load.assert_called_once_with(21)
+        self.assertIn('value="21"', response.text)
+
+    def test_apply_location_extraction_review_posts_decisions(self):
+        result = {"applied": ["Updated Catur", "Created Catur's Well Chamber"], "skipped": [], "reviewed_path": Path("/tmp/reviewed.json")}
+        with patch.object(location_extraction_review, "apply_review", return_value=result) as apply_review:
+            client = TestClient(app)
+            response = client.post("/locations/extractions/apply", data={
+                "session_number": "21",
+                "known_decision_0": "append_note",
+                "new_decision_0": "create",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("/locations/extractions?session=21", response.headers["location"])
+        self.assertIn("command_result=", response.headers["location"])
+        apply_review.assert_called_once()
+        self.assertEqual(apply_review.call_args.args[0], 21)
+        self.assertEqual(apply_review.call_args.args[1]["new_decision_0"], "create")
+
+    def test_archive_mode_blocks_location_extraction_review_page(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}):
+            client = TestClient(app)
+            response = client.get("/locations/extractions")
+
+        self.assertEqual(response.status_code, 404)
+
+
 class NPCRouteTest(unittest.TestCase):
     def npc_rows(self):
         return [{
@@ -1849,6 +1971,87 @@ class NPCRouteTest(unittest.TestCase):
         delete.assert_called_once_with(4)
 
 
+class NPCExtractionReviewRouteTest(unittest.TestCase):
+    def extraction(self):
+        return {
+            "path": Path("/tmp/session21_npcs.json"),
+            "session_number": 21,
+            "known_npc_mentions": [{
+                "npc_id": 12,
+                "canonical_name": "Alistair",
+                "mentioned_as": ["Allister"],
+                "new_information": "Warned that Catur dislikes outsiders.",
+                "location": "Coast near Catur",
+                "confidence": "high",
+                "evidence": "Allister warned Faban.",
+            }],
+            "new_npc_candidates": [{
+                "proposed_name": "Uthgar",
+                "npc_kind": "named_npc",
+                "role": "Catur smith",
+                "description": "Underwater smith contact.",
+                "first_seen_session": 21,
+                "first_seen_location": "Catur",
+                "status": "alive",
+                "confidence": "high",
+                "evidence": "They learned the smith was Uthgar.",
+            }],
+            "rejected_candidates": [{"text": "Mikani", "reason": "Player character."}],
+            "uncertainties": [{"candidate": "Niebain", "issue": "Spelling uncertain."}],
+        }
+
+    def test_npc_extraction_review_page_renders_decisions(self):
+        with patch.object(npc_extraction_review, "available_sessions", return_value=[19, 20, 21]), \
+             patch.object(npc_extraction_review, "load_extraction", return_value=self.extraction()), \
+             patch.object(npc_extraction_review, "reviewed_output_path", return_value=Path("/tmp/session21_npcs_reviewed.json")):
+            client = TestClient(app)
+            response = client.get("/npcs/extractions?session=21")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("NPC Extraction Review", response.text)
+        self.assertIn("Alistair", response.text)
+        self.assertIn("Uthgar", response.text)
+        self.assertIn('name="known_decision_0"', response.text)
+        self.assertIn('name="new_decision_0"', response.text)
+        self.assertIn("Player character.", response.text)
+        self.assertIn("Spelling uncertain.", response.text)
+
+    def test_npc_extraction_review_defaults_to_latest_available_session(self):
+        with patch.object(npc_extraction_review, "available_sessions", return_value=[19, 20, 21]), \
+             patch.object(npc_extraction_review, "load_extraction", return_value=self.extraction()) as load, \
+             patch.object(npc_extraction_review, "reviewed_output_path", return_value=Path("/tmp/session21_npcs_reviewed.json")):
+            client = TestClient(app)
+            response = client.get("/npcs/extractions")
+
+        self.assertEqual(response.status_code, 200)
+        load.assert_called_once_with(21)
+        self.assertIn('value="21"', response.text)
+
+    def test_apply_npc_extraction_review_posts_decisions(self):
+        result = {"applied": ["Updated Alistair", "Created Uthgar"], "skipped": [], "reviewed_path": Path("/tmp/reviewed.json")}
+        with patch.object(npc_extraction_review, "apply_review", return_value=result) as apply_review:
+            client = TestClient(app)
+            response = client.post("/npcs/extractions/apply", data={
+                "session_number": "21",
+                "known_decision_0": "append_note",
+                "new_decision_0": "create",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("/npcs/extractions?session=21", response.headers["location"])
+        self.assertIn("command_result=", response.headers["location"])
+        apply_review.assert_called_once()
+        self.assertEqual(apply_review.call_args.args[0], 21)
+        self.assertEqual(apply_review.call_args.args[1]["new_decision_0"], "create")
+
+    def test_archive_mode_blocks_npc_extraction_review_page(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}):
+            client = TestClient(app)
+            response = client.get("/npcs/extractions")
+
+        self.assertEqual(response.status_code, 404)
+
+
 class ArtifactRouteTest(unittest.TestCase):
     def artifact_rows(self):
         return [{
@@ -1989,6 +2192,303 @@ class ArtifactRouteTest(unittest.TestCase):
         delete.assert_called_once_with(4)
 
 
+class ArtifactExtractionReviewRouteTest(unittest.TestCase):
+    def extraction(self):
+        return {
+            "path": Path("/tmp/session21_artifacts.json"),
+            "session_number": 21,
+            "known_artifact_mentions": [{
+                "artifact_id": 5,
+                "canonical_name": "Acheron Blade",
+                "mentioned_as": ["Acheron Blade"],
+                "new_information": "Clarified as a +1 weapon.",
+                "artifact_type": "weapon",
+                "current_holder": "Faban",
+                "properties": ["+1 weapon"],
+                "is_sentient": False,
+                "is_cursed": False,
+                "is_infernal": True,
+                "confidence": "high",
+                "evidence": "Faban clarified the Acheron Blade.",
+            }],
+            "new_artifact_candidates": [{
+                "proposed_name": "Cap of Water Breathing",
+                "artifact_type": "clothing",
+                "description": "Lets Mikani breathe underwater.",
+                "lore_significance": "Balrog gift for the Catur mission.",
+                "discovered_session": 20,
+                "current_holder": "Mikani",
+                "properties": ["underwater breathing"],
+                "is_sentient": False,
+                "is_cursed": False,
+                "is_infernal": False,
+                "confidence": "high",
+                "evidence": "Mikani has a cap.",
+            }],
+            "rejected_candidates": [{"text": "socks", "reason": "Joke item."}],
+            "uncertainties": [{"candidate": "Pearl of Atlantia", "issue": "Spelling uncertain."}],
+        }
+
+    def test_artifact_extraction_review_page_renders_decisions(self):
+        with patch.object(artifact_extraction_review, "available_sessions", return_value=[20, 21]), \
+             patch.object(artifact_extraction_review, "load_extraction", return_value=self.extraction()), \
+             patch.object(artifact_extraction_review, "reviewed_output_path", return_value=Path("/tmp/session21_artifacts_reviewed.json")):
+            client = TestClient(app)
+            response = client.get("/artifacts/extractions?session=21")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Artifact Extraction Review", response.text)
+        self.assertIn("Acheron Blade", response.text)
+        self.assertIn("Cap of Water Breathing", response.text)
+        self.assertIn('name="known_decision_0"', response.text)
+        self.assertIn('name="new_decision_0"', response.text)
+        self.assertIn("Joke item.", response.text)
+        self.assertIn("Spelling uncertain.", response.text)
+
+    def test_artifact_extraction_review_defaults_to_latest_available_session(self):
+        with patch.object(artifact_extraction_review, "available_sessions", return_value=[20, 21]), \
+             patch.object(artifact_extraction_review, "load_extraction", return_value=self.extraction()) as load, \
+             patch.object(artifact_extraction_review, "reviewed_output_path", return_value=Path("/tmp/session21_artifacts_reviewed.json")):
+            client = TestClient(app)
+            response = client.get("/artifacts/extractions")
+
+        self.assertEqual(response.status_code, 200)
+        load.assert_called_once_with(21)
+        self.assertIn('value="21"', response.text)
+
+    def test_apply_artifact_extraction_review_posts_decisions(self):
+        result = {"applied": ["Updated Acheron Blade", "Created Cap of Water Breathing"], "skipped": [], "reviewed_path": Path("/tmp/reviewed.json")}
+        with patch.object(artifact_extraction_review, "apply_review", return_value=result) as apply_review:
+            client = TestClient(app)
+            response = client.post("/artifacts/extractions/apply", data={
+                "session_number": "21",
+                "known_decision_0": "append_note",
+                "new_decision_0": "create",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("/artifacts/extractions?session=21", response.headers["location"])
+        self.assertIn("command_result=", response.headers["location"])
+        apply_review.assert_called_once()
+        self.assertEqual(apply_review.call_args.args[0], 21)
+        self.assertEqual(apply_review.call_args.args[1]["new_decision_0"], "create")
+
+    def test_archive_mode_blocks_artifact_extraction_review_page(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}):
+            client = TestClient(app)
+            response = client.get("/artifacts/extractions")
+
+        self.assertEqual(response.status_code, 404)
+
+
+class LoreItemRouteTest(unittest.TestCase):
+    def lore_rows(self):
+        return [{
+            "id": 1,
+            "title": "Catur Distrusts Above-Folk",
+            "category": "culture",
+            "description": "Catur distrusts surface dwellers because poachers and pirates intrude on its waters.",
+            "source_npc": "Queen of Catur",
+            "discovered_session": 21,
+            "is_confirmed": True,
+            "notes": "Confirmed during the Catur audience.",
+        }]
+
+    def categories(self):
+        return ["culture", "well_knowledge"]
+
+    def npcs(self):
+        return [{"id": 1, "name": "Queen of Catur"}]
+
+    def test_lore_items_page_renders_sidebar_and_ledger(self):
+        with patch("web_review.services.canon.lore_item_rows", return_value=self.lore_rows()), \
+             patch("web_review.services.canon.lore_categories", return_value=self.categories()), \
+             patch("web_review.services.canon.npc_rows", return_value=self.npcs()):
+            client = TestClient(app)
+            response = client.get("/lore-items")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Lore Items", response.text)
+        self.assertIn("Catur Distrusts Above-Folk", response.text)
+        self.assertIn('href="/lore-items"', response.text)
+        self.assertIn('aria-label="Edit Catur Distrusts Above-Folk"', response.text)
+        self.assertIn('aria-label="Delete Catur Distrusts Above-Folk"', response.text)
+        self.assertIn("Add New", response.text)
+
+    def test_lore_items_add_modal_renders_form(self):
+        with patch("web_review.services.canon.lore_item_rows", return_value=self.lore_rows()), \
+             patch("web_review.services.canon.lore_categories", return_value=self.categories()), \
+             patch("web_review.services.canon.npc_rows", return_value=self.npcs()):
+            client = TestClient(app)
+            response = client.get("/lore-items?modal=add")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Add Lore Item", response.text)
+        self.assertIn('role="dialog"', response.text)
+        self.assertIn('action="/lore-items"', response.text)
+
+    def test_archive_mode_hides_lore_item_edit_controls(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}), \
+             patch("web_review.services.canon.lore_item_rows", return_value=self.lore_rows()), \
+             patch("web_review.services.canon.lore_categories", return_value=self.categories()), \
+             patch("web_review.services.canon.npc_rows", return_value=self.npcs()):
+            client = TestClient(app)
+            response = client.get("/lore-items?modal=add")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Published Archive", response.text)
+        self.assertNotIn("Add New", response.text)
+        self.assertNotIn('aria-label="Edit Catur Distrusts Above-Folk"', response.text)
+        self.assertNotIn('aria-label="Delete Catur Distrusts Above-Folk"', response.text)
+
+    def test_create_lore_item_route_writes_form_values(self):
+        with patch("web_review.services.canon.create_lore_item") as create:
+            client = TestClient(app)
+            response = client.post("/lore-items", data={
+                "title": "Catur Distrusts Above-Folk",
+                "category": "culture",
+                "description": "Catur distrusts surface dwellers.",
+                "source_npc_id": "1",
+                "discovered_session": "21",
+                "is_confirmed": "on",
+                "notes": "Queen audience.",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("created=1", response.headers["location"])
+        create.assert_called_once()
+        values = create.call_args.args[0]
+        self.assertEqual(values["title"], "Catur Distrusts Above-Folk")
+        self.assertEqual(values["source_npc_id"], 1)
+        self.assertEqual(values["discovered_session"], 21)
+        self.assertTrue(values["is_confirmed"])
+
+    def test_edit_lore_item_page_loads_lore_item(self):
+        detail = {
+            "id": 1,
+            "title": "Catur Distrusts Above-Folk",
+            "category": "culture",
+            "description": "Catur distrusts surface dwellers.",
+            "source_npc_id": 1,
+            "discovered_session": 21,
+            "is_confirmed": True,
+            "notes": "",
+        }
+        with patch("web_review.services.canon.lore_item_rows", return_value=self.lore_rows()), \
+             patch("web_review.services.canon.lore_categories", return_value=self.categories()), \
+             patch("web_review.services.canon.npc_rows", return_value=self.npcs()), \
+             patch("web_review.services.canon.lore_item_detail", return_value=detail):
+            client = TestClient(app)
+            response = client.get("/lore-items/1/edit")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Edit Lore Item", response.text)
+        self.assertIn('role="dialog"', response.text)
+        self.assertIn("Catur distrusts surface dwellers.", response.text)
+
+    def test_update_lore_item_route_writes_form_values(self):
+        with patch("web_review.services.canon.update_lore_item") as update:
+            client = TestClient(app)
+            response = client.post("/lore-items/3", data={
+                "title": "Catur Distrusts Above-Folk",
+                "category": "culture",
+                "description": "Catur distrusts surface dwellers.",
+                "source_npc_id": "",
+                "discovered_session": "21",
+                "is_confirmed": "",
+                "notes": "",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("updated=1", response.headers["location"])
+        update.assert_called_once()
+        self.assertEqual(update.call_args.args[0], 3)
+        self.assertFalse(update.call_args.args[1]["is_confirmed"])
+
+    def test_delete_lore_item_route_runs_delete(self):
+        with patch("web_review.services.canon.delete_lore_item") as delete:
+            client = TestClient(app)
+            response = client.post("/lore-items/4/delete", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("deleted=1", response.headers["location"])
+        delete.assert_called_once_with(4)
+
+    def extraction(self):
+        return {
+            "path": Path("/tmp/session21_lore_items.json"),
+            "known_lore_mentions": [{
+                "lore_item_id": 1,
+                "canonical_title": "Catur Distrusts Above-Folk",
+                "new_information": "The queen restricted the party to a courtyard.",
+                "category": "culture",
+                "source_npc": "Queen of Catur",
+                "is_confirmed": True,
+                "confidence": "high",
+                "evidence": "The party was granted access to a courtyard area.",
+            }],
+            "new_lore_candidates": [{
+                "proposed_title": "Celestial Isles Are Draconic",
+                "category": "culture",
+                "description": "The Celestial Isles are home to dragonborn and kobolds.",
+                "source_npc": "Mikani",
+                "discovered_session": 21,
+                "is_confirmed": True,
+                "confidence": "high",
+                "evidence": "The Isles are largely draconic.",
+            }],
+            "rejected_candidates": [{"text": "Faban hates boats", "reason": "Character color."}],
+            "uncertainties": [{"candidate": "Niebain / Nebain", "issue": "Spelling uncertain."}],
+        }
+
+    def test_lore_item_extraction_review_page_renders_decisions(self):
+        with patch.object(lore_item_extraction_review, "available_sessions", return_value=[20, 21]), \
+             patch.object(lore_item_extraction_review, "load_extraction", return_value=self.extraction()), \
+             patch.object(lore_item_extraction_review, "reviewed_output_path", return_value=Path("/tmp/session21_lore_items_reviewed.json")):
+            client = TestClient(app)
+            response = client.get("/lore-items/extractions?session=21")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Lore Item Extraction Review", response.text)
+        self.assertIn("Catur Distrusts Above-Folk", response.text)
+        self.assertIn("Celestial Isles Are Draconic", response.text)
+        self.assertIn('name="known_decision_0"', response.text)
+        self.assertIn('name="new_decision_0"', response.text)
+
+    def test_lore_item_extraction_review_defaults_to_latest_available_session(self):
+        with patch.object(lore_item_extraction_review, "available_sessions", return_value=[20, 21]), \
+             patch.object(lore_item_extraction_review, "load_extraction", return_value=self.extraction()) as load, \
+             patch.object(lore_item_extraction_review, "reviewed_output_path", return_value=Path("/tmp/session21_lore_items_reviewed.json")):
+            client = TestClient(app)
+            response = client.get("/lore-items/extractions")
+
+        self.assertEqual(response.status_code, 200)
+        load.assert_called_once_with(21)
+
+    def test_apply_lore_item_extraction_review_posts_decisions(self):
+        result = {"applied": ["Created Celestial Isles Are Draconic"], "skipped": ["Ignored Catur Distrusts Above-Folk"], "reviewed_path": Path("/tmp/reviewed.json")}
+        with patch.object(lore_item_extraction_review, "apply_review", return_value=result) as apply_review:
+            client = TestClient(app)
+            response = client.post("/lore-items/extractions/apply", data={
+                "session_number": "21",
+                "known_decision_0": "ignore",
+                "new_decision_0": "create",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("/lore-items/extractions?session=21", response.headers["location"])
+        apply_review.assert_called_once()
+        self.assertEqual(apply_review.call_args.args[0], 21)
+        self.assertEqual(apply_review.call_args.args[1]["new_decision_0"], "create")
+
+    def test_archive_mode_blocks_lore_item_extraction_review_page(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}):
+            client = TestClient(app)
+            response = client.get("/lore-items/extractions")
+
+        self.assertEqual(response.status_code, 404)
+
+
 class OpenThreadRouteTest(unittest.TestCase):
     def thread_rows(self):
         return [{
@@ -2006,6 +2506,39 @@ class OpenThreadRouteTest(unittest.TestCase):
 
     def locations(self):
         return [{"id": 3, "name": "The Gale"}]
+
+    def extraction(self):
+        return {
+            "path": Path("/tmp/session21_open_threads.json"),
+            "known_thread_mentions": [{
+                "thread_id": 1,
+                "canonical_title": "What does the Gale want?",
+                "new_information": "The Gale remains an unvisited danger.",
+                "thread_type": "active_threat",
+                "status": "open",
+                "first_session": 20,
+                "last_session": 21,
+                "related_location": "The Gale",
+                "resolution": "",
+                "confidence": "high",
+                "evidence": "The Gale remains ahead.",
+            }],
+            "new_thread_candidates": [{
+                "proposed_title": "Niebain Warns Catur Is Already In Danger",
+                "thread_type": "active_threat",
+                "status": "open",
+                "first_session": 21,
+                "last_session": 21,
+                "related_location": "Catur",
+                "description": "Niebain warned that Catur was already in danger.",
+                "resolution": "",
+                "notes": "Name spelling uncertain.",
+                "confidence": "high",
+                "evidence": "We are in great danger already.",
+            }],
+            "rejected_candidates": [{"text": "Faban hates boats", "reason": "Character color."}],
+            "uncertainties": [{"candidate": "Niebain / Nebain", "issue": "Spelling uncertain."}],
+        }
 
     def test_open_threads_page_renders_sidebar_and_ledger(self):
         with patch("web_review.services.canon.open_thread_rows", return_value=self.thread_rows()), \
@@ -2025,6 +2558,9 @@ class OpenThreadRouteTest(unittest.TestCase):
         self.assertIn("/static/open-threads-icon.png", response.text)
         self.assertIn('href="/open-threads/1/edit"', response.text)
         self.assertIn('action="/open-threads/1/delete"', response.text)
+        self.assertIn('aria-label="Edit What does the Gale want?"', response.text)
+        self.assertIn('aria-label="Delete What does the Gale want?"', response.text)
+        self.assertIn('href="/open-threads/extractions"', response.text)
         self.assertNotIn("Add Open Thread</h2>", response.text)
 
     def test_open_threads_add_modal_renders_four_statuses(self):
@@ -2051,8 +2587,8 @@ class OpenThreadRouteTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Open Threads", response.text)
         self.assertNotIn("Add New", response.text)
-        self.assertNotIn("Edit</a>", response.text)
-        self.assertNotIn("Delete</button>", response.text)
+        self.assertNotIn('aria-label="Edit What does the Gale want?"', response.text)
+        self.assertNotIn('aria-label="Delete What does the Gale want?"', response.text)
         self.assertNotIn("workflow-detail-modal", response.text)
 
     def test_create_open_thread_route_writes_form_values(self):
@@ -2137,6 +2673,43 @@ class OpenThreadRouteTest(unittest.TestCase):
         self.assertIn("deleted=1", response.headers["location"])
         delete.assert_called_once_with(4)
 
+    def test_open_thread_extraction_review_page_renders_decisions(self):
+        with patch.object(open_thread_extraction_review, "available_sessions", return_value=[20, 21]), \
+             patch.object(open_thread_extraction_review, "load_extraction", return_value=self.extraction()), \
+             patch.object(open_thread_extraction_review, "reviewed_output_path", return_value=Path("/tmp/session21_open_threads_reviewed.json")):
+            client = TestClient(app)
+            response = client.get("/open-threads/extractions?session=21")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Open Thread Extraction Review", response.text)
+        self.assertIn("What does the Gale want?", response.text)
+        self.assertIn("Niebain Warns Catur Is Already In Danger", response.text)
+        self.assertIn('name="known_decision_0"', response.text)
+        self.assertIn('name="new_decision_0"', response.text)
+
+    def test_apply_open_thread_extraction_review_posts_decisions(self):
+        result = {"applied": ["Created Niebain Warns Catur Is Already In Danger"], "skipped": ["Ignored What does the Gale want?"], "reviewed_path": Path("/tmp/reviewed.json")}
+        with patch.object(open_thread_extraction_review, "apply_review", return_value=result) as apply_review:
+            client = TestClient(app)
+            response = client.post("/open-threads/extractions/apply", data={
+                "session_number": "21",
+                "known_decision_0": "ignore",
+                "new_decision_0": "create",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("/open-threads/extractions?session=21", response.headers["location"])
+        apply_review.assert_called_once()
+        self.assertEqual(apply_review.call_args.args[0], 21)
+        self.assertEqual(apply_review.call_args.args[1]["new_decision_0"], "create")
+
+    def test_archive_mode_blocks_open_thread_extraction_review_page(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}):
+            client = TestClient(app)
+            response = client.get("/open-threads/extractions")
+
+        self.assertEqual(response.status_code, 404)
+
 
 class CombatEncounterRouteTest(unittest.TestCase):
     def combat_rows(self):
@@ -2183,7 +2756,10 @@ class CombatEncounterRouteTest(unittest.TestCase):
         }]
 
     def test_combat_encounters_page_renders_ledger_and_murder_hobo_count(self):
-        with patch("web_review.services.canon.combat_encounter_rows", return_value=self.combat_rows()):
+        with patch("web_review.services.canon.combat_encounter_rows", return_value=self.combat_rows()), \
+             patch("web_review.services.canon.session_rows", return_value=[{"session_number": 19, "title": "Of Teeth, Memory, and What Remains"}]), \
+             patch("web_review.services.canon.location_rows", return_value=[{"id": 4, "name": "Balrog"}]), \
+             patch("web_review.services.canon.lookup_rows", return_value=[{"value": "killed", "description": "Enemy was killed."}]):
             client = TestClient(app)
             response = client.get("/combat-encounters")
 
@@ -2192,8 +2768,195 @@ class CombatEncounterRouteTest(unittest.TestCase):
         self.assertIn("Orsydon summoned in Balrog", response.text)
         self.assertIn("Murder Hobo Count", response.text)
         self.assertIn(">6<", response.text)
+        self.assertIn("Battle Locale", response.text)
+        self.assertIn('aria-label="Edit Orsydon summoned in Balrog"', response.text)
         self.assertIn('href="/combat-encounters"', response.text)
         self.assertIn("/static/combat-encounters-icon.png", response.text)
+
+    def test_combat_encounters_add_modal_renders_crud_form(self):
+        with patch("web_review.services.canon.combat_encounter_rows", return_value=self.combat_rows()), \
+             patch("web_review.services.canon.session_rows", return_value=[{"session_number": 19, "title": "Of Teeth, Memory, and What Remains"}]), \
+             patch("web_review.services.canon.location_rows", return_value=[{"id": 4, "name": "Balrog"}]), \
+             patch("web_review.services.canon.lookup_rows", return_value=[{"value": "killed", "description": "Enemy was killed."}]):
+            client = TestClient(app)
+            response = client.get("/combat-encounters?modal=add")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Add Combat Encounter", response.text)
+        self.assertIn("+ Add Enemy", response.text)
+        self.assertIn('name="enemy_name_1"', response.text)
+        self.assertIn('name="enemy_quantity_1"', response.text)
+
+    def test_archive_mode_hides_combat_encounter_edit_controls(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}), \
+             patch("web_review.services.canon.combat_encounter_rows", return_value=self.combat_rows()), \
+             patch("web_review.services.canon.session_rows", return_value=[{"session_number": 19, "title": "Of Teeth, Memory, and What Remains"}]), \
+             patch("web_review.services.canon.location_rows", return_value=[{"id": 4, "name": "Balrog"}]), \
+             patch("web_review.services.canon.lookup_rows", return_value=[{"value": "killed", "description": "Enemy was killed."}]):
+            client = TestClient(app)
+            response = client.get("/combat-encounters?modal=add")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("Add New", response.text)
+        self.assertNotIn('aria-label="Edit Orsydon summoned in Balrog"', response.text)
+
+    def test_create_combat_encounter_route_writes_parent_and_enemy_rows(self):
+        with patch("web_review.services.canon.create_combat_encounter") as create:
+            client = TestClient(app)
+            response = client.post("/combat-encounters", data={
+                "session_number": "19",
+                "title": "Orsydon summoned in Balrog",
+                "subtype": "dragon_summoning",
+                "location_id": "4",
+                "participants": "Party, Orsydon, cultists",
+                "outcome": "enemies_defeated",
+                "confidence": "high",
+                "notes": "Cultists summon Orsydon.",
+                "enemy_name_1": "Orsydon",
+                "enemy_type_1": "dragon",
+                "enemy_quantity_1": "1",
+                "enemy_outcome_1": "defeated",
+                "enemy_confidence_1": "high",
+                "enemy_notes_1": "Dragon defeated.",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("created=1", response.headers["location"])
+        values, enemies = create.call_args.args
+        self.assertEqual(values["session_number"], 19)
+        self.assertEqual(values["location_id"], 4)
+        self.assertEqual(enemies[0]["name"], "Orsydon")
+        self.assertEqual(enemies[0]["quantity"], 1)
+
+    def test_edit_combat_encounter_page_loads_detail(self):
+        detail = {
+            "id": 1,
+            "session_number": 19,
+            "event_id": 99,
+            "title": "Orsydon summoned in Balrog",
+            "subtype": "dragon_summoning",
+            "location_id": 4,
+            "participants": "Party, Orsydon, cultists",
+            "outcome": "enemies_defeated",
+            "confidence": "high",
+            "notes": "Cultists summon Orsydon.",
+            "enemies": [{"name": "Orsydon", "enemy_type": "dragon", "quantity": 1, "outcome": "defeated", "confidence": "high", "notes": "Dragon defeated."}],
+        }
+        with patch("web_review.services.canon.combat_encounter_rows", return_value=self.combat_rows()), \
+             patch("web_review.services.canon.session_rows", return_value=[{"session_number": 19, "title": "Of Teeth, Memory, and What Remains"}]), \
+             patch("web_review.services.canon.location_rows", return_value=[{"id": 4, "name": "Balrog"}]), \
+             patch("web_review.services.canon.lookup_rows", return_value=[{"value": "killed", "description": "Enemy was killed."}]), \
+             patch("web_review.services.canon.combat_encounter_detail", return_value=detail):
+            client = TestClient(app)
+            response = client.get("/combat-encounters/1/edit")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Edit Combat Encounter", response.text)
+        self.assertIn("Dragon defeated.", response.text)
+
+    def test_update_combat_encounter_route_writes_values(self):
+        with patch("web_review.services.canon.update_combat_encounter") as update:
+            client = TestClient(app)
+            response = client.post("/combat-encounters/1", data={
+                "session_number": "19",
+                "title": "Orsydon summoned in Balrog",
+                "location_id": "4",
+                "outcome": "enemies_defeated",
+                "confidence": "high",
+                "enemy_name_1": "Cultist",
+                "enemy_quantity_1": "",
+                "enemy_outcome_1": "killed",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("updated=1", response.headers["location"])
+        self.assertEqual(update.call_args.args[0], 1)
+        self.assertIsNone(update.call_args.args[2][0]["quantity"])
+
+    def test_update_combat_encounter_route_skips_removed_enemy_rows(self):
+        with patch("web_review.services.canon.update_combat_encounter") as update:
+            client = TestClient(app)
+            response = client.post("/combat-encounters/1", data={
+                "session_number": "19",
+                "title": "Orsydon summoned in Balrog",
+                "outcome": "enemies_defeated",
+                "confidence": "high",
+                "enemy_name_1": "Orsydon",
+                "enemy_quantity_1": "1",
+                "enemy_outcome_1": "defeated",
+                "enemy_remove_1": "on",
+                "enemy_name_2": "Cultist",
+                "enemy_quantity_2": "5",
+                "enemy_outcome_2": "killed",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        enemies = update.call_args.args[2]
+        self.assertEqual(len(enemies), 1)
+        self.assertEqual(enemies[0]["name"], "Cultist")
+
+    def test_delete_combat_encounter_route_runs_delete(self):
+        with patch("web_review.services.canon.delete_combat_encounter") as delete:
+            client = TestClient(app)
+            response = client.post("/combat-encounters/1/delete", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("deleted=1", response.headers["location"])
+        delete.assert_called_once_with(1)
+
+    def combat_extraction(self):
+        return {
+            "path": Path("/tmp/session19_combat_encounters.json"),
+            "proposed_combat_encounters": [{
+                "title": "Orsydon summoned in Balrog",
+                "session_number": 19,
+                "subtype": "dragon_summoning",
+                "location": "Balrog",
+                "participants": "Party, Orsydon, cultists",
+                "outcome": "enemies_defeated",
+                "confidence": "high",
+                "notes": "Cultists summoned Orsydon.",
+                "evidence": "Cultists summoned the dragon Orsydon.",
+                "enemies": [{"name": "Orsydon", "enemy_type": "dragon", "quantity": 1, "outcome": "defeated"}],
+            }],
+            "rejected_candidates": [{"text": "Audience", "reason": "Social encounter."}],
+            "uncertainties": [{"candidate": "Cultists", "issue": "Quantity unclear."}],
+        }
+
+    def test_combat_extraction_review_page_renders_proposed_encounters(self):
+        with patch.object(combat_extraction_review, "available_sessions", return_value=[19]), \
+             patch.object(combat_extraction_review, "load_extraction", return_value=self.combat_extraction()), \
+             patch.object(combat_extraction_review, "reviewed_output_path", return_value=Path("/tmp/session19_combat_encounters_reviewed.json")):
+            client = TestClient(app)
+            response = client.get("/combat-encounters/extractions?session=19")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Combat Extraction Review", response.text)
+        self.assertIn("Orsydon summoned in Balrog", response.text)
+        self.assertIn('name="encounter_decision_0"', response.text)
+        self.assertIn("Orsydon", response.text)
+
+    def test_apply_combat_extraction_review_posts_decisions(self):
+        result = {"applied": ["Created Orsydon summoned in Balrog"], "skipped": [], "reviewed_path": Path("/tmp/reviewed.json")}
+        with patch.object(combat_extraction_review, "apply_review", return_value=result) as apply_review:
+            client = TestClient(app)
+            response = client.post("/combat-encounters/extractions/apply", data={
+                "session_number": "19",
+                "encounter_decision_0": "create",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("/combat-encounters/extractions?session=19", response.headers["location"])
+        apply_review.assert_called_once()
+        self.assertEqual(apply_review.call_args.args[0], 19)
+        self.assertEqual(apply_review.call_args.args[1]["encounter_decision_0"], "create")
+
+    def test_archive_mode_blocks_combat_extraction_review_page(self):
+        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}):
+            client = TestClient(app)
+            response = client.get("/combat-encounters/extractions")
+
+        self.assertEqual(response.status_code, 404)
 
     def test_combat_encounters_api_returns_rows(self):
         with patch("web_review.services.canon.combat_encounter_rows", return_value=self.combat_rows()):
@@ -2310,6 +3073,8 @@ class ProjectUtilitiesRouteTest(unittest.TestCase):
         self.assertIn("View Todo", response.text)
         self.assertIn("Backup Database", response.text)
         self.assertIn("Run Smoke Test", response.text)
+        self.assertIn("Export Static Archive", response.text)
+        self.assertIn("Publish Static Archive", response.text)
         self.assertIn("Lookup Tables", response.text)
         self.assertIn("Initiate Session", response.text)
         self.assertIn('href="/project-utilities/lookups"', response.text)
@@ -2483,6 +3248,28 @@ class ProjectUtilitiesRouteTest(unittest.TestCase):
         self.assertEqual(response.status_code, 303)
         self.assertIn("command_result=", response.headers["location"])
         smoke.assert_called_once()
+
+    def test_static_export_route_reports_result(self):
+        with patch("web_review.services.commands.run_static_export", return_value=commands.CommandResult(0, "Static archive exported.", "")) as export:
+            client = TestClient(app)
+            response = client.post("/project-utilities/export-static-archive", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("command_result=", response.headers["location"])
+        export.assert_called_once()
+
+    def test_static_publish_route_reports_result(self):
+        with patch("web_review.services.commands.publish_static_archive", return_value=commands.CommandResult(0, "Static archive committed.", "")) as publish:
+            client = TestClient(app)
+            response = client.post("/project-utilities/publish-static-archive", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("command_result=", response.headers["location"])
+        publish.assert_called_once_with(
+            base_url="http://web_archive:8000",
+            static_repo="/Volumes/T7_WORK/Farrlind_Static_Archive",
+            push=False,
+        )
 
 
 class SongbookRouteTest(unittest.TestCase):
@@ -3086,7 +3873,7 @@ class CommandServiceTest(unittest.TestCase):
     def test_run_smoke_test_reports_multiline_category_summary(self):
         response = type("Response", (), {
             "status": 200,
-            "read": lambda self: b"Session Review Ledger Campaign Timeline Open Threads session_count",
+            "read": lambda self: b"Session Review Ledger Campaign Timeline Open Threads Lore Items session_count Six Wells Exist",
             "__enter__": lambda self: self,
             "__exit__": lambda self, exc_type, exc, traceback: False,
         })()
@@ -3095,13 +3882,71 @@ class CommandServiceTest(unittest.TestCase):
             result = commands.run_smoke_test()
 
         self.assertTrue(result.ok)
-        self.assertIn("Tests run: 5", result.stdout)
-        self.assertIn("Passed: 5", result.stdout)
+        self.assertIn("Tests run: 7", result.stdout)
+        self.assertIn("Passed: 7", result.stdout)
         self.assertIn("Failed: 0", result.stdout)
         self.assertIn("Categories: API, Database, Routes", result.stdout)
         self.assertIn("- Routes", result.stdout)
         self.assertIn("PASS /timeline: ok", result.stdout)
         self.assertIn("PASS session count query: 21 sessions", result.stdout)
+
+    def test_run_static_export_runs_export_script(self):
+        completed = type("Completed", (), {
+            "returncode": 0,
+            "stdout": "exported",
+            "stderr": "",
+        })()
+        with patch("web_review.services.commands.subprocess.run", return_value=completed) as run:
+            result = commands.run_static_export("http://archive:8000")
+
+        self.assertTrue(result.ok)
+        command = run.call_args.args[0]
+        self.assertIn(str(reviews.REPO_ROOT / "scripts" / "export_static_archive.py"), command)
+        self.assertIn("http://archive:8000", command)
+        self.assertIn(str(reviews.REPO_ROOT / "dist" / "archive"), command)
+
+    def test_publish_static_archive_runs_publish_script(self):
+        completed = type("Completed", (), {
+            "returncode": 0,
+            "stdout": "published",
+            "stderr": "",
+        })()
+        with patch("web_review.services.commands.subprocess.run", return_value=completed) as run:
+            result = commands.publish_static_archive("http://archive:8000", "/tmp/static-repo", push=True)
+
+        self.assertTrue(result.ok)
+        command = run.call_args.args[0]
+        self.assertIn(str(reviews.REPO_ROOT / "scripts" / "publish_static_archive.py"), command)
+        self.assertIn("http://archive:8000", command)
+        self.assertIn("/tmp/static-repo", command)
+        self.assertIn("--push", command)
+
+
+class StaticArchiveExportTest(unittest.TestCase):
+    def test_rewrite_html_maps_dynamic_archive_links_to_static_paths(self):
+        html = (
+            '<form method="post" action="/sessions/session21/review/save">'
+            '<link rel="stylesheet" href="http://web_archive:8000/static/review.css">'
+            '<a href="/sessions/session21/review">Open</a>'
+            '<a href="/sessions/session21/review?source=diary">Diary</a>'
+            '<a href="/sessions/session21/review?source=final">Summary</a>'
+            '<a href="/songbook/3/lyrics">Lyrics</a>'
+            '<audio src="/songbook/3/audio"></audio>'
+            '</form>'
+        )
+
+        rewritten = export_static_archive.rewrite_html(html)
+
+        self.assertIn('method="get" action="#"', rewritten)
+        self.assertIn('href="/static/review.css"', rewritten)
+        self.assertIn('href="/sessions/session21/summary/"', rewritten)
+        self.assertIn('href="/sessions/session21/diary/"', rewritten)
+        self.assertIn('href="/songbook/3/lyrics/"', rewritten)
+        self.assertIn('src="/media/songbook/03/song.mp3"', rewritten)
+
+    def test_discover_session_keys_from_dashboard_links(self):
+        html = '<a href="/sessions/session02/review">Open</a><a href="/sessions/session21/review">Open</a>'
+        self.assertEqual(export_static_archive.discover_session_keys(html), ["session02", "session21"])
 
     def test_apply_review_route_requires_reviewed_status(self):
         with tempfile.TemporaryDirectory() as tmp:

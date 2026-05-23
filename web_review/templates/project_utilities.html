@@ -7,7 +7,7 @@
     <div>
       <p class="eyebrow">Edit Archive Operator Tools</p>
       <h1>Project Utilities</h1>
-      <p>Project notes, revision history, database backup, and a quick application smoke test.</p>
+      <p>Project notes, revision history, database backup, static archive export, and a quick application smoke test.</p>
     </div>
     <img class="archive-section-icon" src="/static/project-utilities-icon.png" alt="" aria-hidden="true">
   </div>
@@ -60,6 +60,20 @@
     <p>Check core routes and database connectivity.</p>
     <form method="post" action="/project-utilities/smoke-test">
       <button type="submit">Run Smoke Test</button>
+    </form>
+  </article>
+  <article class="utility-card">
+    <h2>Export Static Archive</h2>
+    <p>Build a self-contained Netlify-ready archive under <code>dist/archive</code>.</p>
+    <form method="post" action="/project-utilities/export-static-archive">
+      <button type="submit">Run Export</button>
+    </form>
+  </article>
+  <article class="utility-card">
+    <h2>Publish Static Archive</h2>
+    <p>Export, sync, and commit the archive into the static site repository.</p>
+    <form method="post" action="/project-utilities/publish-static-archive">
+      <button type="submit">Publish Archive</button>
     </form>
   </article>
   <article class="utility-card">

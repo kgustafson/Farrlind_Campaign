@@ -97,13 +97,42 @@ steps:
     rerun_policy: safe
     canon_impact: none
 
+  - id: curate_transcript
+    display_name: Draft Canon Packet With Gemma
+    lane: draft_generation
+    dependencies:
+      - source_status_check
+    command: ./rag-env/bin/python scripts/rag.py curate sessionXX
+    expected_inputs:
+      - knowledge/Faban/raw/sessionXX_transcript.txt
+      - knowledge/Faban/sessions/sessionXX_context.yaml
+      - knowledge/Faban/final/session##_summary.md
+    expected_outputs:
+      - knowledge/Faban/clean/sessionXX_curated.md
+      - knowledge/Faban/clean/sessionXX_curated_metadata.json
+      - knowledge/Faban/clean/sessionXX_curated_chunks/chunk_*.md
+    status_rules:
+      complete_when:
+        - draft canon packet exists
+      stale_when:
+        - raw transcript mtime is newer than curated draft packet mtime
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+    notes: >
+      Uses gemma4:e2b by default via FARRLIND_CURATION_MODEL to produce a
+      draft canon packet: narrative summary, major events, NPCs/entities,
+      locations, artifacts/items, lore items, combat encounters, open threads,
+      timeline notes, and inventory/resource notes.
+
   - id: extract_events
     display_name: Extract Events
     lane: draft_generation
     dependencies:
-      - source_status_check
+      - curate_transcript
     command: ./rag-env/bin/python scripts/rag.py extract sessionXX
     expected_inputs:
+      - knowledge/Faban/clean/sessionXX_curated.md
       - knowledge/Faban/raw/sessionXX_transcript.txt
       - knowledge/Faban/clean/sessionXX_diary.md
     expected_outputs:
@@ -538,6 +567,11 @@ lanes:
     display_name: Draft Generation
   - id: human_review
     display_name: Human Review
+    implementation_status: not_done
+    notes: >
+      Current YAML/event-fragment review is an interim gate. The target
+      implementation is draft-canon-packet review: Gemma packet, human-edited
+      canon summary, structured canon item confirmations, then database apply.
   - id: canonization
     display_name: Canonization
   - id: verification

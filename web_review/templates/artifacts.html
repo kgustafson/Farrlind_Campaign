@@ -11,7 +11,12 @@
     </div>
     <img class="archive-section-icon" src="/static/artifacts-icon.png" alt="" aria-hidden="true">
   </div>
-  {% if can_edit() %}<a class="icon-link add-new-link" href="/artifacts?modal=add">Add New</a>{% endif %}
+  {% if can_edit() %}
+  <div class="section-actions">
+    <a class="icon-link secondary-link" href="/artifacts/extractions">Review Extraction</a>
+    <a class="icon-link add-new-link" href="/artifacts?modal=add">Add New</a>
+  </div>
+  {% endif %}
 </section>
 
 {% if request.query_params.get("created") %}
@@ -69,11 +74,11 @@
         </td>
         <td data-label="Description">{{ artifact.description or "—" }}</td>
         <td data-label="Lore">{{ artifact.lore_significance or "—" }}</td>
-        {% if can_edit() %}<td data-label="Actions">
-          <div class="row-actions">
-            <a class="icon-link" href="/artifacts/{{ artifact.id }}/edit">Edit</a>
+        {% if can_edit() %}<td class="compact-action-cell" data-label="Actions">
+          <div class="row-actions compact-row-actions">
+            <a class="icon-link icon-only-action" href="/artifacts/{{ artifact.id }}/edit" aria-label="Edit {{ artifact.name }}" title="Edit {{ artifact.name }}">✎</a>
             <form method="post" action="/artifacts/{{ artifact.id }}/delete">
-              <button class="danger-button" type="submit">Delete</button>
+              <button class="danger-button icon-only-action" type="submit" aria-label="Delete {{ artifact.name }}" title="Delete {{ artifact.name }}">×</button>
             </form>
           </div>
         </td>{% endif %}

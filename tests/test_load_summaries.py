@@ -416,7 +416,10 @@ class LoadSummariesTest(unittest.TestCase):
 
         self.assertIn("Loaded from reviewed canon NPC scrub.", sql)
         self.assertIn("Alistair", sql)
-        self.assertIn("Coastal boat contact who gave the party a boat near Catur.", sql)
+        self.assertIn(
+            "Coastal merchant or boat contact, also heard as Allister, who warned Faban that Catur is dangerous and does not like outsiders.",
+            sql,
+        )
 
     def test_build_sql_scrubs_audited_missed_npcs(self):
         summaries = [

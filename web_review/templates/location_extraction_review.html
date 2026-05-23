@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Location Extraction Review | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div class="archive-section-title">
+    <div>
+      <p class="eyebrow">Human Review Gate</p>
+      <h1>Location Extraction Review</h1>
+      <p>Review model-proposed location updates before applying them to the campaign gazetteer.</p>
+    </div>
+    <img class="archive-section-icon" src="/static/locations-icon.png" alt="" aria-hidden="true">
+  </div>
+</section>
+
+{% if request.query_params.get("apply_failed") %}
+  <div class="flash error-flash">Location extraction review was not applied. Check the extraction file and related canon records.</div>
+{% endif %}
+
+<form class="session-picker" method="get" action="/locations/extractions">
+  <label class="field-block">
+    <span>Session Number</span>
+    <input name="session" type="number" min="0" value="{{ session_number }}" list="available-location-extractions">
+    {% if available_sessions %}
+      <datalist id="available-location-extractions">
+        {% for available_session in available_sessions %}
+          <option value="{{ available_session }}">Session {{ "%02d"|format(available_session) }}</option>
+        {% endfor %}
+      </datalist>
+    {% endif %}
+  </label>
+  <button type="submit">Load Extraction</button>
+  <a class="icon-link secondary-link" href="/locations">Back to Locations</a>
+</form>
+
+{% if command_result %}
+  <section class="command-result utility-result">
+    <div class="command-result-head">
+      <h2>{{ command_result.action }}</h2>
+      <span class="badge {% if command_result.ok %}applied-applied{% else %}decision-rejected{% endif %}">
+        {% if command_result.ok %}pass{% else %}fail{% endif %}
+      </span>
+    </div>
+    {% if command_result.stdout %}<pre>{{ command_result.stdout }}</pre>{% endif %}
+    {% if command_result.stderr %}<pre>{{ command_result.stderr }}</pre>{% endif %}
+  </section>
+{% endif %}
+
+{% if not extraction %}
+  <div class="flash muted-flash">No location extraction JSON found for session {{ "%02d"|format(session_number) }}. Run <code>scripts/rag.py extract-locations session{{ "%02d"|format(session_number) }}</code> first.</div>
+{% else %}
+<section class="command-log">
+  <div class="command-log-head">
+    <div>
+      <h2>Session {{ "%02d"|format(session_number) }} Location Extraction</h2>
+      <p class="muted">Source: {{ extraction.path }}</p>
+    </div>
+  </div>
+</section>
+
+<form method="post" action="/locations/extractions/apply" class="entity-review-form">
+  <input type="hidden" name="session_number" value="{{ session_number }}">
+
+  <section class="entity-review-section">
+    <h2>Known Location Mentions</h2>
+    {% if not extraction.known_location_mentions %}
+      <p class="muted">No known location mentions proposed.</p>
+    {% endif %}
+    <div class="entity-review-list">
+      {% for item in extraction.known_location_mentions %}
+      <article class="entity-review-card">
+        <div class="entity-review-head">
+          <div>
+            <h3>{{ item.canonical_name }}</h3>
+            <p class="muted">Mentioned as: {{ item.mentioned_as | join(", ") }}</p>
+          </div>
+          <label class="field-block decision-field">
+            <span>Decision</span>
+            <select name="known_decision_{{ loop.index0 }}">
+              <option value="ignore">Ignore</option>
+              <option value="append_note">Append note/update metadata</option>
+            </select>
+          </label>
+        </div>
+        <dl class="entity-review-details">
+          <dt>New Information</dt>
+          <dd>{{ item.new_information or "—" }}</dd>
+          <dt>Type</dt>
+          <dd>{{ item.location_type or "—" }}</dd>
+          <dt>Parent</dt>
+          <dd>{{ item.parent_location or "—" }}</dd>
+          <dt>Flags</dt>
+          <dd>{% if item.is_underwater %}underwater{% endif %}{% if item.is_underwater and item.is_feywild %}, {% endif %}{% if item.is_feywild %}feywild{% endif %}{% if not item.is_underwater and not item.is_feywild %}—{% endif %}</dd>
+          <dt>Confidence</dt>
+          <dd>{{ item.confidence or "—" }}</dd>
+          <dt>Evidence</dt>
+          <dd>{{ item.evidence or "—" }}</dd>
+        </dl>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="entity-review-section">
+    <h2>New Location Candidates</h2>
+    {% if not extraction.new_location_candidates %}
+      <p class="muted">No new location candidates proposed.</p>
+    {% endif %}
+    <div class="entity-review-list">
+      {% for item in extraction.new_location_candidates %}
+      <article class="entity-review-card">
+        <div class="entity-review-head">
+          <div>
+            <h3>{{ item.proposed_name }}</h3>
+            <p class="muted">{{ item.location_type or "location" }}{% if item.parent_location %} · {{ item.parent_location }}{% endif %}</p>
+          </div>
+          <label class="field-block decision-field">
+            <span>Decision</span>
+            <select name="new_decision_{{ loop.index0 }}">
+              <option value="reject">Reject</option>
+              <option value="create">Create Location</option>
+            </select>
+          </label>
+        </div>
+        <dl class="entity-review-details">
+          <dt>Description</dt>
+          <dd>{{ item.description or "—" }}</dd>
+          <dt>First Visited</dt>
+          <dd>Session {{ item.first_visited_session or session_number }}</dd>
+          <dt>Flags</dt>
+          <dd>{% if item.is_underwater %}underwater{% endif %}{% if item.is_underwater and item.is_feywild %}, {% endif %}{% if item.is_feywild %}feywild{% endif %}{% if not item.is_underwater and not item.is_feywild %}—{% endif %}</dd>
+          <dt>Confidence</dt>
+          <dd>{{ item.confidence or "—" }}</dd>
+          <dt>Evidence</dt>
+          <dd>{{ item.evidence or "—" }}</dd>
+        </dl>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="entity-review-section two-column-review">
+    <div>
+      <h2>Rejected By Extractor</h2>
+      {% if not extraction.rejected_candidates %}<p class="muted">None.</p>{% endif %}
+      {% for item in extraction.rejected_candidates %}
+        <div class="mini-review-note"><strong>{{ item.text }}</strong><br>{{ item.reason }}</div>
+      {% endfor %}
+    </div>
+    <div>
+      <h2>Uncertainties</h2>
+      {% if not extraction.uncertainties %}<p class="muted">None.</p>{% endif %}
+      {% for item in extraction.uncertainties %}
+        <div class="mini-review-note"><strong>{{ item.candidate }}</strong><br>{{ item.issue }}</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="panel-actions split-actions sticky-review-actions">
+    <a class="icon-link secondary-link" href="/locations">Cancel</a>
+    <button type="submit">Apply Reviewed Location Changes</button>
+  </div>
+</form>
+{% endif %}
+{% endblock %}

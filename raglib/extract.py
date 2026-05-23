@@ -9,12 +9,20 @@ def transcript_path(session_name: str):
     return RAW / f"{session_name}_transcript.txt"
 
 
+def curated_path(session_name: str):
+    return CLEAN / f"{session_name}_curated.md"
+
+
 def events_path(session_name: str):
     return CLEAN / f"{session_name}_events.md"
 
 
 def extract_session(session_name: str):
-    source = transcript_path(session_name)
+    source = curated_path(session_name)
+    source_kind = "curated session packet"
+    if not source.exists():
+        source = transcript_path(session_name)
+        source_kind = "transcript"
     output = events_path(session_name)
 
     transcript = read_text(source)
@@ -36,11 +44,11 @@ def extract_session(session_name: str):
         print(f"Extracting chunk {index} of {len(chunks)}...")
 
         user_prompt = f"""
-Extract event records from this transcript chunk.
+Extract event records from this {source_kind} chunk.
 
 Chunk: {index} of {len(chunks)}
 
-TRANSCRIPT CHUNK:
+SOURCE CHUNK:
 {chunk}
 """
 

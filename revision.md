@@ -1,5 +1,21 @@
 # Revision History
 
+## v0.5.0 - 5/23/2026
+
+Added the model-curated extraction review layer and static archive release tooling.
+
+- Workflow: Added Gemma-backed transcript curation prompts and wired curated output into the session processing flow.
+- Workflow: Added dedicated extractors for NPCs, Locations, Artifacts, Lore Items, Combat Encounters, and Open Threads.
+- App: Added human review/apply pages for extracted entities so model output becomes canon only after explicit approval.
+- App: Expanded Combat Encounters into editable encounter records with child enemy rows and quantity/outcome tracking.
+- App: Added Lore Items as a first-class archive section with CRUD and extraction review.
+- App: Added Open Thread extraction review and changed Open Thread edit/delete controls to the shared pencil/X icon style.
+- App: Added Project Utilities support for static archive export and related utility command output.
+- Data: Added campaign metadata for party, players, and DM context used by extraction prompts.
+- Model Eval: Added gold summaries and prompt iterations for local model cook-off scoring.
+- Docs: Updated workflow and TODO notes for the revised curation-first review approach.
+- Tests: Added extractor, review-service, route, workflow, and static-export coverage for the new release.
+
 ## v0.4.31 - 5/18/2026
 
 Enforced the staged session review workflow.

@@ -6,14 +6,11 @@ The goal is to reduce human review work by testing whether local models can turn
 
 ## Models
 
-The initial run-off uses:
+The active run-off uses the Gemma models. Qwen models were dropped after early rounds showed much slower runtime without a quality win.
 
 - `gemma3:latest`
 - `gemma4:e2b`
 - `gemma4:e4b`
-- `qwen3:8b`
-- `qwen3:14b`
-- `qwen2.5:14b`
 
 Optional stretch candidate:
 

@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}Lore Item Extraction Review | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div class="archive-section-title">
+    <div>
+      <p class="eyebrow">Human Review Gate</p>
+      <h1>Lore Item Extraction Review</h1>
+      <p>Review model-proposed lore updates before applying them to the canon lore ledger.</p>
+    </div>
+    <img class="archive-section-icon" src="/static/wells-of-magic-icon.png" alt="" aria-hidden="true">
+  </div>
+</section>
+
+{% if request.query_params.get("apply_failed") %}
+  <div class="flash error-flash">Lore item extraction review was not applied. Check the extraction file and related canon records.</div>
+{% endif %}
+
+<form class="session-picker" method="get" action="/lore-items/extractions">
+  <label class="field-block">
+    <span>Session Number</span>
+    <input name="session" type="number" min="0" value="{{ session_number }}" list="available-lore-item-extractions">
+    {% if available_sessions %}
+      <datalist id="available-lore-item-extractions">
+        {% for available_session in available_sessions %}
+          <option value="{{ available_session }}">Session {{ "%02d"|format(available_session) }}</option>
+        {% endfor %}
+      </datalist>
+    {% endif %}
+  </label>
+  <button type="submit">Load Extraction</button>
+  <a class="icon-link secondary-link" href="/lore-items">Back to Lore Items</a>
+</form>
+
+{% if command_result %}
+  <section class="command-result utility-result">
+    <div class="command-result-head">
+      <h2>{{ command_result.action }}</h2>
+      <span class="badge {% if command_result.ok %}applied-applied{% else %}decision-rejected{% endif %}">
+        {% if command_result.ok %}pass{% else %}fail{% endif %}
+      </span>
+    </div>
+    {% if command_result.stdout %}<pre>{{ command_result.stdout }}</pre>{% endif %}
+    {% if command_result.stderr %}<pre>{{ command_result.stderr }}</pre>{% endif %}
+  </section>
+{% endif %}
+
+{% if not extraction %}
+  <div class="flash muted-flash">No lore item extraction JSON found for session {{ "%02d"|format(session_number) }}. Run <code>scripts/rag.py extract-lore-items session{{ "%02d"|format(session_number) }}</code> first.</div>
+{% else %}
+<section class="command-log">
+  <div class="command-log-head">
+    <div>
+      <h2>Session {{ "%02d"|format(session_number) }} Lore Item Extraction</h2>
+      <p class="muted">Source: {{ extraction.path }}</p>
+    </div>
+  </div>
+</section>
+
+<form method="post" action="/lore-items/extractions/apply" class="entity-review-form">
+  <input type="hidden" name="session_number" value="{{ session_number }}">
+
+  <section class="entity-review-section">
+    <h2>Known Lore Mentions</h2>
+    {% if not extraction.known_lore_mentions %}
+      <p class="muted">No known lore mentions proposed.</p>
+    {% endif %}
+    <div class="entity-review-list">
+      {% for item in extraction.known_lore_mentions %}
+      <article class="entity-review-card">
+        <div class="entity-review-head">
+          <div>
+            <h3>{{ item.canonical_title }}</h3>
+            <p class="muted">{{ item.category or "uncategorized" }}{% if item.source_npc %} · {{ item.source_npc }}{% endif %}</p>
+          </div>
+          <label class="field-block decision-field">
+            <span>Decision</span>
+            <select name="known_decision_{{ loop.index0 }}">
+              <option value="ignore">Ignore</option>
+              <option value="append_note">Append note/update metadata</option>
+            </select>
+          </label>
+        </div>
+        <dl class="entity-review-details">
+          <dt>New Information</dt>
+          <dd>{{ item.new_information or "—" }}</dd>
+          <dt>Canon</dt>
+          <dd>{% if item.is_confirmed %}confirmed{% else %}draft / uncertain{% endif %}</dd>
+          <dt>Confidence</dt>
+          <dd>{{ item.confidence or "—" }}</dd>
+          <dt>Evidence</dt>
+          <dd>{{ item.evidence or "—" }}</dd>
+        </dl>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="entity-review-section">
+    <h2>New Lore Candidates</h2>
+    {% if not extraction.new_lore_candidates %}
+      <p class="muted">No new lore candidates proposed.</p>
+    {% endif %}
+    <div class="entity-review-list">
+      {% for item in extraction.new_lore_candidates %}
+      <article class="entity-review-card">
+        <div class="entity-review-head">
+          <div>
+            <h3>{{ item.proposed_title }}</h3>
+            <p class="muted">{{ item.category or "uncategorized" }}{% if item.source_npc %} · {{ item.source_npc }}{% endif %}</p>
+          </div>
+          <label class="field-block decision-field">
+            <span>Decision</span>
+            <select name="new_decision_{{ loop.index0 }}">
+              <option value="reject">Reject</option>
+              <option value="create">Create Lore Item</option>
+            </select>
+          </label>
+        </div>
+        <dl class="entity-review-details">
+          <dt>Description</dt>
+          <dd>{{ item.description or "—" }}</dd>
+          <dt>Discovered</dt>
+          <dd>Session {{ item.discovered_session or session_number }}</dd>
+          <dt>Canon</dt>
+          <dd>{% if item.is_confirmed %}confirmed{% else %}draft / uncertain{% endif %}</dd>
+          <dt>Confidence</dt>
+          <dd>{{ item.confidence or "—" }}</dd>
+          <dt>Evidence</dt>
+          <dd>{{ item.evidence or "—" }}</dd>
+        </dl>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="entity-review-section two-column-review">
+    <div>
+      <h2>Rejected By Extractor</h2>
+      {% if not extraction.rejected_candidates %}<p class="muted">None.</p>{% endif %}
+      {% for item in extraction.rejected_candidates %}
+        <div class="mini-review-note"><strong>{{ item.text }}</strong><br>{{ item.reason }}</div>
+      {% endfor %}
+    </div>
+    <div>
+      <h2>Uncertainties</h2>
+      {% if not extraction.uncertainties %}<p class="muted">None.</p>{% endif %}
+      {% for item in extraction.uncertainties %}
+        <div class="mini-review-note"><strong>{{ item.candidate }}</strong><br>{{ item.issue }}</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="panel-actions split-actions sticky-review-actions">
+    <a class="icon-link secondary-link" href="/lore-items">Cancel</a>
+    <button type="submit">Apply Reviewed Lore Changes</button>
+  </div>
+</form>
+{% endif %}
+{% endblock %}

@@ -1,4 +1,5 @@
 import requests
+from typing import Optional
 
 from raglib.config import OLLAMA_URL, MODEL
 
@@ -21,13 +22,14 @@ def chat(system_prompt: str, user_prompt: str, model: str = MODEL, timeout: int 
     return response.json()["message"]["content"]
 
 
-def generate(prompt: str, model: str = MODEL, timeout: int = 600) -> str:
+def generate(prompt: str, model: str = MODEL, timeout: int = 600, options: Optional[dict] = None) -> str:
     response = requests.post(
         f"{OLLAMA_URL}/api/generate",
         json={
             "model": model,
             "prompt": prompt,
             "stream": False,
+            "options": options or {},
         },
         timeout=timeout,
     )

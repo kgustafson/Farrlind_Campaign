@@ -60,6 +60,11 @@ def command_plan(session_number: int) -> list[WorkflowCommand]:
             ("source_status_check",),
         ),
         WorkflowCommand(
+            "curate_transcript",
+            [python, "scripts/rag.py", "curate", session],
+            ("curate_transcript",),
+        ),
+        WorkflowCommand(
             "extract_events",
             [python, "scripts/rag.py", "extract", session],
             ("extract_events",),

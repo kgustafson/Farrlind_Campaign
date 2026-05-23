@@ -11,7 +11,32 @@
     </div>
     <img class="archive-section-icon" src="/static/combat-encounters-icon.png" alt="" aria-hidden="true">
   </div>
+  {% if can_edit() %}
+  <div class="panel-actions">
+    <a class="icon-link secondary-link" href="/combat-encounters/extractions">Review Extractions</a>
+    <a class="icon-link add-new-link" href="/combat-encounters?modal=add">Add New</a>
+  </div>
+  {% endif %}
 </section>
+
+{% if request.query_params.get("created") %}
+  <div class="flash">Combat encounter added.</div>
+{% endif %}
+{% if request.query_params.get("updated") %}
+  <div class="flash">Combat encounter updated.</div>
+{% endif %}
+{% if request.query_params.get("deleted") %}
+  <div class="flash">Combat encounter deleted.</div>
+{% endif %}
+{% if request.query_params.get("create_failed") %}
+  <div class="flash error-flash">Combat encounter was not added. Session and title are required.</div>
+{% endif %}
+{% if request.query_params.get("update_failed") %}
+  <div class="flash error-flash">Combat encounter was not updated. Check the session, title, and enemy rows.</div>
+{% endif %}
+{% if request.query_params.get("delete_failed") %}
+  <div class="flash error-flash">Combat encounter was not deleted.</div>
+{% endif %}
 
 <section class="archive-stat-row" aria-label="Combat statistics">
   <div class="archive-stat-card murder-hobo-card">
@@ -29,7 +54,6 @@
     <caption>Combat Encounter Ledger</caption>
     <thead>
       <tr>
-        <th>Session</th>
         <th>Encounter</th>
         <th>Location</th>
         <th>Enemies</th>
@@ -41,16 +65,22 @@
     <tbody>
       {% for encounter in encounters %}
       <tr>
-        <td class="session-cell" data-label="Session">
-          {{ encounter.session_span }}
-          {% if encounter.session_title %}<span class="subtle-line">{{ encounter.session_title }}</span>{% endif %}
-        </td>
         <td data-label="Encounter">
           <strong>{{ encounter.title }}</strong>
           {% if encounter.subtype %}<span class="subtle-line">{{ encounter.subtype }}</span>{% endif %}
           {% if encounter.confidence %}<span class="badge status-in_review">{{ encounter.confidence }}</span>{% endif %}
+          {% if can_edit() %}
+          <div class="row-actions combat-title-actions">
+            <a class="icon-link icon-only-action" href="/combat-encounters/{{ encounter.id }}/edit" aria-label="Edit {{ encounter.title }}" title="Edit {{ encounter.title }}">✎</a>
+            <form method="post" action="/combat-encounters/{{ encounter.id }}/delete">
+              <button class="danger-button icon-only-action" type="submit" aria-label="Delete {{ encounter.title }}" title="Delete {{ encounter.title }}">×</button>
+            </form>
+          </div>
+          {% endif %}
         </td>
-        <td data-label="Location">{{ encounter.location or "—" }}</td>
+        <td data-label="Battle Locale">
+          <span class="combat-location">{{ encounter.location or "—" }}</span>
+        </td>
         <td data-label="Enemies">
           {% if encounter.enemies %}
             <ul class="enemy-list">
@@ -59,7 +89,12 @@
                   <span class="enemy-count">{% if enemy.quantity is not none %}{{ enemy.quantity }}{% else %}unknown{% endif %}</span>
                   <span class="enemy-name">{{ enemy.name }}</span>
                   {% if enemy.enemy_type %}<span class="enemy-type">{{ enemy.enemy_type }}</span>{% endif %}
-                  {% if enemy.outcome %}<span class="enemy-outcome">{{ enemy.outcome }}</span>{% endif %}
+                  <span class="enemy-outcome">{{ enemy.outcome or "unknown" }}</span>
+                  {% if enemy.quantity is not none and (enemy.outcome or "") in ["killed", "defeated"] %}
+                    <span class="enemy-kill-count">{{ enemy.quantity }} killed/defeated</span>
+                  {% elif (enemy.outcome or "") in ["killed", "defeated"] %}
+                    <span class="enemy-kill-count">unknown killed/defeated</span>
+                  {% endif %}
                 </li>
               {% endfor %}
             </ul>
@@ -83,4 +118,174 @@
     </tbody>
   </table>
 </section>
+
+{% if show_combat_modal %}
+<section class="modal-backdrop" role="presentation">
+  <div class="archive-modal combat-modal" role="dialog" aria-modal="true" aria-labelledby="combat-modal-title">
+    <div class="modal-head">
+      <div class="modal-title-with-icon">
+        <img class="modal-title-icon" src="/static/combat-encounters-icon.png" alt="" aria-hidden="true">
+        <h2 id="combat-modal-title">{% if editing %}Edit Combat Encounter{% else %}Add Combat Encounter{% endif %}</h2>
+      </div>
+      <a class="modal-close" href="/combat-encounters" aria-label="Close combat encounter form">x</a>
+    </div>
+    <form method="post" action="{% if editing %}/combat-encounters/{{ editing.id }}{% else %}/combat-encounters{% endif %}">
+      <div class="form-grid three-col">
+        <label class="field-block">
+          <span>Session</span>
+          <select name="session_number" required>
+            <option value="">choose session</option>
+            {% for session in sessions %}
+              <option value="{{ session.session_number }}" {% if editing and editing.session_number == session.session_number %}selected{% endif %}>Session {{ "%02d"|format(session.session_number) }}{% if session.title %} — {{ session.title }}{% endif %}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field-block">
+          <span>Battle Locale</span>
+          <select name="location_id">
+            <option value="">unknown</option>
+            {% for location in locations %}
+              <option value="{{ location.id }}" {% if editing and editing.location_id == location.id %}selected{% endif %}>{{ location.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field-block">
+          <span>Encounter Outcome</span>
+          <input name="outcome" list="combat-outcome-options" value="{{ editing.outcome if editing else '' }}" placeholder="enemies_defeated">
+        </label>
+      </div>
+      <label class="field-block">
+        <span>Encounter Title</span>
+        <input name="title" required value="{{ editing.title if editing else '' }}">
+      </label>
+      <div class="form-grid two-col">
+        <label class="field-block">
+          <span>Subtype</span>
+          <input name="subtype" value="{{ editing.subtype if editing else '' }}" placeholder="ambush">
+        </label>
+        <label class="field-block">
+          <span>Confidence</span>
+          <select name="confidence">
+            {% for confidence in ["high", "medium", "low"] %}
+              <option value="{{ confidence }}" {% if (editing and editing.confidence == confidence) or (not editing and confidence == "medium") %}selected{% endif %}>{{ confidence }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
+      <label class="field-block">
+        <span>Participants</span>
+        <input name="participants" value="{{ editing.participants if editing else '' }}" placeholder="Party, enemies, allies">
+      </label>
+
+      <section class="combat-enemy-editor" aria-label="Enemy rows">
+        <div class="combat-enemy-editor-head">
+          <h3>Enemies Fought</h3>
+        </div>
+        <div class="combat-enemy-grid combat-enemy-grid-head" aria-hidden="true">
+          <span></span>
+          <span>Enemy</span>
+          <span>Type</span>
+          <span>Qty</span>
+          <span>Outcome</span>
+          <span>Confidence</span>
+          <span>Notes</span>
+        </div>
+        {% set existing_enemies = editing.enemies if editing else [] %}
+        {% for enemy in existing_enemies %}
+          {% set i = loop.index %}
+          <div class="combat-enemy-grid combat-enemy-row" data-enemy-row>
+            <div class="combat-enemy-actions" aria-label="Enemy row controls">
+              <span class="icon-only-action enemy-edit-marker" title="Edit enemy row" aria-hidden="true">✎</span>
+              <label class="enemy-remove-toggle" title="Remove enemy row" aria-label="Remove enemy row {{ i }}">
+                <input type="checkbox" name="enemy_remove_{{ i }}">
+                <span class="danger-button icon-only-action">×</span>
+              </label>
+            </div>
+            <label class="field-block">
+              <span>Enemy {{ i }}</span>
+              <input name="enemy_name_{{ i }}" value="{{ enemy.name }}" placeholder="Cultist">
+            </label>
+            <label class="field-block">
+              <span>Type</span>
+              <input name="enemy_type_{{ i }}" value="{{ enemy.enemy_type }}" placeholder="cultist">
+            </label>
+            <label class="field-block">
+              <span>Qty</span>
+              <input name="enemy_quantity_{{ i }}" type="number" min="0" value="{{ enemy.quantity if enemy.quantity is not none else '' }}" placeholder="unknown">
+            </label>
+            <label class="field-block">
+              <span>Outcome</span>
+              <input name="enemy_outcome_{{ i }}" list="combat-outcome-options" value="{{ enemy.outcome }}" placeholder="killed">
+            </label>
+            <label class="field-block">
+              <span>Confidence</span>
+              <select name="enemy_confidence_{{ i }}">
+                {% for confidence in ["high", "medium", "low"] %}
+                  <option value="{{ confidence }}" {% if enemy.confidence == confidence %}selected{% endif %}>{{ confidence }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label class="field-block">
+              <span>Notes</span>
+              <input name="enemy_notes_{{ i }}" value="{{ enemy.notes }}">
+            </label>
+          </div>
+        {% endfor %}
+        {% set new_enemy_index = (existing_enemies|length) + 1 %}
+        <details class="combat-add-enemy" {% if not editing %}open{% endif %}>
+          <summary>+ Add Enemy</summary>
+          <div class="combat-enemy-grid combat-enemy-row">
+            <div class="combat-enemy-actions" aria-label="New enemy row controls">
+              <span class="icon-only-action enemy-edit-marker" title="New enemy row" aria-hidden="true">✎</span>
+            </div>
+            <label class="field-block">
+              <span>Enemy {{ new_enemy_index }}</span>
+              <input name="enemy_name_{{ new_enemy_index }}" value="" placeholder="Cultist">
+            </label>
+            <label class="field-block">
+              <span>Type</span>
+              <input name="enemy_type_{{ new_enemy_index }}" value="" placeholder="cultist">
+            </label>
+            <label class="field-block">
+              <span>Qty</span>
+              <input name="enemy_quantity_{{ new_enemy_index }}" type="number" min="0" value="" placeholder="unknown">
+            </label>
+            <label class="field-block">
+              <span>Outcome</span>
+              <input name="enemy_outcome_{{ new_enemy_index }}" list="combat-outcome-options" value="" placeholder="killed">
+            </label>
+            <label class="field-block">
+              <span>Confidence</span>
+              <select name="enemy_confidence_{{ new_enemy_index }}">
+                {% for confidence in ["high", "medium", "low"] %}
+                  <option value="{{ confidence }}" {% if confidence == "medium" %}selected{% endif %}>{{ confidence }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label class="field-block">
+              <span>Notes</span>
+              <input name="enemy_notes_{{ new_enemy_index }}" value="">
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <label class="field-block">
+        <span>Encounter Notes</span>
+        <textarea name="notes">{{ editing.notes if editing else '' }}</textarea>
+      </label>
+      <div class="form-actions">
+        <a class="icon-link secondary-link" href="/combat-encounters">Cancel</a>
+        <button type="submit">{% if editing %}Save Encounter{% else %}Add Encounter{% endif %}</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<datalist id="combat-outcome-options">
+  {% for outcome in outcomes %}
+    <option value="{{ outcome.value }}">{{ outcome.description }}</option>
+  {% endfor %}
+</datalist>
+{% endif %}
 {% endblock %}

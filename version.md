@@ -1,6 +1,6 @@
 # Version
 
-v0.4.31
+v0.5.0
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.4.31` enforces the staged session review workflow.
+`v0.5.0` adds the model-curated extraction review layer, static archive export support, and expanded archive management tools.

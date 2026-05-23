@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}NPC Extraction Review | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div class="archive-section-title">
+    <div>
+      <p class="eyebrow">Human Review Gate</p>
+      <h1>NPC Extraction Review</h1>
+      <p>Review model-proposed NPC updates before applying them to the canon registry.</p>
+    </div>
+    <img class="archive-section-icon" src="/static/npc-registry-icon.png" alt="" aria-hidden="true">
+  </div>
+</section>
+
+{% if request.query_params.get("apply_failed") %}
+  <div class="flash error-flash">NPC extraction review was not applied. Check the extraction file and related canon records.</div>
+{% endif %}
+
+<form class="session-picker" method="get" action="/npcs/extractions">
+  <label class="field-block">
+    <span>Session Number</span>
+    <input name="session" type="number" min="0" value="{{ session_number }}" list="available-npc-extractions">
+    {% if available_sessions %}
+      <datalist id="available-npc-extractions">
+        {% for available_session in available_sessions %}
+          <option value="{{ available_session }}">Session {{ "%02d"|format(available_session) }}</option>
+        {% endfor %}
+      </datalist>
+    {% endif %}
+  </label>
+  <button type="submit">Load Extraction</button>
+  <a class="icon-link secondary-link" href="/npcs">Back to NPC Registry</a>
+</form>
+
+{% if command_result %}
+  <section class="command-result utility-result">
+    <div class="command-result-head">
+      <h2>{{ command_result.action }}</h2>
+      <span class="badge {% if command_result.ok %}applied-applied{% else %}decision-rejected{% endif %}">
+        {% if command_result.ok %}pass{% else %}fail{% endif %}
+      </span>
+    </div>
+    {% if command_result.stdout %}<pre>{{ command_result.stdout }}</pre>{% endif %}
+    {% if command_result.stderr %}<pre>{{ command_result.stderr }}</pre>{% endif %}
+  </section>
+{% endif %}
+
+{% if not extraction %}
+  <div class="flash muted-flash">No NPC extraction JSON found for session {{ "%02d"|format(session_number) }}. Run <code>scripts/rag.py extract-npcs session{{ "%02d"|format(session_number) }}</code> first.</div>
+{% else %}
+<section class="command-log">
+  <div class="command-log-head">
+    <div>
+      <h2>Session {{ "%02d"|format(session_number) }} NPC Extraction</h2>
+      <p class="muted">Source: {{ extraction.path }}</p>
+    </div>
+  </div>
+</section>
+
+<form method="post" action="/npcs/extractions/apply" class="entity-review-form">
+  <input type="hidden" name="session_number" value="{{ session_number }}">
+
+  <section class="entity-review-section">
+    <h2>Known NPC Mentions</h2>
+    {% if not extraction.known_npc_mentions %}
+      <p class="muted">No known NPC mentions proposed.</p>
+    {% endif %}
+    <div class="entity-review-list">
+      {% for item in extraction.known_npc_mentions %}
+      <article class="entity-review-card">
+        <div class="entity-review-head">
+          <div>
+            <h3>{{ item.canonical_name }}</h3>
+            <p class="muted">Mentioned as: {{ item.mentioned_as | join(", ") }}</p>
+          </div>
+          <label class="field-block decision-field">
+            <span>Decision</span>
+            <select name="known_decision_{{ loop.index0 }}">
+              <option value="ignore">Ignore</option>
+              <option value="append_note">Append note/update location</option>
+            </select>
+          </label>
+        </div>
+        <dl class="entity-review-details">
+          <dt>New Information</dt>
+          <dd>{{ item.new_information or "—" }}</dd>
+          <dt>Location</dt>
+          <dd>{{ item.location or "—" }}</dd>
+          <dt>Confidence</dt>
+          <dd>{{ item.confidence or "—" }}</dd>
+          <dt>Evidence</dt>
+          <dd>{{ item.evidence or "—" }}</dd>
+        </dl>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="entity-review-section">
+    <h2>New NPC Candidates</h2>
+    {% if not extraction.new_npc_candidates %}
+      <p class="muted">No new NPC candidates proposed.</p>
+    {% endif %}
+    <div class="entity-review-list">
+      {% for item in extraction.new_npc_candidates %}
+      <article class="entity-review-card">
+        <div class="entity-review-head">
+          <div>
+            <h3>{{ item.proposed_name }}</h3>
+            <p class="muted">{{ item.npc_kind or "candidate" }}{% if item.role %} · {{ item.role }}{% endif %}</p>
+          </div>
+          <label class="field-block decision-field">
+            <span>Decision</span>
+            <select name="new_decision_{{ loop.index0 }}">
+              <option value="reject">Reject</option>
+              <option value="create">Create NPC</option>
+            </select>
+          </label>
+        </div>
+        <dl class="entity-review-details">
+          <dt>Description</dt>
+          <dd>{{ item.description or "—" }}</dd>
+          <dt>First Seen</dt>
+          <dd>Session {{ item.first_seen_session or session_number }} · {{ item.first_seen_location or "unknown location" }}</dd>
+          <dt>Status</dt>
+          <dd>{{ item.status or "unknown" }}</dd>
+          <dt>Confidence</dt>
+          <dd>{{ item.confidence or "—" }}</dd>
+          <dt>Evidence</dt>
+          <dd>{{ item.evidence or "—" }}</dd>
+        </dl>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="entity-review-section two-column-review">
+    <div>
+      <h2>Rejected By Extractor</h2>
+      {% if not extraction.rejected_candidates %}<p class="muted">None.</p>{% endif %}
+      {% for item in extraction.rejected_candidates %}
+        <div class="mini-review-note"><strong>{{ item.text }}</strong><br>{{ item.reason }}</div>
+      {% endfor %}
+    </div>
+    <div>
+      <h2>Uncertainties</h2>
+      {% if not extraction.uncertainties %}<p class="muted">None.</p>{% endif %}
+      {% for item in extraction.uncertainties %}
+        <div class="mini-review-note"><strong>{{ item.candidate }}</strong><br>{{ item.issue }}</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="panel-actions split-actions sticky-review-actions">
+    <a class="icon-link secondary-link" href="/npcs">Cancel</a>
+    <button type="submit">Apply Reviewed NPC Changes</button>
+  </div>
+</form>
+{% endif %}
+{% endblock %}

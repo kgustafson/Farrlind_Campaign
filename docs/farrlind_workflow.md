@@ -10,6 +10,8 @@ AI drafts the memory. The user canonizes it.
 
 Generated transcripts, extracted events, draft summaries, and validation notes are source material. Canon changes only after human review and explicit apply/publish actions.
 
+The primary AI artifact should be a **Draft Canon Packet**, not just a prose summary. The packet should gather the likely canon from a session into reviewable sections: narrative summary, major events, NPCs/entities, locations, artifacts/items, lore items, combat encounters, open threads, timeline notes, and inventory/resource notes.
+
 ## End-To-End Flow
 
 ```text
@@ -21,21 +23,16 @@ source material
        -> write raw transcript
   -> plain worker skeleton, for future structured audio orchestration
   -> transcript or diary source
-  -> extract
-  -> filter
-  -> classify
-  -> normalize
-  -> merge
-  -> validate
-  -> summarize
-  -> initialize review
-  -> human decisions
+  -> draft canon packet with gemma4:e2b
+  -> human canon packet review
+  -> accepted canon summary
+  -> accepted structured canon items
   -> apply review
   -> write final summary
   -> database/canon health
 ```
 
-Audio ingestion now has a production parallel transcription command. The broader workflow still treats generated transcripts as source material that must be reviewed downstream.
+Audio ingestion now has a production parallel transcription command. The broader workflow still treats generated transcripts and Gemma-generated draft canon packets as source material that must be reviewed downstream.
 
 ## Plain Worker Skeleton
 
@@ -173,7 +170,8 @@ The web page at `/wells` edits that file directly. Use it for consolidated Well 
 | worker skeleton | `PYTHONPATH=src ./rag-env/bin/python -m farrlind_pipeline.pipeline.simple_runner ...` | source audio | chunk manifest, placeholder chunk transcripts, stitched transcript, validation report | draft only | experimental, safe to rerun |
 | status | `scripts/rag.py status sessionXX` | expected artifact paths | artifact presence report | none | safe anytime |
 | transcribe | `scripts/rag.py transcribe sessionXX` | audio | `raw/sessionXX_transcript.txt` | source material | rerun before review |
-| extract | `scripts/rag.py extract sessionXX` | transcript | `clean/sessionXX_events.md` | draft only | rerun with care |
+| draft canon packet | `scripts/rag.py curate sessionXX` | raw transcript, session context, previous final summary | `clean/sessionXX_curated.md`, curation metadata, chunk extracts | draft only | rerun before review |
+| extract | `scripts/rag.py extract sessionXX` | curated packet when present, otherwise transcript | `clean/sessionXX_events.md` | draft only | rerun with care |
 | filter | `scripts/rag.py filter sessionXX` | extracted events | `clean/sessionXX_filtered.md` | draft only | rerun with care |
 | classify | `scripts/rag.py classify sessionXX` | filtered events | `clean/sessionXX_classified.md` | draft only | rerun with care |
 | normalize | `scripts/rag.py normalize sessionXX` | filtered/classified events plus context | `clean/sessionXX_normalized.md` | draft only | rerun with care |
@@ -222,6 +220,7 @@ Existing RAG and canon artifacts:
 ```text
 audio/sessionXX.wav
   -> knowledge/Faban/raw/sessionXX_transcript.txt
+  -> knowledge/Faban/clean/sessionXX_curated.md
   -> knowledge/Faban/clean/sessionXX_events.md
   -> knowledge/Faban/clean/sessionXX_filtered.md
   -> knowledge/Faban/clean/sessionXX_classified.md
@@ -242,6 +241,41 @@ knowledge/Faban/notes/sessionXX_corrections.md
 ```
 
 ## Human Review Decisions
+
+Human review is currently **not done** as a workflow feature.
+
+The original event-fragment review model works for small batches, but Session 21 showed that it is not a humane or efficient primary review surface for long recorded sessions. The next review design should be draft-canon-packet-first:
+
+```text
+raw transcript
+  -> Gemma draft canon packet
+  -> human edits packet into canon summary
+  -> human confirms structured canon items
+  -> apply reviewed canon to database
+```
+
+The draft canon packet should present a coherent session narrative first, then expose structured sections for key locations, NPCs/entities, artifacts/items, lore items, combat encounters, open threads, inventory/resource notes, and timeline changes. Extracted event fragments remain useful as evidence and secondary detail, but they should not be the main object the user must review one-by-one.
+
+Until this draft-canon-packet review flow is built, the `initialize_review`, `edit_review_decisions`, and `mark_reviewed` workflow steps represent the intended human gate, not a finished user experience.
+
+## Lore Items
+
+Lore items should become a first-class Archivum registry, similar to NPCs, Locations, and Artifacts. The Wells of Magic page remains useful as curated essay-style lore, but individual lore tidbits should also be stored as queryable canon records.
+
+Useful lore item fields:
+
+- `title`
+- `lore_type`
+- `summary`
+- `source_session`
+- `source_context`
+- `confidence`
+- `canon_status`
+- `related_location`
+- `related_npc`
+- `related_artifact`
+- `related_thread`
+- `notes`
 
 Review files live in:
 

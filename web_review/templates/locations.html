@@ -11,7 +11,12 @@
     </div>
     <img class="archive-section-icon" src="/static/locations-icon.png" alt="" aria-hidden="true">
   </div>
-  {% if can_edit() %}<a class="icon-link add-new-link" href="/locations?modal=add">Add New</a>{% endif %}
+  {% if can_edit() %}
+  <div class="section-actions">
+    <a class="icon-link secondary-link" href="/locations/extractions">Review Extraction</a>
+    <a class="icon-link add-new-link" href="/locations?modal=add">Add New</a>
+  </div>
+  {% endif %}
 </section>
 
 {% if request.query_params.get("created") %}
@@ -60,11 +65,11 @@
         </td>
         <td data-label="First">{% if location.first_visited_session is not none %}{{ location.first_visited_session }}{% else %}<span class="muted">—</span>{% endif %}</td>
         <td data-label="Description">{{ location.description or "—" }}</td>
-        {% if can_edit() %}<td data-label="Actions">
-          <div class="row-actions">
-            <a class="icon-link" href="/locations/{{ location.id }}/edit">Edit</a>
+        {% if can_edit() %}<td class="compact-action-cell" data-label="Actions">
+          <div class="row-actions compact-row-actions">
+            <a class="icon-link icon-only-action" href="/locations/{{ location.id }}/edit" aria-label="Edit {{ location.name }}" title="Edit {{ location.name }}">✎</a>
             <form method="post" action="/locations/{{ location.id }}/delete">
-              <button class="danger-button" type="submit">Delete</button>
+              <button class="danger-button icon-only-action" type="submit" aria-label="Delete {{ location.name }}" title="Delete {{ location.name }}">×</button>
             </form>
           </div>
         </td>{% endif %}

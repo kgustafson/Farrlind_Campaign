@@ -14,6 +14,13 @@ from raglib.normalize import normalize_session
 from raglib.merge import merge_session
 from raglib.validate import validate_session
 from raglib.summarize import summarize_session
+from raglib.curate import curate_session
+from raglib.npc_extractor import extract_npcs
+from raglib.location_extractor import extract_locations
+from raglib.artifact_extractor import extract_artifacts
+from raglib.lore_item_extractor import extract_lore_items
+from raglib.combat_encounter_extractor import extract_combat_encounters
+from raglib.open_thread_extractor import extract_open_threads
 from scripts.load_summaries import apply_sql, write_sql
 from scripts.load_songbook import apply_sql as apply_songbook_sql
 from scripts.load_songbook import write_songbook_sql
@@ -23,6 +30,7 @@ from raglib.workflow_state import write_historical_workflow_seed_sql, write_work
 
 
 STAGES = {
+    "curate": curate_session,
     "extract": extract_session,
     "filter": filter_session,
     "classify": classify_session,
@@ -30,6 +38,12 @@ STAGES = {
     "merge": merge_session,
     "validate": validate_session,
     "summarize": summarize_session,
+    "extract-npcs": extract_npcs,
+    "extract-locations": extract_locations,
+    "extract-artifacts": extract_artifacts,
+    "extract-lore-items": extract_lore_items,
+    "extract-combat-encounters": extract_combat_encounters,
+    "extract-open-threads": extract_open_threads,
 }
 
 POSTEXTRACT_STAGES = [
@@ -45,6 +59,7 @@ STATUS_FILES = [
     ("audio", REPO_ROOT / "audio", "{session}.wav"),
     ("diary", CLEAN, "{session}_diary.md"),
     ("transcript", RAW, "{session}_transcript.txt"),
+    ("curated", CLEAN, "{session}_curated.md"),
     ("context", SESSIONS, "{session}_context.yaml"),
     ("events", CLEAN, "{session}_events.md"),
     ("filtered", CLEAN, "{session}_filtered.md"),
@@ -100,7 +115,13 @@ def parse_args():
     parser.add_argument("--backup-output", type=Path, default=None, help="Optional db-backup output path.")
     parser.add_argument("--audio-file", type=Path, default=None, help="Transcribe command input. Defaults to audio/<session>.wav.")
     parser.add_argument("--output", type=Path, default=None, help="Transcribe command output. Defaults to raw/<session>_transcript.txt.")
-    parser.add_argument("--model", default=None, help="Transcribe command Whisper model. Defaults to large-v3.")
+    parser.add_argument("--model", default=None, help="Model override for commands that support one.")
+    parser.add_argument(
+        "--source",
+        choices=["auto", "final_summary", "curated_packet", "draft_summary", "diary", "transcript"],
+        default="auto",
+        help="Source material for entity extraction commands. Defaults to auto.",
+    )
     parser.add_argument("--chunk-seconds", type=int, default=None, help="Transcribe command chunk size. Defaults to 180.")
     parser.add_argument("--max-workers", type=int, default=None, help="Transcribe command worker count. Defaults to 2.")
     parser.add_argument("--work-dir", type=Path, default=None, help="Optional transcribe command artifact directory.")
@@ -171,7 +192,20 @@ def main():
     elif args.command == "postextract":
         run_stages(args.session_name, POSTEXTRACT_STAGES)
     else:
-        run_stages(args.session_name, [args.command])
+        if args.command == "extract-npcs":
+            extract_npcs(args.session_name, model=args.model, source=args.source)
+        elif args.command == "extract-locations":
+            extract_locations(args.session_name, model=args.model, source=args.source)
+        elif args.command == "extract-artifacts":
+            extract_artifacts(args.session_name, model=args.model, source=args.source)
+        elif args.command == "extract-lore-items":
+            extract_lore_items(args.session_name, model=args.model, source=args.source)
+        elif args.command == "extract-combat-encounters":
+            extract_combat_encounters(args.session_name, model=args.model, source=args.source)
+        elif args.command == "extract-open-threads":
+            extract_open_threads(args.session_name, model=args.model, source=args.source)
+        else:
+            run_stages(args.session_name, [args.command])
 
 
 if __name__ == "__main__":

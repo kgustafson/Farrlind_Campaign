@@ -11,7 +11,12 @@
     </div>
     <img class="archive-section-icon" src="/static/npc-registry-icon.png" alt="" aria-hidden="true">
   </div>
-  {% if can_edit() %}<a class="icon-link add-new-link" href="/npcs?modal=add">Add New</a>{% endif %}
+  {% if can_edit() %}
+  <div class="section-actions">
+    <a class="icon-link secondary-link" href="/npcs/extractions">Review Extraction</a>
+    <a class="icon-link add-new-link" href="/npcs?modal=add">Add New</a>
+  </div>
+  {% endif %}
 </section>
 
 {% if request.query_params.get("created") %}
@@ -66,11 +71,11 @@
         <td data-label="Last Known">{{ npc.last_known_location or "—" }}</td>
         <td data-label="First Seen">{% if npc.first_seen_session is not none %}Session {{ npc.first_seen_session }}{% else %}<span class="muted">—</span>{% endif %}</td>
         <td data-label="Description">{{ npc.description or "—" }}</td>
-        {% if can_edit() %}<td data-label="Actions">
-          <div class="row-actions">
-            <a class="icon-link" href="/npcs/{{ npc.id }}/edit">Edit</a>
+        {% if can_edit() %}<td class="compact-action-cell" data-label="Actions">
+          <div class="row-actions compact-row-actions">
+            <a class="icon-link icon-only-action" href="/npcs/{{ npc.id }}/edit" aria-label="Edit {{ npc.name }}" title="Edit {{ npc.name }}">✎</a>
             <form method="post" action="/npcs/{{ npc.id }}/delete">
-              <button class="danger-button" type="submit">Delete</button>
+              <button class="danger-button icon-only-action" type="submit" aria-label="Delete {{ npc.name }}" title="Delete {{ npc.name }}">×</button>
             </form>
           </div>
         </td>{% endif %}

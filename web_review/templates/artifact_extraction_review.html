@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}Artifact Extraction Review | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div class="archive-section-title">
+    <div>
+      <p class="eyebrow">Human Review Gate</p>
+      <h1>Artifact Extraction Review</h1>
+      <p>Review model-proposed artifact updates before applying them to the relic ledger.</p>
+    </div>
+    <img class="archive-section-icon" src="/static/artifacts-icon.png" alt="" aria-hidden="true">
+  </div>
+</section>
+
+{% if request.query_params.get("apply_failed") %}
+  <div class="flash error-flash">Artifact extraction review was not applied. Check the extraction file and related canon records.</div>
+{% endif %}
+
+<form class="session-picker" method="get" action="/artifacts/extractions">
+  <label class="field-block">
+    <span>Session Number</span>
+    <input name="session" type="number" min="0" value="{{ session_number }}" list="available-artifact-extractions">
+    {% if available_sessions %}
+      <datalist id="available-artifact-extractions">
+        {% for available_session in available_sessions %}
+          <option value="{{ available_session }}">Session {{ "%02d"|format(available_session) }}</option>
+        {% endfor %}
+      </datalist>
+    {% endif %}
+  </label>
+  <button type="submit">Load Extraction</button>
+  <a class="icon-link secondary-link" href="/artifacts">Back to Artifacts</a>
+</form>
+
+{% if command_result %}
+  <section class="command-result utility-result">
+    <div class="command-result-head">
+      <h2>{{ command_result.action }}</h2>
+      <span class="badge {% if command_result.ok %}applied-applied{% else %}decision-rejected{% endif %}">
+        {% if command_result.ok %}pass{% else %}fail{% endif %}
+      </span>
+    </div>
+    {% if command_result.stdout %}<pre>{{ command_result.stdout }}</pre>{% endif %}
+    {% if command_result.stderr %}<pre>{{ command_result.stderr }}</pre>{% endif %}
+  </section>
+{% endif %}
+
+{% if not extraction %}
+  <div class="flash muted-flash">No artifact extraction JSON found for session {{ "%02d"|format(session_number) }}. Run <code>scripts/rag.py extract-artifacts session{{ "%02d"|format(session_number) }}</code> first.</div>
+{% else %}
+<section class="command-log">
+  <div class="command-log-head">
+    <div>
+      <h2>Session {{ "%02d"|format(session_number) }} Artifact Extraction</h2>
+      <p class="muted">Source: {{ extraction.path }}</p>
+    </div>
+  </div>
+</section>
+
+<form method="post" action="/artifacts/extractions/apply" class="entity-review-form">
+  <input type="hidden" name="session_number" value="{{ session_number }}">
+
+  <section class="entity-review-section">
+    <h2>Known Artifact Mentions</h2>
+    {% if not extraction.known_artifact_mentions %}
+      <p class="muted">No known artifact mentions proposed.</p>
+    {% endif %}
+    <div class="entity-review-list">
+      {% for item in extraction.known_artifact_mentions %}
+      <article class="entity-review-card">
+        <div class="entity-review-head">
+          <div>
+            <h3>{{ item.canonical_name }}</h3>
+            <p class="muted">Mentioned as: {{ item.mentioned_as | join(", ") }}</p>
+          </div>
+          <label class="field-block decision-field">
+            <span>Decision</span>
+            <select name="known_decision_{{ loop.index0 }}">
+              <option value="ignore">Ignore</option>
+              <option value="append_note">Append note/update metadata</option>
+            </select>
+          </label>
+        </div>
+        <dl class="entity-review-details">
+          <dt>New Information</dt>
+          <dd>{{ item.new_information or "—" }}</dd>
+          <dt>Type</dt>
+          <dd>{{ item.artifact_type or "—" }}</dd>
+          <dt>Holder</dt>
+          <dd>{{ item.current_holder or "—" }}</dd>
+          <dt>Properties</dt>
+          <dd>{% if item.properties %}{{ item.properties | join(", ") }}{% else %}—{% endif %}</dd>
+          <dt>Flags</dt>
+          <dd>{% if item.is_sentient %}sentient{% endif %}{% if item.is_sentient and (item.is_cursed or item.is_infernal) %}, {% endif %}{% if item.is_cursed %}cursed{% endif %}{% if item.is_cursed and item.is_infernal %}, {% endif %}{% if item.is_infernal %}infernal{% endif %}{% if not item.is_sentient and not item.is_cursed and not item.is_infernal %}—{% endif %}</dd>
+          <dt>Confidence</dt>
+          <dd>{{ item.confidence or "—" }}</dd>
+          <dt>Evidence</dt>
+          <dd>{{ item.evidence or "—" }}</dd>
+        </dl>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="entity-review-section">
+    <h2>New Artifact Candidates</h2>
+    {% if not extraction.new_artifact_candidates %}
+      <p class="muted">No new artifact candidates proposed.</p>
+    {% endif %}
+    <div class="entity-review-list">
+      {% for item in extraction.new_artifact_candidates %}
+      <article class="entity-review-card">
+        <div class="entity-review-head">
+          <div>
+            <h3>{{ item.proposed_name }}</h3>
+            <p class="muted">{{ item.artifact_type or "artifact" }}{% if item.current_holder %} · {{ item.current_holder }}{% endif %}</p>
+          </div>
+          <label class="field-block decision-field">
+            <span>Decision</span>
+            <select name="new_decision_{{ loop.index0 }}">
+              <option value="reject">Reject</option>
+              <option value="create">Create Artifact</option>
+            </select>
+          </label>
+        </div>
+        <dl class="entity-review-details">
+          <dt>Description</dt>
+          <dd>{{ item.description or "—" }}</dd>
+          <dt>Lore</dt>
+          <dd>{{ item.lore_significance or "—" }}</dd>
+          <dt>Discovered</dt>
+          <dd>Session {{ item.discovered_session or session_number }}</dd>
+          <dt>Properties</dt>
+          <dd>{% if item.properties %}{{ item.properties | join(", ") }}{% else %}—{% endif %}</dd>
+          <dt>Flags</dt>
+          <dd>{% if item.is_sentient %}sentient{% endif %}{% if item.is_sentient and (item.is_cursed or item.is_infernal) %}, {% endif %}{% if item.is_cursed %}cursed{% endif %}{% if item.is_cursed and item.is_infernal %}, {% endif %}{% if item.is_infernal %}infernal{% endif %}{% if not item.is_sentient and not item.is_cursed and not item.is_infernal %}—{% endif %}</dd>
+          <dt>Confidence</dt>
+          <dd>{{ item.confidence or "—" }}</dd>
+          <dt>Evidence</dt>
+          <dd>{{ item.evidence or "—" }}</dd>
+        </dl>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="entity-review-section two-column-review">
+    <div>
+      <h2>Rejected By Extractor</h2>
+      {% if not extraction.rejected_candidates %}<p class="muted">None.</p>{% endif %}
+      {% for item in extraction.rejected_candidates %}
+        <div class="mini-review-note"><strong>{{ item.text }}</strong><br>{{ item.reason }}</div>
+      {% endfor %}
+    </div>
+    <div>
+      <h2>Uncertainties</h2>
+      {% if not extraction.uncertainties %}<p class="muted">None.</p>{% endif %}
+      {% for item in extraction.uncertainties %}
+        <div class="mini-review-note"><strong>{{ item.candidate }}</strong><br>{{ item.issue }}</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="panel-actions split-actions sticky-review-actions">
+    <a class="icon-link secondary-link" href="/artifacts">Cancel</a>
+    <button type="submit">Apply Reviewed Artifact Changes</button>
+  </div>
+</form>
+{% endif %}
+{% endblock %}

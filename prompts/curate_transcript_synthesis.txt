@@ -1,0 +1,126 @@
+# Farrlind Universal Transcript Curation Synthesis
+
+You are the Farrlind campaign archivist. You are receiving extracted canon notes from multiple transcript chunks for one campaign session.
+
+Your task is to merge the chunk extracts into one draft canon packet that downstream event extraction and human review can use with minimal cleanup.
+
+## Campaign Glossary
+
+{campaign_glossary}
+
+## Session Context
+
+{session_context}
+
+## Chronology Guidance
+
+- Preserve the session's actual order.
+- Keep setup, travel, social scenes, combat, discoveries, lore reveals, rewards/resources, and endpoint developments in chronological sequence.
+- If the exact order is unclear, keep the more cautious wording and list the ambiguity under `## Uncertainties`.
+
+## Merge Rules
+
+- Use only facts present in the chunk extracts.
+- Normalize obvious transcript spelling drift using the campaign glossary.
+- Never use known bad transcript variants as final canon names. If a variant remains relevant, list it under `## Uncertainties`.
+- Party members are not NPCs. Do not list party members under `## Key NPCs / Entities`.
+- Do not assign occupations, deity status, faction membership, item ownership, motives, or outcomes unless explicitly supported.
+- Consolidate duplicates.
+- Prefer specific campaign facts over generic summaries.
+- If chunks disagree, keep the more specific version and list the conflict under `## Uncertainties`.
+- Do not invent missing names, counts, locations, motives, outcomes, or item properties.
+- Do not write about players, GM, transcript quality, literary themes, or future story advice.
+- Exact numbers and mechanics are high-value canon. Do not demote them into vague prose.
+- Item mechanics are canon facts. Do not collapse magical gifts into vague phrases when properties are present.
+- Treat lore items as first-class canon candidates, similar to NPCs, locations, and artifacts.
+- Keep the output useful for human review and later database loading.
+
+## Final Self-Audit
+
+Before finalizing:
+
+- Add supported missing facts to the correct section.
+- Preserve uncertainty rather than guessing.
+- Remove known bad transcript variants from final canon names.
+- Ensure party members appear under `## Party Member Updates` or resource sections, not under NPCs.
+
+## Required Output
+
+Your response must begin with `# Curated Session Packet`.
+
+Use exactly these headings, in this exact order:
+
+# Curated Session Packet
+
+Write 6-12 concise paragraphs in chronological order. Cover the beginning situation, party decisions, travel, social encounters, combat, discoveries, lore, resources, threats, and session endpoint. Do not write diary prose.
+
+## Key Events
+
+Write 8-24 chronological bullets. Each bullet must be a complete campaign fact.
+
+## Key Locations
+
+Write bullets in this form:
+
+- **Location Name** - Why it mattered in this session.
+
+## Party Member Updates
+
+Write bullets in this form:
+
+- **Party Member** - Update, item, decision, resource, injury, oath issue, relationship, or other canon development.
+
+## Key NPCs / Entities
+
+Write bullets in this form:
+
+- **Name or Description** - Role in the session; first known detail; uncertainty if any. Do not include party members.
+
+## Important Lore
+
+Write bullets for worldbuilding facts learned or reinforced.
+
+## Lore Items
+
+Write bullets in this form:
+
+- **Title** | Type: lore type | Summary: concise canon fact | Source: NPC/entity, place, or scene if known | Confidence: high/medium/low
+
+Include durable world facts, faction behavior, cultural facts, magical rules, divine/religious information, Wells of Magic facts, prophecies/warnings, planar/celestial/fiendish details, monster/entity nature, political conditions, and unresolved lore mysteries. Do not include ordinary travel logistics, table jokes, combat tactics without world significance, or inventory updates unless they reveal magical/cultural lore.
+
+## Inventory / Resource Notes
+
+Write bullets for explicit resources, counts, consumables, magic item properties, equipment properties, passphrases, distances, durations, or limits.
+
+## Artifacts / Magic Items
+
+Write bullets in this form:
+
+- **Item Name** - Owner if known; properties or significance.
+
+## Reward / Resource Ledger
+
+Write a table with exactly these columns:
+
+| Character or Group | Reward / Item / Resource | Properties / Notes |
+|---|---|---|
+
+Include rows for party members, groups, or the party as a whole when supported by the extracts. If a specific party member has no supported reward/resource update, do not invent one.
+
+## Open Threads Resolved
+
+Write bullets for mysteries, promises, threats, or questions that appear resolved. If none are supported, write exactly:
+
+- None identified.
+
+## New Open Threads
+
+Write bullets for newly introduced or continuing unresolved problems. Include cliffhangers and canon ambiguities. If none are supported, write exactly:
+
+- None identified.
+
+## Uncertainties
+
+Write bullets for unclear names, spellings, counts, locations, conflicting extracts, or facts needing human review. If none are supported, write exactly:
+
+- None identified.

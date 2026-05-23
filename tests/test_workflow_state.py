@@ -66,7 +66,7 @@ class WorkflowStateTest(unittest.TestCase):
         self.assertIn("ON CONFLICT (session_id, workflow_id, workflow_version)", self.sql)
         self.assertIn("'farrlind_session_canon'", self.sql)
         self.assertIn("'source_audio_registered', 1", self.sql)
-        self.assertIn("'git_push', 26", self.sql)
+        self.assertIn("'git_push', 27", self.sql)
 
     def test_initialize_sql_uses_rendered_session_inputs_outputs_and_commands(self):
         self.assertIn("audio/session21.wav", self.sql)

@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from scripts.db_backup import backup_database
-from web_review.services import canon, commands, lore, reviews, workflow
+from web_review.services import artifact_extraction_review, canon, combat_extraction_review, commands, location_extraction_review, lore, lore_item_extraction_review, npc_extraction_review, open_thread_extraction_review, reviews, workflow
 
 
 app = FastAPI(title="Farrlind Review Workbench")
@@ -178,6 +178,18 @@ def artifact_form_values(form) -> dict:
     }
 
 
+def lore_item_form_values(form) -> dict:
+    return {
+        "title": (form.get("title") or "").strip(),
+        "category": (form.get("category") or "").strip(),
+        "description": (form.get("description") or "").strip(),
+        "source_npc_id": optional_int(form.get("source_npc_id")),
+        "discovered_session": optional_int(form.get("discovered_session")),
+        "is_confirmed": checkbox_value(form.get("is_confirmed")),
+        "notes": (form.get("notes") or "").strip(),
+    }
+
+
 def open_thread_form_values(form) -> dict:
     status = (form.get("status") or "open").strip()
     thread_type = (form.get("thread_type") or "lore_mystery").strip()
@@ -211,6 +223,39 @@ def session_initiation_form_values(form) -> dict:
         "audio_file_path": (form.get("audio_file_path") or "").strip(),
         "notes": (form.get("notes") or "").strip(),
     }
+
+
+def combat_encounter_form_values(form) -> tuple[dict, list[dict]]:
+    values = {
+        "session_number": optional_int(form.get("session_number")),
+        "title": (form.get("title") or "").strip(),
+        "subtype": (form.get("subtype") or "").strip(),
+        "location_id": optional_int(form.get("location_id")),
+        "participants": (form.get("participants") or "").strip(),
+        "outcome": (form.get("outcome") or "unknown").strip(),
+        "confidence": (form.get("confidence") or "medium").strip(),
+        "notes": (form.get("notes") or "").strip(),
+    }
+    enemies = []
+    for index in range(1, 17):
+        if form.get(f"enemy_remove_{index}"):
+            continue
+        name = (form.get(f"enemy_name_{index}") or "").strip()
+        if not name:
+            continue
+        enemies.append({
+            "name": name,
+            "enemy_type": (form.get(f"enemy_type_{index}") or "").strip(),
+            "quantity": optional_int(form.get(f"enemy_quantity_{index}")),
+            "outcome": (form.get(f"enemy_outcome_{index}") or "unknown").strip(),
+            "confidence": (form.get(f"enemy_confidence_{index}") or "medium").strip(),
+            "notes": (form.get(f"enemy_notes_{index}") or "").strip(),
+        })
+    return values, enemies
+
+
+def form_dict(form) -> dict[str, str]:
+    return {key: str(value) for key, value in form.items()}
 
 
 def lookup_context(lookup_key: str, editing_id: Optional[int] = None, show_modal: bool = False) -> dict:
@@ -733,6 +778,57 @@ def locations_index(request: Request, modal: str = ""):
     )
 
 
+@app.get("/locations/extractions", response_class=HTMLResponse)
+def location_extraction_review_page(request: Request, session: Optional[int] = None):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Location extraction review is not available in archive mode.")
+    sessions = location_extraction_review.available_sessions()
+    session_number = session if session is not None else (sessions[-1] if sessions else 21)
+    try:
+        extraction = location_extraction_review.load_extraction(session_number)
+    except FileNotFoundError:
+        extraction = None
+    return templates.TemplateResponse(
+        request,
+        "location_extraction_review.html",
+        {
+            "session_number": session_number,
+            "available_sessions": sessions,
+            "extraction": extraction,
+            "reviewed_path": location_extraction_review.reviewed_output_path(session_number),
+            "command_result": COMMAND_RESULTS.get(request.query_params.get("command_result", "")),
+        },
+    )
+
+
+@app.post("/locations/extractions/apply")
+async def apply_location_extraction_review(request: Request):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Location extraction review is not available in archive mode.")
+    form = await request.form()
+    session_number = optional_int(form.get("session_number")) or 0
+    try:
+        result = location_extraction_review.apply_review(session_number, form_dict(form))
+    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, location_extraction_review.LocationExtractionReviewError):
+        return RedirectResponse(url=f"/locations/extractions?session={session_number}&apply_failed=1", status_code=303)
+    token = store_command_result(
+        "Apply Location Extraction Review",
+        commands.CommandResult(
+            0,
+            "\n".join([
+                "Location extraction review applied.",
+                f"Applied: {len(result['applied'])}",
+                f"Skipped: {len(result['skipped'])}",
+                f"Review decisions: {result['reviewed_path']}",
+                "",
+                *result["applied"],
+            ]),
+            "",
+        ),
+    )
+    return RedirectResponse(url=f"/locations/extractions?session={session_number}&command_result={token}", status_code=303)
+
+
 @app.post("/locations")
 async def create_location(request: Request):
     form = await request.form()
@@ -814,6 +910,57 @@ def npcs_index(request: Request, modal: str = ""):
             "show_npc_modal": can_edit() and modal == "add",
         },
     )
+
+
+@app.get("/npcs/extractions", response_class=HTMLResponse)
+def npc_extraction_review_page(request: Request, session: Optional[int] = None):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="NPC extraction review is not available in archive mode.")
+    sessions = npc_extraction_review.available_sessions()
+    session_number = session if session is not None else (sessions[-1] if sessions else 21)
+    try:
+        extraction = npc_extraction_review.load_extraction(session_number)
+    except FileNotFoundError:
+        extraction = None
+    return templates.TemplateResponse(
+        request,
+        "npc_extraction_review.html",
+        {
+            "session_number": session_number,
+            "available_sessions": sessions,
+            "extraction": extraction,
+            "reviewed_path": npc_extraction_review.reviewed_output_path(session_number),
+            "command_result": COMMAND_RESULTS.get(request.query_params.get("command_result", "")),
+        },
+    )
+
+
+@app.post("/npcs/extractions/apply")
+async def apply_npc_extraction_review(request: Request):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="NPC extraction review is not available in archive mode.")
+    form = await request.form()
+    session_number = optional_int(form.get("session_number")) or 0
+    try:
+        result = npc_extraction_review.apply_review(session_number, form_dict(form))
+    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, npc_extraction_review.NpcExtractionReviewError):
+        return RedirectResponse(url=f"/npcs/extractions?session={session_number}&apply_failed=1", status_code=303)
+    token = store_command_result(
+        "Apply NPC Extraction Review",
+        commands.CommandResult(
+            0,
+            "\n".join([
+                "NPC extraction review applied.",
+                f"Applied: {len(result['applied'])}",
+                f"Skipped: {len(result['skipped'])}",
+                f"Review decisions: {result['reviewed_path']}",
+                "",
+                *result["applied"],
+            ]),
+            "",
+        ),
+    )
+    return RedirectResponse(url=f"/npcs/extractions?session={session_number}&command_result={token}", status_code=303)
 
 
 @app.post("/npcs")
@@ -898,6 +1045,57 @@ def artifacts_index(request: Request, modal: str = ""):
     )
 
 
+@app.get("/artifacts/extractions", response_class=HTMLResponse)
+def artifact_extraction_review_page(request: Request, session: Optional[int] = None):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Artifact extraction review is not available in archive mode.")
+    sessions = artifact_extraction_review.available_sessions()
+    session_number = session if session is not None else (sessions[-1] if sessions else 21)
+    try:
+        extraction = artifact_extraction_review.load_extraction(session_number)
+    except FileNotFoundError:
+        extraction = None
+    return templates.TemplateResponse(
+        request,
+        "artifact_extraction_review.html",
+        {
+            "session_number": session_number,
+            "available_sessions": sessions,
+            "extraction": extraction,
+            "reviewed_path": artifact_extraction_review.reviewed_output_path(session_number),
+            "command_result": COMMAND_RESULTS.get(request.query_params.get("command_result", "")),
+        },
+    )
+
+
+@app.post("/artifacts/extractions/apply")
+async def apply_artifact_extraction_review(request: Request):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Artifact extraction review is not available in archive mode.")
+    form = await request.form()
+    session_number = optional_int(form.get("session_number")) or 0
+    try:
+        result = artifact_extraction_review.apply_review(session_number, form_dict(form))
+    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, artifact_extraction_review.ArtifactExtractionReviewError):
+        return RedirectResponse(url=f"/artifacts/extractions?session={session_number}&apply_failed=1", status_code=303)
+    token = store_command_result(
+        "Apply Artifact Extraction Review",
+        commands.CommandResult(
+            0,
+            "\n".join([
+                "Artifact extraction review applied.",
+                f"Applied: {len(result['applied'])}",
+                f"Skipped: {len(result['skipped'])}",
+                f"Review decisions: {result['reviewed_path']}",
+                "",
+                *result["applied"],
+            ]),
+            "",
+        ),
+    )
+    return RedirectResponse(url=f"/artifacts/extractions?session={session_number}&command_result={token}", status_code=303)
+
+
 @app.post("/artifacts")
 async def create_artifact(request: Request):
     form = await request.form()
@@ -957,6 +1155,139 @@ async def delete_artifact(artifact_id: int):
     return RedirectResponse(url="/artifacts?deleted=1", status_code=303)
 
 
+@app.get("/lore-items", response_class=HTMLResponse)
+def lore_items_index(request: Request, modal: str = ""):
+    try:
+        rows = canon.lore_item_rows()
+        categories = canon.lore_categories()
+        npcs = canon.npc_rows()
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    return templates.TemplateResponse(
+        request,
+        "lore_items.html",
+        {
+            "lore_items": rows,
+            "categories": categories,
+            "npcs": npcs,
+            "editing": None,
+            "show_lore_modal": can_edit() and modal == "add",
+        },
+    )
+
+
+@app.get("/lore-items/extractions", response_class=HTMLResponse)
+def lore_item_extraction_review_page(request: Request, session: Optional[int] = None):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Lore item extraction review is not available in archive mode.")
+    sessions = lore_item_extraction_review.available_sessions()
+    session_number = session if session is not None else (sessions[-1] if sessions else 21)
+    try:
+        extraction = lore_item_extraction_review.load_extraction(session_number)
+    except FileNotFoundError:
+        extraction = None
+    return templates.TemplateResponse(
+        request,
+        "lore_item_extraction_review.html",
+        {
+            "session_number": session_number,
+            "available_sessions": sessions,
+            "extraction": extraction,
+            "reviewed_path": lore_item_extraction_review.reviewed_output_path(session_number),
+            "command_result": COMMAND_RESULTS.get(request.query_params.get("command_result", "")),
+        },
+    )
+
+
+@app.post("/lore-items/extractions/apply")
+async def apply_lore_item_extraction_review(request: Request):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Lore item extraction review is not available in archive mode.")
+    form = await request.form()
+    session_number = optional_int(form.get("session_number")) or 0
+    try:
+        result = lore_item_extraction_review.apply_review(session_number, form_dict(form))
+    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, lore_item_extraction_review.LoreItemExtractionReviewError):
+        return RedirectResponse(url=f"/lore-items/extractions?session={session_number}&apply_failed=1", status_code=303)
+    token = store_command_result(
+        "Apply Lore Item Extraction Review",
+        commands.CommandResult(
+            0,
+            "\n".join([
+                "Lore item extraction review applied.",
+                f"Applied: {len(result['applied'])}",
+                f"Skipped: {len(result['skipped'])}",
+                f"Review decisions: {result['reviewed_path']}",
+                "",
+                *result["applied"],
+            ]),
+            "",
+        ),
+    )
+    return RedirectResponse(url=f"/lore-items/extractions?session={session_number}&command_result={token}", status_code=303)
+
+
+@app.post("/lore-items")
+async def create_lore_item(request: Request):
+    form = await request.form()
+    values = lore_item_form_values(form)
+    if not values["title"] or not values["description"]:
+        return RedirectResponse(url="/lore-items?create_failed=1", status_code=303)
+    try:
+        canon.create_lore_item(values)
+    except canon.CanonWriteError:
+        return RedirectResponse(url="/lore-items?create_failed=1", status_code=303)
+    return RedirectResponse(url="/lore-items?created=1", status_code=303)
+
+
+@app.get("/lore-items/{lore_item_id}/edit", response_class=HTMLResponse)
+def edit_lore_item(request: Request, lore_item_id: int):
+    if not can_edit():
+        return RedirectResponse(url="/lore-items", status_code=303)
+    try:
+        rows = canon.lore_item_rows()
+        categories = canon.lore_categories()
+        npcs = canon.npc_rows()
+        editing = canon.lore_item_detail(lore_item_id)
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    if not editing:
+        raise HTTPException(status_code=404, detail="Lore item not found.")
+    return templates.TemplateResponse(
+        request,
+        "lore_items.html",
+        {
+            "lore_items": rows,
+            "categories": categories,
+            "npcs": npcs,
+            "editing": editing,
+            "show_lore_modal": True,
+        },
+    )
+
+
+@app.post("/lore-items/{lore_item_id}")
+async def update_lore_item(request: Request, lore_item_id: int):
+    form = await request.form()
+    values = lore_item_form_values(form)
+    if not values["title"] or not values["description"]:
+        return RedirectResponse(url=f"/lore-items/{lore_item_id}/edit?update_failed=1", status_code=303)
+    try:
+        canon.update_lore_item(lore_item_id, values)
+    except canon.CanonWriteError:
+        return RedirectResponse(url=f"/lore-items/{lore_item_id}/edit?update_failed=1", status_code=303)
+    return RedirectResponse(url="/lore-items?updated=1", status_code=303)
+
+
+@app.post("/lore-items/{lore_item_id}/delete")
+async def delete_lore_item(lore_item_id: int):
+    try:
+        canon.delete_lore_item(lore_item_id)
+    except canon.CanonWriteError:
+        return RedirectResponse(url="/lore-items?delete_failed=1", status_code=303)
+    return RedirectResponse(url="/lore-items?deleted=1", status_code=303)
+
+
 @app.get("/open-threads", response_class=HTMLResponse)
 def open_threads_index(request: Request, modal: str = ""):
     try:
@@ -989,6 +1320,57 @@ async def create_open_thread(request: Request):
     except canon.CanonWriteError:
         return RedirectResponse(url="/open-threads?create_failed=1", status_code=303)
     return RedirectResponse(url="/open-threads?created=1", status_code=303)
+
+
+@app.get("/open-threads/extractions", response_class=HTMLResponse)
+def open_thread_extraction_review_page(request: Request, session: Optional[int] = None):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Open thread extraction review is not available in archive mode.")
+    sessions = open_thread_extraction_review.available_sessions()
+    session_number = session if session is not None else (sessions[-1] if sessions else 21)
+    try:
+        extraction = open_thread_extraction_review.load_extraction(session_number)
+    except FileNotFoundError:
+        extraction = None
+    return templates.TemplateResponse(
+        request,
+        "open_thread_extraction_review.html",
+        {
+            "session_number": session_number,
+            "available_sessions": sessions,
+            "extraction": extraction,
+            "reviewed_path": open_thread_extraction_review.reviewed_output_path(session_number),
+            "command_result": COMMAND_RESULTS.get(request.query_params.get("command_result", "")),
+        },
+    )
+
+
+@app.post("/open-threads/extractions/apply")
+async def apply_open_thread_extraction_review(request: Request):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Open thread extraction review is not available in archive mode.")
+    form = await request.form()
+    session_number = optional_int(form.get("session_number")) or 0
+    try:
+        result = open_thread_extraction_review.apply_review(session_number, form_dict(form))
+    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, open_thread_extraction_review.OpenThreadExtractionReviewError):
+        return RedirectResponse(url=f"/open-threads/extractions?session={session_number}&apply_failed=1", status_code=303)
+    token = store_command_result(
+        "Apply Open Thread Extraction Review",
+        commands.CommandResult(
+            0,
+            "\n".join([
+                "Open thread extraction review applied.",
+                f"Applied: {len(result['applied'])}",
+                f"Skipped: {len(result['skipped'])}",
+                f"Review decisions: {result['reviewed_path']}",
+                "",
+                *result["applied"],
+            ]),
+            "",
+        ),
+    )
+    return RedirectResponse(url=f"/open-threads/extractions?session={session_number}&command_result={token}", status_code=303)
 
 
 @app.get("/open-threads/{thread_id}/edit", response_class=HTMLResponse)
@@ -1040,9 +1422,12 @@ async def delete_open_thread(thread_id: int):
 
 
 @app.get("/combat-encounters", response_class=HTMLResponse)
-def combat_encounters_index(request: Request):
+def combat_encounters_index(request: Request, modal: str = ""):
     try:
         rows = canon.combat_encounter_rows()
+        sessions = canon.session_rows()
+        locations = canon.location_rows()
+        outcomes = canon.lookup_rows("combat-outcomes")
     except canon.CanonReadError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
     return templates.TemplateResponse(
@@ -1051,8 +1436,128 @@ def combat_encounters_index(request: Request):
         {
             "encounters": rows,
             "murder_hobo_count": canon.murder_hobo_count(rows),
+            "sessions": sessions,
+            "locations": locations,
+            "outcomes": outcomes,
+            "editing": None,
+            "show_combat_modal": can_edit() and modal == "add",
         },
     )
+
+
+@app.get("/combat-encounters/extractions", response_class=HTMLResponse)
+def combat_extraction_review_page(request: Request, session: Optional[int] = None):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Combat extraction review is not available in archive mode.")
+    sessions = combat_extraction_review.available_sessions()
+    session_number = session if session is not None else (sessions[-1] if sessions else 21)
+    try:
+        extraction = combat_extraction_review.load_extraction(session_number)
+    except FileNotFoundError:
+        extraction = None
+    return templates.TemplateResponse(
+        request,
+        "combat_extraction_review.html",
+        {
+            "session_number": session_number,
+            "available_sessions": sessions,
+            "extraction": extraction,
+            "reviewed_path": combat_extraction_review.reviewed_output_path(session_number),
+            "command_result": COMMAND_RESULTS.get(request.query_params.get("command_result", "")),
+        },
+    )
+
+
+@app.post("/combat-encounters/extractions/apply")
+async def apply_combat_extraction_review(request: Request):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Combat extraction review is not available in archive mode.")
+    form = await request.form()
+    session_number = optional_int(form.get("session_number")) or 0
+    try:
+        result = combat_extraction_review.apply_review(session_number, form_dict(form))
+    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, combat_extraction_review.CombatExtractionReviewError):
+        return RedirectResponse(url=f"/combat-encounters/extractions?session={session_number}&apply_failed=1", status_code=303)
+    token = store_command_result(
+        "Apply Combat Extraction Review",
+        commands.CommandResult(
+            0,
+            "\n".join([
+                "Combat extraction review applied.",
+                f"Applied: {len(result['applied'])}",
+                f"Skipped: {len(result['skipped'])}",
+                f"Review decisions: {result['reviewed_path']}",
+                "",
+                *result["applied"],
+            ]),
+            "",
+        ),
+    )
+    return RedirectResponse(url=f"/combat-encounters/extractions?session={session_number}&command_result={token}", status_code=303)
+
+
+@app.post("/combat-encounters")
+async def create_combat_encounter(request: Request):
+    form = await request.form()
+    values, enemies = combat_encounter_form_values(form)
+    if not values["session_number"] or not values["title"]:
+        return RedirectResponse(url="/combat-encounters?create_failed=1", status_code=303)
+    try:
+        canon.create_combat_encounter(values, enemies)
+    except canon.CanonWriteError:
+        return RedirectResponse(url="/combat-encounters?create_failed=1", status_code=303)
+    return RedirectResponse(url="/combat-encounters?created=1", status_code=303)
+
+
+@app.get("/combat-encounters/{encounter_id}/edit", response_class=HTMLResponse)
+def edit_combat_encounter(request: Request, encounter_id: int):
+    if not can_edit():
+        return RedirectResponse(url="/combat-encounters", status_code=303)
+    try:
+        rows = canon.combat_encounter_rows()
+        sessions = canon.session_rows()
+        locations = canon.location_rows()
+        outcomes = canon.lookup_rows("combat-outcomes")
+        editing = canon.combat_encounter_detail(encounter_id)
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    if not editing:
+        raise HTTPException(status_code=404, detail="Combat encounter not found.")
+    return templates.TemplateResponse(
+        request,
+        "combat_encounters.html",
+        {
+            "encounters": rows,
+            "murder_hobo_count": canon.murder_hobo_count(rows),
+            "sessions": sessions,
+            "locations": locations,
+            "outcomes": outcomes,
+            "editing": editing,
+            "show_combat_modal": True,
+        },
+    )
+
+
+@app.post("/combat-encounters/{encounter_id}")
+async def update_combat_encounter(request: Request, encounter_id: int):
+    form = await request.form()
+    values, enemies = combat_encounter_form_values(form)
+    if not values["session_number"] or not values["title"]:
+        return RedirectResponse(url=f"/combat-encounters/{encounter_id}/edit?update_failed=1", status_code=303)
+    try:
+        canon.update_combat_encounter(encounter_id, values, enemies)
+    except canon.CanonWriteError:
+        return RedirectResponse(url=f"/combat-encounters/{encounter_id}/edit?update_failed=1", status_code=303)
+    return RedirectResponse(url="/combat-encounters?updated=1", status_code=303)
+
+
+@app.post("/combat-encounters/{encounter_id}/delete")
+async def delete_combat_encounter(encounter_id: int):
+    try:
+        canon.delete_combat_encounter(encounter_id)
+    except canon.CanonWriteError:
+        return RedirectResponse(url="/combat-encounters?delete_failed=1", status_code=303)
+    return RedirectResponse(url="/combat-encounters?deleted=1", status_code=303)
 
 
 @app.get("/timeline", response_class=HTMLResponse)
@@ -1218,6 +1723,28 @@ def project_utilities_smoke_test():
     return RedirectResponse(url=f"/project-utilities?command_result={token}", status_code=303)
 
 
+@app.post("/project-utilities/export-static-archive")
+def project_utilities_export_static_archive():
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Project utilities are not available in archive mode.")
+    result = commands.run_static_export(os.getenv("FARRLIND_STATIC_EXPORT_BASE_URL", "http://web_archive:8000"))
+    token = store_command_result("Export Static Archive", result)
+    return RedirectResponse(url=f"/project-utilities?command_result={token}", status_code=303)
+
+
+@app.post("/project-utilities/publish-static-archive")
+def project_utilities_publish_static_archive():
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Project utilities are not available in archive mode.")
+    result = commands.publish_static_archive(
+        base_url=os.getenv("FARRLIND_STATIC_EXPORT_BASE_URL", "http://web_archive:8000"),
+        static_repo=os.getenv("FARRLIND_STATIC_REPO_PATH", "/Volumes/T7_WORK/Farrlind_Static_Archive"),
+        push=os.getenv("FARRLIND_STATIC_PUBLISH_PUSH", "").strip().lower() in {"1", "true", "yes", "on"},
+    )
+    token = store_command_result("Publish Static Archive", result)
+    return RedirectResponse(url=f"/project-utilities?command_result={token}", status_code=303)
+
+
 @app.get("/songbook", response_class=HTMLResponse)
 def songbook_index(request: Request):
     try:
@@ -1355,6 +1882,14 @@ def api_npcs():
 def api_artifacts():
     try:
         return canon.artifact_rows()
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+
+@app.get("/api/lore-items")
+def api_lore_items():
+    try:
+        return canon.lore_item_rows()
     except canon.CanonReadError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
 

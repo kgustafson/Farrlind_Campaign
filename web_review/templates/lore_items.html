@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %}Lore Items | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div class="archive-section-title">
+    <div>
+      <p class="eyebrow">World Truths, Rumors, and Revelations</p>
+      <h1>Lore Items</h1>
+      <p>Queryable canon lore gathered from sessions, including Wells knowledge, history, culture, factions, magic, threats, and uncertain truths.</p>
+    </div>
+    <img class="archive-section-icon" src="/static/wells-of-magic-icon.png" alt="" aria-hidden="true">
+  </div>
+  {% if can_edit() %}
+  <div class="panel-actions">
+    <a class="icon-link secondary-link" href="/lore-items/extractions">Review Extractions</a>
+    <a class="icon-link add-new-link" href="/lore-items?modal=add">Add New</a>
+  </div>
+  {% endif %}
+</section>
+
+{% if request.query_params.get("created") %}
+  <div class="flash">Lore item added.</div>
+{% endif %}
+{% if request.query_params.get("updated") %}
+  <div class="flash">Lore item updated.</div>
+{% endif %}
+{% if request.query_params.get("deleted") %}
+  <div class="flash">Lore item deleted.</div>
+{% endif %}
+{% if request.query_params.get("create_failed") %}
+  <div class="flash error-flash">Lore item was not added. Title and description are required.</div>
+{% endif %}
+{% if request.query_params.get("update_failed") %}
+  <div class="flash error-flash">Lore item was not updated. Check the title, description, and related fields.</div>
+{% endif %}
+{% if request.query_params.get("delete_failed") %}
+  <div class="flash error-flash">Lore item was not deleted. It may still be referenced by another record.</div>
+{% endif %}
+
+<section class="table-wrap archive-ledger" aria-label="Lore item ledger">
+  <table class="status-table lore-item-table">
+    <caption>Lore Ledger</caption>
+    <colgroup>
+      <col class="lore-title-col">
+      <col class="lore-category-col">
+      <col class="lore-session-col">
+      <col class="lore-source-col">
+      <col class="lore-description-col">
+      <col class="lore-status-col">
+      {% if can_edit() %}<col class="lore-actions-col">{% endif %}
+    </colgroup>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Session</th>
+        <th>Source</th>
+        <th>Description</th>
+        <th>Canon</th>
+        {% if can_edit() %}<th></th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in lore_items %}
+      <tr>
+        <td class="session-cell" data-label="Title">
+          {% if item.notes %}
+            <span class="hover-note" title="{{ item.notes }}">{{ item.title }}</span>
+          {% else %}
+            {{ item.title }}
+          {% endif %}
+        </td>
+        <td data-label="Type">{{ item.category or "uncategorized" }}</td>
+        <td data-label="Session">{% if item.discovered_session is not none %}Session {{ item.discovered_session }}{% else %}<span class="muted">—</span>{% endif %}</td>
+        <td data-label="Source">{{ item.source_npc or "—" }}</td>
+        <td data-label="Description">{{ item.description }}</td>
+        <td data-label="Canon">
+          {% if item.is_confirmed %}
+            <span class="badge status-reviewed">confirmed</span>
+          {% else %}
+            <span class="badge status-in_review">draft</span>
+          {% endif %}
+        </td>
+        {% if can_edit() %}<td class="compact-action-cell" data-label="Actions">
+          <div class="row-actions compact-row-actions">
+            <a class="icon-link icon-only-action" href="/lore-items/{{ item.id }}/edit" aria-label="Edit {{ item.title }}" title="Edit {{ item.title }}">✎</a>
+            <form method="post" action="/lore-items/{{ item.id }}/delete">
+              <button class="danger-button icon-only-action" type="submit" aria-label="Delete {{ item.title }}" title="Delete {{ item.title }}">×</button>
+            </form>
+          </div>
+        </td>{% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{% if show_lore_modal %}
+<section class="modal-backdrop" role="presentation">
+  <div class="archive-modal" role="dialog" aria-modal="true" aria-labelledby="lore-modal-title">
+    <div class="modal-head">
+      <div class="modal-title-with-icon">
+        <img class="modal-title-icon" src="/static/wells-of-magic-icon.png" alt="" aria-hidden="true">
+        <h2 id="lore-modal-title">{% if editing %}Edit Lore Item{% else %}Add Lore Item{% endif %}</h2>
+      </div>
+      <a class="modal-close" href="/lore-items" aria-label="Close lore item form">x</a>
+    </div>
+    <form method="post" action="{% if editing %}/lore-items/{{ editing.id }}{% else %}/lore-items{% endif %}">
+      <div class="form-grid three-col">
+        <label class="field-block">
+          <span>Title</span>
+          <input name="title" required value="{{ editing.title if editing else '' }}">
+        </label>
+        <label class="field-block">
+          <span>Type</span>
+          <input name="category" list="lore-category-options" value="{{ editing.category if editing else '' }}" placeholder="well_knowledge">
+        </label>
+        <label class="field-block">
+          <span>Discovered Session</span>
+          <input name="discovered_session" inputmode="numeric" value="{{ editing.discovered_session if editing and editing.discovered_session is not none else '' }}">
+        </label>
+      </div>
+      <label class="field-block">
+        <span>Description</span>
+        <textarea name="description" required rows="8">{{ editing.description if editing else '' }}</textarea>
+      </label>
+      <div class="form-grid two-col">
+        <label class="field-block">
+          <span>Source NPC / Entity</span>
+          <select name="source_npc_id">
+            <option value="">none / unknown</option>
+            {% for npc in npcs %}
+              <option value="{{ npc.id }}" {% if editing and editing.source_npc_id == npc.id %}selected{% endif %}>{{ npc.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="check-row modal-check-row">
+          <input type="checkbox" name="is_confirmed" {% if editing and editing.is_confirmed %}checked{% endif %}>
+          <span>Confirmed canon</span>
+        </label>
+      </div>
+      <label class="field-block">
+        <span>Notes</span>
+        <textarea name="notes">{{ editing.notes if editing else '' }}</textarea>
+      </label>
+      <div class="panel-actions split-actions">
+        <a class="icon-link secondary-link" href="/lore-items">Cancel</a>
+        <button type="submit">{% if editing %}Save Lore Item{% else %}Add Lore Item{% endif %}</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endif %}
+
+<datalist id="lore-category-options">
+  {% for category in categories %}<option value="{{ category }}"></option>{% endfor %}
+</datalist>
+{% endblock %}

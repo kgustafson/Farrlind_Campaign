@@ -5,5 +5,11 @@ __pycache__/
 rag-env/
 audio/
 farrlind/out/
+dist/archive/
+logs/
+benchmarks/
+backups/
+model_eval/runs/
+model_eval/scorecards/
 *.log
 *.tmp

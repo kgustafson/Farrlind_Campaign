@@ -2,17 +2,14 @@ models:
   - gemma3:latest
   - gemma4:e2b
   - gemma4:e4b
-  - qwen3:8b
-  - qwen3:14b
-  - qwen2.5:14b
 
 sessions:
   session19:
     transcript: knowledge/Faban/raw/session19_transcript.txt
-    gold_summary: null
+    gold_summary: model_eval/gold/session19_gold_summary.md
   session20:
     transcript: knowledge/Faban/raw/session20_transcript.txt
-    gold_summary: null
+    gold_summary: model_eval/gold/session20_gold_summary.md
   session21:
     transcript: knowledge/Faban/raw/session21_transcript.txt
     gold_summary: model_eval/gold/session21_gold_summary.md

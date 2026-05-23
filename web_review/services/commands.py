@@ -64,7 +64,9 @@ def run_smoke_test(base_url: str = "http://127.0.0.1:8000", timeout: float = 3.0
         ("Routes", "/", "Session Review Ledger"),
         ("Routes", "/timeline", "Campaign Timeline"),
         ("Routes", "/open-threads", "Open Threads"),
+        ("Routes", "/lore-items", "Lore Items"),
         ("API", "/api/timeline", "session_count"),
+        ("API", "/api/lore-items", "Six Wells Exist"),
     ]
     passed: list[tuple[str, str]] = []
     errors: list[tuple[str, str]] = []
@@ -116,6 +118,55 @@ def run_smoke_test(base_url: str = "http://127.0.0.1:8000", timeout: float = 3.0
         for _error_category, detail in [item for item in errors if item[0] == category]:
             lines.append(f"  FAIL {detail}")
     return CommandResult(1 if errors else 0, "\n".join(lines), "")
+
+
+def run_static_export(base_url: str = "http://127.0.0.1:8002", timeout: Optional[int] = 300) -> CommandResult:
+    command = [
+        sys.executable,
+        str(reviews.REPO_ROOT / "scripts" / "export_static_archive.py"),
+        "--base-url",
+        base_url,
+        "--output-dir",
+        str(reviews.REPO_ROOT / "dist" / "archive"),
+    ]
+    completed = subprocess.run(
+        command,
+        cwd=str(reviews.REPO_ROOT),
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+    )
+    return CommandResult(completed.returncode, completed.stdout, completed.stderr)
+
+
+def publish_static_archive(
+    base_url: str = "http://127.0.0.1:8002",
+    static_repo: str = "/Volumes/T7_WORK/Farrlind_Static_Archive",
+    push: bool = False,
+    timeout: Optional[int] = 300,
+) -> CommandResult:
+    command = [
+        sys.executable,
+        str(reviews.REPO_ROOT / "scripts" / "publish_static_archive.py"),
+        "--base-url",
+        base_url,
+        "--output-dir",
+        str(reviews.REPO_ROOT / "dist" / "archive"),
+        "--static-repo",
+        static_repo,
+    ]
+    if push:
+        command.append("--push")
+    completed = subprocess.run(
+        command,
+        cwd=str(reviews.REPO_ROOT),
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+    )
+    return CommandResult(completed.returncode, completed.stdout, completed.stderr)
 
 
 def apply_review(session_number: int) -> CommandResult:

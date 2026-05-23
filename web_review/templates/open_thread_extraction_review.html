@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Open Thread Extraction Review | The Farrlind Archivum{% endblock %}
+{% block body_class %}archive-dashboard{% endblock %}
+{% block content %}
+<section class="page-head archive-section-head">
+  <div class="archive-section-title">
+    <div>
+      <p class="eyebrow">Human Review Gate</p>
+      <h1>Open Thread Extraction Review</h1>
+      <p>Review model-proposed unresolved story hooks before applying them to the open thread ledger.</p>
+    </div>
+    <img class="archive-section-icon" src="/static/open-threads-icon.png" alt="" aria-hidden="true">
+  </div>
+</section>
+
+{% if request.query_params.get("apply_failed") %}
+  <div class="flash error-flash">Open thread extraction review was not applied. Check the extraction file and related canon records.</div>
+{% endif %}
+
+<form class="session-picker" method="get" action="/open-threads/extractions">
+  <label class="field-block">
+    <span>Session Number</span>
+    <input name="session" type="number" min="0" value="{{ session_number }}" list="available-open-thread-extractions">
+    {% if available_sessions %}
+      <datalist id="available-open-thread-extractions">
+        {% for available_session in available_sessions %}
+          <option value="{{ available_session }}">Session {{ "%02d"|format(available_session) }}</option>
+        {% endfor %}
+      </datalist>
+    {% endif %}
+  </label>
+  <button type="submit">Load Extraction</button>
+  <a class="icon-link secondary-link" href="/open-threads">Back to Open Threads</a>
+</form>
+
+{% if command_result %}
+  <section class="command-result utility-result">
+    <div class="command-result-head">
+      <h2>{{ command_result.action }}</h2>
+      <span class="badge {% if command_result.ok %}applied-applied{% else %}decision-rejected{% endif %}">
+        {% if command_result.ok %}pass{% else %}fail{% endif %}
+      </span>
+    </div>
+    {% if command_result.stdout %}<pre>{{ command_result.stdout }}</pre>{% endif %}
+    {% if command_result.stderr %}<pre>{{ command_result.stderr }}</pre>{% endif %}
+  </section>
+{% endif %}
+
+{% if not extraction %}
+  <div class="flash muted-flash">No open thread extraction JSON found for session {{ "%02d"|format(session_number) }}. Run <code>scripts/rag.py extract-open-threads session{{ "%02d"|format(session_number) }}</code> first.</div>
+{% else %}
+<section class="command-log">
+  <div class="command-log-head">
+    <div>
+      <h2>Session {{ "%02d"|format(session_number) }} Open Thread Extraction</h2>
+      <p class="muted">Source: {{ extraction.path }}</p>
+    </div>
+  </div>
+</section>
+
+<form method="post" action="/open-threads/extractions/apply" class="entity-review-form">
+  <input type="hidden" name="session_number" value="{{ session_number }}">
+
+  <section class="entity-review-section">
+    <h2>Known Thread Updates</h2>
+    {% if not extraction.known_thread_mentions %}
+      <p class="muted">No known thread updates proposed.</p>
+    {% endif %}
+    <div class="entity-review-list">
+      {% for item in extraction.known_thread_mentions %}
+      <article class="entity-review-card">
+        <div class="entity-review-head">
+          <div>
+            <h3>{{ item.canonical_title }}</h3>
+            <p class="muted">{{ item.thread_type.replace("_", " ") if item.thread_type else "open thread" }} · {{ item.status or "open" }}</p>
+          </div>
+          <label class="field-block decision-field">
+            <span>Decision</span>
+            <select name="known_decision_{{ loop.index0 }}">
+              <option value="ignore">Ignore</option>
+              <option value="update">Update Thread</option>
+            </select>
+          </label>
+        </div>
+        <dl class="entity-review-details">
+          <dt>New Information</dt>
+          <dd>{{ item.new_information or "—" }}</dd>
+          <dt>Scope</dt>
+          <dd>Session {{ item.first_session or "?" }}-{{ item.last_session or "?" }}{% if item.related_location %} · {{ item.related_location }}{% endif %}</dd>
+          <dt>Resolution</dt>
+          <dd>{{ item.resolution or "—" }}</dd>
+          <dt>Confidence</dt>
+          <dd>{{ item.confidence or "—" }}</dd>
+          <dt>Evidence</dt>
+          <dd>{{ item.evidence or "—" }}</dd>
+        </dl>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="entity-review-section">
+    <h2>New Thread Candidates</h2>
+    {% if not extraction.new_thread_candidates %}
+      <p class="muted">No new open thread candidates proposed.</p>
+    {% endif %}
+    <div class="entity-review-list">
+      {% for item in extraction.new_thread_candidates %}
+      <article class="entity-review-card">
+        <div class="entity-review-head">
+          <div>
+            <h3>{{ item.proposed_title }}</h3>
+            <p class="muted">{{ item.thread_type.replace("_", " ") if item.thread_type else "open thread" }} · {{ item.status or "open" }}</p>
+          </div>
+          <label class="field-block decision-field">
+            <span>Decision</span>
+            <select name="new_decision_{{ loop.index0 }}">
+              <option value="reject">Reject</option>
+              <option value="create">Create Open Thread</option>
+            </select>
+          </label>
+        </div>
+        <dl class="entity-review-details">
+          <dt>Description</dt>
+          <dd>{{ item.description or "—" }}</dd>
+          <dt>Scope</dt>
+          <dd>Session {{ item.first_session or session_number }}-{{ item.last_session or session_number }}{% if item.related_location %} · {{ item.related_location }}{% endif %}</dd>
+          <dt>Resolution</dt>
+          <dd>{{ item.resolution or "—" }}</dd>
+          <dt>Notes</dt>
+          <dd>{{ item.notes or "—" }}</dd>
+          <dt>Confidence</dt>
+          <dd>{{ item.confidence or "—" }}</dd>
+          <dt>Evidence</dt>
+          <dd>{{ item.evidence or "—" }}</dd>
+        </dl>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="entity-review-section two-column-review">
+    <div>
+      <h2>Rejected By Extractor</h2>
+      {% if not extraction.rejected_candidates %}<p class="muted">None.</p>{% endif %}
+      {% for item in extraction.rejected_candidates %}
+        <div class="mini-review-note"><strong>{{ item.text }}</strong><br>{{ item.reason }}</div>
+      {% endfor %}
+    </div>
+    <div>
+      <h2>Uncertainties</h2>
+      {% if not extraction.uncertainties %}<p class="muted">None.</p>{% endif %}
+      {% for item in extraction.uncertainties %}
+        <div class="mini-review-note"><strong>{{ item.candidate }}</strong><br>{{ item.issue }}</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="panel-actions split-actions sticky-review-actions">
+    <a class="icon-link secondary-link" href="/open-threads">Cancel</a>
+    <button type="submit">Apply Reviewed Thread Changes</button>
+  </div>
+</form>
+{% endif %}
+{% endblock %}

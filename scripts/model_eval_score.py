@@ -20,7 +20,79 @@ REQUIRED_HEADINGS = [
     "## Uncertainties",
 ]
 
-GOLD_FACTS = [
+SESSION_GOLD_FACTS = {
+    "session19": [
+        ("Balrog underground dwarven city", ["balrog", "dwarven"]),
+        ("falling dwarf wizard saved", ["dwarf wizard", "falling"]),
+        ("Faban used Dimension Door", ["faban", "dimension door"]),
+        ("Gildas saved wizard", ["gildas", "saved"]),
+        ("Scythe/Safi carried in wineskin", ["scythe", "wineskin"]),
+        ("Gildas Bag of Holding", ["gildas", "bag of holding"]),
+        ("cultists summoned black cave dragon", ["cultists", "dragon"]),
+        ("battlefield Balrog town square", ["town square"]),
+        ("pillars provided cover", ["pillars", "cover"]),
+        ("party started about ninety feet from dragon", ["ninety feet", "dragon"]),
+        ("Brigit killed cultist with sneak attack", ["brigit", "sneak attack", "cultist"]),
+        ("cultists used Eldritch Blast/dark magic", ["eldritch", "blast"]),
+        ("cultists conjured Spiritual Weapon", ["spiritual weapon"]),
+        ("dragon used Nightmare Breath", ["nightmare breath"]),
+        ("Makani and Corvinus frightened psychic damage", ["makani", "corvinus", "frightened"]),
+        ("Gildas attempted Web", ["gildas", "web"]),
+        ("Faban inspired Roon with Urgan/Ergen Wormbane", ["faban", "roon", "wormbane"]),
+        ("Faban attempted Enemies Abound", ["enemies abound"]),
+        ("Roon used Riposte", ["roon", "riposte"]),
+        ("Makani used breath weapon", ["makani", "breath weapon"]),
+        ("greatsword of life stealing clarified", ["greatsword of life stealing"]),
+        ("Faban cast Cloud of Daggers", ["faban", "cloud of daggers"]),
+        ("dwarf wizard cast Cloud of Daggers", ["dwarf wizard", "cloud of daggers"]),
+        ("dragon defeated by dagger magic", ["dragon", "daggers"]),
+        ("dwarf wizard crushed by falling dragon", ["dwarf wizard", "crushed"]),
+        ("Faban killed wounded cultist", ["faban", "cultist"]),
+        ("Faban used Healing Word on wizard", ["healing word", "wizard"]),
+        ("dwarf wizard used Lightning Bolt", ["lightning bolt"]),
+        ("celebration with dwarven ale", ["dwarven ale"]),
+        ("Brigit passed out from ale", ["brigit", "passed out"]),
+        ("Faban sang about defeat of Orsydon", ["faban", "orsydon"]),
+        ("Scythe restored to mines", ["scythe", "mines"]),
+        ("remaining wells distrust mortals", ["wells", "mortals"]),
+        ("ancient fiendish/celestial items may persuade wells", ["fiendish", "celestial", "persuade"]),
+        ("Wand of Wells stolen by not mortal", ["wand of wells", "not mortal"]),
+        ("cataclysm against natural order", ["natural order"]),
+        ("party leveled from 7 to 8", ["level", "8"]),
+        ("Catur Hanidal Gale still ahead", ["catur", "hanidal", "gale"]),
+    ],
+    "session20": [
+        ("post-dragon victory and recovered well", ["dragon", "well"]),
+        ("wells may need persuasion", ["wells", "persuasion"]),
+        ("fiendish/celestial ancient items", ["fiendish", "celestial"]),
+        ("orb fragments discussed", ["orb", "fragment"]),
+        ("Roon greatsword of life stealing", ["roon", "life stealing"]),
+        ("Corvinus demonic mark", ["corvinus", "demonic mark"]),
+        ("Mikani medallion from Celestial Isles", ["mikani", "medallion", "celestial isles"]),
+        ("Faban satchel/book mystery", ["faban", "book"]),
+        ("outer islands unnatural stress", ["outer islands", "stress"]),
+        ("party reached level 8", ["level 8"]),
+        ("Catur chosen over Monastery of the Open Hand", ["catur", "monastery of the open hand"]),
+        ("Gale Catur Hanidal unvisited places", ["gale", "catur", "hanidal"]),
+        ("Faban forge master and Magus Council", ["faban", "forge master", "magus council"]),
+        ("Balrog temples and Christa temple", ["balrog", "christa"]),
+        ("Cap of Water Breathing gifted to Mikani", ["cap of water breathing", "mikani"]),
+        ("Roon provisions and Catur warnings", ["roon", "catur", "outsiders"]),
+        ("tritons kuo-toa merfolk in Catur", ["tritons", "kuo-toa", "merfolk"]),
+        ("above folk distrust", ["above folk"]),
+        ("Pearl of Atlantia/Antenella rumor", ["pearl", "atlant"]),
+        ("Shortbow of Warning for Brigit", ["brigit", "shortbow of warning"]),
+        ("Staff of Defense for Gildas", ["gildas", "staff of defense"]),
+        ("Roon enchanted dwarven shield", ["roon", "dwarven shield"]),
+        ("Acheron Blade for Faban", ["faban", "acheron blade"]),
+        ("Corvinus flame weapon works underwater", ["corvinus", "flame", "underwater"]),
+        ("coast near Catur and giant fishermen", ["coast near catur", "giant fishermen"]),
+        ("Catur six miles offshore", ["catur", "six miles"]),
+        ("Commune with Nature identified fishing commune and giant fish", ["commune with nature", "giant fish"]),
+        ("20 potions of water breathing", ["20", "potions", "water breathing"]),
+        ("water-breathing mushrooms one hour", ["mushrooms", "one hour"]),
+    ],
+    "session21": [
     ("dragon fight and recovered well", ["dragon", "well"]),
     ("fiendish/celestial ancient items may persuade wells", ["fiendish", "celestial", "persuade"]),
     ("orb of control fragments", ["orb", "control", "fragment"]),
@@ -47,7 +119,10 @@ GOLD_FACTS = [
     ("Wand of Wells stolen", ["wand of wells", "stolen"]),
     ("aboleth Niebain/Nebain telepathic warning", ["aboleth", "danger"]),
     ("water rushed in through crack cliffhanger", ["water", "rushing", "crack"]),
-]
+    ],
+}
+
+GOLD_FACTS = SESSION_GOLD_FACTS["session21"]
 
 BAD_PATTERNS = [
     ("wrong Catur variant: Kator", r"\bKator\b"),
@@ -74,10 +149,10 @@ def fact_matched(text: str, terms: list[str]) -> bool:
     return all(has_any(text, [term.lower()]) for term in terms)
 
 
-def score_output(output_text: str) -> dict[str, Any]:
+def score_output(output_text: str, gold_facts: list[tuple[str, list[str]]]) -> dict[str, Any]:
     normalized = normalize(output_text)
     heading_hits = [heading for heading in REQUIRED_HEADINGS if heading in output_text]
-    fact_hits = [name for name, terms in GOLD_FACTS if fact_matched(normalized, terms)]
+    fact_hits = [name for name, terms in gold_facts if fact_matched(normalized, terms)]
     penalties = []
     penalty_points = 0
     for label, pattern in BAD_PATTERNS:
@@ -118,11 +193,12 @@ def load_metadata(output_path: Path) -> dict[str, Any]:
 
 
 def score_prompt(prompt_version: str, session: str) -> dict[str, Any]:
+    gold_facts = SESSION_GOLD_FACTS.get(session, GOLD_FACTS)
     results = []
     for output_path in sorted((REPO_ROOT / "model_eval" / "runs").glob(f"*/{prompt_version}/{session}_output.md")):
         output_text = output_path.read_text(encoding="utf-8")
         metadata = load_metadata(output_path)
-        scored = score_output(output_text)
+        scored = score_output(output_text, gold_facts)
         scored.update(
             {
                 "model": metadata.get("model", output_path.parts[-3]),
@@ -134,7 +210,7 @@ def score_prompt(prompt_version: str, session: str) -> dict[str, Any]:
         )
         results.append(scored)
     results.sort(key=lambda row: (row["score"], -(row.get("duration_seconds") or 0)), reverse=True)
-    return {"prompt_version": prompt_version, "session": session, "results": results}
+    return {"prompt_version": prompt_version, "session": session, "results": results, "gold_fact_count": len(gold_facts)}
 
 
 def write_scorecard(scorecard: dict[str, Any]) -> None:
@@ -162,7 +238,7 @@ def write_scorecard(scorecard: dict[str, Any]) -> None:
     for row in scorecard["results"]:
         lines.append("")
         lines.append(f"### {row['model']}")
-        lines.append(f"- Facts matched: {len(row['facts_matched'])}/{len(GOLD_FACTS)}")
+        lines.append(f"- Facts matched: {len(row['facts_matched'])}/{scorecard['gold_fact_count']}")
         lines.append(f"- Headings present: {len(row['headings_present'])}/{len(REQUIRED_HEADINGS)}")
         if row["facts_matched"]:
             lines.append("- Matched: " + "; ".join(row["facts_matched"]))

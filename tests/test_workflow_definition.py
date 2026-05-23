@@ -50,6 +50,7 @@ class WorkflowDefinitionTest(unittest.TestCase):
             "transcribe_audio",
             "diary_source_available",
             "source_status_check",
+            "curate_transcript",
             "extract_events",
             "filter_events",
             "classify_events",

@@ -11,7 +11,12 @@
     </div>
     <img class="archive-section-icon" src="/static/open-threads-icon.png" alt="" aria-hidden="true">
   </div>
-  {% if can_edit() %}<a class="icon-link add-new-link" href="/open-threads?modal=add">Add New</a>{% endif %}
+  {% if can_edit() %}
+    <div class="panel-actions">
+      <a class="icon-link secondary-link" href="/open-threads/extractions">Review Extractions</a>
+      <a class="icon-link add-new-link" href="/open-threads?modal=add">Add New</a>
+    </div>
+  {% endif %}
 </section>
 
 {% if request.query_params.get("created") %}
@@ -62,10 +67,10 @@
             {{ thread.title }}
           {% endif %}
           {% if can_edit() %}
-            <div class="row-actions thread-title-actions">
-              <a class="icon-link thread-edit-link" href="/open-threads/{{ thread.id }}/edit">Edit</a>
+            <div class="row-actions thread-title-actions compact-row-actions">
+              <a class="icon-link thread-edit-link icon-only-action" href="/open-threads/{{ thread.id }}/edit" aria-label="Edit {{ thread.title }}" title="Edit {{ thread.title }}">✎</a>
               <form method="post" action="/open-threads/{{ thread.id }}/delete">
-                <button class="danger-button" type="submit">Delete</button>
+                <button class="danger-button icon-only-action" type="submit" aria-label="Delete {{ thread.title }}" title="Delete {{ thread.title }}">×</button>
               </form>
             </div>
           {% endif %}

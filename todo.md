@@ -8,14 +8,10 @@ The workflow should eventually make it easy to see where each session is in the 
 
 ```text
 audio/transcript
-  -> extract
-  -> filter
-  -> classify
-  -> normalize
-  -> merge
-  -> validate
-  -> summarize
-  -> human review
+  -> draft canon packet with gemma4:e2b
+  -> human canon packet review
+  -> accepted canon summary
+  -> accepted structured canon items
   -> apply review
   -> final summary
   -> database/canon health
@@ -26,10 +22,12 @@ audio/transcript
 - Workflow state should live in the database.
 - Start with per-session workflow state first.
 - Add campaign-level maintenance workflows later.
-- Audio ingestion belongs later, not in the first workflow graph.
+- Audio ingestion is now part of the per-session intake path, but remains upstream draft/source material.
 - Reruns must never overwrite reviewed or applied canon automatically.
 - Reruns may only affect canon after explicit human review and approval.
 - Which steps can run automatically versus require user approval will be decided over time.
+- Gemma curation should be treated as a draft canon packet generator, not merely a prose summarizer.
+- Draft canon packets should extract coherent sections for summary, major events, NPCs/entities, locations, artifacts/items, lore items, combat encounters, open threads, timeline notes, and inventory/resource notes.
 
 ## Project Management
 
@@ -77,6 +75,17 @@ audio/transcript
 
 ### Phase 4: Wire Existing Commands To Workflow Actions
 
+- Human review is not done yet.
+  - The current fragment/event review flow is too large for long recorded sessions.
+  - Session 21 showed that reviewing 200+ extracted event fragments is not the right primary operator experience.
+  - Replace the primary review surface with a Gemma-curated summary review first.
+  - The user should review and edit a coherent session summary into canon before structured database extraction is applied.
+  - Event fragments should become supporting evidence or secondary detail, not the main review workload.
+- Build the next review flow around:
+  - Review Gemma draft canon packet.
+  - Edit the narrative section into a human-approved canon summary.
+  - Confirm key locations, NPCs, artifacts, lore items, combat encounters, open threads, inventory/resource notes, and timeline updates from that packet.
+  - Only then apply reviewed canon to the database.
 - Add a session initiation action for future sessions.
   - Capture the real-world session date.
   - Accept an uploaded audio file or a filesystem path to the audio file.
@@ -141,6 +150,7 @@ audio/transcript
 - Develop Well of Magic Lore Section. Done in v0.2.13 with editable Markdown lore backed by `knowledge/Faban/lore/wells_of_magic.md`.
 - Develop Faban Songbook. Done in v0.3.15 with sidebar page, song cards, metadata, local playback, source links, lyrics pages, and API route.
 - Develop Campaign Timeline. Done in v0.4.4 with read-only timeline, travel movements, major events, and API route.
+- Develop Lore Items Registry. Done with sidebar page, edit/archive modes, add/edit/delete modals, API route, smoke-test coverage, and draft canon packet prompt support.
 
 ## Data Management
 

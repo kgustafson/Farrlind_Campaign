@@ -9,9 +9,6 @@ MODELS = [
     "gemma3:latest",
     "gemma4:e2b",
     "gemma4:e4b",
-    "qwen3:8b",
-    "qwen3:14b",
-    "qwen2.5:14b",
 ]
 
 VARIANTS = [

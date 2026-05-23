@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 import yaml
+from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from web_review import db
@@ -45,6 +46,17 @@ def _fetch(sql: str, params: Optional[dict[str, Any]] = None) -> list[dict[str, 
 def _execute(sql: str, params: dict[str, Any]) -> None:
     try:
         db.execute(sql, params)
+    except SQLAlchemyError as exc:
+        raise CanonWriteError(str(exc)) from exc
+
+
+def _fetch_one_write(sql: str, params: dict[str, Any]) -> dict[str, Any]:
+    try:
+        engine = db.make_engine()
+        with engine.begin() as connection:
+            result = connection.execute(text(sql), params)
+            row = result.first()
+            return dict(row._mapping) if row else {}
     except SQLAlchemyError as exc:
         raise CanonWriteError(str(exc)) from exc
 
@@ -93,12 +105,67 @@ def location_types() -> list[dict[str, Any]]:
     return _fetch("SELECT id, type_name FROM location_type ORDER BY type_name;")
 
 
+def location_type_id(type_name: Optional[str]) -> Optional[int]:
+    if not type_name:
+        return None
+    rows = _fetch(
+        "SELECT id FROM location_type WHERE lower(type_name) = lower(:type_name) LIMIT 1;",
+        {"type_name": type_name},
+    )
+    return rows[0]["id"] if rows else None
+
+
 def artifact_types() -> list[dict[str, Any]]:
     return _fetch("SELECT id, type_name FROM artifact_type ORDER BY type_name;")
 
 
+def artifact_type_id(type_name: Optional[str]) -> Optional[int]:
+    if not type_name:
+        return None
+    rows = _fetch(
+        "SELECT id FROM artifact_type WHERE lower(type_name) = lower(:type_name) LIMIT 1;",
+        {"type_name": type_name},
+    )
+    return rows[0]["id"] if rows else None
+
+
+def lore_categories() -> list[str]:
+    rows = _fetch("""
+        SELECT DISTINCT category
+        FROM lore_item
+        WHERE category IS NOT NULL AND category <> ''
+        ORDER BY category;
+    """)
+    categories = [row["category"] for row in rows]
+    defaults = [
+        "well_knowledge",
+        "history",
+        "divine",
+        "cosmology",
+        "faction_lore",
+        "location_lore",
+        "culture",
+        "magic",
+        "threat",
+        "prophecy",
+        "artifact_lore",
+        "canon_ambiguity",
+    ]
+    return sorted({*categories, *defaults})
+
+
 def entity_statuses() -> list[dict[str, Any]]:
     return _fetch("SELECT id, status_code, description FROM entity_status ORDER BY status_code;")
+
+
+def entity_status_id(status_code: Optional[str]) -> Optional[int]:
+    if not status_code:
+        return None
+    rows = _fetch(
+        "SELECT id FROM entity_status WHERE lower(status_code) = lower(:status_code) LIMIT 1;",
+        {"status_code": status_code},
+    )
+    return rows[0]["id"] if rows else None
 
 
 def factions() -> list[dict[str, Any]]:
@@ -222,6 +289,24 @@ def location_rows() -> list[dict[str, Any]]:
         LEFT JOIN location parent ON parent.id = l.parent_location_id
         ORDER BY l.name;
     """)
+
+
+def session_rows() -> list[dict[str, Any]]:
+    return _fetch("""
+        SELECT session_number, title
+        FROM session
+        ORDER BY session_number;
+    """)
+
+
+def location_id(name: Optional[str]) -> Optional[int]:
+    if not name:
+        return None
+    rows = _fetch(
+        "SELECT id FROM location WHERE lower(name) = lower(:name) LIMIT 1;",
+        {"name": name},
+    )
+    return rows[0]["id"] if rows else None
 
 
 def location_detail(location_id: int) -> Optional[dict[str, Any]]:
@@ -439,6 +524,80 @@ def update_artifact(artifact_id: int, values: dict[str, Any]) -> None:
 
 def delete_artifact(artifact_id: int) -> None:
     _execute("DELETE FROM artifact WHERE id = :id;", {"id": artifact_id})
+
+
+def lore_item_rows() -> list[dict[str, Any]]:
+    return _fetch("""
+        SELECT
+            li.id,
+            li.title,
+            li.category,
+            li.description,
+            n.name AS source_npc,
+            ds.session_number AS discovered_session,
+            li.is_confirmed,
+            li.notes
+        FROM lore_item li
+        LEFT JOIN npc n ON n.id = li.source_npc_id
+        LEFT JOIN session ds ON ds.id = li.discovered_session
+        ORDER BY
+            CASE WHEN li.is_confirmed THEN 1 ELSE 0 END DESC,
+            COALESCE(ds.session_number, 9999),
+            COALESCE(li.category, ''),
+            li.title;
+    """)
+
+
+def lore_item_detail(lore_item_id: int) -> Optional[dict[str, Any]]:
+    rows = _fetch("""
+        SELECT
+            li.id,
+            li.title,
+            li.category,
+            li.description,
+            li.source_npc_id,
+            ds.session_number AS discovered_session,
+            li.is_confirmed,
+            li.notes
+        FROM lore_item li
+        LEFT JOIN session ds ON ds.id = li.discovered_session
+        WHERE li.id = :id;
+    """, {"id": lore_item_id})
+    return rows[0] if rows else None
+
+
+def create_lore_item(values: dict[str, Any]) -> None:
+    _execute("""
+        INSERT INTO lore_item (
+            title, category, description, source_npc_id,
+            discovered_session, is_confirmed, notes
+        )
+        VALUES (
+            :title, :category, :description, :source_npc_id,
+            (SELECT id FROM session WHERE session_number = :discovered_session),
+            :is_confirmed, :notes
+        );
+    """, values)
+
+
+def update_lore_item(lore_item_id: int, values: dict[str, Any]) -> None:
+    params = {**values, "id": lore_item_id}
+    _execute("""
+        UPDATE lore_item
+        SET
+            title = :title,
+            category = :category,
+            description = :description,
+            source_npc_id = :source_npc_id,
+            discovered_session = (SELECT id FROM session WHERE session_number = :discovered_session),
+            is_confirmed = :is_confirmed,
+            notes = :notes
+        WHERE id = :id;
+    """, params)
+
+
+def delete_lore_item(lore_item_id: int) -> None:
+    _execute("DELETE FROM lore_item WHERE id = :id;", {"id": lore_item_id})
 
 
 def open_thread_statuses() -> list[dict[str, str]]:
@@ -770,6 +929,195 @@ def combat_encounter_rows() -> list[dict[str, Any]]:
             "notes": row["enemy_notes"],
         })
     return list(encounters.values())
+
+
+def combat_encounter_detail(encounter_id: int) -> Optional[dict[str, Any]]:
+    rows = _fetch("""
+        SELECT
+            c.id,
+            s.session_number,
+            c.event_id,
+            c.title,
+            c.subtype,
+            c.location_id,
+            c.participants,
+            c.outcome,
+            c.confidence,
+            c.notes
+        FROM encounter c
+        JOIN session s ON s.id = c.session_id
+        WHERE c.id = :id;
+    """, {"id": encounter_id})
+    if not rows:
+        return None
+    detail = rows[0]
+    detail["enemies"] = _fetch("""
+        SELECT
+            e.name,
+            e.enemy_type,
+            ee.quantity,
+            ee.outcome,
+            ee.confidence,
+            ee.notes
+        FROM event_enemy ee
+        JOIN enemy e ON e.id = ee.enemy_id
+        WHERE ee.event_id = :event_id
+        ORDER BY e.name;
+    """, {"event_id": detail["event_id"]}) if detail.get("event_id") else []
+    return detail
+
+
+def _create_combat_event(values: dict[str, Any]) -> int:
+    row = _fetch_one_write("""
+        INSERT INTO session_event (
+            session_id, event_type_id, sequence_order, location_id,
+            description, significance, notes
+        )
+        SELECT
+            s.id,
+            (SELECT id FROM event_type WHERE type_name = 'combat' LIMIT 1),
+            COALESCE((SELECT MAX(sequence_order) + 1 FROM session_event WHERE session_id = s.id), 1),
+            :location_id,
+            :title,
+            3,
+            :event_notes
+        FROM session s
+        WHERE s.session_number = :session_number
+        RETURNING id;
+    """, {
+        "session_number": values["session_number"],
+        "location_id": values.get("location_id"),
+        "title": values["title"],
+        "event_notes": "Created from Combat Encounters UI.",
+    })
+    if not row.get("id"):
+        raise CanonWriteError("Could not create combat event. Session may not exist.")
+    return int(row["id"])
+
+
+def _ensure_enemy(enemy: dict[str, Any], session_number: int) -> int:
+    name = (enemy.get("name") or "").strip()
+    if not name:
+        raise CanonWriteError("Enemy name is required.")
+    rows = _fetch("SELECT id FROM enemy WHERE lower(name) = lower(:name) ORDER BY id LIMIT 1;", {"name": name})
+    if rows:
+        enemy_id = int(rows[0]["id"])
+        _execute("""
+            UPDATE enemy
+            SET
+                enemy_type = COALESCE(NULLIF(:enemy_type, ''), enemy.enemy_type),
+                first_encountered_session = COALESCE(enemy.first_encountered_session, (SELECT id FROM session WHERE session_number = :session_number))
+            WHERE id = :id;
+        """, {"id": enemy_id, "enemy_type": enemy.get("enemy_type") or "", "session_number": session_number})
+        return enemy_id
+    row = _fetch_one_write("""
+        INSERT INTO enemy (
+            name, enemy_type, threat_level_id, entity_status_id,
+            first_encountered_session, description, notes
+        )
+        VALUES (
+            :name,
+            :enemy_type,
+            (SELECT id FROM threat_level WHERE level_code = 'minor' LIMIT 1),
+            (SELECT id FROM entity_status WHERE status_code = 'unknown' LIMIT 1),
+            (SELECT id FROM session WHERE session_number = :session_number),
+            :description,
+            :notes
+        )
+        RETURNING id;
+    """, {
+        "name": name,
+        "enemy_type": enemy.get("enemy_type") or "",
+        "session_number": session_number,
+        "description": "Generic or encounter-level enemy tracked from Combat Encounters UI.",
+        "notes": "Created from Combat Encounters UI.",
+    })
+    if not row.get("id"):
+        raise CanonWriteError("Could not create enemy row.")
+    return int(row["id"])
+
+
+def _replace_combat_enemies(event_id: int, session_number: int, enemies: list[dict[str, Any]]) -> None:
+    _execute("DELETE FROM event_enemy WHERE event_id = :event_id;", {"event_id": event_id})
+    for enemy in enemies:
+        if not (enemy.get("name") or "").strip():
+            continue
+        enemy_id = _ensure_enemy(enemy, session_number)
+        _execute("""
+            INSERT INTO event_enemy (
+                event_id, enemy_id, outcome, quantity, confidence, notes
+            )
+            VALUES (
+                :event_id, :enemy_id, :outcome, :quantity, :confidence, :notes
+            )
+            ON CONFLICT (event_id, enemy_id) DO UPDATE SET
+                outcome = EXCLUDED.outcome,
+                quantity = EXCLUDED.quantity,
+                confidence = EXCLUDED.confidence,
+                notes = EXCLUDED.notes;
+        """, {
+            "event_id": event_id,
+            "enemy_id": enemy_id,
+            "outcome": enemy.get("outcome") or "unknown",
+            "quantity": enemy.get("quantity"),
+            "confidence": enemy.get("confidence") or "medium",
+            "notes": enemy.get("notes") or "",
+        })
+
+
+def create_combat_encounter(values: dict[str, Any], enemies: list[dict[str, Any]]) -> None:
+    event_id = _create_combat_event(values)
+    _execute("""
+        INSERT INTO encounter (
+            session_id, event_id, encounter_type, subtype, location_id,
+            title, participants, outcome, confidence, notes
+        )
+        SELECT
+            s.id, :event_id, 'combat', :subtype, :location_id,
+            :title, :participants, :outcome, :confidence, :notes
+        FROM session s
+        WHERE s.session_number = :session_number;
+    """, {**values, "event_id": event_id})
+    _replace_combat_enemies(event_id, int(values["session_number"]), enemies)
+
+
+def update_combat_encounter(encounter_id: int, values: dict[str, Any], enemies: list[dict[str, Any]]) -> None:
+    detail = combat_encounter_detail(encounter_id)
+    if not detail:
+        raise CanonWriteError("Combat encounter not found.")
+    event_id = detail.get("event_id") or _create_combat_event(values)
+    _execute("""
+        UPDATE session_event
+        SET
+            session_id = (SELECT id FROM session WHERE session_number = :session_number),
+            location_id = :location_id,
+            description = :title
+        WHERE id = :event_id;
+    """, {**values, "event_id": event_id})
+    _execute("""
+        UPDATE encounter
+        SET
+            session_id = (SELECT id FROM session WHERE session_number = :session_number),
+            event_id = :event_id,
+            subtype = :subtype,
+            location_id = :location_id,
+            title = :title,
+            participants = :participants,
+            outcome = :outcome,
+            confidence = :confidence,
+            notes = :notes
+        WHERE id = :id;
+    """, {**values, "id": encounter_id, "event_id": event_id})
+    _replace_combat_enemies(event_id, int(values["session_number"]), enemies)
+
+
+def delete_combat_encounter(encounter_id: int) -> None:
+    detail = combat_encounter_detail(encounter_id)
+    if not detail:
+        return
+    if detail.get("event_id"):
+        _execute("DELETE FROM event_enemy WHERE event_id = :event_id;", {"event_id": detail["event_id"]})
+    _execute("DELETE FROM encounter WHERE id = :id;", {"id": encounter_id})
 
 
 def murder_hobo_count(encounters: list[dict[str, Any]]) -> dict[str, Any]:
