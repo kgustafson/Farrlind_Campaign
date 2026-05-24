@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 from raglib.curate import canon_scrub, split_transcript
 
@@ -12,13 +13,16 @@ class CurateTranscriptTest(unittest.TestCase):
         self.assertIn("paragraph 0", chunks[0])
         self.assertIn("paragraph 19", chunks[-1])
 
-    def test_canon_scrub_normalizes_known_transcript_drift(self):
-        text = "Kator and Couture worried Makani while Gildos met Utgar near Namalua."
+    def test_canon_scrub_normalizes_campaign_glossary_aliases(self):
+        text = "Triniville and Jins visited Kator."
 
-        self.assertEqual(
-            canon_scrub(text),
-            "Catur and Catur worried Mikani while Gildas met Uthgar near Namaloa.",
-        )
+        with patch("raglib.curate.load_campaign_metadata", return_value={
+            "glossary": [
+                {"term": "Trinyvale", "aliases": ["Triniville"]},
+                {"term": "Jens Lyndelle", "aliases": ["Jins"]},
+            ],
+        }):
+            self.assertEqual(canon_scrub(text), "Trinyvale and Jens Lyndelle visited Kator.")
 
 
 if __name__ == "__main__":

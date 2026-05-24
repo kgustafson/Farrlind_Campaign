@@ -1,0 +1,81 @@
+# =============================================================================
+# SESSION CONTEXT — session20
+# Fill this out before running the pipeline for a session.
+# Used by normalize.py to catch session-specific Whisper garbles.
+# =============================================================================
+
+session: session20
+date: "2026-04-27"
+in_game_date: "1832 AS — Namal 20"
+party_level: 7
+
+# ---------------------------------------------------------------------------
+# NEW NPCS introduced this session
+# key: whisper garble(s) → value: correct name
+# Add as many variants as you think Whisper might produce
+# ---------------------------------------------------------------------------
+new_npcs:
+  Alistair:
+    variants:
+      - elaine
+      - alistar
+      - alastair
+      - alistaire
+    notes: "New NPC introduced at Catur coast"
+
+# ---------------------------------------------------------------------------
+# NEW LOCATIONS introduced this session
+# ---------------------------------------------------------------------------
+new_locations:
+  Catur:
+    variants:
+      - couture
+      - katoor
+      - katur
+      - cature
+    notes: "Sunken coastal city; destination this session"
+
+# ---------------------------------------------------------------------------
+# NEW ITEMS / ARTIFACTS introduced this session
+# ---------------------------------------------------------------------------
+new_items:
+  "Black Blade":
+    variants:
+      - black blade
+      - dark blade
+      - blackblade
+    holder: "Faban"
+    notes: "Gift from Balrog dwarves; refuses light"
+
+  "Cap of Water Breathing":
+    variants:
+      - water breathing cap
+      - cap of waterbreathing
+      - breathing cap
+    holder: "Mikani"
+    notes: "Gift from Balrog dwarves; allows underwater breathing"
+
+# ---------------------------------------------------------------------------
+# NEW ENEMIES / CREATURES introduced this session
+# ---------------------------------------------------------------------------
+new_enemies: {}
+
+# ---------------------------------------------------------------------------
+# KNOWN GARBLES from this session
+# Things Whisper got wrong that you noticed during review
+# ---------------------------------------------------------------------------
+known_garbles:
+  "butcher and his llc": "UNKNOWN — flag for review"
+
+# ---------------------------------------------------------------------------
+# SESSION NOTES (freeform — fed into summarize prompt as context)
+# ---------------------------------------------------------------------------
+notes: |
+  Party departed Balrog with dwarven gifts (black blade for Faban,
+  staff for Gildas, breathing cap for Mikani, upgraded bow for Brigit,
+  flame blade for Corvinas, shield for Roon).
+  Four days travel to coast.
+  Arrived at Catur shoreline.
+  Met fishermen — boats missing, lights under water, something thought-large beneath.
+  Preparing to descend into sunken city.
+  Roon continues to survive against all odds.

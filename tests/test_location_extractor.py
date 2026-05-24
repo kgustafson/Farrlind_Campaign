@@ -66,6 +66,61 @@ class LocationExtractorTest(unittest.TestCase):
         self.assertEqual(cleaned["rejected_candidates"][0]["text"], "Imaginary City")
         self.assertIn("not present", warnings[0])
 
+    def test_postprocess_rejects_party_interpretation_location(self):
+        document = {
+            "known_location_mentions": [],
+            "new_location_candidates": [{
+                "proposed_name": "Resort Management Office",
+                "description": "The party jokingly assumes the castle is the resort management office.",
+                "evidence": "They call it the manager's office as a joke.",
+            }],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = location_extractor.postprocess_extraction(
+            document,
+            [],
+            "session02",
+            "The party jokingly calls the castle the Resort Management Office, but no real place by that name is confirmed.",
+        )
+
+        self.assertEqual(cleaned["new_location_candidates"], [])
+        self.assertEqual(cleaned["rejected_candidates"][0]["text"], "Resort Management Office")
+        self.assertIn("party-interpretation location", warnings[0])
+
+    def test_postprocess_converts_unknown_known_mentions_to_new_candidates(self):
+        document = {
+            "known_location_mentions": [
+                {
+                    "location_id": 1,
+                    "canonical_name": "Night Lotus Inn and Spa",
+                    "new_information": "The party stayed at the resort.",
+                    "location_type": "building",
+                    "parent_location": "Icewind Dale",
+                    "is_underwater": False,
+                    "is_feywild": False,
+                    "confidence": "high",
+                    "evidence": "The party stayed at the Night Lotus Inn and Spa.",
+                }
+            ],
+            "new_location_candidates": [],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = location_extractor.postprocess_extraction(
+            document,
+            [],
+            "session01",
+            "The party stayed at the Night Lotus Inn and Spa in Icewind Dale.",
+        )
+
+        self.assertEqual(cleaned["known_location_mentions"], [])
+        self.assertEqual(cleaned["new_location_candidates"][0]["proposed_name"], "Night Lotus Inn and Spa")
+        self.assertEqual(cleaned["new_location_candidates"][0]["first_visited_session"], 1)
+        self.assertIn("Converted unknown known location mention", warnings[0])
+
     def test_extract_locations_writes_review_json(self):
         output = {
             "known_location_mentions": [],

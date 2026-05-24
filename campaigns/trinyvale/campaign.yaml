@@ -1,0 +1,96 @@
+campaign:
+  id: trinyvale
+  name: Trinyvale
+  archive_title: The Trinyvale Archivum
+  archive_subtitle: A campaign canon archive of sessions, lore, people, places, artifacts, and unresolved threads.
+  description: New campaign archive.
+
+database:
+  name: trinyvale
+  user: admin
+  password: gofaban
+  port: 5434
+
+dm:
+  name: Caldwell Tanner
+  aliases:
+    - Caldwell
+    - Dungeon Uncle
+    - Dunkle
+
+party:
+  - character_name: Jens
+    full_name: Jens Lyndelle
+    player_name: Brian Murphy
+    race: elf
+    class: bard
+    aliases:
+      - Jens Lindell
+      - Jins
+      - Murph
+    notes: One of the Trinyvale Triplets; introduced in the transcript as an elven bard.
+  - character_name: Onyx
+    full_name: Onyx Lumiere
+    player_name: Emily Axford
+    class: warlock
+    aliases:
+      - Onyx back
+    notes: One of the Trinyvale Triplets; introduced as a social media warlock from the moon.
+  - character_name: Nyack
+    full_name: Nyack of the Ran'afor
+    player_name: Jake Hurwitz
+    race: half-elf
+    class: ranger
+    aliases:
+      - Nyac
+      - Niac
+      - Nayak
+      - Jake
+    notes: One of the Trinyvale Triplets; introduced in the transcript as Jens's shirtless half-elf half brother.
+
+extraction_guidance:
+  party_members_are_player_characters: true
+  players_are_not_campaign_npcs: true
+  dm_is_not_campaign_npc: true
+  npc_extraction:
+    - Do not create NPC candidates for party members.
+    - Mentions of party members may be used as context, but not as NPC registry entries.
+    - Do not create NPC candidates for real-world players or the DM.
+
+glossary:
+  - term: Trinyvale
+    note: Campaign world name; normalize transcript drift to this spelling.
+    aliases: [Trinivale, Triniville, Trinnyvale]
+  - term: Trinyvale Triplets
+    note: Party nickname for Jens, Onyx, and Nyack.
+    aliases: [Trinivale triplets, Trinnyvale Toxic Triplets, Toxic Triplets]
+  - term: Jens Lyndelle
+    note: Player character played by Brian Murphy; transcript often hears the surname as Lindell.
+    aliases: [Jens Lindell, Jins]
+  - term: Onyx Lumiere
+    note: Player character played by Emily Axford.
+    aliases: [Onyx]
+  - term: Nyack of the Ran'afor
+    note: Player character played by Jake Hurwitz.
+    aliases: [Nyack, Nyac, Niac, Nayak]
+  - term: Strahd von Zarovich
+    note: Vampire lord of Barovia; the Triplets keep interpreting him as the resort manager.
+    aliases: [Strahd, Strahd Von Zorovich, Strahd von Zorovich]
+  - term: Barovia
+    note: Gothic domain where the Triplets are trapped after leaving the Night Lotus.
+    aliases: [Borovia, Barovia resort]
+  - term: Kolyan Indirovich
+    note: Burgomaster of Barovia; father of Ismark and adoptive father of Marina Kulyana.
+    aliases: [Kolyan, Burgomaster Kolyan]
+  - term: Marina Kulyana
+    note: Kolyan's adopted daughter, bitten by a vampire.
+    aliases: [Marina, Marina Kuljana, Marina Kolyana]
+  - term: Ismark
+    note: Kolyan's son; meets the party at Blood on the Vine and becomes suspicious of their disguises.
+    aliases: [Ismark the Lesser]
+  - term: Bluetooth
+    note: Onyx's imp familiar, also nicknamed Jens Z.
+    aliases: [Jens Z, Jens Z. Bluetooth]
+
+features:
+  songbook: false

@@ -75,6 +75,9 @@ Rules:
 - Do not include empty sections.
 - Ignore pure table chatter.
 - Ignore repeated filler such as "yep", "snap", or repeated cheering unless it affects play.
+- Separate confirmed world facts from party jokes, nicknames, sarcasm, mistaken assumptions, hypotheticals, and misunderstandings.
+- It is valid to extract a character moment where the party misunderstands something, but the summary/outcome must label it as party interpretation rather than objective canon.
+- Do not turn a pun, misread title, or invented player theory into a real NPC, location, artifact, lore fact, or combat outcome.
 
 High importance examples:
 - initiative begins

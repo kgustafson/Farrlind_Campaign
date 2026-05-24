@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}The Farrlind Archivum{% endblock %}
+{% block title %}{{ archive_title() }}{% endblock %}
 {% block body_class %}archive-dashboard{% endblock %}
 {% block content %}
 <section class="page-head archive-hero">
   <div>
-    <p class="eyebrow">Campaign Canon Ledger</p>
-    <h1>The Farrlind Archivum</h1>
-    <p>An eclectic collection of songs, recollections, and questionable wisdom from a traveling bard.</p>
+    <p class="eyebrow">{% if event_review_mode %}Human Review Gate{% else %}Campaign Canon Ledger{% endif %}</p>
+    <h1>{% if event_review_mode %}Event Review{% else %}{{ archive_title() }}{% endif %}</h1>
+    <p>{% if event_review_mode %}Review session event YAML after all extraction reviews are complete.{% else %}{{ archive_subtitle() }}{% endif %}</p>
   </div>
 </section>
 
@@ -35,8 +35,20 @@
         <td data-label="Unapplied">{{ row.unapplied_items }}</td>
         <td data-label="Final">{% if row.final_exists %}<span class="ok">yes</span>{% else %}<span class="muted">no</span>{% endif %}</td>
         <td data-label="Next"><span class="badge next">{{ row.next_action }}</span></td>
-        <td data-label="Open"><a class="icon-link" title="Open review" href="/sessions/{{ row.session }}/review">Open</a></td>
+        <td data-label="Open">
+          {% if event_review_mode and not row.event_review_ready %}
+            <span class="muted" title="Missing: {{ row.missing_extraction_reviews|join(', ') }}">Waiting</span>
+          {% else %}
+            <a class="icon-link" title="Open review" href="/sessions/{{ row.session }}/review">Open</a>
+          {% endif %}
+        </td>
       </tr>
+      {% if event_review_mode and row.missing_extraction_reviews %}
+      <tr class="subtle-row">
+        <td></td>
+        <td colspan="7" class="muted">Missing extraction reviews: {{ row.missing_extraction_reviews|join(", ") }}</td>
+      </tr>
+      {% endif %}
       {% endfor %}
     </tbody>
   </table>

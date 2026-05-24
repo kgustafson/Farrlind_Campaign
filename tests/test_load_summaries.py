@@ -1,5 +1,7 @@
 import importlib.util
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -15,6 +17,114 @@ spec.loader.exec_module(load_summaries)
 
 
 class LoadSummariesTest(unittest.TestCase):
+    def test_apply_sql_uses_docker_when_available(self):
+        sql_path = Path("/tmp/load.sql")
+        with patch("load_summaries.shutil.which", return_value="/usr/bin/docker"), \
+             patch("load_summaries.subprocess.run") as run:
+            load_summaries.apply_sql(sql_path, "trinyvale_db", "admin", "trinyvale")
+
+        self.assertEqual(run.call_count, 2)
+        self.assertEqual(run.call_args_list[0].args[0], ["docker", "cp", str(sql_path), "trinyvale_db:/tmp/load.sql"])
+        self.assertEqual(run.call_args_list[1].args[0][:3], ["docker", "exec", "trinyvale_db"])
+
+    def test_apply_sql_falls_back_to_direct_psql_when_docker_is_unavailable(self):
+        sql_path = Path("/tmp/load.sql")
+        with patch("load_summaries.shutil.which", return_value=None), \
+             patch.dict("load_summaries.os.environ", {
+                 "FARRLIND_DATABASE_URL": "postgresql+psycopg2://admin:gofaban@db:5432/trinyvale",
+             }), \
+             patch("load_summaries.subprocess.run") as run:
+            load_summaries.apply_sql(sql_path, "trinyvale_db", "admin", "trinyvale")
+
+        command = run.call_args.args[0]
+        self.assertEqual(command[:5], ["psql", "-v", "ON_ERROR_STOP=1", "-h", "db"])
+        self.assertIn("-p", command)
+        self.assertIn("5432", command)
+        self.assertEqual(command[-2:], ["-f", str(sql_path)])
+        self.assertEqual(run.call_args.kwargs["env"]["PGPASSWORD"], "gofaban")
+
+    def test_delete_events_sql_removes_encounters_before_session_events(self):
+        sql = load_summaries.delete_events_sql(1)
+
+        self.assertLess(sql.index("DELETE FROM encounter"), sql.index("DELETE FROM session_event"))
+        self.assertIn("OR event_id IN", sql)
+        self.assertNotIn("notes LIKE '%Loaded from encounters.yaml%'", sql)
+
+    def test_load_reviewed_combat_encounters_pairs_review_with_original_candidate(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            extracted = Path(tmp)
+            (extracted / "session01_combat_encounters.json").write_text(json.dumps({
+                "proposed_combat_encounters": [{
+                    "title": "Dire Wolf And Bat Swarm Confrontation",
+                    "session_number": 1,
+                    "subtype": "monster_fight",
+                    "location": "Trail",
+                    "participants": "Party, wolves, bats",
+                    "outcome": "enemies_fled",
+                    "confidence": "high",
+                    "notes": "A fight at the gate.",
+                    "enemies": [{
+                        "name": "Dire Wolves",
+                        "enemy_type": "dire_wolf",
+                        "quantity": 3,
+                        "quantity_killed": 1,
+                        "outcome": "fled",
+                    }],
+                }],
+            }), encoding="utf-8")
+            (extracted / "session01_combat_encounters_reviewed.json").write_text(json.dumps({
+                "session_number": 1,
+                "proposed_combat_encounters": [{
+                    "index": 0,
+                    "title": "Dire Wolf And Bat Swarm Confrontation",
+                    "decision": "create",
+                }],
+            }), encoding="utf-8")
+
+            with patch.object(load_summaries, "EXTRACTED_DIR", extracted):
+                encounters = load_summaries.load_reviewed_combat_encounters()
+
+        self.assertEqual(len(encounters), 1)
+        self.assertEqual(encounters[0]["title"], "Dire Wolf And Bat Swarm Confrontation")
+        self.assertEqual(encounters[0]["source"], "reviewed_combat_extraction")
+        self.assertEqual(encounters[0]["enemies"][0]["quantity_killed"], 1)
+
+    def test_reviewed_combat_sql_recreates_encounter_and_enemy_rows(self):
+        statements = load_summaries.reviewed_combat_sql({
+            "session_number": 1,
+            "source_index": 0,
+            "title": "Dire Wolf And Bat Swarm Confrontation",
+            "subtype": "monster_fight",
+            "location": "Trail",
+            "participants": "Party, wolves, bats",
+            "outcome": "enemies_fled",
+            "confidence": "high",
+            "notes": "A fight at the gate.",
+            "enemies": [{
+                "name": "Dire Wolves",
+                "enemy_type": "dire_wolf",
+                "quantity": 3,
+                "quantity_killed": 1,
+                "outcome": "fled",
+                "confidence": "high",
+                "notes": "One wolf was defeated.",
+            }],
+        })
+        sql = "\n".join(statements)
+
+        self.assertIn("Loaded from reviewed combat extraction", sql)
+        self.assertIn("INSERT INTO encounter", sql)
+        self.assertIn("INSERT INTO event_enemy", sql)
+        self.assertIn("Dire Wolves", sql)
+        self.assertIn("quantity_killed", sql)
+
+    def test_farrlind_legacy_seed_sql_is_campaign_gated(self):
+        with patch("load_summaries.active_campaign_name", return_value="trinyvale"):
+            self.assertEqual(load_summaries.canon_npc_scrub_sql(), "")
+            self.assertEqual(load_summaries.canon_enemy_scrub_sql(), "")
+            self.assertEqual(load_summaries.canon_open_threads_sql(), "")
+            self.assertEqual(load_summaries.first_seen_sql([]), "")
+
     def test_canon_decision_helpers_group_session_updates(self):
         decisions = {
             "session_primary_locations": [
@@ -212,15 +322,58 @@ class LoadSummariesTest(unittest.TestCase):
             18: {"status": "applied", "primary_location": "Balrog"},
             17: {"status": "in_review", "primary_location": "Paramon"},
             16: {"status": "applied", "primary_location": ""},
+            15: {"status": "applied", "macro_events": [{"order": 2, "location": "Catur"}]},
         }
 
-        self.assertEqual(load_summaries.review_primary_locations(reviews), {18: "Balrog"})
+        self.assertEqual(load_summaries.review_primary_locations(reviews), {18: "Balrog", 15: "Catur"})
+
+    def test_review_timeline_fact_derives_start_and_end_from_macro_events(self):
+        review = {
+            "session": "session01",
+            "status": "applied",
+            "session_date": "2026-05-23",
+            "in_game_date": "",
+            "macro_events": [
+                {"order": 2, "description": "Travel", "location": "Trail"},
+                {"order": 1, "description": "Spa", "location": "Night Lotus Inn and Spa"},
+                {"order": 3, "description": "Barovia", "location": "Barovia"},
+            ],
+        }
+
+        self.assertEqual(load_summaries.review_timeline_fact(review), {
+            "physical_date": "2026-05-23",
+            "in_game_date": "N/A",
+            "start_location": "Night Lotus Inn and Spa",
+            "end_location": "Barovia",
+        })
+
+    def test_review_timeline_fact_defaults_missing_physical_date_to_today(self):
+        review = {
+            "session": "session01",
+            "status": "applied",
+            "session_date": "",
+            "macro_events": [
+                {"order": 1, "location": "Night Lotus Inn and Spa"},
+                {"order": 2, "location": "Barovia"},
+            ],
+        }
+
+        with patch("load_summaries.date") as today:
+            today.today.return_value.isoformat.return_value = "2026-05-23"
+            fact = load_summaries.review_timeline_fact(review)
+
+        self.assertEqual(fact["physical_date"], "2026-05-23")
+        self.assertEqual(fact["in_game_date"], "N/A")
 
     def test_review_location_names_collects_completed_review_locations(self):
         reviews = {
             17: {
                 "status": "reviewed",
                 "primary_location": "Paramon",
+                "macro_events": [
+                    {"order": 1, "location": "Start Place"},
+                    {"order": 2, "location": "End Place"},
+                ],
                 "items": [
                     {"decision": "accepted", "location": "Crossroads"},
                     {"decision": "rejected", "location": "Ignored"},
@@ -236,7 +389,7 @@ class LoadSummariesTest(unittest.TestCase):
             },
         }
 
-        self.assertEqual(load_summaries.review_location_names(reviews), {"Paramon", "Crossroads", "Balrog"})
+        self.assertEqual(load_summaries.review_location_names(reviews), {"Paramon", "Start Place", "End Place", "Crossroads", "Balrog"})
 
     def test_build_sql_uses_reviewed_events_instead_of_summary_events(self):
         summaries = [
@@ -296,6 +449,10 @@ class LoadSummariesTest(unittest.TestCase):
                 "session": "session18",
                 "status": "applied",
                 "primary_location": "Balrog",
+                "macro_events": [
+                    {"order": 1, "location": "Paramon"},
+                    {"order": 2, "location": "Balrog"},
+                ],
                 "items": [],
                 "added_items": [],
             }
@@ -307,6 +464,8 @@ class LoadSummariesTest(unittest.TestCase):
                     sql = load_summaries.build_sql(summaries)
 
         self.assertIn("(SELECT id FROM location WHERE name = 'Balrog' LIMIT 1)", sql)
+        self.assertIn("start_location_id, end_location_id", sql)
+        self.assertIn("(SELECT id FROM location WHERE name = 'Paramon' LIMIT 1)", sql)
 
     def test_build_sql_inserts_review_introduced_locations(self):
         summaries = [
@@ -632,6 +791,7 @@ class LoadSummariesTest(unittest.TestCase):
                 "enemy_name": "Goblin",
                 "enemy_type": "goblin",
                 "quantity": 2,
+                "quantity_killed": 2,
                 "outcome": "defeated",
                 "confidence": "high",
                 "notes": "Two goblins summoned by the fey witch.",
@@ -645,6 +805,7 @@ class LoadSummariesTest(unittest.TestCase):
                         sql = load_summaries.build_sql(summaries)
 
         self.assertIn("ALTER TABLE event_enemy ADD COLUMN IF NOT EXISTS quantity", sql)
+        self.assertIn("ALTER TABLE event_enemy ADD COLUMN IF NOT EXISTS quantity_killed", sql)
         self.assertIn("'Goblin'", sql)
         self.assertIn("'goblin'", sql)
         self.assertIn("se.sequence_order = 1", sql)
@@ -674,6 +835,7 @@ class LoadSummariesTest(unittest.TestCase):
                 "enemy_name": "Cultist spellcaster",
                 "enemy_type": "cultist_spellcaster",
                 "quantity": 2,
+                "quantity_killed": 2,
                 "outcome": "killed",
                 "confidence": "high",
                 "notes": "Two spellcasting cultists; both killed.",
@@ -684,6 +846,7 @@ class LoadSummariesTest(unittest.TestCase):
                 "enemy_name": "Cultist melee fighter",
                 "enemy_type": "cultist_melee",
                 "quantity": 3,
+                "quantity_killed": 3,
                 "outcome": "killed",
                 "confidence": "high",
                 "notes": "Three melee cultists; all killed.",

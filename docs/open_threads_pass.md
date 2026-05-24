@@ -43,19 +43,19 @@ These probably should not be loaded as open unless you want historical thread tr
 
 ## Source Anchors
 
-- `knowledge/Faban/lore/wells_of_magic.md`: consolidated Wells rules and explicit open questions.
-- `knowledge/Faban/final/session04_summary.md`: Allegiance of Stars, Corvinas mark, Urgan's Axe promise, other Wells.
-- `knowledge/Faban/final/session05_summary.md`: Salazar contract, Cataclysm explanation, Hanedal, Alliance of Stars.
-- `knowledge/Faban/final/session06_summary.md`: Khorag, Wand of Wells, Open Hand, party lying by omission, Ardema.
-- `knowledge/Faban/final/session07_summary.md`: Ardema plane-shifts away.
-- `knowledge/Faban/final/session09_summary.md`: primordial chaos and cult activity.
-- `knowledge/Faban/final/session11_summary.md`: archaeological site protections and ancient curses.
-- `knowledge/Faban/final/session12_summary.md`: Abyssal dagger.
-- `knowledge/Faban/final/session13_summary.md`: Corvinas' mark, Cole's card, stolen Wand, Jennifer's Well list.
-- `knowledge/Faban/final/session14_summary.md`: Ordor, Catur, Open Hand, Hanedal, disturbed Well.
-- `knowledge/Faban/final/session15_summary.md`: tabaxi, Tiamat, demons, Ordor's condition, Iron Paw, sapphire-eyed stranger.
-- `knowledge/Faban/final/session16_summary.md`: Iron Paw confrontation.
-- `knowledge/Faban/final/session17_summary.md`: primordial over-release, Whisper Root, Crossroads Festival, elemental cult mark.
-- `knowledge/Faban/final/session18_summary.md`: Saiffi, Tiamat, cults, Orsydon.
-- `knowledge/Faban/final/session19_summary.md`: Orsydon defeated, planning around Wells and Wand.
-- `knowledge/Faban/final/session20_summary.md`: Catur approach, fishermen warnings, boat from Alistair.
+- `campaigns/{campaign}/lore/wells_of_magic.md`: consolidated Wells rules and explicit open questions.
+- `campaigns/{campaign}/final/session04_summary.md`: Allegiance of Stars, Corvinas mark, Urgan's Axe promise, other Wells.
+- `campaigns/{campaign}/final/session05_summary.md`: Salazar contract, Cataclysm explanation, Hanedal, Alliance of Stars.
+- `campaigns/{campaign}/final/session06_summary.md`: Khorag, Wand of Wells, Open Hand, party lying by omission, Ardema.
+- `campaigns/{campaign}/final/session07_summary.md`: Ardema plane-shifts away.
+- `campaigns/{campaign}/final/session09_summary.md`: primordial chaos and cult activity.
+- `campaigns/{campaign}/final/session11_summary.md`: archaeological site protections and ancient curses.
+- `campaigns/{campaign}/final/session12_summary.md`: Abyssal dagger.
+- `campaigns/{campaign}/final/session13_summary.md`: Corvinas' mark, Cole's card, stolen Wand, Jennifer's Well list.
+- `campaigns/{campaign}/final/session14_summary.md`: Ordor, Catur, Open Hand, Hanedal, disturbed Well.
+- `campaigns/{campaign}/final/session15_summary.md`: tabaxi, Tiamat, demons, Ordor's condition, Iron Paw, sapphire-eyed stranger.
+- `campaigns/{campaign}/final/session16_summary.md`: Iron Paw confrontation.
+- `campaigns/{campaign}/final/session17_summary.md`: primordial over-release, Whisper Root, Crossroads Festival, elemental cult mark.
+- `campaigns/{campaign}/final/session18_summary.md`: Saiffi, Tiamat, cults, Orsydon.
+- `campaigns/{campaign}/final/session19_summary.md`: Orsydon defeated, planning around Wells and Wand.
+- `campaigns/{campaign}/final/session20_summary.md`: Catur approach, fishermen warnings, boat from Alistair.

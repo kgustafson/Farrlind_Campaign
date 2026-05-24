@@ -43,7 +43,7 @@
     <span class="stat-label">Murder Hobo Count</span>
     <strong>{{ murder_hobo_count.label }}</strong>
     <span class="stat-note">
-      Confirmed party kills from combat rows with killed or defeated outcomes.
+      Confirmed party kills from combat enemy killed-count rows.
       {% if murder_hobo_count.unknown_rows %}Unknown-count kill rows remain unresolved.{% endif %}
     </span>
   </div>
@@ -90,10 +90,10 @@
                   <span class="enemy-name">{{ enemy.name }}</span>
                   {% if enemy.enemy_type %}<span class="enemy-type">{{ enemy.enemy_type }}</span>{% endif %}
                   <span class="enemy-outcome">{{ enemy.outcome or "unknown" }}</span>
-                  {% if enemy.quantity is not none and (enemy.outcome or "") in ["killed", "defeated"] %}
-                    <span class="enemy-kill-count">{{ enemy.quantity }} killed/defeated</span>
-                  {% elif (enemy.outcome or "") in ["killed", "defeated"] %}
-                    <span class="enemy-kill-count">unknown killed/defeated</span>
+                  {% if enemy.quantity_killed is not none and enemy.quantity_killed %}
+                    <span class="enemy-kill-count">{{ enemy.quantity_killed }} killed</span>
+                  {% elif enemy.quantity_killed is none and (enemy.outcome or "") in ["killed", "defeated"] %}
+                    <span class="enemy-kill-count">unknown killed</span>
                   {% endif %}
                 </li>
               {% endfor %}
@@ -186,6 +186,7 @@
           <span>Enemy</span>
           <span>Type</span>
           <span>Qty</span>
+          <span>Qty Killed</span>
           <span>Outcome</span>
           <span>Confidence</span>
           <span>Notes</span>
@@ -210,8 +211,12 @@
               <input name="enemy_type_{{ i }}" value="{{ enemy.enemy_type }}" placeholder="cultist">
             </label>
             <label class="field-block">
-              <span>Qty</span>
-              <input name="enemy_quantity_{{ i }}" type="number" min="0" value="{{ enemy.quantity if enemy.quantity is not none else '' }}" placeholder="unknown">
+          <span>Qty</span>
+          <input name="enemy_quantity_{{ i }}" type="number" min="0" value="{{ enemy.quantity if enemy.quantity is not none else '' }}" placeholder="unknown">
+        </label>
+            <label class="field-block">
+              <span>Qty Killed</span>
+              <input name="enemy_quantity_killed_{{ i }}" type="number" min="0" value="{{ enemy.quantity_killed if enemy.quantity_killed is not none else '' }}" placeholder="0">
             </label>
             <label class="field-block">
               <span>Outcome</span>
@@ -249,6 +254,10 @@
             <label class="field-block">
               <span>Qty</span>
               <input name="enemy_quantity_{{ new_enemy_index }}" type="number" min="0" value="" placeholder="unknown">
+            </label>
+            <label class="field-block">
+              <span>Qty Killed</span>
+              <input name="enemy_quantity_killed_{{ new_enemy_index }}" type="number" min="0" value="" placeholder="0">
             </label>
             <label class="field-block">
               <span>Outcome</span>

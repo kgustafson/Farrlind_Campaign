@@ -8,9 +8,11 @@ from typing import Any, Optional
 import markdown
 import yaml
 
+from raglib import campaign
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-KNOWLEDGE_DIR = REPO_ROOT / "knowledge" / "Faban"
+KNOWLEDGE_DIR = campaign.campaign_root()
 CLEAN_DIR = KNOWLEDGE_DIR / "clean"
 FINAL_DIR = KNOWLEDGE_DIR / "final"
 REVIEWS_DIR = KNOWLEDGE_DIR / "reviews"
@@ -50,6 +52,18 @@ class ReviewSummary:
     unknown_decisions: int
     unapplied_items: int
     next_action: str
+    event_review_ready: bool
+    missing_extraction_reviews: list[str]
+
+
+EXTRACTION_REVIEW_FILES = [
+    ("NPC Extraction", "session{session_number:02d}_npcs_reviewed.json"),
+    ("Location Extraction", "session{session_number:02d}_locations_reviewed.json"),
+    ("Artifact Extraction", "session{session_number:02d}_artifacts_reviewed.json"),
+    ("Lore Item Extraction", "session{session_number:02d}_lore_items_reviewed.json"),
+    ("Combat Encounter Extraction", "session{session_number:02d}_combat_encounters_reviewed.json"),
+    ("Open Thread Extraction", "session{session_number:02d}_open_threads_reviewed.json"),
+]
 
 
 def session_key(session_number: int) -> str:
@@ -65,6 +79,29 @@ def parse_session_ref(value: Any) -> int:
 
 def review_path(session_number: int) -> Path:
     return REVIEWS_DIR / f"{session_key(session_number)}_review.yaml"
+
+
+def extraction_review_path(session_number: int, pattern: str) -> Path:
+    return KNOWLEDGE_DIR / "extracted" / pattern.format(session_number=session_number)
+
+
+def missing_extraction_reviews(session_number: int) -> list[str]:
+    missing = []
+    for label, pattern in EXTRACTION_REVIEW_FILES:
+        if not extraction_review_path(session_number, pattern).exists():
+            missing.append(label)
+    return missing
+
+
+def event_review_ready(session_number: int) -> bool:
+    return not missing_extraction_reviews(session_number)
+
+
+def event_review_access_blocked(session_number: int) -> bool:
+    document = load_review_document(session_number)
+    if (document.get("status") or "") in {"reviewed", "applied"}:
+        return False
+    return not event_review_ready(session_number)
 
 
 def diary_path(session_number: int) -> Path:
@@ -136,6 +173,7 @@ def summarize_review_document(session_number: int, document: dict[str, Any]) -> 
     counts = decision_counts(document)
     items = document.get("items") or []
     added_items = document.get("added_items") or []
+    missing_reviews = missing_extraction_reviews(session_number)
     return ReviewSummary(
         session=key,
         session_number=session_number,
@@ -155,6 +193,8 @@ def summarize_review_document(session_number: int, document: dict[str, Any]) -> 
         unknown_decisions=counts["other"],
         unapplied_items=unapplied_count(document),
         next_action=next_action_for(document),
+        event_review_ready=not missing_reviews,
+        missing_extraction_reviews=missing_reviews,
     )
 
 
@@ -210,6 +250,8 @@ def review_stage(document: dict[str, Any]) -> str:
     if (document.get("status") or "") in {"reviewed", "applied"}:
         return "event_resolution"
     stage = document.get("review_stage") or "high_level_order"
+    if stage == "bucketing" and not document.get("macro_events"):
+        return "high_level_order"
     return stage if stage in VALID_REVIEW_STAGES else "high_level_order"
 
 
@@ -769,6 +811,7 @@ def validate_review_document(document: dict[str, Any]) -> list[str]:
     seen_ids = set()
     for item in all_review_items(document):
         item_id = item.get("id") or ""
+        item_label = f"Order {item.get('sequence')} event {item_id}" if item.get("sequence") not in {None, ""} and item_id else item_id or "Item"
         if item_id in seen_ids:
             notes.append(f"Duplicate item id: {item_id}.")
         elif item_id:
@@ -782,15 +825,15 @@ def validate_review_document(document: dict[str, Any]) -> list[str]:
 
         decision = item.get("decision") or "pending"
         if decision not in VALID_DECISIONS:
-            notes.append(f"{item_id or 'Item'} has unknown decision: {decision}.")
+            notes.append(f"{item_label} has unknown decision: {decision}.")
         if decision == "pending":
-            notes.append(f"{item_id or 'Item'} still has a pending decision.")
+            notes.append(f"{item_label} still has a pending decision.")
         if decision not in {"pending", "rejected"} and item.get("event_type") not in EVENT_TYPES:
-            notes.append(f"{item_id or 'Item'} has decision {decision} but is missing a valid event type.")
+            notes.append(f"{item_label} has decision {decision} but is missing a valid event type.")
         if decision in {"corrected", "added"}:
             for field in ["canonical_text", "significance", "reason"]:
                 if item.get(field) in {None, ""}:
-                    notes.append(f"{item_id or 'Item'} is {decision} but missing {field}.")
+                    notes.append(f"{item_label} is {decision} but missing {field}.")
 
     if not notes:
         notes.append("No review validation issues found.")

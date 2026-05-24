@@ -84,6 +84,28 @@ class DmQueryTest(unittest.TestCase):
         self.assertIn("--csv", command)
         self.assertEqual(command[-2:], ["-c", "SELECT 1;"])
 
+    def test_run_query_falls_back_to_direct_psql_when_docker_is_unavailable(self):
+        completed = subprocess.CompletedProcess(
+            args=[],
+            returncode=0,
+            stdout="session_number,title\n1,Start\n",
+            stderr="",
+        )
+        with patch("dm_query.shutil.which", return_value=None), \
+             patch.dict("dm_query.os.environ", {
+                 "FARRLIND_DATABASE_URL": "postgresql+psycopg2://admin:gofaban@db:5432/trinyvale",
+             }), \
+             patch("dm_query.subprocess.run", return_value=completed) as run:
+            rows = dm_query.run_query(args(), "SELECT 1;")
+
+        self.assertEqual(rows, [{"session_number": "1", "title": "Start"}])
+        command = run.call_args.args[0]
+        self.assertEqual(command[:5], ["psql", "-v", "ON_ERROR_STOP=1", "-h", "db"])
+        self.assertIn("-p", command)
+        self.assertIn("5432", command)
+        self.assertEqual(command[-2:], ["-c", "SELECT 1;"])
+        self.assertEqual(run.call_args.kwargs["env"]["PGPASSWORD"], "gofaban")
+
     def test_run_query_exits_on_psql_error(self):
         completed = subprocess.CompletedProcess(
             args=[],
@@ -355,6 +377,7 @@ class DmQueryTest(unittest.TestCase):
         self.assertEqual(document["items"][0]["decision"], "pending")
         self.assertEqual(document["items"][0]["applied_status"], "pending")
         self.assertIn("Use sequence", document["review_instructions"][2])
+        self.assertIn("source_files", document)
         self.assertEqual(document["added_items"], [])
 
     def test_parse_merged_events_converts_draft_events_to_review_rows(self):
@@ -722,6 +745,74 @@ class DmQueryTest(unittest.TestCase):
         self.assertIn("Arrived at Catur shoreline", rendered)
         self.assertIn("Coast near Catur", rendered)
         self.assertIn("negotiated with fishermen", rendered)
+
+    def test_review_events_falls_back_to_draft_events_and_summary(self):
+        review_data = {
+            "session": {
+                "session_number": "21",
+                "session_date": "2026-05-04",
+                "in_game_date": "",
+                "title": "Draft Only",
+                "location": "",
+                "summary": "",
+            },
+            "events": [],
+        }
+        draft_events = [
+            {
+                "sequence_order": "1",
+                "event_type": "story",
+                "location": "Night Lotus Inn and Spa",
+                "description": "The draft event should be visible before DB load.",
+                "significance": 3,
+            }
+        ]
+
+        with patch("dm_query.query_event_review", return_value=review_data):
+            with patch("dm_query.review_events_for_init", return_value=draft_events):
+                with patch("dm_query.review_summary_text", return_value="Draft summary from clean files."):
+                    with patch("dm_query.load_canon_decisions", return_value={}):
+                        with contextlib.redirect_stdout(io.StringIO()) as output:
+                            dm_query.review_events(args(session_number=21))
+
+        rendered = output.getvalue()
+        self.assertIn("Source Summary", rendered)
+        self.assertIn("Draft summary from clean files.", rendered)
+        self.assertIn("Draft Merged Events", rendered)
+        self.assertIn("draft event should be visible", rendered)
+
+    def test_init_review_uses_draft_session_when_db_session_absent(self):
+        review_data = {"session": {}, "events": []}
+        draft_session = {
+            "session_number": "1",
+            "session_date": "",
+            "in_game_date": "",
+            "title": "Session 01",
+            "location": "",
+            "summary": "Draft-only session.",
+        }
+        draft_events = [{
+            "sequence_order": "1",
+            "event_type": "story",
+            "location": "Night Lotus Inn and Spa",
+            "description": "Draft event.",
+            "significance": 3,
+        }]
+
+        with tempfile.TemporaryDirectory() as tmp:
+            output_path = Path(tmp) / "session01_review.yaml"
+            with patch("dm_query.query_event_review", return_value=review_data):
+                with patch("dm_query.draft_session_for_review", return_value=draft_session):
+                    with patch("dm_query.review_events_for_init", return_value=draft_events):
+                        with patch("dm_query.review_path", return_value=output_path):
+                            with contextlib.redirect_stdout(io.StringIO()):
+                                dm_query.init_review(args(session_number=1))
+
+            document = yaml.safe_load(output_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(document["session"], "session01")
+        self.assertEqual(document["session_title"], "Session 01")
+        self.assertEqual(document["items"][0]["source_text"], "Draft event.")
 
     def test_session_final_prints_reviewed_packet(self):
         review_data = {

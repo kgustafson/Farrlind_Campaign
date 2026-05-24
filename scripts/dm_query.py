@@ -1,25 +1,33 @@
 import argparse
 import csv
+import os
 import re
+import shutil
 import subprocess
 import sys
 import textwrap
 from datetime import date
 from pathlib import Path
 from typing import Optional
+from urllib.parse import urlparse
 
 import yaml
 
-
-DEFAULT_CONTAINER = "farrlind_db"
-DEFAULT_USER = "admin"
-DEFAULT_DATABASE = "farrlind"
-MAX_LIMIT = 1000
 REPO_ROOT = Path(__file__).resolve().parents[1]
-CANON_DECISIONS_PATH = REPO_ROOT / "knowledge" / "Faban" / "canon_decisions.yaml"
-REVIEWS_DIR = REPO_ROOT / "knowledge" / "Faban" / "reviews"
-FINAL_DIR = REPO_ROOT / "knowledge" / "Faban" / "final"
-CLEAN_DIR = REPO_ROOT / "knowledge" / "Faban" / "clean"
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from raglib.campaign import campaign_container_name, campaign_database_name, campaign_path
+
+
+DEFAULT_CONTAINER = campaign_container_name()
+DEFAULT_USER = "admin"
+DEFAULT_DATABASE = campaign_database_name()
+MAX_LIMIT = 1000
+CANON_DECISIONS_PATH = campaign_path("canon_decisions.yaml")
+REVIEWS_DIR = campaign_path("reviews")
+FINAL_DIR = campaign_path("final")
+CLEAN_DIR = campaign_path("clean")
 
 
 def bounded_int(value: str, minimum: int = 1, maximum: int = MAX_LIMIT) -> int:
@@ -53,8 +61,20 @@ def like_pattern(value: str) -> str:
     return sql_literal(f"%{value}%")
 
 
-def run_query(args, sql: str) -> list[dict]:
-    command = [
+def database_connection_args(args) -> dict[str, str]:
+    url = os.getenv("FARRLIND_DATABASE_URL") or ""
+    parsed = urlparse(url.replace("postgresql+psycopg2://", "postgresql://", 1)) if url else None
+    return {
+        "host": getattr(args, "host", None) or (parsed.hostname if parsed else None) or "localhost",
+        "port": str(getattr(args, "port", None) or (parsed.port if parsed else None) or ""),
+        "user": getattr(args, "user", None) or (parsed.username if parsed else None) or DEFAULT_USER,
+        "password": getattr(args, "password", None) or (parsed.password if parsed else None) or "",
+        "database": getattr(args, "database", None) or ((parsed.path or "").lstrip("/") if parsed else None) or DEFAULT_DATABASE,
+    }
+
+
+def docker_query_command(args, sql: str) -> tuple[list[str], Optional[dict[str, str]]]:
+    return [
         "docker",
         "exec",
         args.container,
@@ -68,8 +88,47 @@ def run_query(args, sql: str) -> list[dict]:
         "--csv",
         "-c",
         sql,
+    ], None
+
+
+def direct_psql_query_command(args, sql: str) -> tuple[list[str], Optional[dict[str, str]]]:
+    connection = database_connection_args(args)
+    command = [
+        "psql",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-h",
+        connection["host"],
+        "-U",
+        connection["user"],
+        "-d",
+        connection["database"],
+        "--csv",
+        "-c",
+        sql,
     ]
-    result = subprocess.run(command, check=False, capture_output=True, text=True)
+    if connection["port"]:
+        command[5:5] = ["-p", connection["port"]]
+    env = os.environ.copy()
+    if connection["password"]:
+        env["PGPASSWORD"] = connection["password"]
+    return command, env
+
+
+def query_command(args, sql: str) -> tuple[list[str], Optional[dict[str, str]]]:
+    mode = getattr(args, "query_mode", "auto")
+    if mode == "docker":
+        return docker_query_command(args, sql)
+    if mode == "psql":
+        return direct_psql_query_command(args, sql)
+    if shutil.which("docker"):
+        return docker_query_command(args, sql)
+    return direct_psql_query_command(args, sql)
+
+
+def run_query(args, sql: str) -> list[dict]:
+    command, env = query_command(args, sql)
+    result = subprocess.run(command, check=False, capture_output=True, text=True, env=env)
     if result.returncode != 0:
         print(result.stderr.strip() or result.stdout.strip(), file=sys.stderr)
         raise SystemExit(result.returncode)
@@ -512,8 +571,63 @@ def final_summary_path(session_number: int) -> Path:
     return FINAL_DIR / f"{session_key(session_number)}_summary.md"
 
 
+def draft_summary_path(session_number: int) -> Path:
+    return CLEAN_DIR / f"{session_key(session_number)}_summary.md"
+
+
+def curated_packet_path(session_number: int) -> Path:
+    return CLEAN_DIR / f"{session_key(session_number)}_curated.md"
+
+
+def validation_report_path(session_number: int) -> Path:
+    return CLEAN_DIR / f"{session_key(session_number)}_validation.md"
+
+
 def merged_events_path(session_number: int) -> Path:
     return CLEAN_DIR / f"{session_key(session_number)}_merged.md"
+
+
+def review_source_files(session_number: int) -> dict[str, str]:
+    paths = {
+        "draft_summary": draft_summary_path(session_number),
+        "curated_packet": curated_packet_path(session_number),
+        "merged_events": merged_events_path(session_number),
+        "validation_report": validation_report_path(session_number),
+    }
+    return {label: str(path) for label, path in paths.items() if path.exists()}
+
+
+def read_first_existing(paths: list[Path]) -> str:
+    for path in paths:
+        if path.exists():
+            return path.read_text(encoding="utf-8")
+    return ""
+
+
+def review_summary_text(session: dict, session_number: int) -> str:
+    if session.get("summary"):
+        return session.get("summary") or ""
+    return read_first_existing([
+        draft_summary_path(session_number),
+        curated_packet_path(session_number),
+    ])
+
+
+def draft_session_for_review(session_number: int) -> dict:
+    sources = review_source_files(session_number)
+    if not sources:
+        return {}
+    return {
+        "session_number": str(session_number),
+        "session_date": "",
+        "in_game_date": "",
+        "title": f"Session {session_number:02d}",
+        "location": "",
+        "summary": read_first_existing([
+            draft_summary_path(session_number),
+            curated_packet_path(session_number),
+        ]),
+    }
 
 
 def load_review_file(path: Path) -> dict:
@@ -733,6 +847,7 @@ def build_review_document(session: dict, events: list[dict]) -> dict:
         "session_date": str(session.get("session_date") or ""),
         "in_game_date": session.get("in_game_date") or "",
         "primary_location": session.get("location") or "",
+        "source_files": review_source_files(session_number),
         "items": [review_item_from_event(event) for event in events],
         "added_items": [],
     }
@@ -847,7 +962,9 @@ def health(args):
 def review_events(args):
     session_number = args.session_number
     review = query_event_review(args, session_number)
-    session = review["session"]
+    session = review["session"] or draft_session_for_review(session_number)
+    events = review_events_for_init(args, session_number, review["events"])
+    event_source_label = "Current DB Events" if review["events"] else "Draft Merged Events"
     decisions = canon_decisions_for_session(load_canon_decisions(), session_number)
 
     print_section(f"Session {session_number:02d} Event Review")
@@ -866,14 +983,14 @@ def review_events(args):
     print("")
 
     print_section("Source Summary")
-    print(textwrap.fill(clip(session.get("summary"), 1200), width=96))
+    print(textwrap.fill(clip(review_summary_text(session, session_number), 1200), width=96))
     print("")
 
-    print_section("Current DB Events")
-    if not review["events"]:
-        print("No DB events found.")
+    print_section(event_source_label)
+    if not events:
+        print("No events found.")
     else:
-        for event in review["events"]:
+        for event in events:
             sequence = event.get("sequence_order") or "?"
             event_type = f"{event['event_type']}: " if event.get("event_type") else ""
             location = f" [{event['location']}]" if event.get("location") else ""
@@ -908,7 +1025,7 @@ def init_review(args):
         raise SystemExit(f"Review file already exists: {output_path}")
 
     review = query_event_review(args, session_number)
-    session = review["session"]
+    session = review["session"] or draft_session_for_review(session_number)
     if not session:
         raise SystemExit(f"No session found for session{session_number:02d}")
 
@@ -1081,7 +1198,7 @@ def render_final_summary(session: dict, events: list[dict], review_document: dic
         "## Provenance",
         "",
         f"- Built from final database events for session{session_number:02d}.",
-        f"- Review file: knowledge/Faban/reviews/session{session_number:02d}_review.yaml",
+        f"- Review file: {REVIEWS_DIR.relative_to(REPO_ROOT)}/session{session_number:02d}_review.yaml",
         "- The ingest draft summary is source material, not canon.",
         "",
     ])
@@ -1245,6 +1362,10 @@ def build_parser():
     parser.add_argument("--container", default=DEFAULT_CONTAINER)
     parser.add_argument("--user", default=DEFAULT_USER)
     parser.add_argument("--database", default=DEFAULT_DATABASE)
+    parser.add_argument("--host", default="")
+    parser.add_argument("--port", default="")
+    parser.add_argument("--password", default="")
+    parser.add_argument("--query-mode", choices=["auto", "docker", "psql"], default="auto")
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 

@@ -6,8 +6,8 @@ from unittest.mock import patch
 
 import yaml
 
-from web_review.services import artifact_extraction_review, canon, combat_extraction_review, commands, location_extraction_review, lore, lore_item_extraction_review, npc_extraction_review, open_thread_extraction_review, reviews, workflow
-from web_review.app import BACKUP_DOWNLOADS, COMMAND_RESULTS, app, app_version
+from web_review.services import artifact_extraction_review, canon, combat_extraction_review, commands, location_extraction_review, lore_item_extraction_review, npc_extraction_review, open_thread_extraction_review, reviews, workflow
+from web_review.app import BACKUP_DOWNLOADS, COMMAND_RESULTS, app, app_version, sync_after_extraction_review
 from scripts import export_static_archive
 from scripts.load_songbook import songbook_source_sql
 from fastapi.testclient import TestClient
@@ -56,6 +56,29 @@ class WebReviewServiceTest(unittest.TestCase):
         self.assertEqual(rows[0].unapplied_items, 2)
         self.assertTrue(rows[0].final_exists)
         self.assertEqual(rows[0].next_action, "apply")
+        self.assertFalse(rows[0].event_review_ready)
+        self.assertIn("NPC Extraction", rows[0].missing_extraction_reviews)
+
+    def test_dashboard_rows_mark_event_review_ready_after_extraction_reviews(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "clean").mkdir()
+            (root / "final").mkdir()
+            extracted = root / "extracted"
+            extracted.mkdir()
+            (root / "clean" / "session01_summary.md").write_text("draft", encoding="utf-8")
+            self.write_review(root, "session01", {"session": "session01", "status": "in_review", "items": []})
+            for _label, pattern in reviews.EXTRACTION_REVIEW_FILES:
+                (extracted / pattern.format(session_number=1)).write_text("{}", encoding="utf-8")
+
+            with patch.object(reviews, "KNOWLEDGE_DIR", root), \
+                 patch.object(reviews, "REVIEWS_DIR", root / "reviews"), \
+                 patch.object(reviews, "CLEAN_DIR", root / "clean"), \
+                 patch.object(reviews, "FINAL_DIR", root / "final"):
+                rows = reviews.dashboard_rows()
+
+        self.assertTrue(rows[0].event_review_ready)
+        self.assertEqual(rows[0].missing_extraction_reviews, [])
 
     def test_session_workspace_loads_selected_source_and_sorts_items(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -93,13 +116,6 @@ class WebReviewServiceTest(unittest.TestCase):
         self.assertEqual([item["id"] for item in workspace["items"]], ["event-001", "added-001", "event-002"])
         self.assertEqual(workspace["validation"], ["No review validation issues found."])
 
-    def test_wells_lore_write_creates_parent_and_trims_trailing_blank_lines(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp) / "lore" / "wells_of_magic.md"
-            lore.write_wells_of_magic("The Wells remember.\n\n", path=path)
-
-            self.assertEqual(path.read_text(encoding="utf-8"), "The Wells remember.\n")
-
     def test_validate_review_document_reports_required_corrected_fields(self):
         notes = reviews.validate_review_document({
             "status": "reviewed",
@@ -108,8 +124,8 @@ class WebReviewServiceTest(unittest.TestCase):
             ],
         })
 
-        self.assertIn("event-001 is corrected but missing canonical_text.", notes)
-        self.assertIn("event-001 has decision corrected but is missing a valid event type.", notes)
+        self.assertIn("Order 1 event event-001 is corrected but missing canonical_text.", notes)
+        self.assertIn("Order 1 event event-001 has decision corrected but is missing a valid event type.", notes)
 
     def test_update_review_document_from_form_updates_existing_items(self):
         document = {
@@ -271,7 +287,8 @@ class WebReviewServiceTest(unittest.TestCase):
 
     def test_review_stage_defaults_to_high_level_order_but_preserves_applied(self):
         self.assertEqual(reviews.review_stage({"status": "in_review"}), "high_level_order")
-        self.assertEqual(reviews.review_stage({"status": "in_review", "review_stage": "bucketing"}), "bucketing")
+        self.assertEqual(reviews.review_stage({"status": "in_review", "review_stage": "bucketing", "macro_events": [{"id": "macro-001"}]}), "bucketing")
+        self.assertEqual(reviews.review_stage({"status": "in_review", "review_stage": "bucketing", "items": [{"id": "event-001"}]}), "high_level_order")
         self.assertEqual(reviews.review_stage({"status": "applied"}), "event_resolution")
 
     def test_update_bucketing_from_form_assigns_bucket_or_rejects(self):
@@ -568,15 +585,154 @@ class WebReviewAppTest(unittest.TestCase):
         self.assertIn(f"Farrlind Campaign {app_version()}", response.text)
 
     def test_dashboard_renders_world_map_modal_link(self):
-        with patch.object(reviews, "dashboard_rows", return_value=[]):
+        with tempfile.TemporaryDirectory() as tmp, \
+             patch.object(reviews, "dashboard_rows", return_value=[]), \
+             patch("web_review.app.assets_dir", return_value=Path(tmp)):
+            (Path(tmp) / "world-map.png").write_bytes(b"map")
             client = TestClient(app)
             response = client.get("/")
 
         self.assertEqual(response.status_code, 200)
         self.assertIn('href="#world-map-modal"', response.text)
         self.assertIn("World Map", response.text)
-        self.assertIn("/static/farrlind-world-map.png", response.text)
+        self.assertIn("/world-map/image?v=", response.text)
         self.assertIn("Farrlind World Map", response.text)
+
+    def test_dashboard_renders_world_map_placeholder_without_campaign_map(self):
+        with tempfile.TemporaryDirectory() as tmp, \
+             patch.object(reviews, "dashboard_rows", return_value=[]), \
+             patch("web_review.app.assets_dir", return_value=Path(tmp)):
+            client = TestClient(app)
+            response = client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("No Map Uploaded", response.text)
+        self.assertIn("Upload Map Image", response.text)
+        self.assertNotIn("/static/farrlind-world-map.png", response.text)
+
+    def test_world_map_image_returns_campaign_asset(self):
+        with tempfile.TemporaryDirectory() as tmp, \
+             patch("web_review.app.assets_dir", return_value=Path(tmp)):
+            (Path(tmp) / "world-map.png").write_bytes(b"map")
+            client = TestClient(app)
+            response = client.get("/world-map/image")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"map")
+        self.assertEqual(response.headers["content-type"], "image/png")
+
+    def test_world_map_upload_replaces_existing_campaign_asset(self):
+        with tempfile.TemporaryDirectory() as tmp, \
+             patch("web_review.app.assets_dir", return_value=Path(tmp)):
+            assets = Path(tmp)
+            (assets / "world-map.png").write_bytes(b"old")
+            client = TestClient(app)
+            response = client.post(
+                "/world-map",
+                files={"map_image": ("new-map.jpg", b"new", "image/jpeg")},
+                follow_redirects=False,
+            )
+
+            self.assertEqual(response.status_code, 303)
+            self.assertEqual(response.headers["location"], "/#world-map-modal")
+            self.assertFalse((assets / "world-map.png").exists())
+            self.assertEqual((assets / "world-map.jpg").read_bytes(), b"new")
+
+    def test_high_level_event_order_shows_micro_events_without_buckets(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            reviews_dir.mkdir()
+            clean.mkdir()
+            final.mkdir()
+            (reviews_dir / "session01_review.yaml").write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "in_review",
+                "items": [
+                    {"id": "event-001", "sequence": 1, "source_text": "The party reaches the inn.", "location": "Night Lotus"},
+                    {"id": "event-002", "sequence": 2, "source_text": "A stranger enters.", "location": "Night Lotus"},
+                ],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final), \
+                 patch("web_review.app.reviews.event_review_access_blocked", return_value=False), \
+                 patch("web_review.app.canon_location_names", return_value=[]), \
+                 patch("web_review.services.canon.location_types", return_value=[]):
+                client = TestClient(app)
+                response = client.get("/sessions/session01/review")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Micro Events To Group", response.text)
+        self.assertIn("The party reaches the inn.", response.text)
+        self.assertIn("A stranger enters.", response.text)
+        self.assertIn("2 draft", response.text)
+
+    def test_event_review_dashboard_disables_blocked_sessions(self):
+        row = reviews.ReviewSummary(
+            session="session01",
+            session_number=1,
+            status="in_review",
+            title="Start",
+            path="/tmp/session01_review.yaml",
+            review_exists=True,
+            final_exists=False,
+            total_items=1,
+            base_items=1,
+            added_items=0,
+            pending_decisions=1,
+            accepted=0,
+            rejected=0,
+            corrected=0,
+            added=0,
+            unknown_decisions=0,
+            unapplied_items=0,
+            next_action="edit",
+            event_review_ready=False,
+            missing_extraction_reviews=["NPC Extraction"],
+        )
+        with patch.object(reviews, "dashboard_rows", return_value=[row]):
+            client = TestClient(app)
+            response = client.get("/event-review")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Event Review", response.text)
+        self.assertIn("Waiting", response.text)
+        self.assertIn("Missing extraction reviews: NPC Extraction", response.text)
+
+    def test_event_review_dashboard_opens_ready_sessions(self):
+        row = reviews.ReviewSummary(
+            session="session01",
+            session_number=1,
+            status="in_review",
+            title="Start",
+            path="/tmp/session01_review.yaml",
+            review_exists=True,
+            final_exists=False,
+            total_items=1,
+            base_items=1,
+            added_items=0,
+            pending_decisions=1,
+            accepted=0,
+            rejected=0,
+            corrected=0,
+            added=0,
+            unknown_decisions=0,
+            unapplied_items=0,
+            next_action="edit",
+            event_review_ready=True,
+            missing_extraction_reviews=[],
+        )
+        with patch.object(reviews, "dashboard_rows", return_value=[row]):
+            client = TestClient(app)
+            response = client.get("/event-review")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('href="/sessions/session01/review"', response.text)
 
     def test_print_view_renders_source_markdown(self):
         client = TestClient(app)
@@ -612,6 +768,76 @@ class WebReviewAppTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("source-text", response.text)
+
+    def test_session_review_blocks_until_extraction_reviews_complete(self):
+        with patch.object(reviews, "event_review_access_blocked", return_value=True), \
+             patch.object(reviews, "missing_extraction_reviews", return_value=["NPC Extraction"]), \
+             patch.object(reviews, "session_workspace", return_value={
+                 "session_key": "session01",
+                 "document": {},
+                 "summary": None,
+                 "source": "diary",
+                 "source_view": "raw",
+                 "source_text": "",
+                 "source_html": "",
+                 "source_label": "Diary",
+                 "items": [],
+                 "selected_bucket": "",
+                 "review_locked": False,
+                 "review_stage": "event_resolution",
+                 "macro_events": [],
+                 "bucket_counts": {},
+                 "validation": [],
+             }):
+            client = TestClient(app)
+            response = client.get("/sessions/session01/review")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Event review is not available yet.", response.text)
+        self.assertIn("NPC Extraction", response.text)
+
+    def test_session_review_missing_yaml_can_initialize_from_web(self):
+        with patch.object(reviews, "event_review_access_blocked", return_value=False), \
+             patch.object(reviews, "session_workspace", return_value={
+                 "session_key": "session01",
+                 "document": {},
+                 "summary": None,
+                 "source": "diary",
+                 "source_view": "raw",
+                 "source_text": "",
+                 "source_html": "",
+                 "source_label": "Diary",
+                 "items": [],
+                 "selected_bucket": "",
+                 "review_locked": False,
+                 "review_stage": "event_resolution",
+                 "macro_events": [],
+                 "bucket_counts": {},
+                 "validation": [],
+             }):
+            client = TestClient(app)
+            response = client.get("/sessions/session01/review")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Initialize Event Review", response.text)
+
+    def test_init_session_review_runs_command_when_ready(self):
+        result = commands.CommandResult(0, "created", "")
+        with patch.object(reviews, "event_review_access_blocked", return_value=False), \
+             patch("web_review.services.commands.init_review", return_value=result):
+            client = TestClient(app)
+            response = client.post("/sessions/session01/review/init", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("init_reviewed=1", response.headers["location"])
+
+    def test_init_session_review_redirects_when_blocked(self):
+        with patch.object(reviews, "event_review_access_blocked", return_value=True):
+            client = TestClient(app)
+            response = client.post("/sessions/session01/review/init", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("event_review_blocked=1", response.headers["location"])
 
     def test_archive_session_review_is_print_only_reader(self):
         with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}):
@@ -916,7 +1142,8 @@ class WebReviewAppTest(unittest.TestCase):
 
             with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
                  patch.object(reviews, "CLEAN_DIR", clean), \
-                 patch.object(reviews, "FINAL_DIR", final):
+                 patch.object(reviews, "FINAL_DIR", final), \
+                 patch("web_review.services.workflow.sync_session_workflow") as sync:
                 client = TestClient(app)
                 response = client.post("/sessions/session01/review/mark-reviewed", data={
                     "source": "diary",
@@ -938,6 +1165,7 @@ class WebReviewAppTest(unittest.TestCase):
             saved = yaml.safe_load(path.read_text(encoding="utf-8"))
             self.assertEqual(saved["status"], "reviewed")
             self.assertEqual(saved["items"][0]["decision"], "accepted")
+            sync.assert_called_once_with(1)
 
     def test_mark_reviewed_route_saves_but_does_not_mark_invalid_review(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1391,6 +1619,7 @@ class CanonServiceTest(unittest.TestCase):
                 "enemy_name": "Cultist",
                 "enemy_type": "cultist",
                 "quantity": None,
+                "quantity_killed": None,
                 "enemy_outcome": "defeated",
                 "enemy_confidence": "medium",
                 "enemy_notes": "Count unknown.",
@@ -1409,6 +1638,7 @@ class CanonServiceTest(unittest.TestCase):
                 "enemy_name": "Orsydon",
                 "enemy_type": "dragon",
                 "quantity": 1,
+                "quantity_killed": 1,
                 "enemy_outcome": "defeated",
                 "enemy_confidence": "high",
                 "enemy_notes": "Dragon defeated.",
@@ -1421,6 +1651,7 @@ class CanonServiceTest(unittest.TestCase):
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["known_enemy_total"], 1)
         self.assertTrue(rows[0]["has_unknown_quantity"])
+        self.assertEqual(rows[0]["enemies"][1]["quantity_killed"], 1)
         self.assertEqual([enemy["name"] for enemy in rows[0]["enemies"]], ["Cultist", "Orsydon"])
 
     def test_combat_encounter_rows_labels_spanning_combat(self):
@@ -1438,6 +1669,7 @@ class CanonServiceTest(unittest.TestCase):
             "enemy_name": "Regenerating construct",
             "enemy_type": "construct",
             "quantity": 1,
+            "quantity_killed": 1,
             "enemy_outcome": "defeated",
             "enemy_confidence": "high",
             "enemy_notes": "",
@@ -1447,15 +1679,15 @@ class CanonServiceTest(unittest.TestCase):
 
         self.assertEqual(rows[0]["session_span"], "Session 00 -> Session 01")
 
-    def test_murder_hobo_count_sums_known_killed_and_defeated_enemies(self):
+    def test_murder_hobo_count_sums_quantity_killed(self):
         summary = canon.murder_hobo_count([
             {
                 "enemies": [
-                    {"quantity": 1, "outcome": "defeated"},
-                    {"quantity": 2, "outcome": "killed"},
-                    {"quantity": 5, "outcome": "fled"},
-                    {"quantity": None, "outcome": "killed"},
-                    {"quantity": 3, "outcome": "defeated_or_fled"},
+                    {"quantity": 3, "quantity_killed": 1, "outcome": "fled"},
+                    {"quantity": 2, "quantity_killed": 2, "outcome": "killed"},
+                    {"quantity": 5, "quantity_killed": 0, "outcome": "fled"},
+                    {"quantity": None, "quantity_killed": None, "outcome": "killed"},
+                    {"quantity": 3, "quantity_killed": None, "outcome": "defeated_or_fled"},
                 ],
             }
         ])
@@ -1795,7 +2027,8 @@ class LocationExtractionReviewRouteTest(unittest.TestCase):
 
     def test_apply_location_extraction_review_posts_decisions(self):
         result = {"applied": ["Updated Catur", "Created Catur's Well Chamber"], "skipped": [], "reviewed_path": Path("/tmp/reviewed.json")}
-        with patch.object(location_extraction_review, "apply_review", return_value=result) as apply_review:
+        with patch.object(location_extraction_review, "apply_review", return_value=result) as apply_review, \
+             patch("web_review.services.workflow.sync_session_workflow") as sync:
             client = TestClient(app)
             response = client.post("/locations/extractions/apply", data={
                 "session_number": "21",
@@ -1809,6 +2042,32 @@ class LocationExtractionReviewRouteTest(unittest.TestCase):
         apply_review.assert_called_once()
         self.assertEqual(apply_review.call_args.args[0], 21)
         self.assertEqual(apply_review.call_args.args[1]["new_decision_0"], "create")
+        sync.assert_called_once_with(21)
+
+    def test_apply_location_extraction_review_reports_failure_detail(self):
+        with patch.object(location_extraction_review, "apply_review", side_effect=location_extraction_review.LocationExtractionReviewError("bad location")):
+            client = TestClient(app)
+            response = client.post("/locations/extractions/apply", data={
+                "session_number": "21",
+            }, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertIn("apply_failed=1", response.headers["location"])
+        token = response.headers["location"].split("command_result=", 1)[1]
+        self.assertEqual(COMMAND_RESULTS[token]["stderr"], "bad location")
+
+    def test_post_extraction_review_initializes_event_review_when_all_reviews_complete(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            review_path = Path(tmp) / "session02_review.yaml"
+            with patch.object(reviews, "event_review_ready", return_value=True), \
+                 patch.object(reviews, "review_path", return_value=review_path), \
+                 patch("web_review.services.commands.init_review", return_value=commands.CommandResult(0, "Wrote review", "")) as init, \
+                 patch("web_review.services.workflow.sync_session_workflow") as sync:
+                messages = sync_after_extraction_review(2)
+
+        init.assert_called_once_with(2)
+        self.assertEqual(sync.call_count, 2)
+        self.assertIn("Initialized event review.", messages)
 
     def test_archive_mode_blocks_location_extraction_review_page(self):
         with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}):
@@ -2258,7 +2517,8 @@ class ArtifactExtractionReviewRouteTest(unittest.TestCase):
 
     def test_apply_artifact_extraction_review_posts_decisions(self):
         result = {"applied": ["Updated Acheron Blade", "Created Cap of Water Breathing"], "skipped": [], "reviewed_path": Path("/tmp/reviewed.json")}
-        with patch.object(artifact_extraction_review, "apply_review", return_value=result) as apply_review:
+        with patch.object(artifact_extraction_review, "apply_review", return_value=result) as apply_review, \
+             patch("web_review.services.workflow.sync_session_workflow") as sync:
             client = TestClient(app)
             response = client.post("/artifacts/extractions/apply", data={
                 "session_number": "21",
@@ -2272,6 +2532,7 @@ class ArtifactExtractionReviewRouteTest(unittest.TestCase):
         apply_review.assert_called_once()
         self.assertEqual(apply_review.call_args.args[0], 21)
         self.assertEqual(apply_review.call_args.args[1]["new_decision_0"], "create")
+        sync.assert_called_once_with(21)
 
     def test_archive_mode_blocks_artifact_extraction_review_page(self):
         with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}):
@@ -2467,7 +2728,8 @@ class LoreItemRouteTest(unittest.TestCase):
 
     def test_apply_lore_item_extraction_review_posts_decisions(self):
         result = {"applied": ["Created Celestial Isles Are Draconic"], "skipped": ["Ignored Catur Distrusts Above-Folk"], "reviewed_path": Path("/tmp/reviewed.json")}
-        with patch.object(lore_item_extraction_review, "apply_review", return_value=result) as apply_review:
+        with patch.object(lore_item_extraction_review, "apply_review", return_value=result) as apply_review, \
+             patch("web_review.services.workflow.sync_session_workflow") as sync:
             client = TestClient(app)
             response = client.post("/lore-items/extractions/apply", data={
                 "session_number": "21",
@@ -2480,6 +2742,7 @@ class LoreItemRouteTest(unittest.TestCase):
         apply_review.assert_called_once()
         self.assertEqual(apply_review.call_args.args[0], 21)
         self.assertEqual(apply_review.call_args.args[1]["new_decision_0"], "create")
+        sync.assert_called_once_with(21)
 
     def test_archive_mode_blocks_lore_item_extraction_review_page(self):
         with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}):
@@ -2689,7 +2952,8 @@ class OpenThreadRouteTest(unittest.TestCase):
 
     def test_apply_open_thread_extraction_review_posts_decisions(self):
         result = {"applied": ["Created Niebain Warns Catur Is Already In Danger"], "skipped": ["Ignored What does the Gale want?"], "reviewed_path": Path("/tmp/reviewed.json")}
-        with patch.object(open_thread_extraction_review, "apply_review", return_value=result) as apply_review:
+        with patch.object(open_thread_extraction_review, "apply_review", return_value=result) as apply_review, \
+             patch("web_review.services.workflow.sync_session_workflow") as sync:
             client = TestClient(app)
             response = client.post("/open-threads/extractions/apply", data={
                 "session_number": "21",
@@ -2702,6 +2966,7 @@ class OpenThreadRouteTest(unittest.TestCase):
         apply_review.assert_called_once()
         self.assertEqual(apply_review.call_args.args[0], 21)
         self.assertEqual(apply_review.call_args.args[1]["new_decision_0"], "create")
+        sync.assert_called_once_with(21)
 
     def test_archive_mode_blocks_open_thread_extraction_review_page(self):
         with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}):
@@ -2732,6 +2997,7 @@ class CombatEncounterRouteTest(unittest.TestCase):
                     "name": "Orsydon",
                     "enemy_type": "dragon",
                     "quantity": 1,
+                    "quantity_killed": 0,
                     "outcome": "defeated",
                     "confidence": "high",
                     "notes": "Dragon defeated.",
@@ -2740,6 +3006,7 @@ class CombatEncounterRouteTest(unittest.TestCase):
                     "name": "Cultist spellcaster",
                     "enemy_type": "cultist_spellcaster",
                     "quantity": 2,
+                    "quantity_killed": 2,
                     "outcome": "killed",
                     "confidence": "high",
                     "notes": "Both killed.",
@@ -2748,6 +3015,7 @@ class CombatEncounterRouteTest(unittest.TestCase):
                     "name": "Cultist melee fighter",
                     "enemy_type": "cultist_melee",
                     "quantity": 3,
+                    "quantity_killed": 3,
                     "outcome": "killed",
                     "confidence": "high",
                     "notes": "All killed.",
@@ -2767,7 +3035,7 @@ class CombatEncounterRouteTest(unittest.TestCase):
         self.assertIn("Combat Encounters", response.text)
         self.assertIn("Orsydon summoned in Balrog", response.text)
         self.assertIn("Murder Hobo Count", response.text)
-        self.assertIn(">6<", response.text)
+        self.assertIn(">5<", response.text)
         self.assertIn("Battle Locale", response.text)
         self.assertIn('aria-label="Edit Orsydon summoned in Balrog"', response.text)
         self.assertIn('href="/combat-encounters"', response.text)
@@ -2786,6 +3054,7 @@ class CombatEncounterRouteTest(unittest.TestCase):
         self.assertIn("+ Add Enemy", response.text)
         self.assertIn('name="enemy_name_1"', response.text)
         self.assertIn('name="enemy_quantity_1"', response.text)
+        self.assertIn('name="enemy_quantity_killed_1"', response.text)
 
     def test_archive_mode_hides_combat_encounter_edit_controls(self):
         with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}), \
@@ -2815,6 +3084,7 @@ class CombatEncounterRouteTest(unittest.TestCase):
                 "enemy_name_1": "Orsydon",
                 "enemy_type_1": "dragon",
                 "enemy_quantity_1": "1",
+                "enemy_quantity_killed_1": "0",
                 "enemy_outcome_1": "defeated",
                 "enemy_confidence_1": "high",
                 "enemy_notes_1": "Dragon defeated.",
@@ -2827,6 +3097,7 @@ class CombatEncounterRouteTest(unittest.TestCase):
         self.assertEqual(values["location_id"], 4)
         self.assertEqual(enemies[0]["name"], "Orsydon")
         self.assertEqual(enemies[0]["quantity"], 1)
+        self.assertEqual(enemies[0]["quantity_killed"], 0)
 
     def test_edit_combat_encounter_page_loads_detail(self):
         detail = {
@@ -2840,7 +3111,7 @@ class CombatEncounterRouteTest(unittest.TestCase):
             "outcome": "enemies_defeated",
             "confidence": "high",
             "notes": "Cultists summon Orsydon.",
-            "enemies": [{"name": "Orsydon", "enemy_type": "dragon", "quantity": 1, "outcome": "defeated", "confidence": "high", "notes": "Dragon defeated."}],
+            "enemies": [{"name": "Orsydon", "enemy_type": "dragon", "quantity": 1, "quantity_killed": 0, "outcome": "defeated", "confidence": "high", "notes": "Dragon defeated."}],
         }
         with patch("web_review.services.canon.combat_encounter_rows", return_value=self.combat_rows()), \
              patch("web_review.services.canon.session_rows", return_value=[{"session_number": 19, "title": "Of Teeth, Memory, and What Remains"}]), \
@@ -2865,6 +3136,7 @@ class CombatEncounterRouteTest(unittest.TestCase):
                 "confidence": "high",
                 "enemy_name_1": "Cultist",
                 "enemy_quantity_1": "",
+                "enemy_quantity_killed_1": "1",
                 "enemy_outcome_1": "killed",
             }, follow_redirects=False)
 
@@ -2872,6 +3144,7 @@ class CombatEncounterRouteTest(unittest.TestCase):
         self.assertIn("updated=1", response.headers["location"])
         self.assertEqual(update.call_args.args[0], 1)
         self.assertIsNone(update.call_args.args[2][0]["quantity"])
+        self.assertEqual(update.call_args.args[2][0]["quantity_killed"], 1)
 
     def test_update_combat_encounter_route_skips_removed_enemy_rows(self):
         with patch("web_review.services.canon.update_combat_encounter") as update:
@@ -2883,10 +3156,12 @@ class CombatEncounterRouteTest(unittest.TestCase):
                 "confidence": "high",
                 "enemy_name_1": "Orsydon",
                 "enemy_quantity_1": "1",
+                "enemy_quantity_killed_1": "0",
                 "enemy_outcome_1": "defeated",
                 "enemy_remove_1": "on",
                 "enemy_name_2": "Cultist",
                 "enemy_quantity_2": "5",
+                "enemy_quantity_killed_2": "5",
                 "enemy_outcome_2": "killed",
             }, follow_redirects=False)
 
@@ -2894,6 +3169,7 @@ class CombatEncounterRouteTest(unittest.TestCase):
         enemies = update.call_args.args[2]
         self.assertEqual(len(enemies), 1)
         self.assertEqual(enemies[0]["name"], "Cultist")
+        self.assertEqual(enemies[0]["quantity_killed"], 5)
 
     def test_delete_combat_encounter_route_runs_delete(self):
         with patch("web_review.services.canon.delete_combat_encounter") as delete:
@@ -2917,7 +3193,7 @@ class CombatEncounterRouteTest(unittest.TestCase):
                 "confidence": "high",
                 "notes": "Cultists summoned Orsydon.",
                 "evidence": "Cultists summoned the dragon Orsydon.",
-                "enemies": [{"name": "Orsydon", "enemy_type": "dragon", "quantity": 1, "outcome": "defeated"}],
+                "enemies": [{"name": "Orsydon", "enemy_type": "dragon", "quantity": 1, "quantity_killed": 0, "outcome": "defeated"}],
             }],
             "rejected_candidates": [{"text": "Audience", "reason": "Social encounter."}],
             "uncertainties": [{"candidate": "Cultists", "issue": "Quantity unclear."}],
@@ -2938,7 +3214,8 @@ class CombatEncounterRouteTest(unittest.TestCase):
 
     def test_apply_combat_extraction_review_posts_decisions(self):
         result = {"applied": ["Created Orsydon summoned in Balrog"], "skipped": [], "reviewed_path": Path("/tmp/reviewed.json")}
-        with patch.object(combat_extraction_review, "apply_review", return_value=result) as apply_review:
+        with patch.object(combat_extraction_review, "apply_review", return_value=result) as apply_review, \
+             patch("web_review.services.workflow.sync_session_workflow") as sync:
             client = TestClient(app)
             response = client.post("/combat-encounters/extractions/apply", data={
                 "session_number": "19",
@@ -2950,6 +3227,7 @@ class CombatEncounterRouteTest(unittest.TestCase):
         apply_review.assert_called_once()
         self.assertEqual(apply_review.call_args.args[0], 19)
         self.assertEqual(apply_review.call_args.args[1]["encounter_decision_0"], "create")
+        sync.assert_called_once_with(19)
 
     def test_archive_mode_blocks_combat_extraction_review_page(self):
         with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}):
@@ -2987,6 +3265,8 @@ class CampaignTimelineRouteTest(unittest.TestCase):
                     "title": "The Party forms",
                     "summary": "",
                     "primary_location": "Bentrios",
+                    "start_location": "Alexander's Inn",
+                    "end_location": "Bentrios",
                     "travel": [],
                     "key_events": [
                         {
@@ -3007,6 +3287,8 @@ class CampaignTimelineRouteTest(unittest.TestCase):
                     "title": "Salt, Steel, and the Distance Between Legends",
                     "summary": "",
                     "primary_location": "Coast near Catur",
+                    "start_location": "Balrog",
+                    "end_location": "Coast near Catur",
                     "travel": [
                         {
                             "from_location": "Balrog",
@@ -3043,6 +3325,8 @@ class CampaignTimelineRouteTest(unittest.TestCase):
         self.assertIn('id="session-20-modal"', response.text)
         self.assertIn('role="dialog"', response.text)
         self.assertIn("1832 AS Namal 20 thru 1832 AS Namal 24", response.text)
+        self.assertIn("Starting Location", response.text)
+        self.assertIn("Ending Location", response.text)
         self.assertNotIn(">1832 AS Namal 20, 1832 AS Namal 24<", response.text)
         self.assertIn("Balrog -> Coast near Catur", response.text)
         self.assertIn("The party begins to form", response.text)
@@ -3267,7 +3551,7 @@ class ProjectUtilitiesRouteTest(unittest.TestCase):
         self.assertIn("command_result=", response.headers["location"])
         publish.assert_called_once_with(
             base_url="http://web_archive:8000",
-            static_repo="/Volumes/T7_WORK/Farrlind_Static_Archive",
+            static_repo="",
             push=False,
         )
 
@@ -3347,42 +3631,16 @@ class SongbookRouteTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["content-type"], "audio/mpeg")
 
-
-class WellsLoreRouteTest(unittest.TestCase):
-    def test_wells_page_renders_single_lore_editor(self):
-        with patch("web_review.services.lore.read_wells_of_magic", return_value="Six Wells Exist"):
+    def test_songbook_routes_are_hidden_when_campaign_disables_songbook(self):
+        with patch("web_review.app.campaign_feature_enabled", return_value=False):
             client = TestClient(app)
-            response = client.get("/wells")
+            index_response = client.get("/")
+            songbook_response = client.get("/songbook")
+            api_response = client.get("/api/songbook")
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("Wells of Magic", response.text)
-        self.assertIn("Six Wells Exist", response.text)
-        self.assertIn('name="lore_text"', response.text)
-        self.assertIn('rows="20"', response.text)
-        self.assertIn('href="/wells"', response.text)
-        self.assertIn("/static/wells-of-magic-icon.png", response.text)
-
-    def test_archive_mode_renders_wells_as_read_only_lore(self):
-        with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}), \
-             patch("web_review.services.lore.read_wells_of_magic", return_value="## Six Wells\n\nThey never lie."):
-            client = TestClient(app)
-            response = client.get("/wells")
-
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("<h2>Six Wells</h2>", response.text)
-        self.assertNotIn('name="lore_text"', response.text)
-        self.assertNotIn("Save Lore", response.text)
-
-    def test_save_wells_lore_writes_text(self):
-        with patch("web_review.services.lore.write_wells_of_magic") as write_lore:
-            client = TestClient(app)
-            response = client.post("/wells", data={
-                "lore_text": "The Wells never lie.",
-            }, follow_redirects=False)
-
-        self.assertEqual(response.status_code, 303)
-        self.assertIn("saved=1", response.headers["location"])
-        write_lore.assert_called_once_with("The Wells never lie.")
+        self.assertEqual(songbook_response.status_code, 404)
+        self.assertEqual(api_response.status_code, 404)
+        self.assertNotIn('href="/songbook"', index_response.text)
 
 
 class WorkflowServiceTest(unittest.TestCase):
@@ -3430,8 +3688,46 @@ class WorkflowServiceTest(unittest.TestCase):
         self.assertIn("INSERT INTO workflow_run", joined_sql)
         self.assertIn("UPDATE session", joined_sql)
         self.assertIn("source_audio_registered", joined_sql)
-        self.assertEqual(statements[-1][1]["status"], "complete")
-        self.assertEqual(statements[-1][1]["artifacts"], f'["{audio.name}"]')
+        audio_step = next(params for _sql, params in statements if params.get("status") == "complete")
+        self.assertEqual(audio_step["artifacts"], f'["{audio.name}"]')
+        transcribe_step = next(params for _sql, params in statements if params.get("summary_comment") == "Transcription will use the registered source audio.")
+        self.assertEqual(transcribe_step["inputs"], f'["{audio.name}"]')
+
+    def test_initiate_session_normalizes_repo_absolute_mp3_path_for_docker(self):
+        definition = {
+            "workflow": {
+                "id": "farrlind_session_canon",
+                "version": 1,
+                "display_name": "Farrlind Session Canon Workflow",
+                "definition_format": "test",
+                "scope": "per_session",
+                "state_persistence": "database",
+            },
+            "steps": [{
+                "id": "source_audio_registered",
+                "display_name": "Source Audio Registered",
+                "lane": "intake",
+                "expected_inputs": ["campaigns/{campaign}/audio/sessionXX.wav"],
+                "expected_outputs": ["campaigns/{campaign}/audio/sessionXX.wav"],
+                "dependencies": [],
+            }],
+        }
+        host_path = "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/audio/session01.mp3"
+        with patch("raglib.workflow_state.load_workflow_definition", return_value=definition), \
+             patch("web_review.services.workflow._execute_transaction") as execute:
+            workflow.initiate_session({
+                "session_number": "1",
+                "session_date": "2026-05-22",
+                "title": "Trinyvale Begins",
+                "audio_file_path": host_path,
+                "notes": "",
+            })
+
+        statements = execute.call_args.args[0]
+        session_update = next(params for _sql, params in statements if params.get("title") == "Trinyvale Begins")
+        self.assertEqual(session_update["audio_file_path"], "campaigns/trinyvale/audio/session01.mp3")
+        transcribe_step = next(params for _sql, params in statements if params.get("summary_comment") == "Transcription will use the registered source audio.")
+        self.assertEqual(transcribe_step["inputs"], '["campaigns/trinyvale/audio/session01.mp3"]')
 
     def test_enqueue_auto_intake_writes_queue_file_for_registered_audio(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -3451,9 +3747,15 @@ class WorkflowServiceTest(unittest.TestCase):
             self.assertEqual(payload["commands"], [
                 "transcribe_audio",
                 "source_status_check",
+                "curate_transcript",
+                "extract_npcs",
+                "extract_locations",
+                "extract_artifacts",
+                "extract_lore_items",
+                "extract_combat_encounters",
+                "extract_open_threads",
                 "extract_events",
                 "postextract_shortcut",
-                "initialize_review",
             ])
         execute.assert_called_once()
 
@@ -3524,8 +3826,8 @@ class WorkflowServiceTest(unittest.TestCase):
             "started_at": None,
             "completed_at": None,
             "summary_comment": "Audio exists.",
-            "inputs": ["audio/session20.wav"],
-            "outputs": ["audio/session20.wav"],
+            "inputs": ["campaigns/farrlind/audio/session20.wav"],
+            "outputs": ["campaigns/farrlind/audio/session20.wav"],
             "dependencies": [],
             "gate": "operator_supplied",
             "rerun_policy": "safe",
@@ -3542,25 +3844,43 @@ class WorkflowServiceTest(unittest.TestCase):
         self.assertEqual(loaded["steps"][0]["step_id"], "source_audio_registered")
         self.assertEqual(loaded["attention_items"], [])
 
+    def test_sync_session_workflow_reseeds_single_session_from_artifacts(self):
+        with patch("raglib.workflow_state.load_workflow_definition", return_value={
+            "workflow": {"id": "farrlind_session_canon", "version": 1},
+            "steps": [],
+        }), \
+             patch(
+                 "raglib.workflow_state.historical_workflow_seed_sql",
+                 return_value="UPDATE workflow_run SET summary_comment = 'one; two'; COMMIT;",
+             ) as seed, \
+             patch("web_review.services.workflow._execute_transaction") as execute:
+            workflow.sync_session_workflow(1)
+
+        seed.assert_called_once()
+        self.assertEqual(seed.call_args.args[0:2], (1, 1))
+        execute.assert_called_once()
+        self.assertEqual(len(execute.call_args.args[0]), 2)
+        self.assertIn("'one; two'", execute.call_args.args[0][0][0])
+
     def test_step_issues_surface_status_and_missing_artifacts(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            (root / "knowledge" / "Faban" / "clean").mkdir(parents=True)
-            (root / "knowledge" / "Faban" / "clean" / "session21_diary.md").write_text("diary", encoding="utf-8")
+            (root / "campaigns" / "farrlind" / "clean").mkdir(parents=True)
+            (root / "campaigns" / "farrlind" / "clean" / "session21_diary.md").write_text("diary", encoding="utf-8")
             with patch("web_review.services.reviews.REPO_ROOT", root):
                 issues = workflow.step_issues({
                     "status": "pending",
                     "summary_comment": "Waiting for transcript.",
                     "inputs": [
-                        "knowledge/Faban/clean/session21_diary.md",
-                        "knowledge/Faban/raw/session21_transcript.txt",
+                        "campaigns/farrlind/clean/session21_diary.md",
+                        "campaigns/farrlind/raw/session21_transcript.txt",
                     ],
-                    "outputs": ["knowledge/Faban/clean/session21_summary.md"],
+                    "outputs": ["campaigns/farrlind/clean/session21_summary.md"],
                 })
 
         self.assertIn("Waiting for transcript.", issues)
-        self.assertIn("Missing input artifact knowledge/Faban/raw/session21_transcript.txt.", issues)
-        self.assertIn("Missing output artifact knowledge/Faban/clean/session21_summary.md.", issues)
+        self.assertIn("Missing input artifact campaigns/farrlind/raw/session21_transcript.txt.", issues)
+        self.assertIn("Missing output artifact campaigns/farrlind/clean/session21_summary.md.", issues)
 
     def test_step_issues_ignore_optional_corrections_notes(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -3568,7 +3888,7 @@ class WorkflowServiceTest(unittest.TestCase):
                 issues = workflow.step_issues({
                     "status": "complete",
                     "summary_comment": "",
-                    "inputs": ["knowledge/Faban/notes/session20_corrections.md"],
+                    "inputs": ["campaigns/farrlind/notes/session20_corrections.md"],
                     "outputs": [],
                 })
 
@@ -3577,7 +3897,11 @@ class WorkflowServiceTest(unittest.TestCase):
     def test_step_links_route_review_and_registry_steps(self):
         self.assertEqual(
             workflow.step_links("edit_review_decisions", 20),
-            [{"label": "Review", "url": "/sessions/session20/review"}],
+            [{"label": "Review Events", "url": "/sessions/session20/review"}],
+        )
+        self.assertEqual(
+            workflow.step_links("review_npc_extraction", 20),
+            [{"label": "Review NPCs", "url": "/npcs/extractions?session=20"}],
         )
         self.assertEqual(
             workflow.step_links("write_final_summary", 20),
@@ -3586,7 +3910,7 @@ class WorkflowServiceTest(unittest.TestCase):
         self.assertEqual(
             workflow.step_links("update_lore_sections", 20),
             [
-                {"label": "Wells", "url": "/wells"},
+                {"label": "Lore Items", "url": "/lore-items"},
                 {"label": "NPCs", "url": "/npcs"},
                 {"label": "Locations", "url": "/locations"},
                 {"label": "Artifacts", "url": "/artifacts"},
@@ -3683,7 +4007,7 @@ class WorkflowRouteTest(unittest.TestCase):
             }, {
                 "step_order": 14,
                 "step_id": "edit_review_decisions",
-                "display_name": "Edit Review Decisions",
+                "display_name": "Review Session Events",
                 "lane": "human_review",
                 "status": "complete",
                 "started_at": None,
@@ -3695,10 +4019,10 @@ class WorkflowRouteTest(unittest.TestCase):
                 "gate": "human_required",
                 "rerun_policy": "edit_until_reviewed",
                 "canon_impact": "review_record",
-                "command": "web_review session review page",
+                "command": "web_review /sessions/sessionXX/review",
                 "status_rules": {},
                 "metadata": {},
-                "links": [{"label": "Review", "url": "/sessions/session20/review"}],
+                "links": [{"label": "Review Events", "url": "/sessions/session20/review"}],
                 "issues": [],
             }, {
                 "step_order": 18,
@@ -3710,7 +4034,7 @@ class WorkflowRouteTest(unittest.TestCase):
                 "completed_at": None,
                 "summary_comment": "Registries checked.",
                 "inputs": ["knowledge/Faban/final/session20_summary.md"],
-                "outputs": ["knowledge/Faban/lore/wells_of_magic.md"],
+                "outputs": ["database lore rows"],
                 "dependencies": ["write_final_summary"],
                 "gate": "human_required",
                 "rerun_policy": "canon_affecting_requires_confirmation",
@@ -3719,7 +4043,7 @@ class WorkflowRouteTest(unittest.TestCase):
                 "status_rules": {},
                 "metadata": {},
                 "links": [
-                    {"label": "Wells", "url": "/wells"},
+                    {"label": "Lore Items", "url": "/lore-items"},
                     {"label": "NPCs", "url": "/npcs"},
                     {"label": "Locations", "url": "/locations"},
                     {"label": "Artifacts", "url": "/artifacts"},
@@ -3757,7 +4081,7 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertIn('href="/workflow" aria-label="Close workflow detail"', response.text)
         self.assertIn("Session 20", response.text)
         self.assertIn("Source Audio Registered", response.text)
-        self.assertIn("Edit Review Decisions", response.text)
+        self.assertIn("Review Session Events", response.text)
         self.assertIn("Started", response.text)
         self.assertIn("Completed", response.text)
         self.assertIn("Comment", response.text)
@@ -3772,7 +4096,8 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertIn("Historical timestamps are estimated", response.text)
         self.assertIn('href="/workflow?session=20"', response.text)
         self.assertIn('href="/sessions/session20/review"', response.text)
-        self.assertIn('href="/wells"', response.text)
+        self.assertIn('href="/lore-items"', response.text)
+        self.assertNotIn('href="/wells"', response.text)
         self.assertIn('href="/npcs"', response.text)
         self.assertIn('href="/locations"', response.text)
         self.assertIn('href="/artifacts"', response.text)
@@ -3787,7 +4112,7 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertEqual(dashboard_response.status_code, 200)
         self.assertIn("Published Archive", dashboard_response.text)
         self.assertIn("World Map", dashboard_response.text)
-        self.assertIn("/static/farrlind-world-map.png", dashboard_response.text)
+        self.assertIn("/world-map/image", dashboard_response.text)
         self.assertNotIn("Workflow Status", dashboard_response.text)
         self.assertNotIn("Validation Queue", dashboard_response.text)
         self.assertNotIn('href="/workflow"', dashboard_response.text)
@@ -3870,10 +4195,34 @@ class CommandServiceTest(unittest.TestCase):
             "health",
         ])
 
+    def test_run_health_includes_session_review_readiness_errors(self):
+        completed = type("Completed", (), {
+            "returncode": 0,
+            "stdout": "healthy",
+            "stderr": "",
+        })()
+        with tempfile.TemporaryDirectory() as tmp, \
+             patch.object(reviews, "REVIEWS_DIR", Path(tmp)), \
+             patch("web_review.services.commands.subprocess.run", return_value=completed):
+            (Path(tmp) / "session01_review.yaml").write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "in_review",
+                "items": [
+                    {"id": "event-003", "sequence": 3, "decision": "corrected", "canonical_text": "Chest appears.", "event_type": "lore", "significance": 3, "reason": ""},
+                ],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+            result = commands.run_health(session_number=1)
+
+        self.assertFalse(result.ok)
+        self.assertIn("healthy", result.stdout)
+        self.assertIn("Review Readiness", result.stderr)
+        self.assertIn("Order 3 event event-003 is corrected but missing reason.", result.stderr)
+
     def test_run_smoke_test_reports_multiline_category_summary(self):
         response = type("Response", (), {
             "status": 200,
-            "read": lambda self: b"Session Review Ledger Campaign Timeline Open Threads Lore Items session_count Six Wells Exist",
+            "read": lambda self: b"Session Review Ledger Campaign Timeline Open Threads Lore Items session_count [",
             "__enter__": lambda self: self,
             "__exit__": lambda self, exc_type, exc, traceback: False,
         })()
@@ -3996,7 +4345,8 @@ class StaticArchiveExportTest(unittest.TestCase):
             with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
                  patch.object(reviews, "CLEAN_DIR", clean), \
                  patch.object(reviews, "FINAL_DIR", final), \
-                 patch("web_review.services.commands.apply_review", return_value=commands.CommandResult(0, "ok", "")) as apply:
+                 patch("web_review.services.commands.apply_review", return_value=commands.CommandResult(0, "ok", "")) as apply, \
+                 patch("web_review.services.workflow.sync_session_workflow") as sync:
                 client = TestClient(app)
                 response = client.post("/sessions/session01/review/apply", data={
                     "source": "final",
@@ -4007,6 +4357,7 @@ class StaticArchiveExportTest(unittest.TestCase):
         self.assertIn("applied=1", response.headers["location"])
         self.assertIn("command_result=", response.headers["location"])
         apply.assert_called_once_with(1)
+        sync.assert_called_once_with(1)
 
     def test_apply_review_route_reports_command_failure(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -4087,7 +4438,8 @@ class StaticArchiveExportTest(unittest.TestCase):
             with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
                  patch.object(reviews, "CLEAN_DIR", clean), \
                  patch.object(reviews, "FINAL_DIR", final), \
-                 patch("web_review.services.commands.write_final_summary", return_value=commands.CommandResult(0, "ok", "")) as write:
+                 patch("web_review.services.commands.write_final_summary", return_value=commands.CommandResult(0, "ok", "")) as write, \
+                 patch("web_review.services.workflow.sync_session_workflow") as sync:
                 client = TestClient(app)
                 response = client.post("/sessions/session01/review/write-final-summary", data={
                     "source": "final",
@@ -4098,6 +4450,7 @@ class StaticArchiveExportTest(unittest.TestCase):
         self.assertIn("final_written=1", response.headers["location"])
         self.assertIn("command_result=", response.headers["location"])
         write.assert_called_once_with(1)
+        sync.assert_called_once_with(1)
 
     def test_write_final_summary_route_reports_command_failure(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -4160,7 +4513,7 @@ class StaticArchiveExportTest(unittest.TestCase):
         self.assertEqual(response.status_code, 303)
         self.assertIn("health_ok=1", response.headers["location"])
         self.assertIn("command_result=", response.headers["location"])
-        health.assert_called_once_with()
+        health.assert_called_once_with(session_number=1)
 
     def test_run_health_route_reports_command_failure(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -3,56 +3,21 @@ from pathlib import Path
 
 import yaml
 
+from raglib.campaign import load_campaign_metadata
 from raglib.config import CLEAN, SESSIONS
 from raglib.io_utils import read_text, write_text
 
 
 # =============================================================================
-# GLOBAL NORMALIZATION MAP
-# Whisper garbles that appear across multiple sessions
+# GENERIC NORMALIZATION MAP
+# Keep this campaign-neutral. Campaign-specific spelling drift belongs in
+# campaigns/<campaign>/campaign.yaml glossary aliases or session context files.
 # =============================================================================
 
 NORMALIZATION_MAP = {
-    # Party names
-    "faven": "Faban",
-    "faben": "Faban",
-    "faban": "Faban",
-
-    "rune": "Roon",
-    "roon": "Roon",
-
-    "bridget": "Brigit",
-    "brigit": "Brigit",
-
-    "makani": "Mikani",
-    "mikani": "Mikani",
-    "mithyra": "Mikani",
-    "mithra": "Mikani",
-
-    "corvinaus": "Corvinas",
-    "corvinox": "Corvinas",
-    "corvance": "Corvinas",
-    "corvinus": "Corvinas",
-    "corvinas": "Corvinas",
-
-    "gildas": "Gildas",
-
-    # Wells / places / items
-    "syfie": "Saiffi",
-    "scythe": "Saiffi",
-    "saiffy": "Saiffi",
-    "saiffi": "Saiffi",
-    "couture": "Catur",
-    "katoor": "Catur",
-    "katur": "Catur",
-
-    "balrog": "Balrog",
-
     "water skin": "waterskin",
     "wine skin": "wineskin",
     "bag of folding": "bag of holding",
-
-    "mouth-a-lug": "Lightdelver",
 
     # Common spell garbles
     "cloud dagger": "Cloud of Daggers",
@@ -139,13 +104,33 @@ def load_session_notes(session_name: str) -> str:
 # NORMALIZATION
 # =============================================================================
 
+def load_campaign_glossary_map() -> dict:
+    """
+    Loads campaign-specific alias normalization from campaign.yaml.
+    This keeps one campaign's names and lore from becoming global guardrails.
+    """
+    metadata = load_campaign_metadata()
+    campaign_map = {}
+    for item in metadata.get("glossary") or []:
+        if not isinstance(item, dict):
+            continue
+        term = (item.get("term") or item.get("name") or "").strip()
+        if not term:
+            continue
+        for alias in item.get("aliases") or []:
+            alias = str(alias).strip()
+            if alias and alias.lower() != term.lower():
+                campaign_map[alias.lower()] = term
+    return campaign_map
+
 def build_normalization_map(session_name: str) -> dict:
     """
-    Merges global map with session-specific map.
-    Session-specific entries take precedence.
+    Merges generic, campaign, and session-specific maps.
+    More specific entries take precedence.
     """
+    campaign_map = load_campaign_glossary_map()
     session_map = load_session_context(session_name)
-    merged = {**NORMALIZATION_MAP, **session_map}
+    merged = {**NORMALIZATION_MAP, **campaign_map, **session_map}
     return merged
 
 
@@ -210,7 +195,7 @@ def normalize_session(session_name: str):
     write_text(output_path, normalized)
 
     print(f"[normalize] Normalized events written to: {output_path}")
-    print(f"[normalize] Global terms: {len(NORMALIZATION_MAP)} | Session terms: {len(norm_map) - len(NORMALIZATION_MAP)}")
+    print(f"[normalize] Generic terms: {len(NORMALIZATION_MAP)} | Campaign/session terms: {len(norm_map) - len(NORMALIZATION_MAP)}")
 
     if garbles:
         print(f"[normalize] Flagged {len(garbles)} known garble(s) for review — grep for [REVIEW: in output")

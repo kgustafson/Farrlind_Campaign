@@ -7,6 +7,14 @@ from pathlib import Path
 from typing import Any, Optional
 
 from raglib.config import BASE, CLEAN, RAW
+from raglib.extraction_hygiene import (
+    chunk_source_sets,
+    compact_campaign_metadata,
+    compact_name_list_for_chunk,
+    looks_like_party_interpretation,
+    merge_extraction_documents,
+    rejection_text,
+)
 from raglib.io_utils import read_text, write_text
 from raglib.ollama_client import generate
 from raglib.prompts import load_prompt
@@ -78,7 +86,11 @@ def normalize_extraction(document: dict[str, Any]) -> dict[str, Any]:
     return normalized
 
 
-def postprocess_extraction(document: dict[str, Any], session_name: str) -> tuple[dict[str, Any], list[str]]:
+def postprocess_extraction(
+    document: dict[str, Any],
+    session_name: str,
+    source_text: str = "",
+) -> tuple[dict[str, Any], list[str]]:
     cleaned = normalize_extraction(document)
     warnings: list[str] = []
     encounters: list[dict[str, Any]] = []
@@ -92,6 +104,18 @@ def postprocess_extraction(document: dict[str, Any], session_name: str) -> tuple
                 "reason": "Combat encounter candidate is missing a title.",
             })
             warnings.append("Rejected combat encounter candidate missing title.")
+            continue
+        if looks_like_party_interpretation(
+            encounter,
+            source_text,
+            name_fields=["title"],
+            context_fields=["participants", "outcome", "notes", "evidence"],
+        ):
+            cleaned["rejected_candidates"].append({
+                "text": rejection_text(encounter, "title", "evidence"),
+                "reason": "Appears to be a party joke, misunderstanding, or theory rather than a confirmed combat encounter.",
+            })
+            warnings.append(f"Rejected party-interpretation combat encounter: {title}")
             continue
         proposed_session_number = normalize_quantity(encounter.get("session_number")) or default_session_number
         if proposed_session_number != default_session_number:
@@ -120,6 +144,7 @@ def postprocess_extraction(document: dict[str, Any], session_name: str) -> tuple
                 "name": name,
                 "enemy_type": (enemy.get("enemy_type") or "").strip(),
                 "quantity": normalize_quantity(enemy.get("quantity")),
+                "quantity_killed": normalize_quantity(enemy.get("quantity_killed")),
                 "outcome": (enemy.get("outcome") or "unknown").strip(),
                 "confidence": (enemy.get("confidence") or encounter.get("confidence") or "medium").strip(),
                 "notes": (enemy.get("notes") or "").strip(),
@@ -206,15 +231,26 @@ def extract_combat_encounters(session_name: str, model: Optional[str] = None, so
     sources = load_session_sources(session_name, source)
     campaign_metadata = load_campaign_metadata()
     locations = canon.locations()
-    prompt = build_prompt(session_name, sources, locations, campaign_metadata)
+    source_sets = chunk_source_sets(sources)
 
     print(f"Extracting combat encounter candidates for {session_name} with {model}...")
     started = time.monotonic()
-    raw_output = generate(prompt, model=model, timeout=1800, options=OLLAMA_OPTIONS)
+    raw_documents = []
+    location_names_sent = []
+    for index, source_set in enumerate(source_sets, start=1):
+        if len(source_sets) > 1:
+            print(f"  Combat transcript chunk {index}/{len(source_sets)}...")
+        chunk_text = "\n\n".join(item["text"] for item in source_set)
+        prompt_locations = compact_name_list_for_chunk(chunk_text, locations) if len(source_sets) > 1 else locations
+        prompt_metadata = compact_campaign_metadata(campaign_metadata) if len(source_sets) > 1 else campaign_metadata
+        location_names_sent.append(len(prompt_locations))
+        prompt = build_prompt(session_name, source_set, prompt_locations, prompt_metadata)
+        raw_documents.append(extract_json_object(generate(prompt, model=model, timeout=1800, options=OLLAMA_OPTIONS)))
     duration = time.monotonic() - started
     extracted, guardrail_warnings = postprocess_extraction(
-        extract_json_object(raw_output),
+        merge_extraction_documents(raw_documents, EXPECTED_TOP_LEVEL_KEYS),
         session_name,
+        "\n\n".join(source["text"] for source in sources),
     )
     path = output_path(session_name)
     write_text(path, json.dumps(extracted, indent=2, ensure_ascii=False) + "\n")
@@ -225,6 +261,10 @@ def extract_combat_encounters(session_name: str, model: Optional[str] = None, so
         "model": model,
         "source": source,
         "sources": [{"label": item["label"], "path": item["path"], "chars": len(item["text"])} for item in sources],
+        "chunked": len(source_sets) > 1,
+        "chunk_count": len(source_sets),
+        "location_names_sent": location_names_sent,
+        "avg_location_names_sent": round(sum(location_names_sent) / len(location_names_sent), 2) if location_names_sent else 0,
         "campaign_metadata": str(campaign_metadata_path()),
         "location_count": len(locations),
         "duration_seconds": round(duration, 2),

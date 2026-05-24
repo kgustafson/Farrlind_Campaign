@@ -1,6 +1,6 @@
 import re
 
-from raglib.config import CLEAN
+from raglib.config import CLEAN, NOTES
 from raglib.io_utils import read_text, write_text
 
 
@@ -190,7 +190,7 @@ def validate_session(session_name: str):
     findings.append("## Recommended Human Corrections")
     findings.append("")
     findings.append("- Add confirmed corrections to:")
-    findings.append(f"  - `knowledge/Faban/notes/{session_name}_corrections.md`")
+    findings.append(f"  - `{NOTES / f'{session_name}_corrections.md'}`")
     findings.append("")
     findings.append("Example:")
     findings.append("")

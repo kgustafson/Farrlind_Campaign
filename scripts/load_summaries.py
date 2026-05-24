@@ -1,9 +1,14 @@
 import argparse
+import json
+import os
 import re
+import shutil
 import subprocess
 import sys
+from datetime import date
 from pathlib import Path
 from typing import Optional
+from urllib.parse import urlparse
 
 import yaml
 
@@ -11,7 +16,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from raglib.config import CLEAN, BASE2
+from raglib.campaign import active_campaign_name, campaign_container_name, campaign_database_name, audio_dir, out_dir, campaign_path
+from raglib.config import CLEAN
 from raglib.summarize import (
     diary_path,
     format_physical_date,
@@ -24,14 +30,15 @@ from raglib.summarize import (
 from raglib.workflow_state import workflow_state_schema_sql
 
 
-OUT_DIR = BASE2 / "farrlind" / "out"
+OUT_DIR = out_dir()
 OUT_SQL = OUT_DIR / "load_summaries.sql"
-TRAVEL_FACTS_PATH = BASE2 / "knowledge" / "Faban" / "travel.yaml"
-ENCOUNTERS_PATH = BASE2 / "knowledge" / "Faban" / "encounters.yaml"
-ENEMY_ENCOUNTERS_PATH = BASE2 / "knowledge" / "Faban" / "enemy_encounters.yaml"
-SONG_PROMPTS_PATH = BASE2 / "knowledge" / "Faban" / "songbook" / "prompts.md"
-CANON_DECISIONS_PATH = BASE2 / "knowledge" / "Faban" / "canon_decisions.yaml"
-REVIEWS_DIR = BASE2 / "knowledge" / "Faban" / "reviews"
+TRAVEL_FACTS_PATH = campaign_path("travel.yaml")
+ENCOUNTERS_PATH = campaign_path("encounters.yaml")
+ENEMY_ENCOUNTERS_PATH = campaign_path("enemy_encounters.yaml")
+SONG_PROMPTS_PATH = campaign_path("songbook", "prompts.md")
+CANON_DECISIONS_PATH = campaign_path("canon_decisions.yaml")
+REVIEWS_DIR = campaign_path("reviews")
+EXTRACTED_DIR = campaign_path("extracted")
 
 KNOWN_LOCATIONS = [
     "Bentrios",
@@ -1081,6 +1088,36 @@ def load_encounters() -> list[dict]:
     return encounters
 
 
+def load_reviewed_combat_encounters() -> list[dict]:
+    if not EXTRACTED_DIR.exists():
+        return []
+
+    encounters = []
+    for reviewed_path in sorted(EXTRACTED_DIR.glob("session*_combat_encounters_reviewed.json")):
+        match = re.fullmatch(r"session(\d+)_combat_encounters_reviewed\.json", reviewed_path.name)
+        if not match:
+            continue
+        session_number = int(match.group(1))
+        extraction_path = EXTRACTED_DIR / f"session{session_number:02d}_combat_encounters.json"
+        if not extraction_path.exists():
+            continue
+        reviewed = json.loads(reviewed_path.read_text(encoding="utf-8"))
+        extraction = json.loads(extraction_path.read_text(encoding="utf-8"))
+        candidates = extraction.get("proposed_combat_encounters") or []
+        for decision in reviewed.get("proposed_combat_encounters") or []:
+            if decision.get("decision") != "create":
+                continue
+            index = decision.get("index")
+            if not isinstance(index, int) or index < 0 or index >= len(candidates):
+                continue
+            candidate = dict(candidates[index])
+            candidate["session_number"] = int(candidate.get("session_number") or session_number)
+            candidate["source"] = "reviewed_combat_extraction"
+            candidate["source_index"] = index
+            encounters.append(candidate)
+    return encounters
+
+
 def load_canon_decisions() -> dict:
     if not CANON_DECISIONS_PATH.exists():
         return {}
@@ -1196,10 +1233,70 @@ def review_primary_locations(reviews: dict[int, dict]) -> dict[int, str]:
     for session_number, review in reviews.items():
         if review.get("status") not in {"reviewed", "complete", "applied"}:
             continue
-        location = (review.get("primary_location") or "").strip()
+        timeline = review_timeline_fact(review)
+        location = (
+            (review.get("primary_location") or "").strip()
+            or timeline.get("end_location", "")
+            or timeline.get("start_location", "")
+        )
         if location:
             locations[session_number] = location
     return locations
+
+
+def review_timeline_fact(review: dict) -> dict[str, str]:
+    if review.get("status") not in {"reviewed", "complete", "applied"}:
+        return {}
+
+    explicit = review.get("timeline") or {}
+    start_location = (explicit.get("start_location") or "").strip()
+    end_location = (explicit.get("end_location") or "").strip()
+
+    macros = review.get("macro_events") or []
+    def macro_order_value(item: dict, fallback: float) -> float:
+        try:
+            return float(item.get("order"))
+        except (TypeError, ValueError):
+            return fallback
+
+    ordered_macros = sorted(
+        [(macro_order_value(item, float(index)), index, item) for index, item in enumerate(macros, start=1) if (item.get("location") or "").strip()],
+        key=lambda entry: (entry[0], entry[1]),
+    )
+    if not start_location and ordered_macros:
+        start_location = (ordered_macros[0][2].get("location") or "").strip()
+    if not end_location and ordered_macros:
+        end_location = (ordered_macros[-1][2].get("location") or "").strip()
+
+    ordered_locations = [
+        (item.get("location") or "").strip()
+        for item in ordered_review_items(review)
+        if item.get("decision") not in {"pending", "rejected"}
+        and (item.get("location") or "").strip()
+    ]
+    if not start_location and ordered_locations:
+        start_location = ordered_locations[0]
+    if not end_location and ordered_locations:
+        end_location = ordered_locations[-1]
+
+    physical_date = (review.get("session_date") or explicit.get("physical_date") or "").strip()
+    if not physical_date:
+        physical_date = date.today().isoformat()
+
+    return {
+        "physical_date": physical_date,
+        "in_game_date": (review.get("in_game_date") or explicit.get("in_game_date") or "N/A").strip() or "N/A",
+        "start_location": start_location,
+        "end_location": end_location,
+    }
+
+
+def review_timeline_facts(reviews: dict[int, dict]) -> dict[int, dict[str, str]]:
+    return {
+        session_number: fact
+        for session_number, review in reviews.items()
+        if (fact := review_timeline_fact(review))
+    }
 
 
 def review_location_names(reviews: dict[int, dict]) -> set[str]:
@@ -1207,7 +1304,12 @@ def review_location_names(reviews: dict[int, dict]) -> set[str]:
     for review in reviews.values():
         if review.get("status") not in {"reviewed", "complete", "applied"}:
             continue
-        for location in [review.get("primary_location") or ""]:
+        timeline = review_timeline_fact(review)
+        for location in [
+            review.get("primary_location") or "",
+            timeline.get("start_location", ""),
+            timeline.get("end_location", ""),
+        ]:
             if location.strip():
                 locations.add(location.strip())
         for item in [*(review.get("items") or []), *(review.get("added_items") or [])]:
@@ -1337,13 +1439,14 @@ ON CONFLICT (name) DO UPDATE SET
 
 def session_sql(session: dict) -> str:
     number = session["session_number"]
-    audio_path = BASE2 / "audio" / f"session{number:02d}.wav"
-    transcript_path = BASE2 / "knowledge" / "Faban" / "raw" / f"session{number:02d}_transcript.txt"
+    audio_path = audio_dir() / f"session{number:02d}.wav"
+    transcript_path = campaign_path("raw", f"session{number:02d}_transcript.txt")
 
     return f"""
 INSERT INTO session (
     session_number, session_date, in_game_date, title, summary,
-    location_id, audio_file_path, transcript_path, notes
+    location_id, start_location_id, end_location_id,
+    audio_file_path, transcript_path, notes
 )
 VALUES (
     {number},
@@ -1352,6 +1455,8 @@ VALUES (
     {sql_quote(session["title"])},
     {sql_quote(session["summary"])},
     {location_expr(session["location"])},
+    {location_expr(session.get("start_location", ""))},
+    {location_expr(session.get("end_location", ""))},
     {sql_quote(str(audio_path) if audio_path.exists() else "")},
     {sql_quote(str(transcript_path) if transcript_path.exists() else "")},
     {sql_quote("Loaded from " + session["source_path"])}
@@ -1362,6 +1467,8 @@ ON CONFLICT (session_number) DO UPDATE SET
     title = EXCLUDED.title,
     summary = EXCLUDED.summary,
     location_id = EXCLUDED.location_id,
+    start_location_id = EXCLUDED.start_location_id,
+    end_location_id = EXCLUDED.end_location_id,
     audio_file_path = EXCLUDED.audio_file_path,
     transcript_path = EXCLUDED.transcript_path,
     notes = EXCLUDED.notes;
@@ -1372,7 +1479,10 @@ def delete_events_sql(session_number: int) -> str:
     return f"""
 DELETE FROM encounter
 WHERE session_id = (SELECT id FROM session WHERE session_number = {session_number})
-  AND notes LIKE '%Loaded from encounters.yaml%';
+   OR event_id IN (
+    SELECT id FROM session_event
+    WHERE session_id = (SELECT id FROM session WHERE session_number = {session_number})
+);
 
 DELETE FROM event_enemy
 WHERE event_id IN (
@@ -1486,6 +1596,8 @@ VALUES (
 
 def travel_log_schema_sql() -> str:
     return """
+ALTER TABLE session ADD COLUMN IF NOT EXISTS start_location_id INT REFERENCES location(id);
+ALTER TABLE session ADD COLUMN IF NOT EXISTS end_location_id INT REFERENCES location(id);
 ALTER TABLE travel_log ADD COLUMN IF NOT EXISTS duration_confidence VARCHAR(30);
 ALTER TABLE travel_log ADD COLUMN IF NOT EXISTS duration_basis TEXT;
 """.strip()
@@ -1494,6 +1606,7 @@ ALTER TABLE travel_log ADD COLUMN IF NOT EXISTS duration_basis TEXT;
 def enemy_encounter_schema_sql() -> str:
     return """
 ALTER TABLE event_enemy ADD COLUMN IF NOT EXISTS quantity SMALLINT;
+ALTER TABLE event_enemy ADD COLUMN IF NOT EXISTS quantity_killed SMALLINT;
 ALTER TABLE event_enemy ADD COLUMN IF NOT EXISTS confidence VARCHAR(30);
 ALTER TABLE event_enemy ADD COLUMN IF NOT EXISTS notes TEXT;
 """.strip()
@@ -1579,6 +1692,8 @@ def enemy_encounter_sql(encounter: dict) -> str:
     enemy_type = encounter.get("enemy_type", "")
     quantity = encounter.get("quantity")
     quantity_sql = quantity if quantity is not None else "NULL"
+    quantity_killed = encounter.get("quantity_killed")
+    quantity_killed_sql = quantity_killed if quantity_killed is not None else "NULL"
     session_number = encounter["session_number"]
     event_sequence = encounter["event_sequence"]
     notes = f"Loaded from enemy_encounters.yaml: {encounter.get('notes', '')}".strip()
@@ -1605,13 +1720,14 @@ SET
 WHERE name = {sql_quote(enemy_name)};
 
 INSERT INTO event_enemy (
-    event_id, enemy_id, outcome, quantity, confidence, notes
+    event_id, enemy_id, outcome, quantity, quantity_killed, confidence, notes
 )
 SELECT
     se.id,
     e.id,
     {sql_quote(encounter.get("outcome", "encountered"))},
     {quantity_sql},
+    {quantity_killed_sql},
     {sql_quote(encounter.get("confidence", "medium"))},
     {sql_quote(notes)}
 FROM session_event se
@@ -1622,9 +1738,158 @@ WHERE s.session_number = {session_number}
 ON CONFLICT (event_id, enemy_id) DO UPDATE SET
     outcome = EXCLUDED.outcome,
     quantity = EXCLUDED.quantity,
+    quantity_killed = EXCLUDED.quantity_killed,
     confidence = EXCLUDED.confidence,
     notes = EXCLUDED.notes;
 """.strip()
+
+
+def reviewed_combat_event_sql(encounter: dict) -> str:
+    session_number = encounter["session_number"]
+    source_index = encounter.get("source_index", 0)
+    title = encounter.get("title", "")
+    notes = f"Loaded from reviewed combat extraction: candidate {source_index}; {encounter.get('notes', '')}".strip()
+    return f"""
+INSERT INTO session_event (
+    session_id, event_type_id, sequence_order, location_id,
+    description, significance, notes
+)
+SELECT
+    s.id,
+    (SELECT id FROM event_type WHERE type_name = 'combat' LIMIT 1),
+    COALESCE((SELECT MAX(sequence_order) + 1 FROM session_event WHERE session_id = s.id), 1),
+    {location_expr(encounter.get("location", ""))},
+    {sql_quote(encounter.get("title", ""))},
+    3,
+    {sql_quote(notes)}
+FROM session s
+WHERE s.session_number = {session_number}
+  AND NOT EXISTS (
+      SELECT 1
+      FROM session_event existing
+      WHERE existing.session_id = s.id
+        AND (
+            existing.notes = {sql_quote(notes)}
+            OR existing.description = {sql_quote(title)}
+            OR existing.description LIKE {sql_quote(title + ":%")}
+        )
+  );
+""".strip()
+
+
+def reviewed_combat_encounter_sql(encounter: dict) -> str:
+    session_number = encounter["session_number"]
+    source_index = encounter.get("source_index", 0)
+    title = encounter.get("title", "")
+    notes = f"Loaded from reviewed combat extraction: candidate {source_index}; {encounter.get('notes', '')}".strip()
+    return f"""
+INSERT INTO encounter (
+    session_id, event_id, encounter_type, subtype, location_id,
+    title, participants, outcome, confidence, notes
+)
+SELECT
+    s.id,
+    se.id,
+    'combat',
+    {sql_quote(encounter.get("subtype", ""))},
+    {location_expr(encounter.get("location", ""))},
+    {sql_quote(encounter.get("title", ""))},
+    {sql_quote(encounter.get("participants", ""))},
+    {sql_quote(encounter.get("outcome", ""))},
+    {sql_quote(encounter.get("confidence", "medium"))},
+    {sql_quote(notes)}
+FROM session s
+JOIN session_event se ON se.session_id = s.id
+    AND (
+        se.notes = {sql_quote(notes)}
+        OR se.description = {sql_quote(title)}
+        OR se.description LIKE {sql_quote(title + ":%")}
+    )
+WHERE s.session_number = {session_number}
+ON CONFLICT (session_id, title) DO UPDATE SET
+    event_id = EXCLUDED.event_id,
+    encounter_type = EXCLUDED.encounter_type,
+    subtype = EXCLUDED.subtype,
+    location_id = EXCLUDED.location_id,
+    participants = EXCLUDED.participants,
+    outcome = EXCLUDED.outcome,
+    confidence = EXCLUDED.confidence,
+    notes = EXCLUDED.notes;
+""".strip()
+
+
+def reviewed_combat_enemy_sql(encounter: dict, enemy: dict) -> str:
+    enemy_name = enemy["name"]
+    enemy_type = enemy.get("enemy_type", "")
+    quantity = enemy.get("quantity")
+    quantity_sql = quantity if quantity is not None else "NULL"
+    quantity_killed = enemy.get("quantity_killed")
+    quantity_killed_sql = quantity_killed if quantity_killed is not None else "NULL"
+    session_number = encounter["session_number"]
+    source_index = encounter.get("source_index", 0)
+    title = encounter.get("title", "")
+    event_notes = f"Loaded from reviewed combat extraction: candidate {source_index}; {encounter.get('notes', '')}".strip()
+    enemy_notes = f"Loaded from reviewed combat extraction: {enemy.get('notes', '')}".strip()
+
+    return f"""
+INSERT INTO enemy (
+    name, enemy_type, threat_level_id, entity_status_id,
+    first_encountered_session, description, notes
+)
+SELECT
+    {sql_quote(enemy_name)},
+    {sql_quote(enemy_type)},
+    (SELECT id FROM threat_level WHERE level_code = 'minor' LIMIT 1),
+    (SELECT id FROM entity_status WHERE status_code = 'unknown' LIMIT 1),
+    (SELECT id FROM session WHERE session_number = {session_number}),
+    {sql_quote("Generic or encounter-level enemy tracked from reviewed combat extraction.")},
+    {sql_quote("Loaded from reviewed combat extraction.")}
+WHERE NOT EXISTS (SELECT 1 FROM enemy WHERE name = {sql_quote(enemy_name)});
+
+UPDATE enemy
+SET
+    enemy_type = COALESCE(NULLIF({sql_quote(enemy_type)}, ''), enemy.enemy_type),
+    first_encountered_session = COALESCE(enemy.first_encountered_session, (SELECT id FROM session WHERE session_number = {session_number}))
+WHERE name = {sql_quote(enemy_name)};
+
+INSERT INTO event_enemy (
+    event_id, enemy_id, outcome, quantity, quantity_killed, confidence, notes
+)
+SELECT
+    se.id,
+    e.id,
+    {sql_quote(enemy.get("outcome", "encountered"))},
+    {quantity_sql},
+    {quantity_killed_sql},
+    {sql_quote(enemy.get("confidence", encounter.get("confidence", "medium")))},
+    {sql_quote(enemy_notes)}
+FROM session_event se
+JOIN session s ON s.id = se.session_id
+JOIN enemy e ON e.name = {sql_quote(enemy_name)}
+WHERE s.session_number = {session_number}
+  AND (
+      se.notes = {sql_quote(event_notes)}
+      OR se.description = {sql_quote(title)}
+      OR se.description LIKE {sql_quote(title + ":%")}
+  )
+ON CONFLICT (event_id, enemy_id) DO UPDATE SET
+    outcome = EXCLUDED.outcome,
+    quantity = EXCLUDED.quantity,
+    quantity_killed = EXCLUDED.quantity_killed,
+    confidence = EXCLUDED.confidence,
+    notes = EXCLUDED.notes;
+""".strip()
+
+
+def reviewed_combat_sql(encounter: dict) -> list[str]:
+    statements = [
+        reviewed_combat_event_sql(encounter),
+        reviewed_combat_encounter_sql(encounter),
+    ]
+    for enemy in encounter.get("enemies") or []:
+        if (enemy.get("name") or "").strip():
+            statements.append(reviewed_combat_enemy_sql(encounter, enemy))
+    return statements
 
 
 def song_prompt_sql(entry: dict) -> str:
@@ -1708,6 +1973,8 @@ WHERE NOT EXISTS (SELECT 1 FROM npc WHERE name = {sql_quote(name)});
 
 
 def canon_npc_scrub_sql() -> str:
+    if active_campaign_name() != "farrlind":
+        return ""
     return "\n\n".join(canon_npc_sql(npc) for npc in CANON_NPCS)
 
 
@@ -1748,6 +2015,8 @@ WHERE NOT EXISTS (SELECT 1 FROM enemy WHERE name = {sql_quote(name)});
 
 
 def canon_enemy_scrub_sql() -> str:
+    if active_campaign_name() != "farrlind":
+        return ""
     return "\n\n".join(canon_enemy_sql(enemy) for enemy in CANON_ENEMIES)
 
 
@@ -1794,6 +2063,8 @@ ON CONFLICT (title) DO UPDATE SET
 
 
 def canon_open_threads_sql() -> str:
+    if active_campaign_name() != "farrlind":
+        return ""
     decisions = load_canon_decisions()
     suppressed_titles = suppressed_open_thread_titles(decisions)
     return "\n\n".join(
@@ -1822,6 +2093,8 @@ VALUES (
 
 
 def first_seen_sql(summaries: list[dict]) -> str:
+    if active_campaign_name() != "farrlind":
+        return ""
     statements = []
 
     for location in KNOWN_LOCATIONS:
@@ -1873,6 +2146,7 @@ def build_sql(summaries: list[dict]) -> str:
     canon_events = canon_event_decisions(decisions)
     reviews = load_review_documents()
     reviewed_primary_locations = review_primary_locations(reviews)
+    reviewed_timeline_facts = review_timeline_facts(reviews)
     reviewed_locations = review_location_names(reviews)
     review_events = {
         summary["session_number"]: review_events_for_session(summary, reviews.get(summary["session_number"]))
@@ -1899,6 +2173,7 @@ def build_sql(summaries: list[dict]) -> str:
     trusted_travel_logs = load_travel_facts()
     enemy_encounters = load_enemy_encounters()
     encounters = load_encounters()
+    reviewed_combat_encounters = load_reviewed_combat_encounters()
     trusted_keys = {
         (log["session_number"], log["from_location"], log["to_location"])
         for log in trusted_travel_logs
@@ -1916,6 +2191,8 @@ def build_sql(summaries: list[dict]) -> str:
         "BEGIN;",
     ]
 
+    statements.append(travel_log_schema_sql())
+
     if any(item.get("canonical") == "Coast near Catur" for item in primary_locations.values()):
         statements.append(canon_location_sql(
             "Coast near Catur",
@@ -1930,12 +2207,20 @@ def build_sql(summaries: list[dict]) -> str:
             summary = {**summary, "location": decision.get("canonical", summary["location"])}
         elif summary["session_number"] in reviewed_primary_locations:
             summary = {**summary, "location": reviewed_primary_locations[summary["session_number"]]}
+        timeline_fact = reviewed_timeline_facts.get(summary["session_number"], {})
+        if timeline_fact:
+            summary = {
+                **summary,
+                "physical_date": timeline_fact.get("physical_date") or summary["physical_date"],
+                "in_game_date": timeline_fact.get("in_game_date") or summary["in_game_date"],
+                "start_location": timeline_fact.get("start_location", ""),
+                "end_location": timeline_fact.get("end_location", ""),
+            }
         statements.append(session_sql(summary))
 
     statements.append(canon_npc_scrub_sql())
     statements.append(canon_enemy_scrub_sql())
     statements.append(workflow_state_schema_sql())
-    statements.append(travel_log_schema_sql())
     statements.append(encounter_schema_sql())
     statements.append(enemy_encounter_schema_sql())
     statements.append(open_thread_schema_sql())
@@ -1974,6 +2259,9 @@ def build_sql(summaries: list[dict]) -> str:
 
     for encounter in encounters:
         statements.append(encounter_sql(encounter))
+
+    for encounter in reviewed_combat_encounters:
+        statements.extend(reviewed_combat_sql(encounter))
 
     statements.append(first_seen_sql(summaries))
     statements.append(pipeline_run_sql(len(summaries), total_events + len(travel_logs)))
@@ -2038,7 +2326,42 @@ def write_sql() -> Path:
     return OUT_SQL
 
 
-def apply_sql(sql_path: Path, container: str, user: str, database: str):
+def database_connection_from_env(user: str, database: str) -> dict[str, str]:
+    url = os.getenv("FARRLIND_DATABASE_URL") or ""
+    parsed = urlparse(url.replace("postgresql+psycopg2://", "postgresql://", 1)) if url else None
+    return {
+        "host": (parsed.hostname if parsed else None) or "localhost",
+        "port": str((parsed.port if parsed else None) or ""),
+        "user": (parsed.username if parsed else None) or user,
+        "password": (parsed.password if parsed else None) or "",
+        "database": ((parsed.path or "").lstrip("/") if parsed else None) or database,
+    }
+
+
+def apply_sql_direct(sql_path: Path, user: str, database: str):
+    connection = database_connection_from_env(user, database)
+    command = [
+        "psql",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-h",
+        connection["host"],
+        "-U",
+        connection["user"],
+        "-d",
+        connection["database"],
+        "-f",
+        str(sql_path),
+    ]
+    if connection["port"]:
+        command[5:5] = ["-p", connection["port"]]
+    env = os.environ.copy()
+    if connection["password"]:
+        env["PGPASSWORD"] = connection["password"]
+    subprocess.run(command, check=True, env=env)
+
+
+def apply_sql_docker(sql_path: Path, container: str, user: str, database: str):
     target = f"/tmp/{sql_path.name}"
     subprocess.run(["docker", "cp", str(sql_path), f"{container}:{target}"], check=True)
     subprocess.run(
@@ -2047,12 +2370,19 @@ def apply_sql(sql_path: Path, container: str, user: str, database: str):
     )
 
 
+def apply_sql(sql_path: Path, container: str, user: str, database: str):
+    if shutil.which("docker"):
+        apply_sql_docker(sql_path, container, user, database)
+    else:
+        apply_sql_direct(sql_path, user, database)
+
+
 def parse_args():
-    parser = argparse.ArgumentParser(description="Load session summaries into Farrlind Postgres.")
+    parser = argparse.ArgumentParser(description="Load session summaries into the active campaign Postgres database.")
     parser.add_argument("--apply", action="store_true", help="Apply generated SQL through Docker.")
-    parser.add_argument("--container", default="farrlind_db")
+    parser.add_argument("--container", default=campaign_container_name())
     parser.add_argument("--user", default="admin")
-    parser.add_argument("--database", default="farrlind")
+    parser.add_argument("--database", default=campaign_database_name())
     return parser.parse_args()
 
 

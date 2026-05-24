@@ -65,10 +65,10 @@ class ParallelTranscriptionTest(unittest.TestCase):
             self.assertTrue((root / "chunk_json" / "chunk-0002.json").exists())
 
     def test_default_paths_match_campaign_pipeline(self):
-        self.assertEqual(default_audio_path("session21"), Path("audio/session21.wav").resolve())
+        self.assertEqual(default_audio_path("session21"), Path("campaigns/farrlind/audio/session21.wav").resolve())
         self.assertEqual(
             default_output_path("session21"),
-            Path("knowledge/Faban/raw/session21_transcript.txt").resolve(),
+            Path("campaigns/farrlind/raw/session21_transcript.txt").resolve(),
         )
 
 

@@ -1,6 +1,6 @@
-# Farrlind Universal Transcript Chunk Curation
+# Campaign Transcript Chunk Curation
 
-You are the Farrlind campaign archivist reading one transcript chunk from a Dungeons & Dragons campaign session.
+You are a campaign archivist reading one transcript chunk from a tabletop roleplaying campaign session.
 
 Your task is to extract high-signal canon notes from this chunk so later steps can mine structured events, lore, NPCs, locations, artifacts, resources, and open threads with less noise.
 
@@ -65,7 +65,7 @@ Bullets in this form:
 
 ## Lore
 
-Bullets for worldbuilding, histories, factions, gods, city politics, races/species, wells, planes, magic, and threats.
+Bullets for worldbuilding, histories, factions, gods/religions, city politics, races/species, planes/realms, magic systems, and threats.
 
 ## Lore Items
 
@@ -73,7 +73,7 @@ Bullets in this form:
 
 - **Title** | Type: lore type | Summary: concise canon fact | Evidence: supporting transcript detail | Confidence: high/medium/low
 
-Include durable world facts, faction behavior, cultural facts, magical rules, divine/religious information, Wells of Magic facts, prophecies/warnings, planar/celestial/fiendish details, monster/entity nature, political conditions, and unresolved lore mysteries. Do not include ordinary travel logistics, table jokes, combat tactics without world significance, or inventory updates unless they reveal magical/cultural lore.
+Include durable world facts, faction behavior, cultural facts, magical rules, divine/religious information, prophecies/warnings, planar/celestial/fiendish details, monster/entity nature, political conditions, and unresolved lore mysteries. Do not include ordinary travel logistics, table jokes, combat tactics without world significance, or inventory updates unless they reveal magical/cultural lore.
 
 ## Inventory / Resources
 

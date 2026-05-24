@@ -7,6 +7,16 @@ from pathlib import Path
 from typing import Any, Optional
 
 from raglib.config import BASE, CLEAN, RAW
+from raglib.extraction_hygiene import (
+    chunk_source_sets,
+    compact_campaign_metadata,
+    compact_name_list_for_chunk,
+    compact_registry_for_chunk,
+    looks_like_party_interpretation,
+    merge_extraction_documents,
+    neutralize_interpretive_update,
+    rejection_text,
+)
 from raglib.io_utils import read_text, write_text
 from raglib.ollama_client import generate
 from raglib.prompts import load_prompt
@@ -65,6 +75,11 @@ def load_campaign_metadata() -> dict[str, Any]:
 def normalized_name(value: Any) -> str:
     normalized = re.sub(r"[^a-z0-9]+", " ", str(value or "").lower()).strip()
     return re.sub(r"\s+", " ", normalized)
+
+
+def source_contains_any(source_text: str, values: list[Any]) -> bool:
+    source = normalized_name(source_text)
+    return any(value and normalized_name(value) in source for value in values)
 
 
 def lore_registry() -> list[dict[str, Any]]:
@@ -130,6 +145,32 @@ def candidate_to_known_mention(candidate: dict[str, Any], registry_row: dict[str
     }
 
 
+def known_mention_to_candidate(item: dict[str, Any], session_name: str) -> dict[str, Any]:
+    return {
+        "proposed_title": item.get("canonical_title") or item.get("proposed_title") or "",
+        "category": item.get("category") or "",
+        "description": item.get("new_information") or item.get("description") or "Mentioned in this session.",
+        "source_npc": item.get("source_npc") or "",
+        "discovered_session": session_number(session_name),
+        "is_confirmed": bool(item.get("is_confirmed")),
+        "confidence": item.get("confidence") or "medium",
+        "evidence": item.get("evidence") or "",
+    }
+
+
+def known_mention_is_source_grounded(source_text: str, item: dict[str, Any], candidate: dict[str, Any]) -> bool:
+    if not source_text:
+        return True
+    return source_contains_any(source_text, [
+        candidate.get("proposed_title"),
+        candidate.get("description"),
+        candidate.get("evidence"),
+        item.get("canonical_title"),
+        item.get("new_information"),
+        item.get("evidence"),
+    ])
+
+
 def normalize_extraction(document: dict[str, Any]) -> dict[str, Any]:
     normalized = {}
     for key in EXPECTED_TOP_LEVEL_KEYS:
@@ -142,12 +183,14 @@ def postprocess_extraction(
     document: dict[str, Any],
     registry: list[dict[str, Any]],
     session_name: str,
+    source_text: str = "",
 ) -> tuple[dict[str, Any], list[str]]:
     cleaned = normalize_extraction(document)
     warnings = []
     by_id, by_title = registry_indexes(registry)
 
     known_mentions = []
+    salvaged_candidates = []
     for item in cleaned["known_lore_mentions"]:
         try:
             lore_item_id = int(item.get("lore_item_id"))
@@ -156,30 +199,69 @@ def postprocess_extraction(
             continue
         registry_row = by_id.get(lore_item_id)
         if not registry_row:
+            candidate = known_mention_to_candidate(item, session_name)
+            if candidate["proposed_title"] and known_mention_is_source_grounded(source_text, item, candidate):
+                salvaged_candidates.append(candidate)
+                warnings.append(f"Converted unknown known lore mention to new candidate: {candidate['proposed_title']}")
+                continue
             warnings.append(f"Dropped known lore mention with unknown lore_item_id {lore_item_id}: {item.get('canonical_title')}")
             continue
         if not canonical_matches_registry(item, registry_row):
+            candidate = known_mention_to_candidate(item, session_name)
+            if candidate["proposed_title"] and known_mention_is_source_grounded(source_text, item, candidate):
+                salvaged_candidates.append(candidate)
+                warnings.append(f"Converted mismatched known lore mention to new candidate: {candidate['proposed_title']}")
+                continue
             warnings.append(
                 f"Dropped known lore mention whose canonical title does not match lore_item_id {lore_item_id}: "
                 f"{item.get('canonical_title')} != {registry_row.get('title')}"
             )
             continue
+        if source_text and not source_contains_any(source_text, [registry_row.get("title"), item.get("canonical_title")]):
+            warnings.append(f"Dropped known lore mention not present in session source: {registry_row.get('title')}")
+            continue
         item["canonical_title"] = registry_row.get("title")
+        if neutralize_interpretive_update(
+            item,
+            source_text,
+            name_fields=["canonical_title"],
+            context_fields=["new_information", "evidence"],
+        ):
+            item["is_confirmed"] = False
+            warnings.append(f"Neutralized party-interpretation lore update: {registry_row.get('title')}")
         known_mentions.append(item)
 
     cleaned["known_lore_mentions"] = known_mentions
     known_ids = existing_known_lore_ids(cleaned)
     new_candidates = []
-    for candidate in cleaned["new_lore_candidates"]:
+    seen_new_titles = set()
+    for candidate in [*salvaged_candidates, *cleaned["new_lore_candidates"]]:
         proposed_title = candidate.get("proposed_title", "")
+        if looks_like_party_interpretation(
+            candidate,
+            source_text,
+            name_fields=["proposed_title"],
+            context_fields=["description", "evidence"],
+        ) and candidate.get("is_confirmed") is not True:
+            reject_candidate(
+                cleaned,
+                candidate,
+                "Appears to be a party joke, misunderstanding, or theory rather than confirmed lore.",
+            )
+            warnings.append(f"Rejected party-interpretation lore candidate: {rejection_text(candidate, 'proposed_title')}")
+            continue
         registry_row = by_title.get(normalized_name(proposed_title))
 
         if registry_row:
             registry_id = int(registry_row["id"])
             if registry_id not in known_ids:
-                cleaned["known_lore_mentions"].append(candidate_to_known_mention(candidate, registry_row, session_name))
-                known_ids.add(registry_id)
-                warnings.append(f"Moved existing lore candidate to known mention: {proposed_title}")
+                if source_text and not source_contains_any(source_text, [proposed_title, registry_row.get("title")]):
+                    reject_candidate(cleaned, candidate, f"Existing lore candidate not present in session source: {registry_row.get('title')}.")
+                    warnings.append(f"Rejected existing lore candidate not present in source: {proposed_title}")
+                else:
+                    cleaned["known_lore_mentions"].append(candidate_to_known_mention(candidate, registry_row, session_name))
+                    known_ids.add(registry_id)
+                    warnings.append(f"Moved existing lore candidate to known mention: {proposed_title}")
             else:
                 reject_candidate(cleaned, candidate, f"Duplicate of existing lore item: {registry_row.get('title')}.")
                 warnings.append(f"Rejected duplicate existing lore candidate: {proposed_title}")
@@ -190,6 +272,12 @@ def postprocess_extraction(
             warnings.append("Rejected lore candidate missing proposed title.")
             continue
 
+        normalized_title = normalized_name(proposed_title)
+        if normalized_title in seen_new_titles:
+            reject_candidate(cleaned, candidate, f"Duplicate new lore candidate: {proposed_title}.")
+            warnings.append(f"Rejected duplicate new lore candidate: {proposed_title}")
+            continue
+        seen_new_titles.add(normalized_title)
         new_candidates.append(candidate)
 
     cleaned["new_lore_candidates"] = new_candidates
@@ -274,16 +362,44 @@ def extract_lore_items(session_name: str, model: Optional[str] = None, source: s
     npcs = [row.get("name") for row in canon.npc_rows() if row.get("name")]
     locations = canon.locations()
     artifacts = [row.get("name") for row in canon.artifact_rows() if row.get("name")]
-    prompt = build_prompt(session_name, sources, registry, npcs, locations, artifacts, campaign_metadata)
+    source_sets = chunk_source_sets(sources)
 
     print(f"Extracting lore item candidates for {session_name} with {model}...")
     started = time.monotonic()
-    raw_output = generate(prompt, model=model, timeout=1800, options=OLLAMA_OPTIONS)
+    raw_documents = []
+    registry_rows_sent = []
+    for index, source_set in enumerate(source_sets, start=1):
+        if len(source_sets) > 1:
+            print(f"  Lore transcript chunk {index}/{len(source_sets)}...")
+        chunk_text = "\n\n".join(item["text"] for item in source_set)
+        prompt_registry = compact_registry_for_chunk(
+            chunk_text,
+            registry,
+            identity_fields=["title"],
+            keep_fields=["id", "title", "category", "source_npc", "is_confirmed"],
+        ) if len(source_sets) > 1 else registry
+        prompt_npcs = compact_name_list_for_chunk(chunk_text, npcs) if len(source_sets) > 1 else npcs
+        prompt_locations = compact_name_list_for_chunk(chunk_text, locations) if len(source_sets) > 1 else locations
+        prompt_artifacts = compact_name_list_for_chunk(chunk_text, artifacts) if len(source_sets) > 1 else artifacts
+        prompt_metadata = compact_campaign_metadata(campaign_metadata) if len(source_sets) > 1 else campaign_metadata
+        registry_rows_sent.append(len(prompt_registry))
+        prompt = build_prompt(
+            session_name,
+            source_set,
+            prompt_registry,
+            prompt_npcs,
+            prompt_locations,
+            prompt_artifacts,
+            prompt_metadata,
+        )
+        raw_documents.append(extract_json_object(generate(prompt, model=model, timeout=1800, options=OLLAMA_OPTIONS)))
     duration = time.monotonic() - started
+    source_text = "\n\n".join(source["text"] for source in sources)
     extracted, guardrail_warnings = postprocess_extraction(
-        extract_json_object(raw_output),
+        merge_extraction_documents(raw_documents, EXPECTED_TOP_LEVEL_KEYS),
         registry,
         session_name,
+        source_text,
     )
     path = output_path(session_name)
     write_text(path, json.dumps(extracted, indent=2, ensure_ascii=False) + "\n")
@@ -294,6 +410,10 @@ def extract_lore_items(session_name: str, model: Optional[str] = None, source: s
         "model": model,
         "source": source,
         "sources": [{"label": item["label"], "path": item["path"], "chars": len(item["text"])} for item in sources],
+        "chunked": len(source_sets) > 1,
+        "chunk_count": len(source_sets),
+        "registry_rows_sent": registry_rows_sent,
+        "avg_registry_rows_sent": round(sum(registry_rows_sent) / len(registry_rows_sent), 2) if registry_rows_sent else 0,
         "campaign_metadata": str(campaign_metadata_path()),
         "lore_registry_count": len(registry),
         "npc_registry_count": len(npcs),

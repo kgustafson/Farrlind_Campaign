@@ -1,6 +1,6 @@
 # Enemy Encounter Pass
 
-Generated from `knowledge/Faban/enemy_encounters.yaml` and loaded into `event_enemy`.
+Generated from `campaigns/{campaign}/enemy_encounters.yaml` and loaded into `event_enemy`.
 
 ## Query Shape
 
@@ -61,6 +61,6 @@ These should be tightened later from diary/transcript/audio where possible:
 ## Implementation Notes
 
 - `event_enemy` now has `quantity`, `confidence`, and `notes`.
-- `scripts/load_summaries.py` loads curated rows from `knowledge/Faban/enemy_encounters.yaml`.
+- `scripts/load_summaries.py` loads curated rows from `campaigns/{campaign}/enemy_encounters.yaml`.
 - Generic enemies are inserted into `enemy` if they do not already exist.
 - Existing reviewed events remain the source of truth; enemy rows link back to final `session_event` rows by session and sequence.

@@ -66,11 +66,15 @@ class WorkflowStateTest(unittest.TestCase):
         self.assertIn("ON CONFLICT (session_id, workflow_id, workflow_version)", self.sql)
         self.assertIn("'farrlind_session_canon'", self.sql)
         self.assertIn("'source_audio_registered', 1", self.sql)
-        self.assertIn("'git_push', 27", self.sql)
+        self.assertIn("'extract_npcs', 7", self.sql)
+        self.assertIn("'extract_open_threads', 12", self.sql)
+        self.assertIn("'review_npc_extraction', 20", self.sql)
+        self.assertIn("'initialize_review', 26", self.sql)
+        self.assertIn("'git_push', 39", self.sql)
 
     def test_initialize_sql_uses_rendered_session_inputs_outputs_and_commands(self):
         self.assertIn("audio/session21.wav", self.sql)
-        self.assertIn("knowledge/Faban/raw/session21_transcript.txt", self.sql)
+        self.assertIn("campaigns/farrlind/raw/session21_transcript.txt", self.sql)
         self.assertIn("./rag-env/bin/python scripts/rag.py transcribe session21", self.sql)
         self.assertNotIn("sessionXX", self.sql)
 

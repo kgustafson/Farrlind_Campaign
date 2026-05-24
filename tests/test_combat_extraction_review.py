@@ -30,7 +30,7 @@ class CombatExtractionReviewServiceTest(unittest.TestCase):
             "outcome": "enemies_defeated",
             "confidence": "high",
             "notes": "The party defeated Orsydon.",
-            "enemies": [{"name": "Orsydon", "enemy_type": "dragon", "quantity": 1, "outcome": "defeated"}],
+            "enemies": [{"name": "Orsydon", "enemy_type": "dragon", "quantity": 1, "quantity_killed": 0, "outcome": "defeated"}],
         }
         with patch("web_review.services.canon.location_id", return_value=4), \
              patch("web_review.services.canon.create_combat_encounter") as create:
@@ -41,6 +41,7 @@ class CombatExtractionReviewServiceTest(unittest.TestCase):
         self.assertEqual(values["location_id"], 4)
         self.assertEqual(enemies[0]["name"], "Orsydon")
         self.assertEqual(enemies[0]["quantity"], 1)
+        self.assertEqual(enemies[0]["quantity_killed"], 0)
 
     def test_apply_review_writes_decision_audit_file(self):
         extraction = {

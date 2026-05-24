@@ -19,6 +19,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from web_review import db
 from web_review.services.workflow import session_key
+from raglib import campaign
 
 
 QUEUE_DIR = REPO_ROOT / "ops" / "workflow_queue"
@@ -40,13 +41,16 @@ def session_name(session_number: int) -> str:
     return session_key(session_number)
 
 
-def command_plan(session_number: int) -> list[WorkflowCommand]:
+def command_plan(session_number: int, audio_file_path: str = "") -> list[WorkflowCommand]:
     session = session_name(session_number)
     python = sys.executable
+    transcribe_command = [python, "scripts/rag.py", "transcribe", session]
+    if audio_file_path:
+        transcribe_command.extend(["--audio-file", audio_file_path])
     return [
         WorkflowCommand(
             "transcribe_audio",
-            [python, "scripts/rag.py", "transcribe", session],
+            transcribe_command,
             ("transcribe_audio",),
         ),
         WorkflowCommand(
@@ -65,6 +69,36 @@ def command_plan(session_number: int) -> list[WorkflowCommand]:
             ("curate_transcript",),
         ),
         WorkflowCommand(
+            "extract_npcs",
+            [python, "scripts/rag.py", "extract-npcs", session],
+            ("extract_npcs",),
+        ),
+        WorkflowCommand(
+            "extract_locations",
+            [python, "scripts/rag.py", "extract-locations", session],
+            ("extract_locations",),
+        ),
+        WorkflowCommand(
+            "extract_artifacts",
+            [python, "scripts/rag.py", "extract-artifacts", session],
+            ("extract_artifacts",),
+        ),
+        WorkflowCommand(
+            "extract_lore_items",
+            [python, "scripts/rag.py", "extract-lore-items", session],
+            ("extract_lore_items",),
+        ),
+        WorkflowCommand(
+            "extract_combat_encounters",
+            [python, "scripts/rag.py", "extract-combat-encounters", session],
+            ("extract_combat_encounters",),
+        ),
+        WorkflowCommand(
+            "extract_open_threads",
+            [python, "scripts/rag.py", "extract-open-threads", session],
+            ("extract_open_threads",),
+        ),
+        WorkflowCommand(
             "extract_events",
             [python, "scripts/rag.py", "extract", session],
             ("extract_events",),
@@ -81,11 +115,6 @@ def command_plan(session_number: int) -> list[WorkflowCommand]:
                 "summarize_draft",
                 "postextract_shortcut",
             ),
-        ),
-        WorkflowCommand(
-            "initialize_review",
-            [python, "scripts/dm_query.py", "init-review", session],
-            ("initialize_review",),
         ),
     ]
 
@@ -129,7 +158,7 @@ def mark_run_waiting_for_review(session_number: int) -> None:
         """,
         {
             "session_number": session_number,
-            "summary_comment": "Auto-intake completed through init-review; waiting for human review.",
+            "summary_comment": "Auto-intake completed through draft extraction; waiting for extraction reviews.",
             "metadata": json.dumps({"auto_intake_completed_at": utc_now().isoformat()}),
         },
     )
@@ -266,6 +295,7 @@ def run_command(session_number: int, command: WorkflowCommand, run_dir: Path, dr
         result = subprocess.run(
             command.argv,
             cwd=REPO_ROOT,
+            env=os.environ.copy(),
             stdout=log_file,
             stderr=subprocess.STDOUT,
             text=True,
@@ -295,12 +325,16 @@ def finish_queue_file(path: Path, suffix: str) -> Path:
 
 def process_job(job_path: Path, dry_run: bool = False) -> None:
     job = json.loads(job_path.read_text(encoding="utf-8"))
+    job_campaign = (job.get("campaign_name") or campaign.active_campaign_name()).strip()
+    os.environ["FARRLIND_CAMPAIGN"] = job_campaign
+    os.environ["FARRLIND_DATABASE_URL"] = campaign.campaign_database_url(job_campaign)
     session_number = int(job["session_number"])
+    audio_file_path = (job.get("audio_file_path") or "").strip()
     run_dir = LOG_DIR / session_name(session_number) / datetime.now().strftime("%Y%m%d_%H%M%S")
     run_dir.mkdir(parents=True, exist_ok=True)
     mark_run_running(session_number)
     try:
-        for command in command_plan(session_number):
+        for command in command_plan(session_number, audio_file_path):
             run_command(session_number, command, run_dir, dry_run=dry_run)
     except SystemExit as exc:
         mark_run_failed(session_number, f"Auto-intake failed before human review. Exit code {exc.code}.")
@@ -333,14 +367,13 @@ def process_queue(session_number: int | None = None, dry_run: bool = False) -> i
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run queued Farrlind workflow intake jobs through init-review.")
+    parser = argparse.ArgumentParser(description="Run queued campaign workflow intake jobs through draft extraction.")
     parser.add_argument("--session", type=int, default=None, help="Only process one session number.")
     parser.add_argument("--dry-run", action="store_true", help="Mark steps without executing commands.")
     return parser.parse_args()
 
 
 def main() -> int:
-    os.environ.setdefault("FARRLIND_DATABASE_URL", "postgresql+psycopg2://admin:gofaban@localhost:5432/farrlind")
     args = parse_args()
     return process_queue(args.session, dry_run=args.dry_run)
 

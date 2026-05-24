@@ -153,6 +153,60 @@ party:
 
         self.assertEqual(cleaned["known_npc_mentions"][0]["canonical_name"], "Alistair")
 
+    def test_postprocess_rejects_party_misunderstanding_as_npc(self):
+        document = {
+            "known_npc_mentions": [],
+            "new_npc_candidates": [{
+                "proposed_name": "Burger Master",
+                "role": "Manager of a restaurant empire",
+                "description": "The party mistakenly interprets the Burgomaster title as a burger boss.",
+                "evidence": "The party misreads Burgomaster as Burger Master.",
+            }],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = npc_extractor.postprocess_extraction(
+            document,
+            [],
+            {"party": []},
+            "session02",
+            "Because of the title Burgomaster, the party misreads it as Burger Master and jokes about a secret recipe.",
+        )
+
+        self.assertEqual(cleaned["new_npc_candidates"], [])
+        self.assertEqual(cleaned["rejected_candidates"][0]["text"], "Burger Master")
+        self.assertIn("party-interpretation NPC", warnings[0])
+
+    def test_postprocess_neutralizes_party_interpretation_known_update(self):
+        registry = [{"id": 4, "name": "Strahd von Zarovich", "alias": "Strahd"}]
+        document = {
+            "known_npc_mentions": [{
+                "npc_id": 4,
+                "canonical_name": "Strahd von Zarovich",
+                "mentioned_as": ["Strahd"],
+                "new_information": "The party mistakenly calls Strahd the resort manager.",
+                "evidence": "The Triplets keep interpreting Strahd as the manager.",
+            }],
+            "new_npc_candidates": [],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = npc_extractor.postprocess_extraction(
+            document,
+            registry,
+            {"party": []},
+            "session02",
+            "The Triplets keep interpreting Strahd as the manager, but Kolyan's letter frames him as a vampire threat.",
+        )
+
+        self.assertEqual(
+            cleaned["known_npc_mentions"][0]["new_information"],
+            "Mentioned in this session; no new canon update proposed.",
+        )
+        self.assertIn("Neutralized party-interpretation NPC update", warnings[0])
+
     def test_postprocess_allows_combined_name_alias_canonical(self):
         registry = [{"id": 43, "name": "Niebain", "alias": "Nebain"}]
         document = {
@@ -199,6 +253,30 @@ party:
         self.assertEqual(cleaned["new_npc_candidates"], [])
         self.assertEqual(cleaned["known_npc_mentions"][0]["npc_id"], 26)
         self.assertIn("Moved existing NPC candidate", warnings[0])
+
+    def test_postprocess_rejects_new_candidate_absent_from_source(self):
+        document = {
+            "known_npc_mentions": [],
+            "new_npc_candidates": [{
+                "proposed_name": "Uthgar",
+                "role": "Smith contact in Catur",
+                "description": "A copied example candidate.",
+            }],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = npc_extractor.postprocess_extraction(
+            document,
+            [],
+            {"party": []},
+            "session01",
+            "Keychain led the party toward the Overseer's Manor.",
+        )
+
+        self.assertEqual(cleaned["new_npc_candidates"], [])
+        self.assertEqual(cleaned["rejected_candidates"][0]["text"], "Uthgar")
+        self.assertIn("not present in source", warnings[0])
 
     def test_postprocess_rejects_duplicate_existing_candidate(self):
         registry = [{"id": 41, "name": "Uthgar", "alias": ""}]
@@ -273,6 +351,39 @@ party:
 
         self.assertEqual(written, output)
         self.assertEqual(metadata["guardrail_warning_count"], 0)
+
+    def test_extract_npcs_chunks_large_transcript_source(self):
+        output = {
+            "known_npc_mentions": [],
+            "new_npc_candidates": [],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            base = root / "knowledge" / "Faban"
+            clean = base / "clean"
+            raw = base / "raw"
+            for path in [clean, raw]:
+                path.mkdir(parents=True)
+            long_text = "\n".join(f"[00:{index:02d}:00] No NPC here." for index in range(2500))
+            (raw / "session21_transcript.txt").write_text(long_text, encoding="utf-8")
+
+            with patch.object(npc_extractor, "BASE", base), \
+                 patch.object(npc_extractor, "CLEAN", clean), \
+                 patch.object(npc_extractor, "RAW", raw), \
+                 patch.object(npc_extractor, "OUTPUT_DIR", base / "extracted"), \
+                 patch.object(npc_extractor, "load_campaign_metadata", return_value={"party": []}), \
+                 patch.object(npc_extractor, "npc_registry", return_value=[]), \
+                 patch("raglib.npc_extractor.canon.locations", return_value=[]), \
+                 patch("raglib.npc_extractor.generate", return_value=json.dumps(output)) as generate:
+                path = npc_extractor.extract_npcs("session21", model="test-model", source="transcript")
+
+            metadata = json.loads(path.with_name("session21_npcs_metadata.json").read_text(encoding="utf-8"))
+
+        self.assertGreater(generate.call_count, 1)
+        self.assertTrue(metadata["chunked"])
+        self.assertEqual(metadata["chunk_count"], generate.call_count)
 
 
 if __name__ == "__main__":

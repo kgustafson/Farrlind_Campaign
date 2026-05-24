@@ -52,6 +52,12 @@ class WorkflowDefinitionTest(unittest.TestCase):
             "source_status_check",
             "curate_transcript",
             "extract_events",
+            "extract_npcs",
+            "extract_locations",
+            "extract_artifacts",
+            "extract_lore_items",
+            "extract_combat_encounters",
+            "extract_open_threads",
             "filter_events",
             "classify_events",
             "normalize_events",
@@ -59,6 +65,12 @@ class WorkflowDefinitionTest(unittest.TestCase):
             "validate_draft",
             "summarize_draft",
             "postextract_shortcut",
+            "review_npc_extraction",
+            "review_location_extraction",
+            "review_artifact_extraction",
+            "review_lore_item_extraction",
+            "review_combat_encounter_extraction",
+            "review_open_thread_extraction",
             "initialize_review",
             "edit_review_decisions",
             "mark_reviewed",
@@ -68,6 +80,34 @@ class WorkflowDefinitionTest(unittest.TestCase):
             "run_health",
         }
         self.assertTrue(expected.issubset(set(self.step_ids)))
+
+    def test_entity_extractors_run_before_human_review(self):
+        by_id = {step["id"]: step for step in self.steps}
+        expected_extractors = {
+            "extract_npcs": "extract-npcs",
+            "extract_locations": "extract-locations",
+            "extract_artifacts": "extract-artifacts",
+            "extract_lore_items": "extract-lore-items",
+            "extract_combat_encounters": "extract-combat-encounters",
+            "extract_open_threads": "extract-open-threads",
+        }
+        for step_id, command_name in expected_extractors.items():
+            self.assertEqual(by_id[step_id]["lane"], "entity_extraction")
+            self.assertIn("curate_transcript", by_id[step_id]["dependencies"])
+            self.assertIn(command_name, by_id[step_id]["command"])
+
+        review_dependencies = {
+            "review_npc_extraction": "extract_npcs",
+            "review_location_extraction": "extract_locations",
+            "review_artifact_extraction": "extract_artifacts",
+            "review_lore_item_extraction": "extract_lore_items",
+            "review_combat_encounter_extraction": "extract_combat_encounters",
+            "review_open_thread_extraction": "extract_open_threads",
+        }
+        for review_step, extractor_step in review_dependencies.items():
+            self.assertEqual(by_id[review_step]["lane"], "human_review")
+            self.assertIn(extractor_step, by_id[review_step]["dependencies"])
+            self.assertIn(review_step, by_id["initialize_review"]["dependencies"])
 
     def test_definition_includes_lore_verification_and_version_control_closure(self):
         expected = {

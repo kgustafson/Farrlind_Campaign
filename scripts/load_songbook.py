@@ -1,5 +1,4 @@
 import argparse
-import subprocess
 import sys
 from pathlib import Path
 
@@ -7,7 +6,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from raglib.config import BASE2
+from raglib.campaign import campaign_container_name, campaign_database_name, out_dir
 from scripts.load_summaries import (
     OUT_DIR,
     SONG_PROMPTS_PATH,
@@ -16,12 +15,13 @@ from scripts.load_summaries import (
     song_prompt_sql,
     song_schema_sql,
     sql_quote,
+    apply_sql as apply_summary_sql,
 )
 from scripts.download_songbook_assets import SONGBOOK_MD, parse_assets
 
 
-OUT_SQL = BASE2 / "farrlind" / "out" / "load_songbook.sql"
-OUT_REPORT = BASE2 / "farrlind" / "out" / "load_songbook_report.md"
+OUT_SQL = out_dir() / "load_songbook.sql"
+OUT_REPORT = out_dir() / "load_songbook_report.md"
 
 
 def songbook_pipeline_run_sql(prompt_count: int, report_path: Path) -> str:
@@ -141,20 +141,15 @@ def write_songbook_sql() -> tuple[Path, Path, list[dict], list[str]]:
 
 
 def apply_sql(sql_path: Path, container: str, user: str, database: str):
-    target = f"/tmp/{sql_path.name}"
-    subprocess.run(["docker", "cp", str(sql_path), f"{container}:{target}"], check=True)
-    subprocess.run(
-        ["docker", "exec", container, "psql", "-v", "ON_ERROR_STOP=1", "-U", user, "-d", database, "-f", target],
-        check=True,
-    )
+    apply_summary_sql(sql_path, container, user, database)
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Load curated Faban songbook metadata into Postgres.")
+    parser = argparse.ArgumentParser(description="Load curated campaign songbook metadata into Postgres.")
     parser.add_argument("--apply", action="store_true", help="Apply generated SQL through Docker.")
-    parser.add_argument("--container", default="farrlind_db")
+    parser.add_argument("--container", default=campaign_container_name())
     parser.add_argument("--user", default="admin")
-    parser.add_argument("--database", default="farrlind")
+    parser.add_argument("--database", default=campaign_database_name())
     return parser.parse_args()
 
 

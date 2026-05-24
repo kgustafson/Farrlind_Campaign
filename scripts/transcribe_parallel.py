@@ -9,7 +9,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from raglib.config import BASE2, RAW
+from raglib.config import RAW
+from raglib.campaign import audio_dir
 from raglib.parallel_transcription import (
     DEFAULT_CHUNK_SECONDS,
     DEFAULT_MAX_WORKERS,
@@ -20,7 +21,7 @@ from raglib.parallel_transcription import (
 
 
 def default_audio_path(session_name: str) -> Path:
-    return BASE2 / "audio" / f"{session_name}.wav"
+    return audio_dir() / f"{session_name}.wav"
 
 
 def default_output_path(session_name: str) -> Path:
@@ -30,8 +31,8 @@ def default_output_path(session_name: str) -> Path:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Transcribe Farrlind session audio with parallel faster-whisper workers.")
     parser.add_argument("session_name", help="Session name, e.g. session21.")
-    parser.add_argument("--audio-file", type=Path, default=None, help="Defaults to audio/<session_name>.wav.")
-    parser.add_argument("--output", type=Path, default=None, help="Defaults to knowledge/Faban/raw/<session_name>_transcript.txt.")
+    parser.add_argument("--audio-file", type=Path, default=None, help="Defaults to campaigns/<campaign>/audio/<session_name>.wav.")
+    parser.add_argument("--output", type=Path, default=None, help="Defaults to campaigns/<campaign>/raw/<session_name>_transcript.txt.")
     parser.add_argument("--model", default=DEFAULT_MODEL_SIZE)
     parser.add_argument("--chunk-seconds", type=int, default=DEFAULT_CHUNK_SECONDS)
     parser.add_argument("--max-workers", type=int, default=DEFAULT_MAX_WORKERS)

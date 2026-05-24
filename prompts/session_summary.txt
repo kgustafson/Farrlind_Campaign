@@ -16,7 +16,7 @@ When selecting content for the summary, prioritize events in this order:
    - lore
    - warnings
    - relationships
-   - history (e.g., Catur conflict)
+   - history and setting conflict
 
 3. ITEMS / REWARDS
    - gifts
@@ -56,7 +56,7 @@ STRICT ACCURACY RULES:
 - Ignore unclear references like "the guy in the back"
 - Do NOT assume death unless explicitly confirmed
 - Avoid redundant phrasing
-- Prefer confirmed names from correction notes (e.g., Lightdelver, Orsydon)
+- Prefer confirmed names from correction notes
 
 STRICT FACTUALITY RULES:
 
@@ -65,8 +65,8 @@ STRICT FACTUALITY RULES:
 - NEVER reinterpret D&D mechanics incorrectly
 - Do NOT assume a character is dead unless explicitly stated as "dead" or "killed"
 - If a character is unconscious or crushed, describe it exactly as such
-- Do NOT treat locations, wells, factions, or destinations as party members
-- Catur is a place/well context, not a player character, unless a correction explicitly says otherwise
+- Do NOT treat locations, factions, power sources, or destinations as party members
+- Use campaign metadata and correction notes to distinguish characters from places, factions, artifacts, and lore concepts
 
 CLARITY RULES:
 

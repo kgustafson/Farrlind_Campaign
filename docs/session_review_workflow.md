@@ -15,8 +15,9 @@ audio
   -> transcript
   -> extraction/postextract
   -> draft summary and events
+  -> web extraction reviews
   -> review YAML
-  -> human decisions
+  -> web event review decisions
   -> apply review
   -> database update
   -> health check
@@ -37,6 +38,23 @@ Create a review file:
 
 ```bash
 ./rag-env/bin/python scripts/dm_query.py init-review sessionXX
+```
+
+Before the event review, review and apply the extraction drafts in the web UI:
+
+```text
+/npcs/extractions?session=XX
+/locations/extractions?session=XX
+/artifacts/extractions?session=XX
+/lore-items/extractions?session=XX
+/combat-encounters/extractions?session=XX
+/open-threads/extractions?session=XX
+```
+
+Then review the event YAML through the web session review page:
+
+```text
+/sessions/sessionXX/review
 ```
 
 Check review progress:
@@ -76,7 +94,7 @@ Inspect a session beside canon decisions:
 Review files live in:
 
 ```text
-knowledge/Faban/reviews/sessionXX_review.yaml
+campaigns/{campaign}/reviews/sessionXX_review.yaml
 ```
 
 Each review file starts as:
@@ -155,7 +173,7 @@ added_items:
 AI drafts the memory. The user canonizes it. The ingest `sessionXX_summary.md` file is source material from the audio pipeline, not final truth. After review is applied, the canonical session summary lives in:
 
 ```text
-knowledge/Faban/final/sessionXX_summary.md
+campaigns/{campaign}/final/sessionXX_summary.md
 ```
 
 ## Backlog

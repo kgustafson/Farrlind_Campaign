@@ -6,6 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+from raglib.campaign import load_campaign_metadata
 from raglib.config import BASE2, CLEAN, RAW, SESSIONS
 from raglib.io_utils import read_text, write_text
 from raglib.ollama_client import generate
@@ -77,16 +78,35 @@ def split_transcript(transcript: str, chunk_size: int = CHUNK_SIZE, overlap: int
 
 
 def campaign_glossary() -> str:
-    return """
-- Faban, Mikani, Brigit, Roon, Gildas, Corvinus, Rune: party/member names.
-- Catur: underwater city; prefer this over Kator, Couture, Peter, Cater, or similar transcript drift.
-- Namaloa: deity/belief associated with Mikani and nature reverence.
-- Celestial Isles: draconic/dragonkin society connected to Mikani.
-- Korog, Safi / Scythe, Ordor: known wells.
-- Wand of Wells: stolen artifact central to the campaign threat.
-- Balrog, Paramon, Bentrios, Hanidal, The Gale, Monastery of the Open Hand: known campaign locations.
-- Known bad variants to avoid as canon names: Kator, Couture, Peter, Cater, Gildos, Utgar, Namalua, Makani.
-""".strip()
+    metadata = load_campaign_metadata()
+    lines = []
+    campaign_info = metadata.get("campaign") or {}
+    if campaign_info.get("name"):
+        lines.append(f"- Campaign: {campaign_info['name']}.")
+    party = metadata.get("party") or []
+    if party:
+        names = []
+        for member in party:
+            name = member.get("full_name") or member.get("character_name")
+            if name:
+                aliases = ", ".join(member.get("aliases") or [])
+                names.append(f"{name} ({aliases})" if aliases else name)
+        if names:
+            lines.append(f"- Player character names and aliases: {'; '.join(names)}.")
+    for item in metadata.get("glossary") or []:
+        if isinstance(item, str):
+            lines.append(f"- {item}")
+        elif isinstance(item, dict):
+            term = item.get("term") or item.get("name")
+            note = item.get("note") or item.get("description") or ""
+            aliases = ", ".join(item.get("aliases") or [])
+            if term and aliases:
+                lines.append(f"- {term}: {note} Aliases/transcript drift: {aliases}.")
+            elif term:
+                lines.append(f"- {term}: {note}".rstrip())
+    if not lines:
+        lines.append("- No campaign-specific glossary has been configured yet.")
+    return "\n".join(lines)
 
 
 def session_context(session_name: str) -> str:
@@ -134,19 +154,26 @@ def build_synthesis_prompt(prompt_text: str, session_name: str, chunk_outputs: l
     return f"{prompt_text.rstrip()}\n\nSession: {session_name}\n\n" + "\n\n".join(extracts) + "\n"
 
 
+def campaign_glossary_replacements() -> dict[str, str]:
+    replacements = {}
+    for item in load_campaign_metadata().get("glossary") or []:
+        if not isinstance(item, dict):
+            continue
+        term = (item.get("term") or item.get("name") or "").strip()
+        if not term:
+            continue
+        for alias in item.get("aliases") or []:
+            alias = str(alias).strip()
+            if alias and alias.lower() != term.lower():
+                replacements[alias] = term
+    return replacements
+
+
 def canon_scrub(text: str) -> str:
-    replacements = {
-        r"\bKator\b": "Catur",
-        r"\bCouture\b": "Catur",
-        r"\bCater\b": "Catur",
-        r"\bGildos\b": "Gildas",
-        r"\bUtgar\b": "Uthgar",
-        r"\bNamalua\b": "Namaloa",
-        r"\bMakani\b": "Mikani",
-    }
+    replacements = campaign_glossary_replacements()
     scrubbed = text
-    for pattern, replacement in replacements.items():
-        scrubbed = re.sub(pattern, replacement, scrubbed)
+    for alias, replacement in replacements.items():
+        scrubbed = re.sub(rf"\b{re.escape(alias)}\b", replacement, scrubbed, flags=re.IGNORECASE)
     return scrubbed
 
 

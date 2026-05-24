@@ -76,6 +76,7 @@ def create_candidate(default_session_number: int, candidate: dict[str, Any]) -> 
             "name": name,
             "enemy_type": enemy.get("enemy_type") or "",
             "quantity": enemy.get("quantity"),
+            "quantity_killed": enemy.get("quantity_killed"),
             "outcome": enemy.get("outcome") or "unknown",
             "confidence": enemy.get("confidence") or candidate.get("confidence") or "medium",
             "notes": enemy.get("notes") or "",

@@ -7,6 +7,7 @@ import yaml
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
+from raglib.campaign import campaign_path
 from web_review import db
 
 
@@ -19,7 +20,7 @@ class CanonWriteError(RuntimeError):
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-CANON_DECISIONS_PATH = REPO_ROOT / "knowledge" / "Faban" / "canon_decisions.yaml"
+CANON_DECISIONS_PATH = campaign_path("canon_decisions.yaml")
 FARRLIND_MONTH_ORDER = {
     "Sha'al": 1,
     "Amoral": 2,
@@ -282,11 +283,12 @@ def location_rows() -> list[dict[str, Any]]:
             l.description,
             l.is_underwater,
             l.is_feywild,
-            l.first_visited_session,
+            fs.session_number AS first_visited_session,
             l.notes
         FROM location l
         LEFT JOIN location_type lt ON lt.id = l.location_type_id
         LEFT JOIN location parent ON parent.id = l.parent_location_id
+        LEFT JOIN session fs ON fs.id = l.first_visited_session
         ORDER BY l.name;
     """)
 
@@ -312,17 +314,18 @@ def location_id(name: Optional[str]) -> Optional[int]:
 def location_detail(location_id: int) -> Optional[dict[str, Any]]:
     rows = _fetch("""
         SELECT
-            id,
-            name,
-            location_type_id,
-            parent_location_id,
-            description,
-            is_underwater,
-            is_feywild,
-            first_visited_session,
-            notes
-        FROM location
-        WHERE id = :id;
+            l.id,
+            l.name,
+            l.location_type_id,
+            l.parent_location_id,
+            l.description,
+            l.is_underwater,
+            l.is_feywild,
+            fs.session_number AS first_visited_session,
+            l.notes
+        FROM location l
+        LEFT JOIN session fs ON fs.id = l.first_visited_session
+        WHERE l.id = :id;
     """, {"id": location_id})
     return rows[0] if rows else None
 
@@ -335,7 +338,10 @@ def create_location(values: dict[str, Any]) -> None:
         )
         VALUES (
             :name, :location_type_id, :parent_location_id, :description,
-            :is_underwater, :is_feywild, :first_visited_session, :notes
+            :is_underwater,
+            :is_feywild,
+            (SELECT id FROM session WHERE session_number = :first_visited_session),
+            :notes
         );
     """, values)
 
@@ -351,7 +357,7 @@ def update_location(location_id: int, values: dict[str, Any]) -> None:
             description = :description,
             is_underwater = :is_underwater,
             is_feywild = :is_feywild,
-            first_visited_session = :first_visited_session,
+            first_visited_session = (SELECT id FROM session WHERE session_number = :first_visited_session),
             notes = :notes
         WHERE id = :id;
     """, params)
@@ -884,6 +890,7 @@ def combat_encounter_rows() -> list[dict[str, Any]]:
             e.name AS enemy_name,
             e.enemy_type,
             ee.quantity,
+            ee.quantity_killed,
             ee.outcome AS enemy_outcome,
             ee.confidence AS enemy_confidence,
             ee.notes AS enemy_notes
@@ -920,10 +927,12 @@ def combat_encounter_rows() -> list[dict[str, Any]]:
             encounter["has_unknown_quantity"] = True
         else:
             encounter["known_enemy_total"] += quantity
+        quantity_killed = row.get("quantity_killed")
         encounter["enemies"].append({
             "name": row["enemy_name"],
             "enemy_type": row["enemy_type"],
             "quantity": quantity,
+            "quantity_killed": quantity_killed,
             "outcome": row["enemy_outcome"],
             "confidence": row["enemy_confidence"],
             "notes": row["enemy_notes"],
@@ -956,6 +965,7 @@ def combat_encounter_detail(encounter_id: int) -> Optional[dict[str, Any]]:
             e.name,
             e.enemy_type,
             ee.quantity,
+            ee.quantity_killed,
             ee.outcome,
             ee.confidence,
             ee.notes
@@ -1045,14 +1055,15 @@ def _replace_combat_enemies(event_id: int, session_number: int, enemies: list[di
         enemy_id = _ensure_enemy(enemy, session_number)
         _execute("""
             INSERT INTO event_enemy (
-                event_id, enemy_id, outcome, quantity, confidence, notes
+                event_id, enemy_id, outcome, quantity, quantity_killed, confidence, notes
             )
             VALUES (
-                :event_id, :enemy_id, :outcome, :quantity, :confidence, :notes
+                :event_id, :enemy_id, :outcome, :quantity, :quantity_killed, :confidence, :notes
             )
             ON CONFLICT (event_id, enemy_id) DO UPDATE SET
                 outcome = EXCLUDED.outcome,
                 quantity = EXCLUDED.quantity,
+                quantity_killed = EXCLUDED.quantity_killed,
                 confidence = EXCLUDED.confidence,
                 notes = EXCLUDED.notes;
         """, {
@@ -1060,6 +1071,7 @@ def _replace_combat_enemies(event_id: int, session_number: int, enemies: list[di
             "enemy_id": enemy_id,
             "outcome": enemy.get("outcome") or "unknown",
             "quantity": enemy.get("quantity"),
+            "quantity_killed": enemy.get("quantity_killed"),
             "confidence": enemy.get("confidence") or "medium",
             "notes": enemy.get("notes") or "",
         })
@@ -1121,17 +1133,16 @@ def delete_combat_encounter(encounter_id: int) -> None:
 
 
 def murder_hobo_count(encounters: list[dict[str, Any]]) -> dict[str, Any]:
-    kill_outcomes = {"killed", "defeated"}
     total = 0
     unknown_rows = 0
     for encounter in encounters:
         for enemy in encounter.get("enemies", []):
-            if (enemy.get("outcome") or "").lower() not in kill_outcomes:
+            quantity_killed = enemy.get("quantity_killed")
+            if quantity_killed is not None:
+                total += quantity_killed
                 continue
-            if enemy.get("quantity") is None:
+            if (enemy.get("outcome") or "").lower() in {"killed", "defeated"}:
                 unknown_rows += 1
-                continue
-            total += enemy["quantity"]
     return {
         "total": total,
         "unknown_rows": unknown_rows,
@@ -1148,9 +1159,13 @@ def campaign_timeline() -> dict[str, Any]:
             s.in_game_date,
             s.title,
             s.summary,
-            l.name AS primary_location
+            l.name AS primary_location,
+            sl.name AS start_location,
+            el.name AS end_location
         FROM session s
         LEFT JOIN location l ON l.id = s.location_id
+        LEFT JOIN location sl ON sl.id = s.start_location_id
+        LEFT JOIN location el ON el.id = s.end_location_id
         ORDER BY s.session_number;
     """)
     events = _fetch("""
@@ -1214,6 +1229,8 @@ def campaign_timeline() -> dict[str, Any]:
             "title": session["title"],
             "summary": session["summary"],
             "primary_location": session["primary_location"],
+            "start_location": session["start_location"],
+            "end_location": session["end_location"],
             "travel": session_travel,
             "key_events": session_events,
             "event_count": len(session_events),
@@ -1228,7 +1245,7 @@ def campaign_timeline() -> dict[str, Any]:
             "known_travel_segments": known_travel_segments,
             "first_in_game_date": first_session["in_game_date_earliest"] if first_session else None,
             "latest_in_game_date": last_session["in_game_date_latest"] if last_session else None,
-            "current_location": last_session["primary_location"] if last_session else None,
+            "current_location": (last_session["end_location"] or last_session["primary_location"]) if last_session else None,
         },
         "rows": rows,
     }

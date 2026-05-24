@@ -7,6 +7,16 @@ from pathlib import Path
 from typing import Any, Optional
 
 from raglib.config import BASE, CLEAN, RAW
+from raglib.extraction_hygiene import (
+    chunk_source_sets,
+    compact_campaign_metadata,
+    compact_name_list_for_chunk,
+    compact_registry_for_chunk,
+    looks_like_party_interpretation,
+    merge_extraction_documents,
+    neutralize_interpretive_update,
+    rejection_text,
+)
 from raglib.io_utils import read_text, write_text
 from raglib.ollama_client import generate
 from raglib.prompts import load_prompt
@@ -205,6 +215,13 @@ def postprocess_extraction(
             warnings.append(f"Dropped known mention not present in session source: {registry_row.get('name')}")
             continue
         item["canonical_name"] = registry_row.get("name")
+        if neutralize_interpretive_update(
+            item,
+            source_text,
+            name_fields=["canonical_name", "mentioned_as"],
+            context_fields=["new_information", "evidence"],
+        ):
+            warnings.append(f"Neutralized party-interpretation NPC update: {registry_row.get('name')}")
         known_mentions.append(item)
 
     cleaned["known_npc_mentions"] = known_mentions
@@ -213,6 +230,19 @@ def postprocess_extraction(
     for candidate in cleaned["new_npc_candidates"]:
         proposed_name = candidate.get("proposed_name", "")
         normalized_proposed = normalized_name(proposed_name)
+        if looks_like_party_interpretation(
+            candidate,
+            source_text,
+            name_fields=["proposed_name"],
+            context_fields=["role", "description", "evidence"],
+        ):
+            reject_candidate(
+                cleaned,
+                candidate,
+                "Appears to be a party joke, nickname, misunderstanding, or theory rather than a confirmed NPC.",
+            )
+            warnings.append(f"Rejected party-interpretation NPC candidate: {rejection_text(candidate, 'proposed_name')}")
+            continue
         if is_party_reference(proposed_name, party_names):
             reject_candidate(cleaned, candidate, "Party member; not an NPC candidate.")
             warnings.append(f"Rejected party member candidate: {proposed_name}")
@@ -240,6 +270,11 @@ def postprocess_extraction(
             else:
                 reject_candidate(cleaned, candidate, f"Duplicate of existing NPC: {registry_row.get('name')}.")
                 warnings.append(f"Rejected duplicate existing NPC candidate: {proposed_name}")
+            continue
+
+        if source_text and not source_contains_any(source_text, [proposed_name]):
+            reject_candidate(cleaned, candidate, "Candidate name not found in session source.")
+            warnings.append(f"Rejected NPC candidate not present in source: {proposed_name}")
             continue
 
         new_candidates.append(candidate)
@@ -356,15 +391,31 @@ def extract_npcs(session_name: str, model: Optional[str] = None, source: str = "
     campaign_metadata = load_campaign_metadata()
     registry = npc_registry()
     locations = canon.locations()
-    prompt = build_prompt(session_name, sources, registry, locations, campaign_metadata)
+    source_sets = chunk_source_sets(sources)
 
     print(f"Extracting NPC candidates for {session_name} with {model}...")
     started = time.monotonic()
-    raw_output = generate(prompt, model=model, timeout=1800, options=OLLAMA_OPTIONS)
+    raw_documents = []
+    registry_rows_sent = []
+    for index, source_set in enumerate(source_sets, start=1):
+        if len(source_sets) > 1:
+            print(f"  NPC transcript chunk {index}/{len(source_sets)}...")
+        chunk_text = "\n\n".join(item["text"] for item in source_set)
+        prompt_registry = compact_registry_for_chunk(
+            chunk_text,
+            registry,
+            identity_fields=["name", "alias"],
+            keep_fields=["id", "name", "alias", "status", "is_named"],
+        ) if len(source_sets) > 1 else registry
+        prompt_locations = compact_name_list_for_chunk(chunk_text, locations) if len(source_sets) > 1 else locations
+        prompt_metadata = compact_campaign_metadata(campaign_metadata) if len(source_sets) > 1 else campaign_metadata
+        registry_rows_sent.append(len(prompt_registry))
+        prompt = build_prompt(session_name, source_set, prompt_registry, prompt_locations, prompt_metadata)
+        raw_documents.append(extract_json_object(generate(prompt, model=model, timeout=1800, options=OLLAMA_OPTIONS)))
     duration = time.monotonic() - started
     source_text = "\n\n".join(source["text"] for source in sources)
     extracted, guardrail_warnings = postprocess_extraction(
-        extract_json_object(raw_output),
+        merge_extraction_documents(raw_documents, EXPECTED_TOP_LEVEL_KEYS),
         registry,
         campaign_metadata,
         session_name,
@@ -379,6 +430,10 @@ def extract_npcs(session_name: str, model: Optional[str] = None, source: str = "
         "model": model,
         "source": source,
         "sources": [{"label": item["label"], "path": item["path"], "chars": len(item["text"])} for item in sources],
+        "chunked": len(source_sets) > 1,
+        "chunk_count": len(source_sets),
+        "registry_rows_sent": registry_rows_sent,
+        "avg_registry_rows_sent": round(sum(registry_rows_sent) / len(registry_rows_sent), 2) if registry_rows_sent else 0,
         "campaign_metadata": str(campaign_metadata_path()),
         "party_character_names": party_character_names(campaign_metadata),
         "npc_registry_count": len(registry),

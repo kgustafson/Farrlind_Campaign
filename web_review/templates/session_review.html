@@ -55,6 +55,15 @@
 {% if request.query_params.get("health_failed") %}
   <div class="flash error-flash">Health check found issues.</div>
 {% endif %}
+{% if request.query_params.get("init_reviewed") %}
+  <div class="flash">Event review initialized.</div>
+{% endif %}
+{% if request.query_params.get("init_failed") %}
+  <div class="flash error-flash">Event review initialization failed. Check the command log.</div>
+{% endif %}
+{% if request.query_params.get("event_review_blocked") %}
+  <div class="flash error-flash">Event review is blocked until extraction reviews are complete.</div>
+{% endif %}
 {% if review_locked %}
   <div class="flash muted-flash">Applied review is locked. Use Reopen Review to make YAML edits.</div>
 {% endif %}
@@ -135,7 +144,7 @@
   <div class="stage-head">
     <div>
       <h2>Step 1: High-Level Event Order</h2>
-      <p>Edit and correct the session spine first. Nothing else is shown until this step is done.</p>
+      <p>Create the major event buckets while using the draft micro events as reference.</p>
     </div>
   </div>
   <section class="macro-add-row" aria-label="Add high-level event">
@@ -172,6 +181,24 @@
       </label>
     </div>
     {% endfor %}
+  </section>
+  <section class="micro-event-reference" aria-label="Draft micro events to group">
+    <div class="micro-event-reference-head">
+      <h3>Micro Events To Group</h3>
+      <span class="badge status-in_review">{{ items|length }} draft</span>
+    </div>
+    <div class="micro-event-list">
+      {% for item in items %}
+      <article class="micro-event-card">
+        <div class="item-topline">
+          <span class="item-id">{{ item.id }}</span>
+          <span class="sequence">Seq {{ item.sequence }}</span>
+          {% if item.location %}<span class="muted">{{ item.location }}</span>{% endif %}
+        </div>
+        <p>{{ item.source_text or item.canonical_text }}</p>
+      </article>
+      {% endfor %}
+    </div>
   </section>
   <div class="panel-actions">
     <button type="submit" formaction="/sessions/{{ session_key }}/review/macros" formmethod="post" {% if review_locked %}disabled{% endif %}>Save Event Order</button>
@@ -258,7 +285,15 @@
   {% if can_edit() %}
   <section class="review-list">
     {% if not document %}
-      <div class="empty-state">Review file has not been initialized.</div>
+      <div class="empty-state">
+        {% if event_review_blocked %}
+          <p>Event review is not available yet.</p>
+          <p>Complete these extraction reviews first: {{ missing_extraction_reviews|join(", ") }}</p>
+        {% else %}
+          <p>Review file has not been initialized.</p>
+          <button type="submit" formaction="/sessions/{{ session_key }}/review/init" formmethod="post">Initialize Event Review</button>
+        {% endif %}
+      </div>
     {% endif %}
     {% if document %}
     <section class="review-tools">

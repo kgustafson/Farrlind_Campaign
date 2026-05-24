@@ -74,6 +74,33 @@ class OpenThreadExtractorTest(unittest.TestCase):
         self.assertEqual(cleaned["rejected_candidates"][0]["text"], "unknown candidate")
         self.assertIn("missing proposed title", warnings[0])
 
+    def test_postprocess_rejects_non_durable_party_misunderstanding(self):
+        document = {
+            "known_thread_mentions": [],
+            "new_thread_candidates": [{
+                "proposed_title": "The Burger Master's Secret Recipe",
+                "thread_type": "pending_quest",
+                "status": "open",
+                "description": "The party mistakenly believes the Burgomaster title is a burger business clue.",
+                "evidence": "They joke about a Burger Master and secret recipe.",
+            }],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        with patch("web_review.services.canon.open_thread_statuses", return_value=self.statuses()), \
+             patch("web_review.services.canon.open_thread_types", return_value=self.types()):
+            cleaned, warnings = open_thread_extractor.postprocess_extraction(
+                document,
+                [],
+                "session02",
+                "The party misreads Burgomaster as Burger Master and jokes about a secret recipe.",
+            )
+
+        self.assertEqual(cleaned["new_thread_candidates"], [])
+        self.assertEqual(cleaned["rejected_candidates"][0]["text"], "The Burger Master's Secret Recipe")
+        self.assertIn("party-interpretation open thread", warnings[0])
+
     def test_extract_open_threads_writes_review_json(self):
         output = {
             "known_thread_mentions": [],

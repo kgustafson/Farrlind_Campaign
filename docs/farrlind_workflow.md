@@ -53,7 +53,7 @@ split -> transcribe_parallel placeholder -> stitch -> validate placeholder
 Run it from the repo root with:
 
 ```bash
-PYTHONPATH=src ./rag-env/bin/python -m farrlind_pipeline.pipeline.simple_runner audio/sessionXX.wav --session-id sessionXX --work-dir data/outputs/sessionXX
+PYTHONPATH=src ./rag-env/bin/python -m farrlind_pipeline.pipeline.simple_runner campaigns/{campaign}/audio/sessionXX.wav --session-id sessionXX --work-dir data/outputs/sessionXX
 ```
 
 Current worker modules:
@@ -86,13 +86,13 @@ The skeleton produces structured intermediate JSON and Markdown so failed chunks
 By default this reads:
 
 ```text
-audio/sessionXX.wav
+campaigns/{campaign}/audio/sessionXX.wav
 ```
 
 and writes:
 
 ```text
-knowledge/Faban/raw/sessionXX_transcript.txt
+campaigns/{campaign}/raw/sessionXX_transcript.txt
 ```
 
 The production defaults are `large-v3`, `180` second chunks, and `2` workers.
@@ -100,7 +100,7 @@ The production defaults are `large-v3`, `180` second chunks, and `2` workers.
 Run the full session20 benchmark from the repo root with:
 
 ```bash
-./rag-env/bin/python scripts/benchmark_transcription_architectures.py audio/session20.wav --session-id session20 --architecture both --model large-v3 --chunk-seconds 180 --max-workers 2
+./rag-env/bin/python scripts/benchmark_transcription_architectures.py campaigns/{campaign}/audio/session20.wav --session-id session20 --architecture both --model large-v3 --chunk-seconds 180 --max-workers 2
 ```
 
 The benchmark compares:
@@ -128,8 +128,8 @@ For the current large-v3 CPU benchmark, the parallel architecture defaults to tw
 ## Canon Safety Rules
 
 - AI-generated output is draft material.
-- `knowledge/Faban/clean/sessionXX_summary.md` is an ingest summary, not final canon.
-- Reviewed canon summaries live in `knowledge/Faban/final/sessionXX_summary.md`.
+- `campaigns/{campaign}/clean/sessionXX_summary.md` is an ingest summary, not final canon.
+- Reviewed canon summaries live in `campaigns/{campaign}/final/sessionXX_summary.md`.
 - Automated reruns must never overwrite reviewed or applied canon.
 - Any canon-changing rerun must return to human review before it can become canon.
 - Human review decisions are part of the session record and should remain inspectable.
@@ -153,15 +153,9 @@ Artifact canon is partly maintained through the reviewed-canon load path and par
 - Current holder is read from the latest `artifact_custody` row when available.
 - Durable artifact canon should eventually be promoted into reviewed summaries, a reviewed artifact scrub list, or explicit custody records so future reloads preserve manual edits.
 
-## Wells of Magic Lore Flow
+## Lore Registry Flow
 
-The Wells of Magic lore section is a single editable Markdown canon note:
-
-```text
-knowledge/Faban/lore/wells_of_magic.md
-```
-
-The web page at `/wells` edits that file directly. Use it for consolidated Well lore, rules, open questions, and current understanding that cuts across sessions.
+Campaign-specific lore belongs in the generic Lore Items and Artifact registries unless it needs a campaign-specific seed file. Farrlind's Wells of Magic are treated as ordinary canon lore and artifacts, not as a dedicated web section.
 
 ## Stage Definitions
 
@@ -171,6 +165,12 @@ The web page at `/wells` edits that file directly. Use it for consolidated Well 
 | status | `scripts/rag.py status sessionXX` | expected artifact paths | artifact presence report | none | safe anytime |
 | transcribe | `scripts/rag.py transcribe sessionXX` | audio | `raw/sessionXX_transcript.txt` | source material | rerun before review |
 | draft canon packet | `scripts/rag.py curate sessionXX` | raw transcript, session context, previous final summary | `clean/sessionXX_curated.md`, curation metadata, chunk extracts | draft only | rerun before review |
+| extract NPCs | `scripts/rag.py extract-npcs sessionXX` | curated packet, final summary, diary, or transcript | `extracted/sessionXX_npcs.json`, metadata | draft only | human review before canon |
+| extract locations | `scripts/rag.py extract-locations sessionXX` | curated packet, final summary, diary, or transcript | `extracted/sessionXX_locations.json`, metadata | draft only | human review before canon |
+| extract artifacts | `scripts/rag.py extract-artifacts sessionXX` | curated packet, final summary, diary, or transcript | `extracted/sessionXX_artifacts.json`, metadata | draft only | human review before canon |
+| extract lore items | `scripts/rag.py extract-lore-items sessionXX` | curated packet, final summary, diary, or transcript | `extracted/sessionXX_lore_items.json`, metadata | draft only | human review before canon |
+| extract combat encounters | `scripts/rag.py extract-combat-encounters sessionXX` | curated packet, final summary, diary, or transcript | `extracted/sessionXX_combat_encounters.json`, metadata | draft only | human review before canon |
+| extract open threads | `scripts/rag.py extract-open-threads sessionXX` | curated packet, final summary, diary, or transcript | `extracted/sessionXX_open_threads.json`, metadata | draft only | human review before canon |
 | extract | `scripts/rag.py extract sessionXX` | curated packet when present, otherwise transcript | `clean/sessionXX_events.md` | draft only | rerun with care |
 | filter | `scripts/rag.py filter sessionXX` | extracted events | `clean/sessionXX_filtered.md` | draft only | rerun with care |
 | classify | `scripts/rag.py classify sessionXX` | filtered events | `clean/sessionXX_classified.md` | draft only | rerun with care |
@@ -194,12 +194,31 @@ The web page at `/wells` edits that file directly. Use it for consolidated Well 
 filter -> classify -> normalize -> merge -> validate -> summarize
 ```
 
+Automatic intake now runs through:
+
+```text
+transcribe
+  -> status
+  -> curate
+  -> extract-npcs
+  -> extract-locations
+  -> extract-artifacts
+  -> extract-lore-items
+  -> extract-combat-encounters
+  -> extract-open-threads
+  -> extract events
+  -> postextract
+  -> init-review
+```
+
+The extractor JSON files are draft queues. They become canon only when reviewed and applied through the corresponding web review pages.
+
 ## Artifact Map
 
 Plain worker skeleton artifacts:
 
 ```text
-audio/sessionXX.wav
+campaigns/{campaign}/audio/sessionXX.wav
   -> data/outputs/sessionXX/chunks/chunk_manifest.json
   -> data/outputs/sessionXX/transcripts/chunk-XXXX.json
   -> data/outputs/sessionXX/stitched/stitched_transcript.md
@@ -211,33 +230,33 @@ audio/sessionXX.wav
 Production transcription artifacts:
 
 ```text
-audio/sessionXX.wav
-  -> knowledge/Faban/raw/sessionXX_transcript.txt
+campaigns/{campaign}/audio/sessionXX.wav
+  -> campaigns/{campaign}/raw/sessionXX_transcript.txt
 ```
 
 Existing RAG and canon artifacts:
 
 ```text
-audio/sessionXX.wav
-  -> knowledge/Faban/raw/sessionXX_transcript.txt
-  -> knowledge/Faban/clean/sessionXX_curated.md
-  -> knowledge/Faban/clean/sessionXX_events.md
-  -> knowledge/Faban/clean/sessionXX_filtered.md
-  -> knowledge/Faban/clean/sessionXX_classified.md
-  -> knowledge/Faban/clean/sessionXX_normalized.md
-  -> knowledge/Faban/clean/sessionXX_merged.md
-  -> knowledge/Faban/clean/sessionXX_validation.md
-  -> knowledge/Faban/clean/sessionXX_summary.md
-  -> knowledge/Faban/reviews/sessionXX_review.yaml
+campaigns/{campaign}/audio/sessionXX.wav
+  -> campaigns/{campaign}/raw/sessionXX_transcript.txt
+  -> campaigns/{campaign}/clean/sessionXX_curated.md
+  -> campaigns/{campaign}/clean/sessionXX_events.md
+  -> campaigns/{campaign}/clean/sessionXX_filtered.md
+  -> campaigns/{campaign}/clean/sessionXX_classified.md
+  -> campaigns/{campaign}/clean/sessionXX_normalized.md
+  -> campaigns/{campaign}/clean/sessionXX_merged.md
+  -> campaigns/{campaign}/clean/sessionXX_validation.md
+  -> campaigns/{campaign}/clean/sessionXX_summary.md
+  -> campaigns/{campaign}/reviews/sessionXX_review.yaml
   -> database canon rows
-  -> knowledge/Faban/final/sessionXX_summary.md
+  -> campaigns/{campaign}/final/sessionXX_summary.md
 ```
 
 Session-specific correction and normalization context lives in:
 
 ```text
-knowledge/Faban/sessions/sessionXX_context.yaml
-knowledge/Faban/notes/sessionXX_corrections.md
+campaigns/{campaign}/sessions/sessionXX_context.yaml
+campaigns/{campaign}/notes/sessionXX_corrections.md
 ```
 
 ## Human Review Decisions
@@ -260,7 +279,7 @@ Until this draft-canon-packet review flow is built, the `initialize_review`, `ed
 
 ## Lore Items
 
-Lore items should become a first-class Archivum registry, similar to NPCs, Locations, and Artifacts. The Wells of Magic page remains useful as curated essay-style lore, but individual lore tidbits should also be stored as queryable canon records.
+Lore items should become a first-class Archivum registry, similar to NPCs, Locations, and Artifacts. Individual lore tidbits should be stored as queryable canon records.
 
 Useful lore item fields:
 
@@ -280,7 +299,7 @@ Useful lore item fields:
 Review files live in:
 
 ```text
-knowledge/Faban/reviews/sessionXX_review.yaml
+campaigns/{campaign}/reviews/sessionXX_review.yaml
 ```
 
 Each review item receives one of these decisions:
@@ -359,7 +378,7 @@ The first machine-readable workflow definition lives at:
 workflows/session_workflow.yaml
 ```
 
-It models the per-session workflow from source intake through draft generation, human review, canonization, verification, and versioned project history. It also includes cross-session lore/registry touchpoints such as Wells of Magic lore updates, automated tests, web smoke checks, and Git commit/tag/push closure after reviewed canon changes.
+It models the per-session workflow from source intake through draft generation, human review, canonization, verification, and versioned project history. It also includes cross-session lore/registry touchpoints, automated tests, web smoke checks, and Git commit/tag/push closure after reviewed canon changes.
 
 ## Phase 2 Work
 

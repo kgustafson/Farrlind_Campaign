@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Farrlind Review{% endblock %}</title>
+  <title>{% block title %}{{ archive_title() }}{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', path='review.css') }}">
 </head>
 <body class="{% block body_class %}{% endblock %}">
   <header class="app-header">
-    <a class="brand" href="/">The Farrlind Archivum</a>
+    <a class="brand" href="/">{{ archive_title() }}</a>
     <nav class="top-nav">
       <span class="mode-pill mode-{{ interface_mode() }}">{% if can_edit() %}Edit Archive{% else %}Published Archive{% endif %}</span>
       <a href="/">Sessions</a>
@@ -23,15 +23,17 @@
         <a class="sidebar-link {% if request.url.path == '/' %}active{% endif %}" href="/">Sessions</a>
         {% if can_edit() %}
         <a class="sidebar-link {% if request.url.path.startswith('/workflow') %}active{% endif %}" href="/workflow">Workflow Status</a>
+        <a class="sidebar-link {% if request.url.path.startswith('/event-review') or (request.url.path.startswith('/sessions/') and request.url.path.endswith('/review')) %}active{% endif %}" href="/event-review">Event Review</a>
         {% endif %}
-        <a class="sidebar-link {% if request.url.path.startswith('/wells') %}active{% endif %}" href="/wells">Wells of Magic</a>
         <a class="sidebar-link {% if request.url.path.startswith('/npcs') %}active{% endif %}" href="/npcs">NPC Registry</a>
         <a class="sidebar-link {% if request.url.path.startswith('/locations') %}active{% endif %}" href="/locations">Locations</a>
         <a class="sidebar-link {% if request.url.path.startswith('/artifacts') %}active{% endif %}" href="/artifacts">Artifacts</a>
         <a class="sidebar-link {% if request.url.path.startswith('/lore-items') %}active{% endif %}" href="/lore-items">Lore Items</a>
         <a class="sidebar-link {% if request.url.path.startswith('/combat-encounters') %}active{% endif %}" href="/combat-encounters">Combat Encounters</a>
         <a class="sidebar-link {% if request.url.path.startswith('/open-threads') %}active{% endif %}" href="/open-threads">Open Threads</a>
-        <a class="sidebar-link {% if request.url.path.startswith('/songbook') %}active{% endif %}" href="/songbook">Faban&rsquo;s Songbook</a>
+        {% if songbook_enabled() %}
+        <a class="sidebar-link {% if request.url.path.startswith('/songbook') %}active{% endif %}" href="/songbook">{{ songbook_label() }}</a>
+        {% endif %}
         <a class="sidebar-link world-map-link" href="#world-map-modal">World Map</a>
         {% if can_edit() %}
         <a class="sidebar-link {% if request.url.path.startswith('/project-utilities') %}active{% endif %}" href="/project-utilities">Project Utilities</a>
@@ -42,18 +44,35 @@
     </aside>
     <main>
       {% block content %}{% endblock %}
-      <footer class="app-version">Farrlind Campaign {{ app_version() }}</footer>
+      <footer class="app-version">{{ campaign_display_name() }} Campaign {{ app_version() }}</footer>
     </main>
   </div>
   <section id="world-map-modal" class="world-map-modal-backdrop" aria-labelledby="world-map-title">
     <div class="world-map-modal" role="dialog" aria-modal="true">
       <div class="modal-head world-map-head">
-        <h2 id="world-map-title">Farrlind World Map</h2>
+        <h2 id="world-map-title">{{ campaign_display_name() }} World Map</h2>
         <a class="modal-close" href="{{ request.url.path }}" aria-label="Close world map">x</a>
       </div>
       <div class="world-map-frame">
-        <img src="/static/farrlind-world-map.png" alt="Map of Farrlind">
+        {% if campaign_world_map_available() %}
+        <img src="{{ campaign_world_map_image_url() }}" alt="Map of {{ campaign_display_name() }}">
+        {% else %}
+        <div class="world-map-placeholder">
+          <p class="eyebrow">No Map Uploaded</p>
+          <h3>{{ campaign_display_name() }}</h3>
+          <p>Add a world map image when one is ready.</p>
+        </div>
+        {% endif %}
       </div>
+      {% if can_edit() %}
+      <form class="world-map-upload" method="post" action="/world-map" enctype="multipart/form-data">
+        <label class="field-block">
+          <span>{% if campaign_world_map_available() %}Replace Map Image{% else %}Upload Map Image{% endif %}</span>
+          <input name="map_image" type="file" accept="image/png,image/jpeg,image/webp,image/gif" required>
+        </label>
+        <button type="submit">{% if campaign_world_map_available() %}Update Map{% else %}Upload Map{% endif %}</button>
+      </form>
+      {% endif %}
     </div>
   </section>
 </body>

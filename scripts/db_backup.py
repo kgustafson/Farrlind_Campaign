@@ -5,6 +5,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+from raglib.campaign import active_campaign_name, campaign_container_name, campaign_database_name
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_BACKUP_DIR = REPO_ROOT / "backups"
@@ -21,7 +23,7 @@ def pg_dump_url(database_url: str) -> str:
 
 def default_backup_path(backup_dir: Path = DEFAULT_BACKUP_DIR, now: Optional[datetime] = None) -> Path:
     timestamp = (now or datetime.now()).strftime("%Y%m%d_%H%M%S")
-    return backup_dir / f"farrlind_{timestamp}.sql"
+    return backup_dir / f"{active_campaign_name()}_{timestamp}.sql"
 
 
 def sanitize_backup_file(path: Path) -> None:
@@ -34,9 +36,9 @@ def sanitize_backup_file(path: Path) -> None:
 def backup_database(
     output_path: Optional[Path] = None,
     *,
-    container: str = "farrlind_db",
+    container: str = "",
     user: str = "admin",
-    database: str = "farrlind",
+    database: str = "",
 ) -> Path:
     path = output_path or default_backup_path()
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -48,14 +50,14 @@ def backup_database(
         command = [
             "docker",
             "exec",
-            container,
+            container or campaign_container_name(),
             "pg_dump",
             "--clean",
             "--if-exists",
             "-U",
             user,
             "-d",
-            database,
+            database or campaign_database_name(),
         ]
     with path.open("wb") as output:
         subprocess.run(command, stdout=output, check=True)

@@ -187,12 +187,12 @@ This is read-only for v1. It helps answer "did the DB now reflect the review?"
 
 Existing files:
 
-- `knowledge/Faban/reviews/sessionXX_review.yaml`
-- `knowledge/Faban/final/sessionXX_summary.md`
-- `knowledge/Faban/travel.yaml`
-- `knowledge/Faban/enemy_encounters.yaml`
-- `knowledge/Faban/encounters.yaml`
-- `knowledge/Faban/canon_decisions.yaml`
+- `campaigns/{campaign}/reviews/sessionXX_review.yaml`
+- `campaigns/{campaign}/final/sessionXX_summary.md`
+- `campaigns/{campaign}/travel.yaml`
+- `campaigns/{campaign}/enemy_encounters.yaml`
+- `campaigns/{campaign}/encounters.yaml`
+- `campaigns/{campaign}/canon_decisions.yaml`
 
 Existing commands:
 

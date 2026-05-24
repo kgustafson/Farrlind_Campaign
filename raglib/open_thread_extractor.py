@@ -7,6 +7,15 @@ from pathlib import Path
 from typing import Any, Optional
 
 from raglib.config import BASE, CLEAN, RAW
+from raglib.extraction_hygiene import (
+    chunk_source_sets,
+    compact_campaign_metadata,
+    compact_name_list_for_chunk,
+    compact_registry_for_chunk,
+    looks_like_party_interpretation,
+    merge_extraction_documents,
+    rejection_text,
+)
 from raglib.io_utils import read_text, write_text
 from raglib.ollama_client import generate
 from raglib.prompts import load_prompt
@@ -174,6 +183,7 @@ def postprocess_extraction(
     document: dict[str, Any],
     registry: list[dict[str, Any]],
     session_name: str,
+    source_text: str = "",
 ) -> tuple[dict[str, Any], list[str]]:
     cleaned = normalize_extraction(document)
     warnings: list[str] = []
@@ -209,6 +219,19 @@ def postprocess_extraction(
     new_candidates = []
     for candidate in cleaned["new_thread_candidates"]:
         proposed_title = candidate.get("proposed_title", "")
+        if looks_like_party_interpretation(
+            candidate,
+            source_text,
+            name_fields=["proposed_title"],
+            context_fields=["description", "notes", "evidence"],
+        ):
+            reject_candidate(
+                cleaned,
+                candidate,
+                "Appears to be a party joke, misunderstanding, or theory rather than durable unresolved campaign business.",
+            )
+            warnings.append(f"Rejected party-interpretation open thread candidate: {rejection_text(candidate, 'proposed_title')}")
+            continue
         registry_row = by_title.get(normalized_name(proposed_title))
 
         if registry_row:
@@ -307,16 +330,33 @@ def extract_open_threads(session_name: str, model: Optional[str] = None, source:
     campaign_metadata = load_campaign_metadata()
     registry = open_thread_registry()
     locations = canon.locations()
-    prompt = build_prompt(session_name, sources, registry, locations, campaign_metadata)
+    source_sets = chunk_source_sets(sources)
 
     print(f"Extracting open thread candidates for {session_name} with {model}...")
     started = time.monotonic()
-    raw_output = generate(prompt, model=model, timeout=1800, options=OLLAMA_OPTIONS)
+    raw_documents = []
+    registry_rows_sent = []
+    for index, source_set in enumerate(source_sets, start=1):
+        if len(source_sets) > 1:
+            print(f"  Open thread transcript chunk {index}/{len(source_sets)}...")
+        chunk_text = "\n\n".join(item["text"] for item in source_set)
+        prompt_registry = compact_registry_for_chunk(
+            chunk_text,
+            registry,
+            identity_fields=["title"],
+            keep_fields=["id", "title", "thread_type", "status", "related_location"],
+        ) if len(source_sets) > 1 else registry
+        prompt_locations = compact_name_list_for_chunk(chunk_text, locations) if len(source_sets) > 1 else locations
+        prompt_metadata = compact_campaign_metadata(campaign_metadata) if len(source_sets) > 1 else campaign_metadata
+        registry_rows_sent.append(len(prompt_registry))
+        prompt = build_prompt(session_name, source_set, prompt_registry, prompt_locations, prompt_metadata)
+        raw_documents.append(extract_json_object(generate(prompt, model=model, timeout=1800, options=OLLAMA_OPTIONS)))
     duration = time.monotonic() - started
     extracted, guardrail_warnings = postprocess_extraction(
-        extract_json_object(raw_output),
+        merge_extraction_documents(raw_documents, EXPECTED_TOP_LEVEL_KEYS),
         registry,
         session_name,
+        "\n\n".join(source["text"] for source in sources),
     )
     path = output_path(session_name)
     write_text(path, json.dumps(extracted, indent=2, ensure_ascii=False) + "\n")
@@ -327,6 +367,10 @@ def extract_open_threads(session_name: str, model: Optional[str] = None, source:
         "model": model,
         "source": source,
         "sources": [{"label": item["label"], "path": item["path"], "chars": len(item["text"])} for item in sources],
+        "chunked": len(source_sets) > 1,
+        "chunk_count": len(source_sets),
+        "registry_rows_sent": registry_rows_sent,
+        "avg_registry_rows_sent": round(sum(registry_rows_sent) / len(registry_rows_sent), 2) if registry_rows_sent else 0,
         "campaign_metadata": str(campaign_metadata_path()),
         "open_thread_count": len(registry),
         "location_count": len(locations),

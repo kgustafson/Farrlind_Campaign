@@ -9,6 +9,8 @@ from datetime import datetime, timedelta, timezone
 
 import yaml
 
+from raglib import campaign
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW_PATH = REPO_ROOT / "workflows" / "session_workflow.yaml"
@@ -333,12 +335,20 @@ def historical_step_state(number: int, step: dict[str, Any]) -> dict[str, Any]:
     step_id = step["id"]
     outputs = render_session_refs(step.get("expected_outputs", []), name)
     inputs = render_session_refs(step.get("expected_inputs", []), name)
-    review = REPO_ROOT / "knowledge" / "Faban" / "reviews" / f"{name}_review.yaml"
-    final_summary = REPO_ROOT / "knowledge" / "Faban" / "final" / f"{name}_summary.md"
-    clean_summary = REPO_ROOT / "knowledge" / "Faban" / "clean" / f"{name}_summary.md"
-    transcript = REPO_ROOT / "knowledge" / "Faban" / "raw" / f"{name}_transcript.txt"
-    audio = REPO_ROOT / "audio" / f"{name}.wav"
+    review = campaign.reviews_dir() / f"{name}_review.yaml"
+    final_summary = campaign.final_dir() / f"{name}_summary.md"
+    clean_summary = campaign.clean_dir() / f"{name}_summary.md"
+    transcript = campaign.raw_dir() / f"{name}_transcript.txt"
+    audio = campaign.audio_dir() / f"{name}.wav"
     review_status = load_review_status(review)
+    extraction_review_outputs = {
+        "review_npc_extraction": campaign.extracted_dir() / f"{name}_npcs_reviewed.json",
+        "review_location_extraction": campaign.extracted_dir() / f"{name}_locations_reviewed.json",
+        "review_artifact_extraction": campaign.extracted_dir() / f"{name}_artifacts_reviewed.json",
+        "review_lore_item_extraction": campaign.extracted_dir() / f"{name}_lore_items_reviewed.json",
+        "review_combat_encounter_extraction": campaign.extracted_dir() / f"{name}_combat_encounters_reviewed.json",
+        "review_open_thread_extraction": campaign.extracted_dir() / f"{name}_open_threads_reviewed.json",
+    }
 
     if step_id == "source_audio_registered":
         if audio.exists():
@@ -353,7 +363,7 @@ def historical_step_state(number: int, step: dict[str, Any]) -> dict[str, Any]:
         return pending_state(step_id, "Audio exists, but no transcript artifact was found.", [relative(audio)])
 
     if step_id == "diary_source_available":
-        diary = REPO_ROOT / "knowledge" / "Faban" / "clean" / f"{name}_diary.md"
+        diary = campaign.clean_dir() / f"{name}_diary.md"
         if diary.exists():
             return complete_state(step_id, f"Diary source exists for {name}.", [relative(diary)])
         if transcript.exists():
@@ -361,12 +371,18 @@ def historical_step_state(number: int, step: dict[str, Any]) -> dict[str, Any]:
         return pending_state(step_id, "No diary or transcript source was found.", [])
 
     if step_id == "source_status_check":
-        if transcript.exists() or (REPO_ROOT / "knowledge" / "Faban" / "clean" / f"{name}_diary.md").exists():
+        if transcript.exists() or (campaign.clean_dir() / f"{name}_diary.md").exists():
             return complete_state(step_id, "At least one source artifact exists and was used for historical review.", existing_paths(inputs))
         return pending_state(step_id, "No usable source artifact was found.", [])
 
     if step_id in {
         "extract_events",
+        "extract_npcs",
+        "extract_locations",
+        "extract_artifacts",
+        "extract_lore_items",
+        "extract_combat_encounters",
+        "extract_open_threads",
         "filter_events",
         "classify_events",
         "normalize_events",
@@ -389,6 +405,12 @@ def historical_step_state(number: int, step: dict[str, Any]) -> dict[str, Any]:
         if clean_summary.exists():
             return complete_state(step_id, f"Draft/source summary exists for {name}.", [relative(clean_summary)])
         return pending_state(step_id, "No draft/source summary was found.", [])
+
+    if step_id in extraction_review_outputs:
+        reviewed = extraction_review_outputs[step_id]
+        if reviewed.exists():
+            return complete_state(step_id, f"Extraction review decision file exists for {name}.", [relative(reviewed)])
+        return pending_state(step_id, "Extraction review decisions have not been applied yet.", existing_paths(outputs))
 
     if step_id == "initialize_review":
         if review.exists():
@@ -446,9 +468,9 @@ def pending_state(step_id: str, comment: str, evidence: list[str]) -> dict[str, 
 def historical_session_timestamp(number: int) -> datetime:
     name = session_name(number)
     paths = [
-        f"knowledge/Faban/reviews/{name}_review.yaml",
-        f"knowledge/Faban/final/{name}_summary.md",
-        f"knowledge/Faban/clean/{name}_summary.md",
+        relative(campaign.reviews_dir() / f"{name}_review.yaml"),
+        relative(campaign.final_dir() / f"{name}_summary.md"),
+        relative(campaign.clean_dir() / f"{name}_summary.md"),
     ]
     result = subprocess.run(
         ["git", "log", "-1", "--format=%cI", "--", *paths],
@@ -496,7 +518,7 @@ def relative(path: Path) -> str:
 
 def render_session_refs(value: Any, name: str) -> Any:
     if isinstance(value, str):
-        return value.replace("sessionXX", name)
+        return value.replace("sessionXX", name).replace("{campaign}", campaign.active_campaign_name())
     if isinstance(value, list):
         return [render_session_refs(item, name) for item in value]
     if isinstance(value, dict):

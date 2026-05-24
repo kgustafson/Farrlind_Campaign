@@ -23,7 +23,7 @@ class CommandResult:
 
 
 def run_review_command(action: str, session_number: int, timeout: Optional[int] = 120) -> CommandResult:
-    if action not in {"apply-review", "write-final-summary"}:
+    if action not in {"init-review", "apply-review", "write-final-summary"}:
         raise ValueError(f"Unsupported review command: {action}")
     command = [
         sys.executable,
@@ -42,7 +42,33 @@ def run_review_command(action: str, session_number: int, timeout: Optional[int] 
     return CommandResult(completed.returncode, completed.stdout, completed.stderr)
 
 
-def run_health(timeout: Optional[int] = 120) -> CommandResult:
+def session_review_health(session_number: int) -> CommandResult:
+    document = reviews.load_review_document(session_number)
+    if not document:
+        return CommandResult(1, "", f"Review file has not been initialized for {reviews.session_key(session_number)}.")
+
+    errors = reviews.review_readiness_errors(document)
+    if errors:
+        stderr = "Review Readiness\n----------------\n" + "\n".join(f"- {error}" for error in errors)
+        return CommandResult(1, "", stderr)
+
+    stdout = "Review Readiness\n----------------\nNo review readiness issues found."
+    return CommandResult(0, stdout, "")
+
+
+def combine_health_results(database_result: CommandResult, review_result: Optional[CommandResult] = None) -> CommandResult:
+    if review_result is None:
+        return database_result
+    stdout_parts = [part for part in [database_result.stdout.strip(), review_result.stdout.strip()] if part]
+    stderr_parts = [part for part in [database_result.stderr.strip(), review_result.stderr.strip()] if part]
+    return CommandResult(
+        0 if database_result.ok and review_result.ok else 1,
+        "\n\n".join(stdout_parts),
+        "\n\n".join(stderr_parts),
+    )
+
+
+def run_health(session_number: Optional[int] = None, timeout: Optional[int] = 120) -> CommandResult:
     command = [
         sys.executable,
         str(reviews.REPO_ROOT / "scripts" / "dm_query.py"),
@@ -56,7 +82,9 @@ def run_health(timeout: Optional[int] = 120) -> CommandResult:
         text=True,
         timeout=timeout,
     )
-    return CommandResult(completed.returncode, completed.stdout, completed.stderr)
+    database_result = CommandResult(completed.returncode, completed.stdout, completed.stderr)
+    review_result = session_review_health(session_number) if session_number is not None else None
+    return combine_health_results(database_result, review_result)
 
 
 def run_smoke_test(base_url: str = "http://127.0.0.1:8000", timeout: float = 3.0) -> CommandResult:
@@ -66,7 +94,7 @@ def run_smoke_test(base_url: str = "http://127.0.0.1:8000", timeout: float = 3.0
         ("Routes", "/open-threads", "Open Threads"),
         ("Routes", "/lore-items", "Lore Items"),
         ("API", "/api/timeline", "session_count"),
-        ("API", "/api/lore-items", "Six Wells Exist"),
+        ("API", "/api/lore-items", "["),
     ]
     passed: list[tuple[str, str]] = []
     errors: list[tuple[str, str]] = []
@@ -142,10 +170,11 @@ def run_static_export(base_url: str = "http://127.0.0.1:8002", timeout: Optional
 
 def publish_static_archive(
     base_url: str = "http://127.0.0.1:8002",
-    static_repo: str = "/Volumes/T7_WORK/Farrlind_Static_Archive",
+    static_repo: str = "",
     push: bool = False,
     timeout: Optional[int] = 300,
 ) -> CommandResult:
+    static_repo = static_repo or str(reviews.REPO_ROOT / "dist" / "static_archive")
     command = [
         sys.executable,
         str(reviews.REPO_ROOT / "scripts" / "publish_static_archive.py"),
@@ -171,6 +200,10 @@ def publish_static_archive(
 
 def apply_review(session_number: int) -> CommandResult:
     return run_review_command("apply-review", session_number)
+
+
+def init_review(session_number: int) -> CommandResult:
+    return run_review_command("init-review", session_number)
 
 
 def write_final_summary(session_number: int) -> CommandResult:

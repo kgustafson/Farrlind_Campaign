@@ -7,6 +7,16 @@ from pathlib import Path
 from typing import Any, Optional
 
 from raglib.config import BASE, CLEAN, RAW
+from raglib.extraction_hygiene import (
+    chunk_source_sets,
+    compact_campaign_metadata,
+    compact_name_list_for_chunk,
+    compact_registry_for_chunk,
+    looks_like_party_interpretation,
+    merge_extraction_documents,
+    neutralize_interpretive_update,
+    rejection_text,
+)
 from raglib.io_utils import read_text, write_text
 from raglib.ollama_client import generate
 from raglib.prompts import load_prompt
@@ -92,6 +102,15 @@ def mentioned_as_values(item: dict[str, Any]) -> list[str]:
     return []
 
 
+def known_artifact_source_terms(item: dict[str, Any], registry_row: dict[str, Any]) -> list[Any]:
+    terms: list[Any] = [registry_row.get("name"), item.get("canonical_name")]
+    registry_name = normalized_name(registry_row.get("name"))
+    for value in mentioned_as_values(item):
+        if normalized_name(value) == registry_name:
+            terms.append(value)
+    return terms
+
+
 def artifact_registry() -> list[dict[str, Any]]:
     registry = []
     for row in canon.artifact_rows():
@@ -162,6 +181,24 @@ def candidate_to_known_mention(candidate: dict[str, Any], registry_row: dict[str
     }
 
 
+def known_mention_to_candidate(item: dict[str, Any], session_name: str) -> dict[str, Any]:
+    name = item.get("canonical_name") or next(iter(mentioned_as_values(item)), "")
+    return {
+        "proposed_name": name,
+        "artifact_type": item.get("artifact_type") or "other",
+        "description": item.get("new_information") or "Mentioned as an artifact or important item in this session.",
+        "lore_significance": item.get("lore_significance") or "",
+        "discovered_session": session_number(session_name),
+        "current_holder": item.get("current_holder") or "unknown",
+        "properties": item.get("properties") or [],
+        "is_sentient": bool(item.get("is_sentient")),
+        "is_cursed": bool(item.get("is_cursed")),
+        "is_infernal": bool(item.get("is_infernal")),
+        "confidence": item.get("confidence") or "medium",
+        "evidence": item.get("evidence") or "",
+    }
+
+
 def normalize_extraction(document: dict[str, Any]) -> dict[str, Any]:
     normalized = {}
     for key in EXPECTED_TOP_LEVEL_KEYS:
@@ -181,34 +218,82 @@ def postprocess_extraction(
     by_id, by_name = registry_indexes(registry)
 
     known_mentions = []
+    salvaged_candidates = []
     for item in cleaned["known_artifact_mentions"]:
         try:
             artifact_id = int(item.get("artifact_id"))
         except (TypeError, ValueError):
-            warnings.append(f"Dropped known artifact mention with invalid artifact_id: {item.get('canonical_name')}")
+            candidate = known_mention_to_candidate(item, session_name)
+            if source_text and candidate["proposed_name"] and source_contains_any(source_text, [candidate["proposed_name"]]):
+                salvaged_candidates.append(candidate)
+                warnings.append(f"Converted invalid known artifact mention to new candidate: {candidate['proposed_name']}")
+            else:
+                warnings.append(f"Dropped known artifact mention with invalid artifact_id: {item.get('canonical_name')}")
             continue
         registry_row = by_id.get(artifact_id)
         if not registry_row:
-            warnings.append(f"Dropped known artifact mention with unknown artifact_id {artifact_id}: {item.get('canonical_name')}")
+            candidate = known_mention_to_candidate(item, session_name)
+            if source_text and candidate["proposed_name"] and source_contains_any(source_text, [candidate["proposed_name"]]):
+                salvaged_candidates.append(candidate)
+                warnings.append(f"Converted unknown known artifact mention to new candidate: {candidate['proposed_name']}")
+            else:
+                warnings.append(f"Dropped known artifact mention with unknown artifact_id {artifact_id}: {item.get('canonical_name')}")
             continue
         if not canonical_matches_registry(item, registry_row):
-            warnings.append(
-                f"Dropped known artifact mention whose canonical name does not match artifact_id {artifact_id}: "
-                f"{item.get('canonical_name')} != {registry_row.get('name')}"
-            )
+            candidate = known_mention_to_candidate(item, session_name)
+            if source_text and candidate["proposed_name"] and source_contains_any(source_text, [candidate["proposed_name"]]):
+                salvaged_candidates.append(candidate)
+                warnings.append(
+                    f"Converted mismatched known artifact mention to new candidate: "
+                    f"{candidate['proposed_name']} != {registry_row.get('name')}"
+                )
+            else:
+                warnings.append(
+                    f"Dropped known artifact mention whose canonical name does not match artifact_id {artifact_id}: "
+                    f"{item.get('canonical_name')} != {registry_row.get('name')}"
+                )
             continue
-        if source_text and not source_contains_any(source_text, [registry_row.get("name"), item.get("canonical_name"), *mentioned_as_values(item)]):
+        if source_text and not source_contains_any(source_text, known_artifact_source_terms(item, registry_row)):
             warnings.append(f"Dropped known artifact mention not present in session source: {registry_row.get('name')}")
             continue
         item["canonical_name"] = registry_row.get("name")
+        if neutralize_interpretive_update(
+            item,
+            source_text,
+            name_fields=["canonical_name", "mentioned_as"],
+            context_fields=["new_information", "evidence"],
+        ):
+            warnings.append(f"Neutralized party-interpretation artifact update: {registry_row.get('name')}")
         known_mentions.append(item)
 
     cleaned["known_artifact_mentions"] = known_mentions
+    if salvaged_candidates:
+        cleaned["new_artifact_candidates"] = [*salvaged_candidates, *cleaned["new_artifact_candidates"]]
     known_ids = existing_known_artifact_ids(cleaned)
     new_candidates = []
+    seen_new_names = set()
     for candidate in cleaned["new_artifact_candidates"]:
         proposed_name = candidate.get("proposed_name", "")
-        registry_row = by_name.get(normalized_name(proposed_name))
+        normalized_proposed = normalized_name(proposed_name)
+        if looks_like_party_interpretation(
+            candidate,
+            source_text,
+            name_fields=["proposed_name"],
+            context_fields=["description", "lore_significance", "evidence"],
+        ):
+            reject_candidate(
+                cleaned,
+                candidate,
+                "Appears to be a party joke, misunderstanding, nickname, or theory rather than a confirmed artifact.",
+            )
+            warnings.append(f"Rejected party-interpretation artifact candidate: {rejection_text(candidate, 'proposed_name')}")
+            continue
+        if normalized_proposed in seen_new_names:
+            reject_candidate(cleaned, candidate, f"Duplicate of new artifact candidate: {proposed_name}.")
+            warnings.append(f"Rejected duplicate new artifact candidate: {proposed_name}")
+            continue
+        seen_new_names.add(normalized_proposed)
+        registry_row = by_name.get(normalized_proposed)
 
         if registry_row:
             registry_id = int(registry_row["id"])
@@ -310,15 +395,32 @@ def extract_artifacts(session_name: str, model: Optional[str] = None, source: st
     registry = artifact_registry()
     npcs = [row.get("name") for row in canon.npc_rows() if row.get("name")]
     locations = canon.locations()
-    prompt = build_prompt(session_name, sources, registry, npcs, locations, campaign_metadata)
+    source_sets = chunk_source_sets(sources)
 
     print(f"Extracting artifact candidates for {session_name} with {model}...")
     started = time.monotonic()
-    raw_output = generate(prompt, model=model, timeout=1800, options=OLLAMA_OPTIONS)
+    raw_documents = []
+    registry_rows_sent = []
+    for index, source_set in enumerate(source_sets, start=1):
+        if len(source_sets) > 1:
+            print(f"  Artifact transcript chunk {index}/{len(source_sets)}...")
+        chunk_text = "\n\n".join(item["text"] for item in source_set)
+        prompt_registry = compact_registry_for_chunk(
+            chunk_text,
+            registry,
+            identity_fields=["name"],
+            keep_fields=["id", "name", "artifact_type", "current_holder"],
+        ) if len(source_sets) > 1 else registry
+        prompt_npcs = compact_name_list_for_chunk(chunk_text, npcs) if len(source_sets) > 1 else npcs
+        prompt_locations = compact_name_list_for_chunk(chunk_text, locations) if len(source_sets) > 1 else locations
+        prompt_metadata = compact_campaign_metadata(campaign_metadata) if len(source_sets) > 1 else campaign_metadata
+        registry_rows_sent.append(len(prompt_registry))
+        prompt = build_prompt(session_name, source_set, prompt_registry, prompt_npcs, prompt_locations, prompt_metadata)
+        raw_documents.append(extract_json_object(generate(prompt, model=model, timeout=1800, options=OLLAMA_OPTIONS)))
     duration = time.monotonic() - started
     source_text = "\n\n".join(source["text"] for source in sources)
     extracted, guardrail_warnings = postprocess_extraction(
-        extract_json_object(raw_output),
+        merge_extraction_documents(raw_documents, EXPECTED_TOP_LEVEL_KEYS),
         registry,
         session_name,
         source_text,
@@ -332,6 +434,10 @@ def extract_artifacts(session_name: str, model: Optional[str] = None, source: st
         "model": model,
         "source": source,
         "sources": [{"label": item["label"], "path": item["path"], "chars": len(item["text"])} for item in sources],
+        "chunked": len(source_sets) > 1,
+        "chunk_count": len(source_sets),
+        "registry_rows_sent": registry_rows_sent,
+        "avg_registry_rows_sent": round(sum(registry_rows_sent) / len(registry_rows_sent), 2) if registry_rows_sent else 0,
         "campaign_metadata": str(campaign_metadata_path()),
         "artifact_registry_count": len(registry),
         "npc_registry_count": len(npcs),

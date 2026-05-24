@@ -1,6 +1,6 @@
 # Version
 
-v0.5.0
+v0.6.0
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.5.0` adds the model-curated extraction review layer, static archive export support, and expanded archive management tools.
+`v0.6.0` adds multi-campaign support, campaign-scoped runtime configuration, and a cleaner extractor-driven workflow foundation tested against a second campaign.

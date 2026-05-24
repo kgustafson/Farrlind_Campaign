@@ -112,7 +112,7 @@
       </label>
       <label class="field-block">
         <span>Audio File Path</span>
-        <input type="text" name="audio_file_path" placeholder="/Volumes/T7_WORK/.../session{{ "%02d"|format(next_session_number) }}.wav">
+        <input type="text" name="audio_file_path" placeholder="{{ campaign_audio_dir() }}/session{{ "%02d"|format(next_session_number) }}.mp3 or .wav">
       </label>
       <label class="field-block">
         <span>Operator Notes</span>

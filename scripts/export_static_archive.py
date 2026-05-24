@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export the read-only Farrlind archive as static files."""
+"""Export the read-only campaign archive as static files."""
 
 from __future__ import annotations
 
@@ -15,8 +15,14 @@ from urllib.parse import urlencode
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from raglib.campaign import active_campaign_name, assets_dir, campaign_feature_enabled
+
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "dist" / "archive"
 DEFAULT_BASE_URL = "http://127.0.0.1:8002"
+WORLD_MAP_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
 
 
 class ExportError(RuntimeError):
@@ -54,6 +60,20 @@ def write_static_page(output_dir: Path, route: str, html: str) -> Path:
     return path
 
 
+def campaign_world_map_path() -> Path | None:
+    assets = assets_dir()
+    for suffix in sorted(WORLD_MAP_EXTENSIONS):
+        candidate = assets / f"world-map{suffix}"
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def static_world_map_path() -> str | None:
+    path = campaign_world_map_path()
+    return f"/media/world-map{path.suffix.lower()}" if path else None
+
+
 def rewrite_html(html: str) -> str:
     html = re.sub(r'https?://[^/"\']+/static/', "/static/", html)
     html = re.sub(r'method="post" action="[^"]+"', 'method="get" action="#"', html)
@@ -78,6 +98,10 @@ def rewrite_html(html: str) -> str:
         html,
     )
     html = re.sub(r'(/songbook/(\d+)/lyrics)(?=["?#])', r"/songbook/\2/lyrics/", html)
+    world_map = static_world_map_path()
+    if world_map:
+        html = re.sub(r"/world-map/image\?v=\d+", world_map, html)
+        html = html.replace("/world-map/image", world_map)
 
     def audio_replacement(match: re.Match[str]) -> str:
         song_number = int(match.group(1))
@@ -114,6 +138,16 @@ def copy_songbook_media(output_dir: Path, songs: list[dict]) -> int:
     return copied
 
 
+def copy_world_map_media(output_dir: Path) -> int:
+    source = campaign_world_map_path()
+    if source is None:
+        return 0
+    destination = output_dir / "media" / f"world-map{source.suffix.lower()}"
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source, destination)
+    return 1
+
+
 def discover_session_keys(index_html: str) -> list[str]:
     return sorted(set(re.findall(r"/sessions/(session\d+)/review", index_html)))
 
@@ -123,21 +157,22 @@ def export_archive(base_url: str = DEFAULT_BASE_URL, output_dir: Path = DEFAULT_
         shutil.rmtree(output_dir)
     output_dir.mkdir(parents=True)
     copy_static_assets(output_dir)
+    copied_world_maps = copy_world_map_media(output_dir)
 
     exported_pages: list[str] = []
 
     primary_routes = [
         "/",
-        "/wells",
         "/npcs",
         "/locations",
         "/artifacts",
         "/lore-items",
         "/combat-encounters",
         "/open-threads",
-        "/songbook",
         "/timeline",
     ]
+    if campaign_feature_enabled("songbook", default=False):
+        primary_routes.insert(-1, "/songbook")
 
     index_html = ""
     for route in primary_routes:
@@ -155,25 +190,29 @@ def export_archive(base_url: str = DEFAULT_BASE_URL, output_dir: Path = DEFAULT_
         write_static_page(output_dir, f"/sessions/{session_key}/summary", summary_html)
         exported_pages.extend([f"/sessions/{session_key}/diary", f"/sessions/{session_key}/summary"])
 
-    songs = fetch_json(base_url, "/api/songbook")
-    for song in songs:
-        song_number = int(song["song_number"])
-        if not song.get("has_local_lyrics"):
-            continue
-        html = rewrite_html(fetch_text(base_url, f"/songbook/{song_number}/lyrics"))
-        write_static_page(output_dir, f"/songbook/{song_number}/lyrics", html)
-        exported_pages.append(f"/songbook/{song_number}/lyrics")
+    songs = []
+    copied_audio = 0
+    if campaign_feature_enabled("songbook", default=False):
+        songs = fetch_json(base_url, "/api/songbook")
+        for song in songs:
+            song_number = int(song["song_number"])
+            if not song.get("has_local_lyrics"):
+                continue
+            html = rewrite_html(fetch_text(base_url, f"/songbook/{song_number}/lyrics"))
+            write_static_page(output_dir, f"/songbook/{song_number}/lyrics", html)
+            exported_pages.append(f"/songbook/{song_number}/lyrics")
 
-    copied_audio = copy_songbook_media(output_dir, songs)
+        copied_audio = copy_songbook_media(output_dir, songs)
     file_count = sum(1 for path in output_dir.rglob("*") if path.is_file())
     byte_count = sum(path.stat().st_size for path in output_dir.rglob("*") if path.is_file())
     manifest = {
-        "source": "farrlind_archive_app",
+        "source": f"{active_campaign_name()}_archive_app",
         "output_dir": "dist/archive",
         "page_count": len(exported_pages),
         "file_count": file_count,
         "byte_count": byte_count,
         "song_audio_files": copied_audio,
+        "world_map_files": copied_world_maps,
         "pages": exported_pages,
     }
     (output_dir / "static-export-manifest.json").write_text(
@@ -184,7 +223,7 @@ def export_archive(base_url: str = DEFAULT_BASE_URL, output_dir: Path = DEFAULT_
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Export the Farrlind archive as static HTML for Netlify.")
+    parser = argparse.ArgumentParser(description="Export the campaign archive as static HTML for Netlify.")
     parser.add_argument("--base-url", default=DEFAULT_BASE_URL, help="Archive app base URL to snapshot.")
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR, help="Static archive output directory.")
     args = parser.parse_args()

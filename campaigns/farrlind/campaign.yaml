@@ -1,0 +1,91 @@
+campaign:
+  id: farrlind
+  name: Farrlind
+  archive_title: The Farrlind Archivum
+  archive_subtitle: An eclectic collection of songs, recollections, and questionable wisdom from a traveling bard.
+  description: The Farrlind campaign archive for Faban Colon's collected songs, recollections, and canon notes.
+
+database:
+  name: farrlind
+  user: admin
+  password: gofaban
+  port: 5432
+
+dm:
+  name: Timothy Gustafson
+
+songbook:
+  enabled: true
+  label: Faban's Songbook
+
+party:
+  - character_name: Faban
+    full_name: Faban Colon
+    player_name: Kurt Gustafson
+    race: human
+    class: bard
+    notes: Bard and primary diary voice.
+  - character_name: Mikani
+    player_name: Beth Gustafson
+    race: blue dragonborn
+    class: cleric
+    aliases:
+      - Makani
+  - character_name: Roon
+    player_name: Will Mahoney
+    race: half-orc
+    class: fighter
+  - character_name: Brigit
+    player_name: Cherrie Redden
+    race: halfling
+    class: rogue
+    aliases:
+      - Bridgit
+  - character_name: Corvinas
+    player_name: Chris Ward
+    race: human
+    class: paladin of Mihira
+    aliases:
+      - Corvinus
+  - character_name: Gildas
+    player_name: Michael Palmer
+    race: elf
+    class: wizard
+
+extraction_guidance:
+  party_members_are_player_characters: true
+  players_are_not_campaign_npcs: true
+  dm_is_not_campaign_npc: true
+  npc_extraction:
+    - Do not create NPC candidates for party members.
+    - Mentions of party members may be used as context, but not as NPC registry entries.
+    - Do not create NPC candidates for real-world players or the DM.
+
+glossary:
+  - term: Catur
+    note: Underwater city; prefer this over common transcript drift.
+    aliases: [Kator, Couture, Peter, Cater]
+  - term: Namaloa
+    note: Deity/belief associated with Mikani and nature reverence.
+    aliases: [Namalua]
+  - term: Celestial Isles
+    note: Draconic or dragonkin society connected to Mikani.
+  - term: Korog
+    note: Known Well of Magic.
+  - term: Safi / Scythe
+    note: Known Well of Magic in Balrog.
+  - term: Ordor
+    note: Known Well of Magic destroyed in Paramon.
+  - term: Wand of Wells
+    note: Stolen artifact central to the campaign threat.
+  - term: Balrog
+    note: Major dwarven city.
+  - term: Paramon
+    note: Major campaign location.
+  - term: Bentrios
+    note: Starting city and recurring location.
+  - term: Hanidal
+    note: Island/location connected to an unknown well.
+    aliases: [Hanedal]
+  - term: The Gale
+    note: Major unvisited danger/location.

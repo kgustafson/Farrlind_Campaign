@@ -1,5 +1,20 @@
 # Revision History
 
+## v0.6.0 - 5/24/2026
+
+Added multi-campaign support and tightened the extractor-driven workflow using Trinyvale as a clean test campaign.
+
+- App: Added campaign-scoped runtime configuration so separate campaigns can run with their own database, ports, archive name, subtitle, and feature flags.
+- App: Added optional songbook support so new campaigns can omit Farrlind-specific songbook routes and exports.
+- App: Added campaign-aware startup helpers and Docker Compose parameterization for running multiple campaign archives side by side.
+- Workflow: Updated auto-intake, transcription, postextract, status checks, and workflow state tracking to operate against the selected campaign.
+- Workflow: Added campaign bootstrap extraction for party, player, DM, and campaign metadata discovery from early sessions.
+- Workflow: Preserved non-timestamped extracted events during merge so transcript-derived sessions do not collapse to empty summaries.
+- Data: Moved Farrlind canon assets under `campaigns/farrlind` and added a blank `campaigns/trinyvale` scaffold.
+- Extraction: Added shared hygiene guardrails for entity extractors and tightened NPC, location, artifact, lore, combat, and open-thread extraction behavior.
+- Ops: Ignored campaign audio inputs and generated runtime artifacts so large MP3/WAV files and transient outputs stay out of Git.
+- Tests: Added and updated campaign config, bootstrap extraction, merge, extractor, workflow, and web-route coverage.
+
 ## v0.5.0 - 5/23/2026
 
 Added the model-curated extraction review layer and static archive release tooling.

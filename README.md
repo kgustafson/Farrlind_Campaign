@@ -81,6 +81,18 @@ Docker Compose also starts a read-only archive viewer at:
 http://127.0.0.1:8002
 ```
 
+## Campaign Database Init
+
+Database first-boot initialization is split by responsibility:
+
+```text
+campaigns/init/01_schema.sql              # universal schema and views
+campaigns/init/02_generic_lookups.sql     # campaign-neutral lookup rows
+campaigns/<campaign>/init/*.sql           # campaign-specific seed/canon rows
+```
+
+New campaign databases should start with the shared schema and generic lookups only, unless that campaign has explicit seed files in its own `init` directory.
+
 The web container bind-mounts the repo into `/app`, so review and canon files written by the UI persist in the working tree.
 
 The interface can run in either edit mode or read-only archive mode. Copy `farrlind/.env.example` to `farrlind/.env` and set:

@@ -2,41 +2,45 @@ services:
 
   db:
     image: postgres:16
-    container_name: farrlind_db
+    container_name: ${CAMPAIGN_NAME:-farrlind}_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB:       farrlind
-      POSTGRES_USER:     admin
-      POSTGRES_PASSWORD: gofaban   # change before any exposure
+      POSTGRES_DB:       ${CAMPAIGN_DB:-farrlind}
+      POSTGRES_USER:     ${CAMPAIGN_DB_USER:-admin}
+      POSTGRES_PASSWORD: ${CAMPAIGN_DB_PASSWORD:-gofaban}   # change before any exposure
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init:/docker-entrypoint-initdb.d   # SQL files here run on first boot
+      - ../campaigns/init/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ../campaigns/init/02_generic_lookups.sql:/docker-entrypoint-initdb.d/02_generic_lookups.sql:ro
+      - ../campaigns/init/99_campaign_seed.sh:/docker-entrypoint-initdb.d/99_campaign_seed.sh:ro
+      - ../campaigns/${FARRLIND_CAMPAIGN:-farrlind}/init:/campaign-init:ro
     ports:
-      - "5432:5432"
+      - "${CAMPAIGN_DB_PORT:-5432}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d farrlind"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   adminer:
     image: adminer:latest
-    container_name: farrlind_adminer
+    container_name: ${CAMPAIGN_NAME:-farrlind}_adminer
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     ports:
-      - "8080:8080"
+      - "${CAMPAIGN_ADMINER_PORT:-8080}:8080"
 
   web:
     build:
       context: ..
       dockerfile: Dockerfile
-    container_name: farrlind_web
+    container_name: ${CAMPAIGN_NAME:-farrlind}_web
     restart: unless-stopped
     environment:
-      FARRLIND_DATABASE_URL: postgresql+psycopg2://admin:gofaban@db:5432/farrlind
+      FARRLIND_CAMPAIGN: ${FARRLIND_CAMPAIGN:-farrlind}
+      FARRLIND_DATABASE_URL: postgresql+psycopg2://${CAMPAIGN_DB_USER:-admin}:${CAMPAIGN_DB_PASSWORD:-gofaban}@db:5432/${CAMPAIGN_DB:-farrlind}
       FARRLIND_INTERFACE_MODE: ${FARRLIND_INTERFACE_MODE:-edit}
       FARRLIND_STATIC_REPO_PATH: /static_archive
       FARRLIND_STATIC_PUBLISH_PUSH: ${FARRLIND_STATIC_PUBLISH_PUSH:-0}
@@ -47,17 +51,18 @@ services:
       - ..:/app
       - /Volumes/T7_WORK/Farrlind_Static_Archive:/static_archive
     ports:
-      - "8000:8000"
+      - "${CAMPAIGN_WEB_PORT:-8000}:8000"
     command: python -m uvicorn web_review.app:app --host 0.0.0.0 --port 8000
 
   web_archive:
     build:
       context: ..
       dockerfile: Dockerfile
-    container_name: farrlind_archive
+    container_name: ${CAMPAIGN_NAME:-farrlind}_archive
     restart: unless-stopped
     environment:
-      FARRLIND_DATABASE_URL: postgresql+psycopg2://admin:gofaban@db:5432/farrlind
+      FARRLIND_CAMPAIGN: ${FARRLIND_CAMPAIGN:-farrlind}
+      FARRLIND_DATABASE_URL: postgresql+psycopg2://${CAMPAIGN_DB_USER:-admin}:${CAMPAIGN_DB_PASSWORD:-gofaban}@db:5432/${CAMPAIGN_DB:-farrlind}
       FARRLIND_INTERFACE_MODE: archive
       PYTHONDONTWRITEBYTECODE: "1"
     depends_on:
@@ -66,7 +71,7 @@ services:
     volumes:
       - ..:/app:ro
     ports:
-      - "8002:8000"
+      - "${CAMPAIGN_ARCHIVE_PORT:-8002}:8000"
     command: python -m uvicorn web_review.app:app --host 0.0.0.0 --port 8000
 
 volumes:

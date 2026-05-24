@@ -6,6 +6,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from raglib.campaign import audio_dir, campaign_container_name, campaign_database_name
 from raglib.config import CLEAN, RAW, SESSIONS
 from raglib.extract import extract_session
 from raglib.filter_events import filter_session
@@ -21,6 +22,7 @@ from raglib.artifact_extractor import extract_artifacts
 from raglib.lore_item_extractor import extract_lore_items
 from raglib.combat_encounter_extractor import extract_combat_encounters
 from raglib.open_thread_extractor import extract_open_threads
+from raglib.campaign_bootstrap_extractor import extract_campaign_bootstrap
 from scripts.load_summaries import apply_sql, write_sql
 from scripts.load_songbook import apply_sql as apply_songbook_sql
 from scripts.load_songbook import write_songbook_sql
@@ -56,7 +58,6 @@ POSTEXTRACT_STAGES = [
 ]
 
 STATUS_FILES = [
-    ("audio", REPO_ROOT / "audio", "{session}.wav"),
     ("diary", CLEAN, "{session}_diary.md"),
     ("transcript", RAW, "{session}_transcript.txt"),
     ("curated", CLEAN, "{session}_curated.md"),
@@ -70,10 +71,17 @@ STATUS_FILES = [
     ("summary", CLEAN, "{session}_summary.md"),
 ]
 
+AUDIO_EXTENSIONS = [".wav", ".mp3", ".m4a", ".flac", ".aac", ".ogg"]
+
 
 def print_status(session_name: str):
     print(f"Workflow status for {session_name}")
     print("")
+
+    audio_paths = [audio_dir() / f"{session_name}{extension}" for extension in AUDIO_EXTENSIONS]
+    audio_path = next((path for path in audio_paths if path.exists()), audio_paths[0])
+    audio_marker = "ok" if audio_path.exists() else "missing"
+    print(f"{audio_marker:7} {'audio':11} {audio_path}")
 
     for label, base, pattern in STATUS_FILES:
         path = base / pattern.format(session=session_name)
@@ -104,14 +112,15 @@ def parse_args():
             "db-backup",
             "workflow-init",
             "workflow-seed-history",
+            "extract-campaign-bootstrap",
         ],
         help="Workflow command to run.",
     )
     parser.add_argument("session_name", nargs="?", help="Session name, e.g. session20.")
     parser.add_argument("--apply", action="store_true", help="Apply generated database SQL.")
-    parser.add_argument("--container", default="farrlind_db", help="Postgres Docker container name.")
+    parser.add_argument("--container", default=campaign_container_name(), help="Postgres Docker container name.")
     parser.add_argument("--user", default="admin", help="Postgres user.")
-    parser.add_argument("--database", default="farrlind", help="Postgres database.")
+    parser.add_argument("--database", default=campaign_database_name(), help="Postgres database.")
     parser.add_argument("--backup-output", type=Path, default=None, help="Optional db-backup output path.")
     parser.add_argument("--audio-file", type=Path, default=None, help="Transcribe command input. Defaults to audio/<session>.wav.")
     parser.add_argument("--output", type=Path, default=None, help="Transcribe command output. Defaults to raw/<session>_transcript.txt.")
@@ -128,6 +137,7 @@ def parse_args():
     parser.add_argument("--limit-seconds", type=float, default=None, help="Optional transcribe smoke-test limit.")
     parser.add_argument("--start-session", type=int, default=0, help="workflow-seed-history first session number.")
     parser.add_argument("--end-session", type=int, default=20, help="workflow-seed-history final session number.")
+    parser.add_argument("--sessions", nargs="+", default=None, help="Session names for extract-campaign-bootstrap.")
     return parser.parse_args()
 
 
@@ -173,6 +183,11 @@ def main():
         sql_path = write_historical_workflow_seed_sql(args.start_session, args.end_session)
         if args.apply:
             apply_sql(sql_path, args.container, args.user, args.database)
+        return
+
+    if args.command == "extract-campaign-bootstrap":
+        sessions = args.sessions or ([args.session_name] if args.session_name else None)
+        extract_campaign_bootstrap(sessions, model=args.model, source=args.source)
         return
 
     if not args.session_name:

@@ -7,6 +7,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from raglib import workflow_state
+from raglib import campaign
 from web_review import db
 from web_review.services import reviews
 
@@ -40,12 +41,87 @@ def _execute_transaction(statements: list[tuple[str, dict[str, Any]]]) -> None:
 
 
 def _split_sql(sql: str) -> list[str]:
-    return [statement.strip() for statement in sql.split(";") if statement.strip()]
+    statements: list[str] = []
+    current: list[str] = []
+    in_single_quote = False
+    index = 0
+    while index < len(sql):
+        char = sql[index]
+        current.append(char)
+        if char == "'":
+            if in_single_quote and index + 1 < len(sql) and sql[index + 1] == "'":
+                current.append(sql[index + 1])
+                index += 1
+            else:
+                in_single_quote = not in_single_quote
+        elif char == ";" and not in_single_quote:
+            statement = "".join(current[:-1]).strip()
+            if statement:
+                statements.append(statement)
+            current = []
+        index += 1
+
+    statement = "".join(current).strip()
+    if statement:
+        statements.append(statement)
+    return statements
 
 
 def next_session_number() -> int:
     rows = _fetch("SELECT COALESCE(MAX(session_number), -1) + 1 AS next_session_number FROM session;")
     return int(rows[0]["next_session_number"]) if rows else 0
+
+
+def artifact_candidates(value: str) -> list[Path]:
+    raw = (value or "").strip()
+    if not raw:
+        return []
+    path = Path(raw).expanduser()
+    candidates = [path]
+    if not path.is_absolute():
+        candidates.append(reviews.REPO_ROOT / path)
+
+    marker = "/campaigns/"
+    if marker in raw:
+        tail = raw.split(marker, 1)[1]
+        candidates.append(reviews.REPO_ROOT / "campaigns" / tail)
+
+    unique: list[Path] = []
+    seen = set()
+    for candidate in candidates:
+        key = str(candidate)
+        if key not in seen:
+            unique.append(candidate)
+            seen.add(key)
+    return unique
+
+
+def artifact_exists(value: str) -> bool:
+    return any(path.exists() for path in artifact_candidates(value))
+
+
+def storage_artifact_path(value: str) -> str:
+    raw = (value or "").strip()
+    for candidate in artifact_candidates(raw):
+        try:
+            return candidate.resolve().relative_to(reviews.REPO_ROOT.resolve()).as_posix()
+        except (FileNotFoundError, ValueError):
+            try:
+                return candidate.absolute().relative_to(reviews.REPO_ROOT.absolute()).as_posix()
+            except ValueError:
+                continue
+
+    marker = "/campaigns/"
+    if marker in raw:
+        return f"campaigns/{raw.split(marker, 1)[1]}"
+    return raw
+
+
+def repo_artifact(path: Path) -> str:
+    try:
+        return path.relative_to(reviews.REPO_ROOT).as_posix()
+    except ValueError:
+        return storage_artifact_path(str(path))
 
 
 def initiate_session(values: dict[str, Any]) -> int:
@@ -56,17 +132,23 @@ def initiate_session(values: dict[str, Any]) -> int:
 
     title = (values.get("title") or f"Session {session_number:02d}").strip()
     session_date = (values.get("session_date") or "").strip() or None
-    audio_path = (values.get("audio_file_path") or "").strip()
+    original_audio_path = (values.get("audio_file_path") or "").strip()
+    audio_path = storage_artifact_path(original_audio_path) if original_audio_path else ""
     notes = (values.get("notes") or "").strip()
     definition = workflow_state.load_workflow_definition()
+    session_name = workflow_state.session_name(session_number)
+    transcript_artifact = repo_artifact(campaign.raw_dir() / f"{session_name}_transcript.txt")
+    diary_artifact = repo_artifact(campaign.clean_dir() / f"{session_name}_diary.md")
 
     metadata = {
         "initiated_from": "project_utilities",
         "real_session_date": session_date,
         "audio_file_path": audio_path or None,
     }
+    if original_audio_path and original_audio_path != audio_path:
+        metadata["original_audio_file_path"] = original_audio_path
     if audio_path:
-        metadata["audio_file_exists_at_initiation"] = Path(audio_path).expanduser().exists()
+        metadata["audio_file_exists_at_initiation"] = artifact_exists(audio_path)
 
     summary_comment = "Session workflow initiated from Project Utilities."
     if audio_path:
@@ -121,7 +203,7 @@ def initiate_session(values: dict[str, Any]) -> int:
     ))
 
     if audio_path:
-        audio_exists = Path(audio_path).expanduser().exists()
+        audio_exists = artifact_exists(audio_path)
         statements.append((
             """
             UPDATE workflow_step_state wss
@@ -149,6 +231,54 @@ def initiate_session(values: dict[str, Any]) -> int:
                 "summary_comment": f"Audio path registered: {audio_path} ({'file exists' if audio_exists else 'file not found yet'}).",
                 "artifacts": json.dumps([audio_path]),
                 "metadata": json.dumps({"audio_file_path": audio_path, "audio_file_exists": audio_exists}),
+            },
+        ))
+        statements.append((
+            """
+            UPDATE workflow_step_state wss
+            SET
+                inputs = CAST(:inputs AS jsonb),
+                outputs = CAST(:outputs AS jsonb),
+                summary_comment = CASE
+                    WHEN wss.status = 'pending' THEN :summary_comment
+                    ELSE wss.summary_comment
+                END,
+                metadata = wss.metadata || CAST(:metadata AS jsonb)
+            FROM workflow_run wr
+            JOIN session s ON s.id = wr.session_id
+            WHERE wss.workflow_run_id = wr.id
+              AND s.session_number = :session_number
+              AND wr.workflow_id = :workflow_id
+              AND wr.workflow_version = :workflow_version
+              AND wss.step_id = 'transcribe_audio';
+            """,
+            {
+                "session_number": session_number,
+                "workflow_id": definition["workflow"]["id"],
+                "workflow_version": int(definition["workflow"]["version"]),
+                "inputs": json.dumps([audio_path]),
+                "outputs": json.dumps([transcript_artifact]),
+                "summary_comment": "Transcription will use the registered source audio.",
+                "metadata": json.dumps({"audio_file_path": audio_path, "audio_file_exists": audio_exists}),
+            },
+        ))
+        statements.append((
+            """
+            UPDATE workflow_step_state wss
+            SET inputs = CAST(:inputs AS jsonb)
+            FROM workflow_run wr
+            JOIN session s ON s.id = wr.session_id
+            WHERE wss.workflow_run_id = wr.id
+              AND s.session_number = :session_number
+              AND wr.workflow_id = :workflow_id
+              AND wr.workflow_version = :workflow_version
+              AND wss.step_id = 'source_status_check';
+            """,
+            {
+                "session_number": session_number,
+                "workflow_id": definition["workflow"]["id"],
+                "workflow_version": int(definition["workflow"]["version"]),
+                "inputs": json.dumps([audio_path, transcript_artifact, diary_artifact]),
             },
         ))
 
@@ -181,17 +311,24 @@ def enqueue_auto_intake(session_number: int) -> Optional[Path]:
 
     QUEUE_DIR.mkdir(parents=True, exist_ok=True)
     payload = {
+        "campaign_name": campaign.active_campaign_name(),
         "session_number": session_number,
         "session_name": session_key(session_number),
         "audio_file_path": audio_path,
         "queued_at": datetime.now(timezone.utc).isoformat(),
-        "stop_before": "edit_review_decisions",
+        "stop_before": "review_npc_extraction",
         "commands": [
             "transcribe_audio",
             "source_status_check",
+            "curate_transcript",
+            "extract_npcs",
+            "extract_locations",
+            "extract_artifacts",
+            "extract_lore_items",
+            "extract_combat_encounters",
+            "extract_open_threads",
             "extract_events",
             "postextract_shortcut",
-            "initialize_review",
         ],
     }
     queue_path = QUEUE_DIR / f"{session_key(session_number)}.json"
@@ -211,7 +348,7 @@ def enqueue_auto_intake(session_number: int) -> Optional[Path]:
           AND s.session_number = :session_number;
         """, {
             "session_number": session_number,
-            "summary_comment": "Auto-intake queued through init-review.",
+            "summary_comment": "Auto-intake queued through draft extraction; extraction reviews are the next human gate.",
             "metadata": json.dumps({"auto_intake_queued": True, "auto_intake_queue_path": str(queue_path.relative_to(reviews.REPO_ROOT))}),
         }),
         ("""
@@ -229,6 +366,13 @@ def enqueue_auto_intake(session_number: int) -> Optional[Path]:
         }),
     ])
     return queue_path
+
+
+def sync_session_workflow(session_number: int) -> None:
+    definition = workflow_state.load_workflow_definition()
+    sql = workflow_state.historical_workflow_seed_sql(session_number, session_number, definition)
+    statements = [(statement, {}) for statement in _split_sql(sql)]
+    _execute_transaction(statements)
 
 
 def workflow_rows() -> list[dict[str, Any]]:
@@ -350,13 +494,19 @@ def step_links(step_id: str, session_number: int) -> list[dict[str, str]]:
     key = session_key(session_number)
     review_url = f"/sessions/{key}/review"
     links_by_step = {
+        "review_npc_extraction": [{"label": "Review NPCs", "url": f"/npcs/extractions?session={session_number}"}],
+        "review_location_extraction": [{"label": "Review Locations", "url": f"/locations/extractions?session={session_number}"}],
+        "review_artifact_extraction": [{"label": "Review Artifacts", "url": f"/artifacts/extractions?session={session_number}"}],
+        "review_lore_item_extraction": [{"label": "Review Lore", "url": f"/lore-items/extractions?session={session_number}"}],
+        "review_combat_encounter_extraction": [{"label": "Review Combat", "url": f"/combat-encounters/extractions?session={session_number}"}],
+        "review_open_thread_extraction": [{"label": "Review Threads", "url": f"/open-threads/extractions?session={session_number}"}],
         "initialize_review": [{"label": "Review", "url": review_url}],
-        "edit_review_decisions": [{"label": "Review", "url": review_url}],
+        "edit_review_decisions": [{"label": "Review Events", "url": review_url}],
         "mark_reviewed": [{"label": "Review", "url": review_url}],
         "apply_review": [{"label": "Review", "url": review_url}],
         "write_final_summary": [{"label": "Final Summary", "url": f"{review_url}?source=final&view=print"}],
         "update_lore_sections": [
-            {"label": "Wells", "url": "/wells"},
+            {"label": "Lore Items", "url": "/lore-items"},
             {"label": "NPCs", "url": "/npcs"},
             {"label": "Locations", "url": "/locations"},
             {"label": "Artifacts", "url": "/artifacts"},
@@ -409,6 +559,11 @@ def is_file_artifact(value: str) -> bool:
         return False
     suffixes = (
         ".wav",
+        ".mp3",
+        ".m4a",
+        ".flac",
+        ".aac",
+        ".ogg",
         ".txt",
         ".md",
         ".yaml",
@@ -420,4 +575,4 @@ def is_file_artifact(value: str) -> bool:
 
 
 def is_optional_artifact(value: str) -> bool:
-    return value.startswith("knowledge/Faban/notes/") and value.endswith("_corrections.md")
+    return "/notes/" in value and value.endswith("_corrections.md")

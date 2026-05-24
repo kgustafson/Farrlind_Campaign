@@ -2,7 +2,7 @@
 
 Benchmark date: 2026-05-10
 
-Audio: `audio/session20.wav`
+Audio: `campaigns/{campaign}/audio/session20.wav`
 
 Model: `large-v3`
 

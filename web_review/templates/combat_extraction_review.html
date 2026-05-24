@@ -104,6 +104,7 @@
                 <span class="enemy-name">{{ enemy.name }}</span>
                 {% if enemy.enemy_type %}<span class="enemy-type">{{ enemy.enemy_type }}</span>{% endif %}
                 <span class="enemy-outcome">{{ enemy.outcome or "unknown" }}</span>
+                {% if enemy.quantity_killed is not none %}<span class="enemy-kill-count">{{ enemy.quantity_killed }} killed</span>{% endif %}
                 {% if enemy.notes %}<span class="muted">{{ enemy.notes }}</span>{% endif %}
               </li>
               {% endfor %}

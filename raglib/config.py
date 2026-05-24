@@ -1,15 +1,17 @@
 from pathlib import Path
 
+from raglib.campaign import active_campaign_name, campaign_root, clean_dir, notes_dir, raw_dir, sessions_dir, ensure_campaign_dirs
+
 BASE2 = Path(__file__).resolve().parents[1]
-BASE = BASE2 / "knowledge" / "Faban"
-RAW = BASE / "raw"
-CLEAN = BASE / "clean"
-SESSIONS = BASE / "sessions"
+CAMPAIGN_NAME = active_campaign_name()
+BASE = campaign_root(CAMPAIGN_NAME)
+RAW = raw_dir(CAMPAIGN_NAME)
+CLEAN = clean_dir(CAMPAIGN_NAME)
+SESSIONS = sessions_dir(CAMPAIGN_NAME)
 
-for d in [RAW, CLEAN, SESSIONS]:
-    d.mkdir(parents=True, exist_ok=True)
+ensure_campaign_dirs(CAMPAIGN_NAME)
 
-NOTES = BASE / "notes"
+NOTES = notes_dir(CAMPAIGN_NAME)
 
 PROMPTS = BASE2 / "prompts"
 

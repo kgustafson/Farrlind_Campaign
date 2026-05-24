@@ -14,10 +14,12 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, urlparse
 from urllib.request import HTTPCookieProcessor, Request, build_opener
 
+from raglib.campaign import campaign_path
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SONGBOOK_MD = REPO_ROOT / "knowledge" / "Faban" / "clean" / "The Revealed Songbook of Faban Colon.md"
-SONGBOOK_DIR = REPO_ROOT / "knowledge" / "Faban" / "songbook"
+SONGBOOK_MD = campaign_path("clean", "The Revealed Songbook of Faban Colon.md")
+SONGBOOK_DIR = campaign_path("songbook")
 
 
 @dataclass

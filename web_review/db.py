@@ -5,8 +5,9 @@ from typing import Any, Optional
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 
+from raglib.campaign import campaign_database_url
 
-DEFAULT_DATABASE_URL = "postgresql+psycopg2://admin:gofaban@localhost:5432/farrlind"
+DEFAULT_DATABASE_URL = campaign_database_url()
 
 
 def database_url() -> str:

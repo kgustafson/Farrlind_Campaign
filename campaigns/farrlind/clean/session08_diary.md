@@ -1,0 +1,22 @@
+# Session Eight \- 8/02/25
+
+**1832 AS  Apollal 18**
+
+**New Journey**  
+We woke up the next day  still sore from our previous night’s encounter.  Gildas, Brigit, Mikani and Corvinas all seek out information about Jennifer in the tree’s library.  They find a red book that is the history of extra planar creatures and describes the nine hells and talks of humans and devils and a war that happened many years ago.  It also describes a working relationship between the gods and demons.  Gildas found a map to the commune in the north.  Brigit tries to steal this book with the map but is caught by Claris.  He agrees to copy the map for the party.  Mikani doesn’t find anything.  Corvinas finds out about the demon that marked him.  His name is Rage and the leader of the 8th circle of hell. Brigit finds a book \- Treatise of Wands –  and is instantly drawn towards the wand of ducks.  
+
+Meanwhile Roon and I head to the tavern where we are staying.  I busk while Roon works the room.  There is a lot of stuff happening out there and one drunk half-orc/half-satyr mentions stuff happening in the woods south of here.  In particular hearing a dragon roar and claims to have seen Jennifer in person.  He mentioned the commune in the north where she lived for a period of time.
+
+Roon heads out to seek out the captain of the guard and ask about  anything strange about the area south of here from the rumors we heard about Jennifer and her proximity to Thisaway. He finds him in the medical tent and the captain agrees to escort the party to the approximate location where the drunk orc/saytr mentioned.
+
+The party rejoins and we set out together to the forest area in the south along with the centaur captain of the guard.  Gildas casts a spell that helps him attune for magic and as we approach the area in the south, he detects a patch of druidic energy that is not recognized by him.  He has never encountered this type of magic before.  Gildas digs down into the dirt to see if the magic is imbued within the soil.  He hits metal.  He enlists my help to dig out the metal from the ground.  A hatch is uncovered
+
+**Down the Rabbit Hole**  
+Brigit unlocks the hatch and opens it.  She avoids a rune trap while doing so.  Gildas feels a wave of druidic energy course over him as the hatch is opened.  Roon leads the party down 200-300 feet as the small hole eventually opens up into a huge cavern.  Gildas sends out his owl to scout around.  Glowing mushrooms seem to mark a path and we follow the path.  We find a circle of mushrooms.  Gildas lands his owl in the circle and his communication is instantly cut off from his familiar.  I recall a nursery rhyme about mushroom circles called [Don’t Step in the Fairy Ring](https://docs.google.com/document/u/0/d/1GIdk9tqU9-1oMCxR5QvhYTS1VxpVCeefBThULBd1q30/edit) and surmise that this circle is actually a portal.
+
+**Through the Looking glass**  
+We enter the circle.  We see a large clearing that is filled with all sorts of mushrooms and fungi. We see a large creature petting Gildas’ owl gently in a soothing manner.  We later find his name to be Zakana and that he is actually a type of giant called a firbolg. He seems friendly enough.  We ask him about what this place is and he says it is the spore sanctuary. We ask how to get out. He points to a large hole many hundreds of feet up on the ceiling. We ask about Jennifer of whom he is familiar with.  He says she was here a couple of weeks ago.  He mentioned that she had a frost dragon – female – with her and that she leaves this sanctuary on the dragon’s back and flies through.  We ask if there is any way Zakana could help us leave this place.  He creates a faerie circle and we are teleported to the exterior of the sanctuary.  He provides us with 10 mushrooms each (heals 1 hp).  The sanctuary is nowhere near where we were in the fey woods and are now somewhere in the middle of the continent.  We ask him where the nearest city is and he mentions that there is a city that starts with the letter B near here.  
+
+**Bellemaine**  
+We depart from Zakana and travel down the road to find Bellemaine which appears to be an elven city.  We find a tavern that appears to be refined and peaceful and upscale to what we normally find in a city.  I end up performing with the local elven band and the highlight of the evening is when I perform [The Song of the Whispering Wood](https://docs.google.com/document/u/0/d/1K0hV9IGGx6cZbSIYCNWAWc5iKgZGpnGTENs-kxDB2RY/edit) **.**  Food and drink cost us 1gp for the night
+

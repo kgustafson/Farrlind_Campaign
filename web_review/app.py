@@ -1,18 +1,20 @@
 import os
 from datetime import date
+from pathlib import Path
 from uuid import uuid4
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from scripts.db_backup import backup_database
-from web_review.services import artifact_extraction_review, canon, combat_extraction_review, commands, location_extraction_review, lore, lore_item_extraction_review, npc_extraction_review, open_thread_extraction_review, reviews, workflow
+from raglib.campaign import active_campaign_name, assets_dir, audio_dir, campaign_feature_enabled, load_campaign_metadata
+from web_review.services import artifact_extraction_review, canon, combat_extraction_review, commands, location_extraction_review, lore_item_extraction_review, npc_extraction_review, open_thread_extraction_review, reviews, workflow
 
 
-app = FastAPI(title="Farrlind Review Workbench")
+app = FastAPI(title="Campaign Review Workbench")
 app.mount("/static", StaticFiles(directory=str(reviews.REPO_ROOT / "web_review" / "static")), name="static")
 templates = Jinja2Templates(directory=str(reviews.REPO_ROOT / "web_review" / "templates"))
 COMMAND_RESULTS = {}
@@ -21,6 +23,7 @@ BACKUP_DOWNLOADS = {}
 EDIT_MODE = "edit"
 ARCHIVE_MODE = "archive"
 SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
+WORLD_MAP_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
 
 
 def interface_mode() -> str:
@@ -44,15 +47,89 @@ def app_version() -> str:
     return "unversioned"
 
 
+def campaign_metadata() -> dict:
+    return load_campaign_metadata()
+
+
+def campaign_display_name() -> str:
+    metadata = campaign_metadata()
+    campaign_info = metadata.get("campaign") or {}
+    return campaign_info.get("name") or active_campaign_name().replace("_", " ").title()
+
+
+def archive_title() -> str:
+    metadata = campaign_metadata()
+    campaign_info = metadata.get("campaign") or {}
+    return campaign_info.get("archive_title") or f"The {campaign_display_name()} Archivum"
+
+
+def archive_subtitle() -> str:
+    metadata = campaign_metadata()
+    campaign_info = metadata.get("campaign") or {}
+    return campaign_info.get("archive_subtitle") or "A campaign canon archive of sessions, lore, people, places, artifacts, and unresolved threads."
+
+
+def songbook_label() -> str:
+    metadata = campaign_metadata()
+    songbook = metadata.get("songbook") or {}
+    return songbook.get("label") or "Songbook"
+
+
+def songbook_enabled() -> bool:
+    return campaign_feature_enabled("songbook", default=False)
+
+
+def active_campaign_name_template() -> str:
+    return active_campaign_name()
+
+
+def campaign_audio_dir() -> str:
+    return str(audio_dir())
+
+
+def campaign_world_map_path() -> Optional[Path]:
+    assets = assets_dir()
+    for suffix in sorted(WORLD_MAP_EXTENSIONS):
+        candidate = assets / f"world-map{suffix}"
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def campaign_world_map_available() -> bool:
+    return campaign_world_map_path() is not None
+
+
+def campaign_world_map_version() -> str:
+    path = campaign_world_map_path()
+    if path is None:
+        return ""
+    return str(int(path.stat().st_mtime))
+
+
+def campaign_world_map_image_url() -> str:
+    version = campaign_world_map_version()
+    return f"/world-map/image?v={version}" if version else "/world-map/image"
+
+
 templates.env.globals["app_version"] = app_version
 templates.env.globals["interface_mode"] = interface_mode
 templates.env.globals["can_edit"] = can_edit
+templates.env.globals["campaign_display_name"] = campaign_display_name
+templates.env.globals["archive_title"] = archive_title
+templates.env.globals["archive_subtitle"] = archive_subtitle
+templates.env.globals["songbook_label"] = songbook_label
+templates.env.globals["songbook_enabled"] = songbook_enabled
+templates.env.globals["active_campaign_name"] = active_campaign_name_template
+templates.env.globals["campaign_audio_dir"] = campaign_audio_dir
+templates.env.globals["campaign_world_map_available"] = campaign_world_map_available
+templates.env.globals["campaign_world_map_image_url"] = campaign_world_map_image_url
 
 
 @app.middleware("http")
 async def archive_mode_write_guard(request: Request, call_next):
     if not can_edit() and request.method.upper() not in SAFE_METHODS:
-        return PlainTextResponse("Farrlind Archivum is running in archive mode.", status_code=403)
+        return PlainTextResponse(f"{archive_title()} is running in archive mode.", status_code=403)
     return await call_next(request)
 
 
@@ -98,6 +175,28 @@ def canon_location_names() -> list[str]:
         return canon.locations()
     except canon.CanonReadError:
         return []
+
+
+def sync_after_extraction_review(session_number: int) -> list[str]:
+    messages: list[str] = []
+    try:
+        workflow.sync_session_workflow(session_number)
+    except workflow.WorkflowWriteError:
+        messages.append("Workflow sync skipped after extraction review.")
+
+    if reviews.event_review_ready(session_number) and not reviews.review_path(session_number).exists():
+        init_result = commands.init_review(session_number)
+        if init_result.ok:
+            messages.append("Initialized event review.")
+            try:
+                workflow.sync_session_workflow(session_number)
+            except workflow.WorkflowWriteError:
+                messages.append("Workflow sync skipped after event review initialization.")
+        else:
+            messages.append("Event review initialization failed.")
+            if init_result.stderr.strip():
+                messages.append(init_result.stderr.strip())
+    return messages
 
 
 def location_confirmation_failed(form_values: dict[str, list[str]], form, known_locations: list[str]) -> bool:
@@ -247,6 +346,7 @@ def combat_encounter_form_values(form) -> tuple[dict, list[dict]]:
             "name": name,
             "enemy_type": (form.get(f"enemy_type_{index}") or "").strip(),
             "quantity": optional_int(form.get(f"enemy_quantity_{index}")),
+            "quantity_killed": optional_int(form.get(f"enemy_quantity_killed_{index}")),
             "outcome": (form.get(f"enemy_outcome_{index}") or "unknown").strip(),
             "confidence": (form.get(f"enemy_confidence_{index}") or "medium").strip(),
             "notes": (form.get(f"enemy_notes_{index}") or "").strip(),
@@ -283,6 +383,59 @@ def dashboard(request: Request):
     )
 
 
+@app.get("/world-map/image")
+def world_map_image():
+    path = campaign_world_map_path()
+    if path is None:
+        raise HTTPException(status_code=404, detail="No campaign world map has been uploaded.")
+    media_types = {
+        ".gif": "image/gif",
+        ".jpeg": "image/jpeg",
+        ".jpg": "image/jpeg",
+        ".png": "image/png",
+        ".webp": "image/webp",
+    }
+    return FileResponse(path, media_type=media_types.get(path.suffix.lower(), "application/octet-stream"))
+
+
+@app.post("/world-map")
+async def upload_world_map(map_image: UploadFile = File(...)):
+    filename = map_image.filename or ""
+    suffix = Path(filename).suffix.lower()
+    if suffix not in WORLD_MAP_EXTENSIONS:
+        raise HTTPException(status_code=400, detail="World map must be a PNG, JPG, WEBP, or GIF image.")
+    content_type = (map_image.content_type or "").lower()
+    if content_type and not content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="World map upload must be an image.")
+
+    content = await map_image.read()
+    if not content:
+        raise HTTPException(status_code=400, detail="World map upload was empty.")
+    if len(content) > 25 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="World map image must be 25 MB or smaller.")
+
+    assets = assets_dir()
+    assets.mkdir(parents=True, exist_ok=True)
+    for extension in WORLD_MAP_EXTENSIONS:
+        existing = assets / f"world-map{extension}"
+        if existing.exists():
+            existing.unlink()
+    destination = assets / f"world-map{suffix}"
+    destination.write_bytes(content)
+    return RedirectResponse(url="/#world-map-modal", status_code=303)
+
+
+@app.get("/event-review", response_class=HTMLResponse)
+def event_review_dashboard(request: Request):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Event review is not available in archive mode.")
+    return templates.TemplateResponse(
+        request,
+        "dashboard.html",
+        {"rows": reviews.dashboard_rows(), "event_review_mode": True},
+    )
+
+
 @app.get("/workflow", response_class=HTMLResponse)
 def workflow_index(request: Request, session: Optional[int] = None):
     if not can_edit():
@@ -316,6 +469,14 @@ def session_review(request: Request, session: str, source: str = "diary", view: 
             source = "final"
         elif source not in {"diary", "final"}:
             source = "diary"
+    elif reviews.event_review_access_blocked(session_number):
+        workspace = reviews.session_workspace(session_number, source, view, bucket)
+        workspace["event_review_blocked"] = True
+        workspace["missing_extraction_reviews"] = reviews.missing_extraction_reviews(session_number)
+        workspace["locations"] = []
+        workspace["location_types"] = []
+        workspace["command_result"] = None
+        return templates.TemplateResponse(request, "session_review.html", workspace)
     workspace = reviews.session_workspace(session_number, source, view, bucket)
     workspace["locations"] = canon_location_names()
     try:
@@ -329,6 +490,23 @@ def session_review(request: Request, session: str, source: str = "diary", view: 
         "session_review.html",
         workspace,
     )
+
+
+@app.post("/sessions/{session}/review/init")
+async def init_session_review(request: Request, session: str):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Event review initialization is not available in archive mode.")
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    if reviews.event_review_access_blocked(session_number):
+        return redirect_to_review(session_number, "diary", "raw", "event_review_blocked=1")
+
+    result = commands.init_review(session_number)
+    token = store_command_result("Initialize Event Review", result)
+    flag = "init_reviewed=1" if result.ok else "init_failed=1"
+    return redirect_to_review(session_number, "diary", "raw", f"{flag}&command_result={token}")
 
 
 @app.post("/sessions/{session}/review/save")
@@ -691,10 +869,19 @@ async def mark_session_reviewed(request: Request, session: str):
         reviews.save_review_document(session_number, marked)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
+    try:
+        workflow.sync_session_workflow(session_number)
+    except workflow.WorkflowWriteError:
+        pass
 
     source = form.get("source") or "diary"
     view = form.get("view") or "raw"
-    flag = "marked=1" if not errors else "mark_failed=1"
+    if errors:
+        result = commands.CommandResult(1, "", "\n".join(errors))
+        token = store_command_result("Mark Reviewed Validation", result)
+        flag = f"mark_failed=1&command_result={token}"
+    else:
+        flag = "marked=1"
     return redirect_to_review(session_number, source, view, flag)
 
 
@@ -713,6 +900,10 @@ async def apply_session_review(request: Request, session: str):
 
     form = await request.form()
     result = commands.apply_review(session_number)
+    try:
+        workflow.sync_session_workflow(session_number)
+    except workflow.WorkflowWriteError:
+        pass
     source = form.get("source") or "diary"
     view = form.get("view") or "raw"
     flag = "applied=1" if result.ok else "apply_failed=1"
@@ -735,6 +926,7 @@ async def write_session_final_summary(request: Request, session: str):
 
     form = await request.form()
     result = commands.write_final_summary(session_number)
+    post_apply_messages = sync_after_extraction_review(session_number)
     source = form.get("source") or "diary"
     view = form.get("view") or "raw"
     flag = "final_written=1" if result.ok else "final_failed=1"
@@ -750,7 +942,7 @@ async def run_session_health(request: Request, session: str):
         raise HTTPException(status_code=404, detail=str(exc))
 
     form = await request.form()
-    result = commands.run_health()
+    result = commands.run_health(session_number=session_number)
     source = form.get("source") or "diary"
     view = form.get("view") or "raw"
     flag = "health_ok=1" if result.ok else "health_failed=1"
@@ -809,8 +1001,13 @@ async def apply_location_extraction_review(request: Request):
     session_number = optional_int(form.get("session_number")) or 0
     try:
         result = location_extraction_review.apply_review(session_number, form_dict(form))
-    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, location_extraction_review.LocationExtractionReviewError):
-        return RedirectResponse(url=f"/locations/extractions?session={session_number}&apply_failed=1", status_code=303)
+    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, location_extraction_review.LocationExtractionReviewError) as exc:
+        token = store_command_result(
+            "Apply Location Extraction Review",
+            commands.CommandResult(1, "", str(exc)),
+        )
+        return RedirectResponse(url=f"/locations/extractions?session={session_number}&apply_failed=1&command_result={token}", status_code=303)
+    post_apply_messages = sync_after_extraction_review(session_number)
     token = store_command_result(
         "Apply Location Extraction Review",
         commands.CommandResult(
@@ -822,6 +1019,7 @@ async def apply_location_extraction_review(request: Request):
                 f"Review decisions: {result['reviewed_path']}",
                 "",
                 *result["applied"],
+                *post_apply_messages,
             ]),
             "",
         ),
@@ -943,8 +1141,10 @@ async def apply_npc_extraction_review(request: Request):
     session_number = optional_int(form.get("session_number")) or 0
     try:
         result = npc_extraction_review.apply_review(session_number, form_dict(form))
-    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, npc_extraction_review.NpcExtractionReviewError):
-        return RedirectResponse(url=f"/npcs/extractions?session={session_number}&apply_failed=1", status_code=303)
+    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, npc_extraction_review.NpcExtractionReviewError) as exc:
+        token = store_command_result("Apply NPC Extraction Review", commands.CommandResult(1, "", str(exc)))
+        return RedirectResponse(url=f"/npcs/extractions?session={session_number}&apply_failed=1&command_result={token}", status_code=303)
+    post_apply_messages = sync_after_extraction_review(session_number)
     token = store_command_result(
         "Apply NPC Extraction Review",
         commands.CommandResult(
@@ -956,6 +1156,7 @@ async def apply_npc_extraction_review(request: Request):
                 f"Review decisions: {result['reviewed_path']}",
                 "",
                 *result["applied"],
+                *post_apply_messages,
             ]),
             "",
         ),
@@ -1076,8 +1277,10 @@ async def apply_artifact_extraction_review(request: Request):
     session_number = optional_int(form.get("session_number")) or 0
     try:
         result = artifact_extraction_review.apply_review(session_number, form_dict(form))
-    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, artifact_extraction_review.ArtifactExtractionReviewError):
-        return RedirectResponse(url=f"/artifacts/extractions?session={session_number}&apply_failed=1", status_code=303)
+    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, artifact_extraction_review.ArtifactExtractionReviewError) as exc:
+        token = store_command_result("Apply Artifact Extraction Review", commands.CommandResult(1, "", str(exc)))
+        return RedirectResponse(url=f"/artifacts/extractions?session={session_number}&apply_failed=1&command_result={token}", status_code=303)
+    post_apply_messages = sync_after_extraction_review(session_number)
     token = store_command_result(
         "Apply Artifact Extraction Review",
         commands.CommandResult(
@@ -1089,6 +1292,7 @@ async def apply_artifact_extraction_review(request: Request):
                 f"Review decisions: {result['reviewed_path']}",
                 "",
                 *result["applied"],
+                *post_apply_messages,
             ]),
             "",
         ),
@@ -1207,8 +1411,10 @@ async def apply_lore_item_extraction_review(request: Request):
     session_number = optional_int(form.get("session_number")) or 0
     try:
         result = lore_item_extraction_review.apply_review(session_number, form_dict(form))
-    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, lore_item_extraction_review.LoreItemExtractionReviewError):
-        return RedirectResponse(url=f"/lore-items/extractions?session={session_number}&apply_failed=1", status_code=303)
+    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, lore_item_extraction_review.LoreItemExtractionReviewError) as exc:
+        token = store_command_result("Apply Lore Item Extraction Review", commands.CommandResult(1, "", str(exc)))
+        return RedirectResponse(url=f"/lore-items/extractions?session={session_number}&apply_failed=1&command_result={token}", status_code=303)
+    post_apply_messages = sync_after_extraction_review(session_number)
     token = store_command_result(
         "Apply Lore Item Extraction Review",
         commands.CommandResult(
@@ -1220,6 +1426,7 @@ async def apply_lore_item_extraction_review(request: Request):
                 f"Review decisions: {result['reviewed_path']}",
                 "",
                 *result["applied"],
+                *post_apply_messages,
             ]),
             "",
         ),
@@ -1353,8 +1560,10 @@ async def apply_open_thread_extraction_review(request: Request):
     session_number = optional_int(form.get("session_number")) or 0
     try:
         result = open_thread_extraction_review.apply_review(session_number, form_dict(form))
-    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, open_thread_extraction_review.OpenThreadExtractionReviewError):
-        return RedirectResponse(url=f"/open-threads/extractions?session={session_number}&apply_failed=1", status_code=303)
+    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, open_thread_extraction_review.OpenThreadExtractionReviewError) as exc:
+        token = store_command_result("Apply Open Thread Extraction Review", commands.CommandResult(1, "", str(exc)))
+        return RedirectResponse(url=f"/open-threads/extractions?session={session_number}&apply_failed=1&command_result={token}", status_code=303)
+    post_apply_messages = sync_after_extraction_review(session_number)
     token = store_command_result(
         "Apply Open Thread Extraction Review",
         commands.CommandResult(
@@ -1366,6 +1575,7 @@ async def apply_open_thread_extraction_review(request: Request):
                 f"Review decisions: {result['reviewed_path']}",
                 "",
                 *result["applied"],
+                *post_apply_messages,
             ]),
             "",
         ),
@@ -1476,8 +1686,10 @@ async def apply_combat_extraction_review(request: Request):
     session_number = optional_int(form.get("session_number")) or 0
     try:
         result = combat_extraction_review.apply_review(session_number, form_dict(form))
-    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, combat_extraction_review.CombatExtractionReviewError):
-        return RedirectResponse(url=f"/combat-encounters/extractions?session={session_number}&apply_failed=1", status_code=303)
+    except (FileNotFoundError, canon.CanonReadError, canon.CanonWriteError, combat_extraction_review.CombatExtractionReviewError) as exc:
+        token = store_command_result("Apply Combat Extraction Review", commands.CommandResult(1, "", str(exc)))
+        return RedirectResponse(url=f"/combat-encounters/extractions?session={session_number}&apply_failed=1&command_result={token}", status_code=303)
+    post_apply_messages = sync_after_extraction_review(session_number)
     token = store_command_result(
         "Apply Combat Extraction Review",
         commands.CommandResult(
@@ -1489,6 +1701,7 @@ async def apply_combat_extraction_review(request: Request):
                 f"Review decisions: {result['reviewed_path']}",
                 "",
                 *result["applied"],
+                *post_apply_messages,
             ]),
             "",
         ),
@@ -1738,7 +1951,7 @@ def project_utilities_publish_static_archive():
         raise HTTPException(status_code=404, detail="Project utilities are not available in archive mode.")
     result = commands.publish_static_archive(
         base_url=os.getenv("FARRLIND_STATIC_EXPORT_BASE_URL", "http://web_archive:8000"),
-        static_repo=os.getenv("FARRLIND_STATIC_REPO_PATH", "/Volumes/T7_WORK/Farrlind_Static_Archive"),
+        static_repo=os.getenv("CAMPAIGN_STATIC_REPO_PATH") or os.getenv("FARRLIND_STATIC_REPO_PATH", ""),
         push=os.getenv("FARRLIND_STATIC_PUBLISH_PUSH", "").strip().lower() in {"1", "true", "yes", "on"},
     )
     token = store_command_result("Publish Static Archive", result)
@@ -1747,6 +1960,8 @@ def project_utilities_publish_static_archive():
 
 @app.get("/songbook", response_class=HTMLResponse)
 def songbook_index(request: Request):
+    if not songbook_enabled():
+        raise HTTPException(status_code=404, detail="Songbook is not enabled for this campaign.")
     try:
         songs = canon.songbook_rows()
         foreword = canon.songbook_foreword()
@@ -1761,6 +1976,8 @@ def songbook_index(request: Request):
 
 @app.get("/songbook/{song_number}/lyrics", response_class=HTMLResponse)
 def songbook_lyrics(request: Request, song_number: int):
+    if not songbook_enabled():
+        raise HTTPException(status_code=404, detail="Songbook is not enabled for this campaign.")
     try:
         song = canon.songbook_detail(song_number)
         lyrics_text = canon.songbook_lyrics(song_number)
@@ -1780,6 +1997,8 @@ def songbook_lyrics(request: Request, song_number: int):
 
 @app.get("/songbook/{song_number}/audio")
 def songbook_audio(song_number: int):
+    if not songbook_enabled():
+        raise HTTPException(status_code=404, detail="Songbook is not enabled for this campaign.")
     try:
         path = canon.songbook_asset_path(song_number, "audio")
     except canon.CanonReadError as exc:
@@ -1787,26 +2006,6 @@ def songbook_audio(song_number: int):
     if path is None:
         raise HTTPException(status_code=404, detail="Song audio not found.")
     return FileResponse(path, media_type="audio/mpeg")
-
-
-@app.get("/wells", response_class=HTMLResponse)
-def wells_lore(request: Request):
-    lore_text = lore.read_wells_of_magic()
-    return templates.TemplateResponse(
-        request,
-        "wells.html",
-        {"lore_text": lore_text, "lore_html": reviews.render_markdown(lore_text)},
-    )
-
-
-@app.post("/wells")
-async def save_wells_lore(request: Request):
-    form = await request.form()
-    try:
-        lore.write_wells_of_magic(form.get("lore_text") or "")
-    except OSError as exc:
-        raise HTTPException(status_code=503, detail=str(exc))
-    return RedirectResponse(url="/wells?saved=1", status_code=303)
 
 
 @app.get("/api/review-status")
@@ -1912,6 +2111,8 @@ def api_timeline():
 
 @app.get("/api/songbook")
 def api_songbook():
+    if not songbook_enabled():
+        raise HTTPException(status_code=404, detail="Songbook is not enabled for this campaign.")
     try:
         return canon.songbook_rows()
     except canon.CanonReadError as exc:

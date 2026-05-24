@@ -1206,8 +1206,41 @@ button:disabled {
   color: var(--muted);
 }
 .macro-sheet-page {
-  max-height: min(58vh, 680px);
+  max-height: min(34vh, 420px);
   overflow: auto;
+}
+.micro-event-reference {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid rgba(139, 95, 39, .26);
+  border-radius: 8px;
+  background: rgba(255, 247, 223, .54);
+}
+.micro-event-reference-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.micro-event-reference-head h3 {
+  margin: 0;
+}
+.micro-event-list {
+  display: grid;
+  gap: 8px;
+  max-height: min(38vh, 440px);
+  overflow: auto;
+  padding-right: 4px;
+}
+.micro-event-card {
+  padding: 10px;
+  border: 1px solid rgba(139, 95, 39, .2);
+  border-radius: 8px;
+  background: rgba(255, 250, 232, .78);
+}
+.micro-event-card p {
+  margin: 7px 0 0;
 }
 .bucketing-list {
   display: grid;
@@ -1651,7 +1684,7 @@ dd { margin: 0; }
   width: min(1296px, calc(100vw - 32px));
   max-height: calc(100vh - 32px);
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
   overflow: hidden;
   padding: 14px;
   border: 1px solid rgba(197, 149, 64, .55);
@@ -1677,8 +1710,43 @@ dd { margin: 0; }
   width: auto;
   height: auto;
   max-width: 100%;
-  max-height: calc(100vh - 130px);
+  max-height: calc(100vh - 210px);
   object-fit: contain;
+}
+.world-map-placeholder {
+  width: min(720px, 100%);
+  min-height: 320px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 28px;
+  text-align: center;
+  border: 1px dashed rgba(110, 67, 24, .42);
+  background:
+    linear-gradient(90deg, rgba(110, 67, 24, .08) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(110, 67, 24, .08) 1px, transparent 1px),
+    rgba(255, 247, 223, .72);
+  background-size: 36px 36px;
+}
+.world-map-placeholder h3,
+.world-map-placeholder p {
+  margin: 0;
+}
+.world-map-placeholder h3 {
+  font-size: clamp(24px, 3vw, 42px);
+}
+.world-map-upload {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  padding-top: 12px;
+}
+.world-map-upload .field-block {
+  flex: 1;
+}
+.world-map-upload button {
+  min-height: 39px;
 }
 .field-block input,
 .field-block select,
@@ -2007,7 +2075,7 @@ dd { margin: 0; }
 }
 .combat-enemy-grid {
   display: grid;
-  grid-template-columns: 74px minmax(150px, 1.3fr) minmax(110px, .9fr) 72px minmax(110px, .85fr) minmax(96px, .75fr) minmax(150px, 1.2fr);
+  grid-template-columns: 74px minmax(150px, 1.3fr) minmax(110px, .9fr) 72px 92px minmax(110px, .85fr) minmax(96px, .75fr) minmax(150px, 1.2fr);
   gap: 8px;
   align-items: end;
   margin-top: 8px;

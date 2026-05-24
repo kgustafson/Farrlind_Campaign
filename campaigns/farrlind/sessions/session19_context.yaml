@@ -1,0 +1,35 @@
+# =============================================================================
+# SESSION CONTEXT — session19
+# Used by normalize.py and summarize.py to ground noisy extracted events.
+# =============================================================================
+
+session: session19
+date: "2026-04-12"
+party_level: 7
+
+new_enemies:
+  Orsydon:
+    variants:
+      - cave dragon
+      - black dragon
+      - dragon
+    notes: "Dragon encountered in Balrog; confirmed by human corrections."
+
+known_garbles:
+  "mouth-a-lug": "Likely Lightdelver"
+  "clap daggers": "Likely Cloud of Daggers"
+  "cloud dagger": "Likely Cloud of Daggers"
+  "scythe": "Likely Saiffi"
+  "syfie": "Likely Saiffi"
+
+notes: |
+  Session takes place during the Balrog/Saiffi arc.
+  The party located the Balrog town center/tower area and learned cultists were trying to summon a dragon.
+  The party decided to help Saiffi and put him in a wineskin.
+  Cultists summoned the dragon Orsydon.
+  Combat involved Orsydon, cultists, party positioning around cover/pillars, and party members using attacks and spells.
+  Orsydon used nightmare breath, dealing psychic damage and causing frightened effects.
+  Faban and Lightdelver both used Cloud of Daggers; Faban called it "Cuisenart."
+  The dragon was defeated.
+  Lightdelver lost concentration and became unconscious during the fight.
+  After the combat, the party returned toward the city/tavern and continued planning around the wells, the Wand of Wells, and the cataclysm.

@@ -30,11 +30,151 @@ class LoreItemExtractorTest(unittest.TestCase):
             "uncertainties": [],
         }
 
-        cleaned, warnings = lore_item_extractor.postprocess_extraction(document, registry, "session21")
+        cleaned, warnings = lore_item_extractor.postprocess_extraction(
+            document,
+            registry,
+            "session21",
+            "Catur Distrusts Above-Folk. Catur does not like outsiders.",
+        )
 
         self.assertEqual(cleaned["new_lore_candidates"], [])
         self.assertEqual(cleaned["known_lore_mentions"][0]["lore_item_id"], 5)
         self.assertIn("Moved existing lore candidate", warnings[0])
+
+    def test_postprocess_drops_known_lore_absent_from_source(self):
+        registry = [{"id": 3, "title": "Wand of Wells Required", "category": "magic", "is_confirmed": True}]
+        document = {
+            "known_lore_mentions": [{
+                "lore_item_id": 3,
+                "canonical_title": "Wand of Wells Required",
+                "new_information": "Guests surrender weapons at a spa.",
+            }],
+            "new_lore_candidates": [],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = lore_item_extractor.postprocess_extraction(
+            document,
+            registry,
+            "session01",
+            "The Night Lotus asks guests to surrender weapons and magic items.",
+        )
+
+        self.assertEqual(cleaned["known_lore_mentions"], [])
+        self.assertIn("not present in session source", warnings[0])
+
+    def test_postprocess_rejects_unconfirmed_party_interpretation_lore(self):
+        document = {
+            "known_lore_mentions": [],
+            "new_lore_candidates": [{
+                "proposed_title": "Burgomaster Means Burger Master",
+                "category": "canon_ambiguity",
+                "description": "The party mistakenly interprets Burgomaster as a burger title.",
+                "is_confirmed": False,
+                "evidence": "The party misreads Burgomaster as Burger Master.",
+            }],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = lore_item_extractor.postprocess_extraction(
+            document,
+            [],
+            "session02",
+            "The party misreads Burgomaster as Burger Master and jokes about a secret recipe.",
+        )
+
+        self.assertEqual(cleaned["new_lore_candidates"], [])
+        self.assertEqual(cleaned["rejected_candidates"][0]["text"], "Burgomaster Means Burger Master")
+        self.assertIn("party-interpretation lore", warnings[0])
+
+    def test_postprocess_converts_unknown_known_mentions_to_new_candidates(self):
+        document = {
+            "known_lore_mentions": [{
+                "lore_item_id": 9,
+                "canonical_title": "The Night Lotus Policy",
+                "new_information": "The Night Lotus asks guests to surrender weapons and magic items.",
+                "session_number": 1,
+                "category": "culture",
+                "source_npc": "Reagan",
+                "is_confirmed": True,
+                "confidence": "high",
+                "evidence": "The Night Lotus asks guests to surrender weapons and magic items.",
+            }],
+            "new_lore_candidates": [],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = lore_item_extractor.postprocess_extraction(
+            document,
+            [],
+            "session01",
+            "Reagan explains The Night Lotus Policy: guests surrender weapons and magic items.",
+        )
+
+        self.assertEqual(cleaned["known_lore_mentions"], [])
+        self.assertEqual(cleaned["new_lore_candidates"][0]["proposed_title"], "The Night Lotus Policy")
+        self.assertIn("Converted unknown known lore mention", warnings[0])
+
+    def test_postprocess_converts_unknown_known_mentions_when_evidence_is_grounded(self):
+        document = {
+            "known_lore_mentions": [{
+                "lore_item_id": 9,
+                "canonical_title": "The Night Lotus Policy",
+                "new_information": "Guests must surrender weapons and magic items.",
+                "session_number": 1,
+                "category": "culture",
+                "source_npc": "Reagan",
+                "is_confirmed": True,
+                "confidence": "high",
+                "evidence": "Reagan established a policy requiring visitors to surrender weapons and magic items during their stay.",
+            }],
+            "new_lore_candidates": [],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = lore_item_extractor.postprocess_extraction(
+            document,
+            [],
+            "session01",
+            "Reagan established a policy requiring visitors to surrender weapons and magic items during their stay.",
+        )
+
+        self.assertEqual(cleaned["new_lore_candidates"][0]["proposed_title"], "The Night Lotus Policy")
+        self.assertIn("Converted unknown known lore mention", warnings[0])
+
+    def test_postprocess_converts_mismatched_known_mentions_to_new_candidates(self):
+        registry = [{"id": 1, "title": "The Night Lotus Policy", "category": "culture", "is_confirmed": True}]
+        document = {
+            "known_lore_mentions": [{
+                "lore_item_id": 1,
+                "canonical_title": "Barovia Revelation",
+                "new_information": "The gate leads into Barovia.",
+                "session_number": 1,
+                "category": "location_lore",
+                "source_npc": "",
+                "is_confirmed": True,
+                "confidence": "high",
+                "evidence": "The gate leads into Barovia.",
+            }],
+            "new_lore_candidates": [],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = lore_item_extractor.postprocess_extraction(
+            document,
+            registry,
+            "session01",
+            "The gate leads into Barovia. Barovia Revelation.",
+        )
+
+        self.assertEqual(cleaned["known_lore_mentions"], [])
+        self.assertEqual(cleaned["new_lore_candidates"][0]["proposed_title"], "Barovia Revelation")
+        self.assertIn("Converted mismatched known lore mention", warnings[0])
 
     def test_postprocess_rejects_candidate_without_title(self):
         document = {

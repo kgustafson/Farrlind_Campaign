@@ -7,9 +7,9 @@
     <div>
       <p class="eyebrow">World Truths, Rumors, and Revelations</p>
       <h1>Lore Items</h1>
-      <p>Queryable canon lore gathered from sessions, including Wells knowledge, history, culture, factions, magic, threats, and uncertain truths.</p>
+      <p>Queryable canon lore gathered from sessions, including history, culture, factions, magic, threats, and uncertain truths.</p>
     </div>
-    <img class="archive-section-icon" src="/static/wells-of-magic-icon.png" alt="" aria-hidden="true">
+    <img class="archive-section-icon" src="/static/open-threads-icon.png" alt="" aria-hidden="true">
   </div>
   {% if can_edit() %}
   <div class="panel-actions">
@@ -101,7 +101,7 @@
   <div class="archive-modal" role="dialog" aria-modal="true" aria-labelledby="lore-modal-title">
     <div class="modal-head">
       <div class="modal-title-with-icon">
-        <img class="modal-title-icon" src="/static/wells-of-magic-icon.png" alt="" aria-hidden="true">
+        <img class="modal-title-icon" src="/static/open-threads-icon.png" alt="" aria-hidden="true">
         <h2 id="lore-modal-title">{% if editing %}Edit Lore Item{% else %}Add Lore Item{% endif %}</h2>
       </div>
       <a class="modal-close" href="/lore-items" aria-label="Close lore item form">x</a>
@@ -114,7 +114,7 @@
         </label>
         <label class="field-block">
           <span>Type</span>
-          <input name="category" list="lore-category-options" value="{{ editing.category if editing else '' }}" placeholder="well_knowledge">
+          <input name="category" list="lore-category-options" value="{{ editing.category if editing else '' }}" placeholder="culture">
         </label>
         <label class="field-block">
           <span>Discovered Session</span>

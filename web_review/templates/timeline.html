@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Campaign Timeline | The Farrlind Archivum{% endblock %}
+{% block title %}Campaign Timeline | {{ archive_title() }}{% endblock %}
 {% block body_class %}archive-dashboard{% endblock %}
 {% block content %}
 <section class="page-head archive-section-head">
@@ -39,7 +39,13 @@
           {{ "%02d"|format(row.session_number) }}
         </a>
         <div class="session-flow-label">
-          <span class="session-flow-location">{{ row.primary_location or "unknown" }}</span>
+          <span class="session-flow-location">
+            {% if row.start_location and row.end_location and row.start_location != row.end_location %}
+              {{ row.start_location }} -> {{ row.end_location }}
+            {% else %}
+              {{ row.end_location or row.primary_location or row.start_location or "unknown" }}
+            {% endif %}
+          </span>
           <span class="session-flow-date">{{ row.in_game_date_display or row.in_game_date or "unknown" }}</span>
         </div>
       </article>
@@ -60,7 +66,9 @@
 
       <dl class="timeline-modal-meta">
         <div><dt>Real Date</dt><dd>{{ row.session_date or "unknown" }}</dd></div>
-        <div><dt>In World</dt><dd>{{ row.in_game_date_display or row.in_game_date or "unknown" }}</dd></div>
+        <div><dt>In World</dt><dd>{{ row.in_game_date_display or row.in_game_date or "N/A" }}</dd></div>
+        <div><dt>Starting Location</dt><dd>{{ row.start_location or "unknown" }}</dd></div>
+        <div><dt>Ending Location</dt><dd>{{ row.end_location or row.primary_location or "unknown" }}</dd></div>
         <div><dt>Primary Location</dt><dd>{{ row.primary_location or "unknown" }}</dd></div>
       </dl>
 

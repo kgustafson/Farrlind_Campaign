@@ -1,6 +1,6 @@
 # Encounter Tightening Pass
 
-Generated from `knowledge/Faban/encounters.yaml` and loaded into the `encounter` table.
+Generated from `campaigns/{campaign}/encounters.yaml` and loaded into the `encounter` table.
 
 ## What Changed
 
@@ -19,7 +19,7 @@ Each encounter tracks:
 - confidence
 - notes
 
-Enemy quantities still live in `event_enemy` via `knowledge/Faban/enemy_encounters.yaml`.
+Enemy quantities still live in `event_enemy` via `campaigns/{campaign}/enemy_encounters.yaml`.
 
 ## Current Encounter Counts
 

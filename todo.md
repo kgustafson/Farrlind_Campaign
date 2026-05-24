@@ -1,4 +1,4 @@
-# Farrlind Workflow Graph TODO
+# D&D Campaign Manager TODO
 
 ## Goal
 
@@ -73,7 +73,7 @@ audio/transcript
 - Done - Surface missing artifacts and validation/status problems.
 - Done - Focused on per-session workflow state first.
 
-### Phase 4: Wire Existing Commands To Workflow Actions
+### Phase 4: Wire Existing Commands To Workflow Actions - Complete
 
 - Human review is not done yet.
   - The current fragment/event review flow is too large for long recorded sessions.
@@ -104,7 +104,7 @@ audio/transcript
 - Capture command output in the same command-result style already used by the review UI.
 - Prefer "Run next step" only after the graph status rules are trustworthy.
 
-### Phase 5: Audio Ingestion
+### Phase 5: Audio Ingestion - Complete
 
 - Add audio ingestion to the workflow graph after the session review and canon workflow is stable.
 - Model audio-specific steps separately, such as:
@@ -131,19 +131,27 @@ audio/transcript
 
 ### Later: Campaign-Level Maintenance
 
+- Introduce Jinja to help with the prompts to both keep the prompts campaign agnostic and also to introduce micro-rules the shape would look like:
+  - Generic base prompt: stable extractor behavior, output schema, source discipline.
+  - Shared rule partials: no invention, no table chatter, evidence required, confidence rules.
+  - Extractor partials: NPC rules, artifact rules, location rules, lore rules, combat rules.
+  - Campaign partials/data: glossary, party exclusions, campaign-specific extraction guidance.
+  - Session context: previous summary, session notes, known aliases, source files.
+  - Few-short examples: optional, ideally generic by default and campaign-specific only when explicitly configured.
+  
 - Add campaign-level workflow graphs after per-session workflows are stable.
 - Candidate maintenance workflows:
-  - NPC registry cleanup
-  - location normalization
-  - enemy encounter tightening
-  - travel timeline validation
-  - open thread review
-  - Wells of Magic status review
-  - songbook prompt/repertoire review
+  - NPC registry cleanup - Complete
+  - location normalization - Complete
+  - enemy encounter tightening - Complete
+  - travel timeline validation - Complete
+  - open thread review - Complete
+  - Wells of Magic status review - Removed
+  - songbook prompt/repertoire review 
 
 ## Web Interface Improvements
 
-### Minor Release Upgrade Candidates
+### Minor Release Upgrade Candidates - Complete
 
 - Develop NPC Registry. Done in v0.2.10 with listing, add/edit modals, delete actions, API route, and canon workflow notes.
 - Develop Artifact Listing. Done in v0.2.11 with listing, add/edit modals, delete actions, API route, and artifact canon notes.

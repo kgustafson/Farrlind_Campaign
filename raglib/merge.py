@@ -44,16 +44,6 @@ def split_event_blocks(text: str):
         if not block:
             continue
 
-        # Drop prompt/template leftovers
-        low = block.lower()
-        if (
-            "timestamp:" in low
-            and "event_type:" in low
-            and "summary:" in low
-            and not re.search(r"\d{1,2}:\d{2}", block)
-        ):
-            continue
-
         blocks.append("EVENT:\n" + block)
 
     return blocks

@@ -1,10 +1,10 @@
 workflow:
   id: farrlind_session_canon
   version: 1
-  display_name: Farrlind Session Canon Workflow
+  display_name: Campaign Session Canon Workflow
   scope: per_session
   description: >
-    Deterministic workflow for moving a Farrlind session from source material
+    Deterministic workflow for moving a campaign session from source material
     through draft extraction, human review, database load, canon outputs,
     verification, and versioned project history.
   state_persistence: database
@@ -24,12 +24,12 @@ steps:
     dependencies: []
     command: null
     expected_inputs:
-      - audio/sessionXX.wav
+      - campaigns/{campaign}/audio/sessionXX.wav
     expected_outputs:
-      - audio/sessionXX.wav
+      - campaigns/{campaign}/audio/sessionXX.wav
     status_rules:
       complete_when:
-        - audio/sessionXX.wav exists
+        - campaigns/{campaign}/audio/sessionXX.wav exists
       blocked_when:
         - audio file is missing and no transcript/diary-only fallback is declared
     gate: operator_supplied
@@ -44,9 +44,9 @@ steps:
       - source_audio_registered
     command: ./rag-env/bin/python scripts/rag.py transcribe sessionXX
     expected_inputs:
-      - audio/sessionXX.wav
+      - campaigns/{campaign}/audio/sessionXX.wav
     expected_outputs:
-      - knowledge/Faban/raw/sessionXX_transcript.txt
+      - campaigns/{campaign}/raw/sessionXX_transcript.txt
     status_rules:
       complete_when:
         - raw transcript exists
@@ -63,9 +63,9 @@ steps:
     dependencies: []
     command: null
     expected_inputs:
-      - knowledge/Faban/clean/sessionXX_diary.md
+      - campaigns/{campaign}/clean/sessionXX_diary.md
     expected_outputs:
-      - knowledge/Faban/clean/sessionXX_diary.md
+      - campaigns/{campaign}/clean/sessionXX_diary.md
     status_rules:
       complete_when:
         - diary source exists
@@ -85,9 +85,9 @@ steps:
     dependency_mode: any
     command: ./rag-env/bin/python scripts/rag.py status sessionXX
     expected_inputs:
-      - audio/sessionXX.wav
-      - knowledge/Faban/raw/sessionXX_transcript.txt
-      - knowledge/Faban/clean/sessionXX_diary.md
+      - campaigns/{campaign}/audio/sessionXX.wav
+      - campaigns/{campaign}/raw/sessionXX_transcript.txt
+      - campaigns/{campaign}/clean/sessionXX_diary.md
     expected_outputs:
       - operator status report
     status_rules:
@@ -104,13 +104,13 @@ steps:
       - source_status_check
     command: ./rag-env/bin/python scripts/rag.py curate sessionXX
     expected_inputs:
-      - knowledge/Faban/raw/sessionXX_transcript.txt
-      - knowledge/Faban/sessions/sessionXX_context.yaml
-      - knowledge/Faban/final/session##_summary.md
+      - campaigns/{campaign}/raw/sessionXX_transcript.txt
+      - campaigns/{campaign}/sessions/sessionXX_context.yaml
+      - campaigns/{campaign}/final/session##_summary.md
     expected_outputs:
-      - knowledge/Faban/clean/sessionXX_curated.md
-      - knowledge/Faban/clean/sessionXX_curated_metadata.json
-      - knowledge/Faban/clean/sessionXX_curated_chunks/chunk_*.md
+      - campaigns/{campaign}/clean/sessionXX_curated.md
+      - campaigns/{campaign}/clean/sessionXX_curated_metadata.json
+      - campaigns/{campaign}/clean/sessionXX_curated_chunks/chunk_*.md
     status_rules:
       complete_when:
         - draft canon packet exists
@@ -119,6 +119,7 @@ steps:
     gate: automatic_allowed_before_review
     rerun_policy: safe_before_review
     canon_impact: draft_only
+    notes: Uses compact per-chunk registry context for large raw transcript extraction.
     notes: >
       Uses gemma4:e2b by default via FARRLIND_CURATION_MODEL to produce a
       draft canon packet: narrative summary, major events, NPCs/entities,
@@ -132,16 +133,147 @@ steps:
       - curate_transcript
     command: ./rag-env/bin/python scripts/rag.py extract sessionXX
     expected_inputs:
-      - knowledge/Faban/clean/sessionXX_curated.md
-      - knowledge/Faban/raw/sessionXX_transcript.txt
-      - knowledge/Faban/clean/sessionXX_diary.md
+      - campaigns/{campaign}/clean/sessionXX_curated.md
+      - campaigns/{campaign}/raw/sessionXX_transcript.txt
+      - campaigns/{campaign}/clean/sessionXX_diary.md
     expected_outputs:
-      - knowledge/Faban/clean/sessionXX_events.md
+      - campaigns/{campaign}/clean/sessionXX_events.md
     status_rules:
       complete_when:
         - events draft exists
       stale_when:
         - source artifact mtime is newer than events draft mtime
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+    notes: Uses compact per-chunk registry context for large raw transcript extraction.
+
+  - id: extract_npcs
+    display_name: Extract NPCs
+    lane: entity_extraction
+    dependencies:
+      - curate_transcript
+    command: ./rag-env/bin/python scripts/rag.py extract-npcs sessionXX
+    expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_curated.md
+      - campaigns/{campaign}/final/sessionXX_summary.md
+      - campaigns/{campaign}/clean/sessionXX_diary.md
+      - campaigns/{campaign}/raw/sessionXX_transcript.txt
+    expected_outputs:
+      - campaigns/{campaign}/extracted/sessionXX_npcs.json
+      - campaigns/{campaign}/extracted/sessionXX_npcs_metadata.json
+    status_rules:
+      complete_when:
+        - NPC extraction JSON exists
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+    notes: Uses compact per-chunk registry context for large raw transcript extraction.
+
+  - id: extract_locations
+    display_name: Extract Locations
+    lane: entity_extraction
+    dependencies:
+      - curate_transcript
+    command: ./rag-env/bin/python scripts/rag.py extract-locations sessionXX
+    expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_curated.md
+      - campaigns/{campaign}/final/sessionXX_summary.md
+      - campaigns/{campaign}/clean/sessionXX_diary.md
+      - campaigns/{campaign}/raw/sessionXX_transcript.txt
+    expected_outputs:
+      - campaigns/{campaign}/extracted/sessionXX_locations.json
+      - campaigns/{campaign}/extracted/sessionXX_locations_metadata.json
+    status_rules:
+      complete_when:
+        - location extraction JSON exists
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+    notes: Uses compact per-chunk registry context for large raw transcript extraction.
+
+  - id: extract_artifacts
+    display_name: Extract Artifacts
+    lane: entity_extraction
+    dependencies:
+      - curate_transcript
+    command: ./rag-env/bin/python scripts/rag.py extract-artifacts sessionXX
+    expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_curated.md
+      - campaigns/{campaign}/final/sessionXX_summary.md
+      - campaigns/{campaign}/clean/sessionXX_diary.md
+      - campaigns/{campaign}/raw/sessionXX_transcript.txt
+    expected_outputs:
+      - campaigns/{campaign}/extracted/sessionXX_artifacts.json
+      - campaigns/{campaign}/extracted/sessionXX_artifacts_metadata.json
+    status_rules:
+      complete_when:
+        - artifact extraction JSON exists
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+    notes: Uses compact per-chunk location context for large raw transcript extraction.
+
+  - id: extract_lore_items
+    display_name: Extract Lore Items
+    lane: entity_extraction
+    dependencies:
+      - curate_transcript
+    command: ./rag-env/bin/python scripts/rag.py extract-lore-items sessionXX
+    expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_curated.md
+      - campaigns/{campaign}/final/sessionXX_summary.md
+      - campaigns/{campaign}/clean/sessionXX_diary.md
+      - campaigns/{campaign}/raw/sessionXX_transcript.txt
+    expected_outputs:
+      - campaigns/{campaign}/extracted/sessionXX_lore_items.json
+      - campaigns/{campaign}/extracted/sessionXX_lore_items_metadata.json
+    status_rules:
+      complete_when:
+        - lore item extraction JSON exists
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+    notes: Uses compact per-chunk registry context for large raw transcript extraction.
+
+  - id: extract_combat_encounters
+    display_name: Extract Combat Encounters
+    lane: entity_extraction
+    dependencies:
+      - curate_transcript
+    command: ./rag-env/bin/python scripts/rag.py extract-combat-encounters sessionXX
+    expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_curated.md
+      - campaigns/{campaign}/final/sessionXX_summary.md
+      - campaigns/{campaign}/clean/sessionXX_diary.md
+      - campaigns/{campaign}/raw/sessionXX_transcript.txt
+    expected_outputs:
+      - campaigns/{campaign}/extracted/sessionXX_combat_encounters.json
+      - campaigns/{campaign}/extracted/sessionXX_combat_encounters_metadata.json
+    status_rules:
+      complete_when:
+        - combat encounter extraction JSON exists
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+
+  - id: extract_open_threads
+    display_name: Extract Open Threads
+    lane: entity_extraction
+    dependencies:
+      - curate_transcript
+    command: ./rag-env/bin/python scripts/rag.py extract-open-threads sessionXX
+    expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_curated.md
+      - campaigns/{campaign}/final/sessionXX_summary.md
+      - campaigns/{campaign}/clean/sessionXX_diary.md
+      - campaigns/{campaign}/raw/sessionXX_transcript.txt
+    expected_outputs:
+      - campaigns/{campaign}/extracted/sessionXX_open_threads.json
+      - campaigns/{campaign}/extracted/sessionXX_open_threads_metadata.json
+    status_rules:
+      complete_when:
+        - open thread extraction JSON exists
     gate: automatic_allowed_before_review
     rerun_policy: safe_before_review
     canon_impact: draft_only
@@ -153,9 +285,9 @@ steps:
       - extract_events
     command: ./rag-env/bin/python scripts/rag.py filter sessionXX
     expected_inputs:
-      - knowledge/Faban/clean/sessionXX_events.md
+      - campaigns/{campaign}/clean/sessionXX_events.md
     expected_outputs:
-      - knowledge/Faban/clean/sessionXX_filtered.md
+      - campaigns/{campaign}/clean/sessionXX_filtered.md
     status_rules:
       complete_when:
         - filtered draft exists
@@ -170,9 +302,9 @@ steps:
       - filter_events
     command: ./rag-env/bin/python scripts/rag.py classify sessionXX
     expected_inputs:
-      - knowledge/Faban/clean/sessionXX_filtered.md
+      - campaigns/{campaign}/clean/sessionXX_filtered.md
     expected_outputs:
-      - knowledge/Faban/clean/sessionXX_classified.md
+      - campaigns/{campaign}/clean/sessionXX_classified.md
     status_rules:
       complete_when:
         - classified draft exists
@@ -187,10 +319,10 @@ steps:
       - classify_events
     command: ./rag-env/bin/python scripts/rag.py normalize sessionXX
     expected_inputs:
-      - knowledge/Faban/clean/sessionXX_classified.md
-      - knowledge/Faban/sessions/sessionXX_context.yaml
+      - campaigns/{campaign}/clean/sessionXX_classified.md
+      - campaigns/{campaign}/sessions/sessionXX_context.yaml
     expected_outputs:
-      - knowledge/Faban/clean/sessionXX_normalized.md
+      - campaigns/{campaign}/clean/sessionXX_normalized.md
     status_rules:
       complete_when:
         - normalized draft exists
@@ -205,9 +337,9 @@ steps:
       - normalize_events
     command: ./rag-env/bin/python scripts/rag.py merge sessionXX
     expected_inputs:
-      - knowledge/Faban/clean/sessionXX_normalized.md
+      - campaigns/{campaign}/clean/sessionXX_normalized.md
     expected_outputs:
-      - knowledge/Faban/clean/sessionXX_merged.md
+      - campaigns/{campaign}/clean/sessionXX_merged.md
     status_rules:
       complete_when:
         - merged draft exists
@@ -222,9 +354,9 @@ steps:
       - merge_events
     command: ./rag-env/bin/python scripts/rag.py validate sessionXX
     expected_inputs:
-      - knowledge/Faban/clean/sessionXX_merged.md
+      - campaigns/{campaign}/clean/sessionXX_merged.md
     expected_outputs:
-      - knowledge/Faban/clean/sessionXX_validation.md
+      - campaigns/{campaign}/clean/sessionXX_validation.md
     status_rules:
       complete_when:
         - validation draft exists
@@ -239,11 +371,11 @@ steps:
       - validate_draft
     command: ./rag-env/bin/python scripts/rag.py summarize sessionXX
     expected_inputs:
-      - knowledge/Faban/clean/sessionXX_merged.md
-      - knowledge/Faban/clean/sessionXX_diary.md
-      - knowledge/Faban/notes/sessionXX_corrections.md
+      - campaigns/{campaign}/clean/sessionXX_merged.md
+      - campaigns/{campaign}/clean/sessionXX_diary.md
+      - campaigns/{campaign}/notes/sessionXX_corrections.md
     expected_outputs:
-      - knowledge/Faban/clean/sessionXX_summary.md
+      - campaigns/{campaign}/clean/sessionXX_summary.md
     status_rules:
       complete_when:
         - draft ingest summary exists
@@ -258,14 +390,14 @@ steps:
       - extract_events
     command: ./rag-env/bin/python scripts/rag.py postextract sessionXX
     expected_inputs:
-      - knowledge/Faban/clean/sessionXX_events.md
+      - campaigns/{campaign}/clean/sessionXX_events.md
     expected_outputs:
-      - knowledge/Faban/clean/sessionXX_filtered.md
-      - knowledge/Faban/clean/sessionXX_classified.md
-      - knowledge/Faban/clean/sessionXX_normalized.md
-      - knowledge/Faban/clean/sessionXX_merged.md
-      - knowledge/Faban/clean/sessionXX_validation.md
-      - knowledge/Faban/clean/sessionXX_summary.md
+      - campaigns/{campaign}/clean/sessionXX_filtered.md
+      - campaigns/{campaign}/clean/sessionXX_classified.md
+      - campaigns/{campaign}/clean/sessionXX_normalized.md
+      - campaigns/{campaign}/clean/sessionXX_merged.md
+      - campaigns/{campaign}/clean/sessionXX_validation.md
+      - campaigns/{campaign}/clean/sessionXX_summary.md
     status_rules:
       complete_when:
         - all postextract outputs exist
@@ -274,17 +406,131 @@ steps:
     canon_impact: draft_only
     notes: Shortcut for filter, classify, normalize, merge, validate, and summarize.
 
+  - id: review_npc_extraction
+    display_name: Review NPC Extraction
+    lane: human_review
+    dependencies:
+      - extract_npcs
+    command: web_review /npcs/extractions
+    expected_inputs:
+      - campaigns/{campaign}/extracted/sessionXX_npcs.json
+    expected_outputs:
+      - campaigns/{campaign}/extracted/sessionXX_npcs_reviewed.json
+      - database npc rows
+    status_rules:
+      complete_when:
+        - NPC extraction review decisions have been applied or explicitly skipped
+    gate: human_required
+    rerun_policy: edit_until_reviewed
+    canon_impact: review_record_and_registry_rows
+
+  - id: review_location_extraction
+    display_name: Review Location Extraction
+    lane: human_review
+    dependencies:
+      - extract_locations
+    command: web_review /locations/extractions
+    expected_inputs:
+      - campaigns/{campaign}/extracted/sessionXX_locations.json
+    expected_outputs:
+      - campaigns/{campaign}/extracted/sessionXX_locations_reviewed.json
+      - database location rows
+    status_rules:
+      complete_when:
+        - Location extraction review decisions have been applied or explicitly skipped
+    gate: human_required
+    rerun_policy: edit_until_reviewed
+    canon_impact: review_record_and_registry_rows
+
+  - id: review_artifact_extraction
+    display_name: Review Artifact Extraction
+    lane: human_review
+    dependencies:
+      - extract_artifacts
+    command: web_review /artifacts/extractions
+    expected_inputs:
+      - campaigns/{campaign}/extracted/sessionXX_artifacts.json
+    expected_outputs:
+      - campaigns/{campaign}/extracted/sessionXX_artifacts_reviewed.json
+      - database artifact rows
+    status_rules:
+      complete_when:
+        - Artifact extraction review decisions have been applied or explicitly skipped
+    gate: human_required
+    rerun_policy: edit_until_reviewed
+    canon_impact: review_record_and_registry_rows
+
+  - id: review_lore_item_extraction
+    display_name: Review Lore Item Extraction
+    lane: human_review
+    dependencies:
+      - extract_lore_items
+    command: web_review /lore-items/extractions
+    expected_inputs:
+      - campaigns/{campaign}/extracted/sessionXX_lore_items.json
+    expected_outputs:
+      - campaigns/{campaign}/extracted/sessionXX_lore_items_reviewed.json
+      - database lore item rows
+    status_rules:
+      complete_when:
+        - Lore item extraction review decisions have been applied or explicitly skipped
+    gate: human_required
+    rerun_policy: edit_until_reviewed
+    canon_impact: review_record_and_registry_rows
+
+  - id: review_combat_encounter_extraction
+    display_name: Review Combat Encounter Extraction
+    lane: human_review
+    dependencies:
+      - extract_combat_encounters
+    command: web_review /combat-encounters/extractions
+    expected_inputs:
+      - campaigns/{campaign}/extracted/sessionXX_combat_encounters.json
+    expected_outputs:
+      - campaigns/{campaign}/extracted/sessionXX_combat_encounters_reviewed.json
+      - database encounter and enemy rows
+    status_rules:
+      complete_when:
+        - Combat encounter extraction review decisions have been applied or explicitly skipped
+    gate: human_required
+    rerun_policy: edit_until_reviewed
+    canon_impact: review_record_and_registry_rows
+
+  - id: review_open_thread_extraction
+    display_name: Review Open Thread Extraction
+    lane: human_review
+    dependencies:
+      - extract_open_threads
+    command: web_review /open-threads/extractions
+    expected_inputs:
+      - campaigns/{campaign}/extracted/sessionXX_open_threads.json
+    expected_outputs:
+      - campaigns/{campaign}/extracted/sessionXX_open_threads_reviewed.json
+      - database open thread rows
+    status_rules:
+      complete_when:
+        - Open thread extraction review decisions have been applied or explicitly skipped
+    gate: human_required
+    rerun_policy: edit_until_reviewed
+    canon_impact: review_record_and_registry_rows
+
   - id: initialize_review
     display_name: Initialize Human Review
     lane: human_review
     dependencies:
       - summarize_draft
+      - review_npc_extraction
+      - review_location_extraction
+      - review_artifact_extraction
+      - review_lore_item_extraction
+      - review_combat_encounter_extraction
+      - review_open_thread_extraction
     command: ./rag-env/bin/python scripts/dm_query.py init-review sessionXX
     expected_inputs:
-      - knowledge/Faban/clean/sessionXX_summary.md
-      - knowledge/Faban/clean/sessionXX_events.md
+      - campaigns/{campaign}/clean/sessionXX_summary.md
+      - campaigns/{campaign}/clean/sessionXX_events.md
     expected_outputs:
-      - knowledge/Faban/reviews/sessionXX_review.yaml
+      - campaigns/{campaign}/reviews/sessionXX_review.yaml
     status_rules:
       complete_when:
         - review YAML exists
@@ -295,16 +541,16 @@ steps:
     canon_impact: none
 
   - id: edit_review_decisions
-    display_name: Edit Review Decisions
+    display_name: Review Session Events
     lane: human_review
     dependencies:
       - initialize_review
-    command: web_review session review page
+    command: web_review /sessions/sessionXX/review
     expected_inputs:
-      - knowledge/Faban/reviews/sessionXX_review.yaml
+      - campaigns/{campaign}/reviews/sessionXX_review.yaml
       - source artifacts and draft outputs
     expected_outputs:
-      - knowledge/Faban/reviews/sessionXX_review.yaml
+      - campaigns/{campaign}/reviews/sessionXX_review.yaml
     status_rules:
       complete_when:
         - every review item has accepted, rejected, corrected, or added decision
@@ -320,9 +566,9 @@ steps:
       - edit_review_decisions
     command: web_review mark reviewed action
     expected_inputs:
-      - knowledge/Faban/reviews/sessionXX_review.yaml
+      - campaigns/{campaign}/reviews/sessionXX_review.yaml
     expected_outputs:
-      - knowledge/Faban/reviews/sessionXX_review.yaml
+      - campaigns/{campaign}/reviews/sessionXX_review.yaml
     status_rules:
       complete_when:
         - review status is reviewed
@@ -339,12 +585,12 @@ steps:
       - mark_reviewed
     command: ./rag-env/bin/python scripts/dm_query.py apply-review sessionXX
     expected_inputs:
-      - knowledge/Faban/reviews/sessionXX_review.yaml
-      - knowledge/Faban/final/session*_summary.md
-      - knowledge/Faban/travel.yaml
-      - knowledge/Faban/encounters.yaml
-      - knowledge/Faban/enemy_encounters.yaml
-      - knowledge/Faban/lore/*.md
+      - campaigns/{campaign}/reviews/sessionXX_review.yaml
+      - campaigns/{campaign}/final/session*_summary.md
+      - campaigns/{campaign}/travel.yaml
+      - campaigns/{campaign}/encounters.yaml
+      - campaigns/{campaign}/enemy_encounters.yaml
+      - campaigns/{campaign}/lore/*.md
     expected_outputs:
       - farrlind/out/load_summaries.sql
       - database rows
@@ -369,7 +615,7 @@ steps:
       - applied review state
       - database session and event rows
     expected_outputs:
-      - knowledge/Faban/final/sessionXX_summary.md
+      - campaigns/{campaign}/final/sessionXX_summary.md
     status_rules:
       complete_when:
         - final summary exists
@@ -386,11 +632,11 @@ steps:
       - write_final_summary
     command: web_review lore and registry pages
     expected_inputs:
-      - knowledge/Faban/final/sessionXX_summary.md
+      - campaigns/{campaign}/final/sessionXX_summary.md
       - reviewed decisions
       - database canon rows
     expected_outputs:
-      - knowledge/Faban/lore/wells_of_magic.md
+      - campaigns/{campaign}/lore/wells_of_magic.md
       - registry database edits for NPCs, locations, artifacts, and future lore sections
     status_rules:
       complete_when:
@@ -409,11 +655,11 @@ steps:
     dependency_mode: all_completed_or_not_applicable
     command: ./rag-env/bin/python scripts/rag.py dbload --apply
     expected_inputs:
-      - knowledge/Faban/final/session*_summary.md
-      - knowledge/Faban/travel.yaml
-      - knowledge/Faban/encounters.yaml
-      - knowledge/Faban/enemy_encounters.yaml
-      - knowledge/Faban/lore/*.md
+      - campaigns/{campaign}/final/session*_summary.md
+      - campaigns/{campaign}/travel.yaml
+      - campaigns/{campaign}/encounters.yaml
+      - campaigns/{campaign}/enemy_encounters.yaml
+      - campaigns/{campaign}/lore/*.md
     expected_outputs:
       - farrlind/out/load_summaries.sql
       - database rows
@@ -565,13 +811,14 @@ lanes:
     display_name: Source Intake
   - id: draft_generation
     display_name: Draft Generation
+  - id: entity_extraction
+    display_name: Entity Extraction
   - id: human_review
     display_name: Human Review
-    implementation_status: not_done
+    implementation_status: in_progress
     notes: >
-      Current YAML/event-fragment review is an interim gate. The target
-      implementation is draft-canon-packet review: Gemma packet, human-edited
-      canon summary, structured canon item confirmations, then database apply.
+      Web review gates now cover extraction review pages first, followed by the
+      YAML-backed session event review page, then mark-reviewed and apply.
   - id: canonization
     display_name: Canonization
   - id: verification

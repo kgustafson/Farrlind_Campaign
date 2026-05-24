@@ -3,7 +3,9 @@
 __pycache__/
 *.pyc
 rag-env/
-audio/
+campaigns/*/audio/
+campaigns/*/raw/
+campaigns/*/extracted/
 farrlind/out/
 dist/archive/
 logs/
