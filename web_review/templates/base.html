@@ -44,7 +44,7 @@
     </aside>
     <main>
       {% block content %}{% endblock %}
-      <footer class="app-version">{{ campaign_display_name() }} Campaign {{ app_version() }}</footer>
+      <footer class="app-version">{{ campaign_display_name() }} Campaign {{ app_version() }}{% if app_git_hash_short() %} · {{ app_git_hash_short() }}{% endif %}</footer>
     </main>
   </div>
   <section id="world-map-modal" class="world-map-modal-backdrop" aria-labelledby="world-map-title">

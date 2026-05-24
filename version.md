@@ -1,6 +1,6 @@
 # Version
 
-v0.6.0
+v0.6.1
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.6.0` adds multi-campaign support, campaign-scoped runtime configuration, and a cleaner extractor-driven workflow foundation tested against a second campaign.
+`v0.6.1` passes the configured Git commit hash through Docker and displays the short build hash in the archive footer.

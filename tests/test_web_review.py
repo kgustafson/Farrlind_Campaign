@@ -1,4 +1,5 @@
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -7,7 +8,7 @@ from unittest.mock import patch
 import yaml
 
 from web_review.services import artifact_extraction_review, canon, combat_extraction_review, commands, location_extraction_review, lore_item_extraction_review, npc_extraction_review, open_thread_extraction_review, reviews, workflow
-from web_review.app import BACKUP_DOWNLOADS, COMMAND_RESULTS, app, app_version, sync_after_extraction_review
+from web_review.app import BACKUP_DOWNLOADS, COMMAND_RESULTS, app, app_git_hash_short, app_version, sync_after_extraction_review
 from scripts import export_static_archive
 from scripts.load_songbook import songbook_source_sql
 from fastapi.testclient import TestClient
@@ -583,6 +584,15 @@ class WebReviewAppTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(f"Farrlind Campaign {app_version()}", response.text)
+
+    def test_dashboard_renders_git_hash_when_available(self):
+        with patch.object(reviews, "dashboard_rows", return_value=[]), \
+             patch.dict(os.environ, {"FARRLIND_GIT_HASH": "baa1b3450a894891cc86a82760aef21c4ac3dafa"}):
+            client = TestClient(app)
+            response = client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(f"Farrlind Campaign {app_version()} · {app_git_hash_short()}", response.text)
 
     def test_dashboard_renders_world_map_modal_link(self):
         with tempfile.TemporaryDirectory() as tmp, \

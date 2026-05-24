@@ -47,6 +47,17 @@ def app_version() -> str:
     return "unversioned"
 
 
+def app_git_hash() -> str:
+    return os.getenv("FARRLIND_GIT_HASH", "").strip()
+
+
+def app_git_hash_short() -> str:
+    value = app_git_hash()
+    if not value or value.lower() == "unknown":
+        return ""
+    return value[:7]
+
+
 def campaign_metadata() -> dict:
     return load_campaign_metadata()
 
@@ -113,6 +124,7 @@ def campaign_world_map_image_url() -> str:
 
 
 templates.env.globals["app_version"] = app_version
+templates.env.globals["app_git_hash_short"] = app_git_hash_short
 templates.env.globals["interface_mode"] = interface_mode
 templates.env.globals["can_edit"] = can_edit
 templates.env.globals["campaign_display_name"] = campaign_display_name

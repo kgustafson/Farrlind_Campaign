@@ -1,5 +1,14 @@
 # Revision History
 
+## v0.6.1 - 5/24/2026
+
+Added build-hash visibility for campaign runtimes.
+
+- App: Reads `FARRLIND_GIT_HASH` from the campaign environment and shows the short hash in the archive footer when available.
+- Runtime: Passes `FARRLIND_GIT_HASH` into both edit and archive Docker containers.
+- Ops: Updated local campaign `.env` files for Farrlind and Trinyvale with the current Git commit hash.
+- Tests: Added dashboard coverage for rendering the configured build hash.
+
 ## v0.6.0 - 5/24/2026
 
 Added multi-campaign support and tightened the extractor-driven workflow using Trinyvale as a clean test campaign.

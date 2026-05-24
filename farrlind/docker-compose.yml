@@ -42,6 +42,7 @@ services:
       FARRLIND_CAMPAIGN: ${FARRLIND_CAMPAIGN:-farrlind}
       FARRLIND_DATABASE_URL: postgresql+psycopg2://${CAMPAIGN_DB_USER:-admin}:${CAMPAIGN_DB_PASSWORD:-gofaban}@db:5432/${CAMPAIGN_DB:-farrlind}
       FARRLIND_INTERFACE_MODE: ${FARRLIND_INTERFACE_MODE:-edit}
+      FARRLIND_GIT_HASH: ${FARRLIND_GIT_HASH:-unknown}
       FARRLIND_STATIC_REPO_PATH: /static_archive
       FARRLIND_STATIC_PUBLISH_PUSH: ${FARRLIND_STATIC_PUBLISH_PUSH:-0}
     depends_on:
@@ -64,6 +65,7 @@ services:
       FARRLIND_CAMPAIGN: ${FARRLIND_CAMPAIGN:-farrlind}
       FARRLIND_DATABASE_URL: postgresql+psycopg2://${CAMPAIGN_DB_USER:-admin}:${CAMPAIGN_DB_PASSWORD:-gofaban}@db:5432/${CAMPAIGN_DB:-farrlind}
       FARRLIND_INTERFACE_MODE: archive
+      FARRLIND_GIT_HASH: ${FARRLIND_GIT_HASH:-unknown}
       PYTHONDONTWRITEBYTECODE: "1"
     depends_on:
       db:
