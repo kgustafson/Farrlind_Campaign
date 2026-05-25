@@ -1,0 +1,34 @@
+{
+  "session_number": 2,
+  "applied_at": "2026-05-24T08:18:17",
+  "known_lore_mentions": [],
+  "new_lore_candidates": [
+    {
+      "index": 0,
+      "proposed_title": "Strahd's Paranoia and Resort Finances",
+      "decision": "create"
+    },
+    {
+      "index": 1,
+      "proposed_title": "Marina Kulyana's History",
+      "decision": "create"
+    },
+    {
+      "index": 2,
+      "proposed_title": "Nature of the Barovian Undead",
+      "decision": "create"
+    },
+    {
+      "index": 3,
+      "proposed_title": "The Kulyana Bloodline Curse",
+      "decision": "create"
+    }
+  ],
+  "applied": [
+    "Created Strahd's Paranoia and Resort Finances",
+    "Created Marina Kulyana's History",
+    "Created Nature of the Barovian Undead",
+    "Created The Kulyana Bloodline Curse"
+  ],
+  "skipped": []
+}

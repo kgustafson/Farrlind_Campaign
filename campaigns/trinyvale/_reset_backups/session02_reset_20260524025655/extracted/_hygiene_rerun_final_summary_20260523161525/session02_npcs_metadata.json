@@ -1,0 +1,38 @@
+{
+  "session": "session02",
+  "model": "gemma4:e2b",
+  "source": "final_summary",
+  "sources": [
+    {
+      "label": "final_summary",
+      "path": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/final/session02_summary.md",
+      "chars": 3868
+    }
+  ],
+  "campaign_metadata": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/campaign.yaml",
+  "party_character_names": [
+    "Jake",
+    "Jens",
+    "Jens Lindell",
+    "Jens Lyndelle",
+    "Jins",
+    "Murph",
+    "Nayak",
+    "Niac",
+    "Nyac",
+    "Nyack",
+    "Nyack of the Ran'afor",
+    "Onyx",
+    "Onyx Lumiere",
+    "Onyx back"
+  ],
+  "npc_registry_count": 10,
+  "location_count": 18,
+  "duration_seconds": 68.71,
+  "guardrail_warning_count": 1,
+  "guardrail_warnings": [
+    "Dropped known mention not present in session source: The Elf"
+  ],
+  "created_at": "2026-05-23T16:09:58",
+  "output": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/extracted/session02_npcs.json"
+}

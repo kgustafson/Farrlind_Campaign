@@ -1,0 +1,512 @@
+{
+  "known_thread_mentions": [],
+  "new_thread_candidates": [
+    {
+      "proposed_title": "The Trek to Complain to the Man-Anger",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "description": "The party is embarking on a journey to complain to the Man-Anger of all of Barovia, implying an unresolved issue or grievance that requires action.",
+      "resolution": "",
+      "notes": "The session sets up an immediate pending quest for the party regarding the Man-Anger in Barovia. Future sessions should address the outcome of this trek.",
+      "confidence": "high",
+      "evidence": "Now, folks, before we begin our trek to complain to the man-anger of all of Barovia,"
+    },
+    {
+      "proposed_title": "The Overseer's Manor and the Trail",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Overseer's Manor",
+      "description": "The party was directed by Regan to the Overseer's Manor to seek complaints, and they followed the trail into a thick fog, suggesting an immediate objective or danger awaits them.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "Regan mentioned that if they had complaints, they could find him at the Overseer's Manor further down the trail. The party then bolted out the door towards the Overseer's Manor, only to find the trail shrouded with a thick fog."
+    },
+    {
+      "proposed_title": "Environmental Deterioration and Lethargy",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Trail",
+      "description": "As the party traveled toward the Overseer's Manor, a strange fog gathered, and as they progressed, their bodies felt oddly lethargic, suggesting an environmental or supernatural threat affecting their physical state.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "You noticed a strange fog gathering outside... As you progressed, the fog grew even thicker and your bodies felt oddly lethargic."
+    },
+    {
+      "proposed_title": "Hunting Strahd Von Zarovich",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Barovia",
+      "description": "The party is actively hunting for Strahd Von Zarovich, the manager of Barovia.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "and began hunting for the manager of all Barovia, Strahd Von Zarovich."
+    },
+    {
+      "proposed_title": "Investigating New Construction and Upgrade",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "new building",
+      "description": "The party is investigating new construction in the resort area and considering obtaining a room upgrade.",
+      "resolution": "",
+      "notes": "The party is currently exploring a new building and discussing the possibility of an upgrade.",
+      "confidence": "high",
+      "evidence": "It looks like they're building a new area of the resort over here, so maybe we could get, like, an upgrade."
+    },
+    {
+      "proposed_title": "Mystery of the Human Corpses and the Room",
+      "thread_type": "lore_mystery",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "The party discovered three human corpses and entered a room with a forest view, prompting an investigation into the cause of death and the nature of the room itself.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "The party found three human corpses and entered a room with the forest view."
+    },
+    {
+      "proposed_title": "The Pickled Ghouls Tongues",
+      "thread_type": "character_hook",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "The party discovered a jar of pickled ghouls tongues, which raises questions about the source of the items and the nature of the environment they are in.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "You find a jar of pickled ghouls tongues."
+    },
+    {
+      "proposed_title": "Mystery of the Dead and Their Possessions",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "grounds for the night lotus",
+      "description": "Three corpses were found in the woods, each clutching different items: a bloodstained longbow, a set of rusty short swords, and a crumpled envelope. The nature of these bodies and the significance of the items remain unknown.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "One body clutches a bloodstained longbow and another holds a set of rusty short swords. The third bears no weapon, but cradles a crumpled envelope close to their chest."
+    },
+    {
+      "proposed_title": "The Location of the Night Lotus Grounds",
+      "thread_type": "lore_mystery",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "grounds for the night lotus",
+      "description": "The party discovered that the area where the confrontation took place is the grounds for the 'night lotus,' suggesting a specific, possibly significant, location within the woods.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "No, this is the grounds for the night lotus, actually."
+    },
+    {
+      "proposed_title": "The Nature of the Undead",
+      "thread_type": "lore_mystery",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "The undead encountered in this campaign possess an unusual quality, exhibiting a firmness and internal fire that distinguishes them from normal zombies.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "You do see that these zombies, despite looking like the normal undead, do kind of have like a firmness to them... They have sort of a fire burning within them that normal zombies do not."
+    },
+    {
+      "proposed_title": "The Building Built Off Bones",
+      "thread_type": "lore_mystery",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "A disturbing statement was made regarding a new building, suggesting it was constructed using the remains of the party members, implying a dark or unnatural origin.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "The character stated: \"The building will be built off of your bones.\""
+    },
+    {
+      "proposed_title": "The Zombie's Envelope",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "A zombie was observed clutching an envelope, suggesting that the contents of this item may hold important information or be a target for the party.",
+      "resolution": "",
+      "confidence": "medium",
+      "evidence": "Zombie clutching the envelope in its hands."
+    },
+    {
+      "proposed_title": "Quest for Identities and Impersonation",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "The party discussed the plan to steal names from targets to impersonate them, suggesting an ongoing goal to gather identities for deception or complaint.",
+      "resolution": "",
+      "notes": "The session established the intent to impersonate people based on knowing their faces. Future sessions should address the success of this plan and the nature of the targets.",
+      "confidence": "high",
+      "evidence": "I'm going to then grab this letter. ... And so if we get their names, I can pretend to be them. ... if we can complain, we can complain about them."
+    },
+    {
+      "proposed_title": "Nyack's Desire for the Bow",
+      "thread_type": "character_hook",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "Nyack actively sought to steal a bow from a zombie, indicating a desire for specific gear or an unresolved physical goal.",
+      "resolution": "",
+      "notes": "Nyack attempted to steal a bow from a zombie using sleight of hand. This desire for the item remains unresolved.",
+      "confidence": "high",
+      "evidence": "And I want to try to strafe up to the zombie with the bow. ... try to steal the bow with the sleight of hand."
+    },
+    {
+      "proposed_title": "Conflict with the Triplets",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "Nyack engaged in a physical conflict with 'the triplets,' resulting in one of them being killed, which necessitates further investigation into the nature of these triplets and their connection to the party's current situation.",
+      "resolution": "",
+      "notes": "Nyack confronted 'the triplets' and killed one of them. The nature of this conflict and the identity of the triplets are unresolved.",
+      "confidence": "high",
+      "evidence": "you messed with the wrong triplets ... He's dead. ... I'll get his tongue."
+    },
+    {
+      "proposed_title": "Zombie Behavior and Nature",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Trail",
+      "description": "The party encountered zombies while traversing the trail, and their behavior (biting people's shoulders off) suggests a disturbing or unusual nature that warrants further investigation.",
+      "resolution": "",
+      "confidence": "medium",
+      "evidence": "The party ran into the mist and then encountered zombies biting people's shoulders off."
+    },
+    {
+      "proposed_title": "The Burgomaster's Plea to Contain the Vampire",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Barovia",
+      "description": "The Burgomaster of Barovia, Kolyan Indirovich, sent a desperate plea to the recipients to help contain a powerful vampire that has been draining the lifeblood of his people for over 400 years, and to encircle the land with symbols of good.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "The Burgomaster sent a letter stating that his adopted daughter, Marina Kuljana, has been bitten by a vampire, and asked the recipients to 'give us up for dead and encircle this land with the symbols of good' to save Barovia from the evil fate of theirs."
+    },
+    {
+      "proposed_title": "Destroying the Hotel for the Tycoon's Cash",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "The party is considering the plan to prove and destroy a hotel to extort money from the rich burger tycoon who owns it.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "And if we can prove and destroy the hotel, take it down, this rich burger tycoon will pay us cash."
+    },
+    {
+      "proposed_title": "Acquiring the Burger Master's Secrets",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "The party plans to bring the Burger Master into their operation to learn his secrets of the burgers, with the ultimate goal of cutting him out eventually.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "We're going to open a burger restaurant. Shut down the hotel, murder the daughter. Bring this guy in to learn his secrets of the burgers, then cut him out eventually."
+    },
+    {
+      "proposed_title": "Eliminating the Hotel and Daughter",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "The party has decided to shut down the hotel and murder the daughter of the vampire, who is believed to work there.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "Shut down the hotel, murder the daughter."
+    },
+    {
+      "proposed_title": "Finding the Burger Master/Manager",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "The party is actively looking for the Burger Master or manager to gain access to the hotel's secrets and proprietary recipes.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "Okay, so I guess first we're looking for this burger master, right? If we're looking for the manager, only in so much that we're going to kill the manager."
+    },
+    {
+      "proposed_title": "Plan to Eliminate Manager and Contact the Bird",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "The party discussed a plan to kill the manager and talk to 'the bird in the house,' indicating an immediate, actionable goal.",
+      "resolution": "",
+      "notes": "This is an immediate plan that requires future action and resolution.",
+      "confidence": "high",
+      "evidence": "The party stated: 'We're going to kill the manager. We're going to talk to the bird in the house.'"
+    },
+    {
+      "proposed_title": "Discovery of Buried Trinket",
+      "thread_type": "character_hook",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "Niac discovered a trinket half-buried in the soil during a random encounter on Svalich Road. The nature and significance of this item remain unknown.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "next to him there is something half buried there uh and you have found another trinket"
+    },
+    {
+      "proposed_title": "Acquisition of the Green Flame Lantern",
+      "thread_type": "character_hook",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "The party acquired a unique lantern with a black candle that never runs out and burns with a green flame during the encounter. The purpose or origin of this item is currently unknown.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "you get a lantern with a black candle that never runs out and burns with a green flame"
+    },
+    {
+      "proposed_title": "The Presence of Burgomaster Kolyan Indirovich",
+      "thread_type": "character_hook",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Village of Barovia",
+      "description": "The party encountered a sign indicating the presence of the Burgomaster, Kolyan Indirovich, in the Village of Barovia, suggesting a point of interaction or potential quest.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "Beneath the guard post, the party saw a sign reading 'welcome to the village of barovia the perch upon which the raven lofts' and noted that someone had added 'current burgomaster kolian indirovich'."
+    },
+    {
+      "proposed_title": "Encounter with Keychain",
+      "thread_type": "character_hook",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "The party encountered a character named Keychain while walking past a guard post in the resort town.",
+      "resolution": "",
+      "notes": "Keychain's role and connection to the party or the location are currently unknown.",
+      "confidence": "high",
+      "evidence": "As you do, you see Keychain looks around"
+    },
+    {
+      "proposed_title": "Unseen Watchers in Town",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "The party observed eyes following them while walking through the dilapidated houses in town, indicating that they are being watched by unknown entities.",
+      "resolution": "",
+      "notes": "The source material only describes the observation; the nature and identity of the watchers remain unknown.",
+      "confidence": "high",
+      "evidence": "And occasionally you see eyes following you from the cracks and slivers in each."
+    },
+    {
+      "proposed_title": "The Establishment of Blood on the Vine",
+      "thread_type": "lore_mystery",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Blood on the Vine",
+      "description": "The party entered the tavern 'Blood on the Vine,' which is noted for its atmosphere and specific clientele, including a dour-looking man with fine leathers.",
+      "resolution": "",
+      "notes": "The tavern's name and atmosphere are established. Future sessions should explore the nature of the clientele and the establishment's connection to the wider campaign lore.",
+      "confidence": "high",
+      "evidence": "To your left, you see light spilling from a tavern named Blood on the Vine. ... You see this once appointed tavern has grown shoddy with age. There's a blazing fire in the hearth giving scant warmth to the few huddled souls within. The souls include the barkeep, one patron huddled at the bar, three boisterous women sitting together at a table near the fire, and a blonde man with a dour expression and fine leathers nursing a drink in the back of the room."
+    },
+    {
+      "proposed_title": "The Vegan Disguise",
+      "thread_type": "character_hook",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "Onyx and Jens were disguised as individuals to enter the tavern, suggesting a potential deception or hidden agenda related to their presence there.",
+      "resolution": "",
+      "notes": "The disguise was used to enter the establishment. Future sessions should explore the reason for the disguise and the identity of the patrons.",
+      "confidence": "medium",
+      "evidence": "So Onyx is disguised as the guy holding the envelope. Jin's is disguised as... I'm disguised as nothing. Yeah, you're disguised as nothing."
+    },
+    {
+      "proposed_title": "The Warning Posted at The Gate",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "The Gate",
+      "description": "The party posted a warning on the outside of The Gate, likely in response to an instruction from a relative, setting up a pending quest or active threat related to the area beyond the gate.",
+      "resolution": "",
+      "notes": "The nature of the warning and the entity who requested it need further definition.",
+      "confidence": "high",
+      "evidence": "Did you manage to post the warning on the outside of the gate? / Like my father asked you to?"
+    },
+    {
+      "proposed_title": "Strahd's Influence and Identity",
+      "thread_type": "character_hook",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "The party discussed whether Strahd mesmerized one of the travelers, leading to a reflection on memory and identity, suggesting a deeper mystery regarding the characters' pasts and their connection to the setting.",
+      "resolution": "",
+      "notes": "This thread relates to the characters' personal history and the nature of the influence of Strahd.",
+      "confidence": "medium",
+      "evidence": "did Strahd mesmerize you? / Is that why you cannot remember who you are?"
+    },
+    {
+      "proposed_title": "Defending the Local Establishment",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "The party is actively planning to defend the local establishment and its owners from the manager, Strahd, suggesting an impending conflict or confrontation.",
+      "resolution": "",
+      "notes": "The nature of the defense and the consequences for the owners remain unresolved.",
+      "confidence": "high",
+      "evidence": "we think it's terrible what they did and we think this establishment is awesome but this is only the beginning okay of what it can be"
+    },
+    {
+      "proposed_title": "The Massive Stone Pillar",
+      "thread_type": "lore_mystery",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Village edge",
+      "description": "A massive stone pillar was revealed rising from the edge of the village as the sun rose, suggesting a significant, unknown structure or landmark.",
+      "resolution": "",
+      "notes": "The pillar is a major physical feature revealed during the session. Future sessions should explore its origin and significance.",
+      "confidence": "high",
+      "evidence": "revealing for the first time a massive stone pillar rising from the edge of the village."
+    },
+    {
+      "proposed_title": "Strahd and Minions Harass the Mansion",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Mansion",
+      "description": "Strahd and his minions have repeatedly harassed the party in the mansion, evidenced by sounds of yelling from inside and fresh footprints, suggesting an ongoing, immediate threat.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "Um, there have been several attacks, unfortunately. These past few nights, uh, well, Strahd and his minions have repeatedly harassed us. Just for writing bad Yelp reviews? Well, there was much Yelping from inside, yes."
+    },
+    {
+      "proposed_title": "Mansion History and Markings",
+      "thread_type": "lore_mystery",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Mansion",
+      "description": "The mansion bears heavy claw markings and black marks indicating fires that have assailed it, suggesting a dark and violent history.",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "Heavy claw markings have stripped the once beautiful finish of the walls. Great black marks tell of fires that have assailed the mansion."
+    },
+    {
+      "proposed_title": "Ismark's Return and the Imp's Pact",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "",
+      "description": "Ismark returned with 'help' and a pact with an imp, which resulted in the imp launching an attack, indicating a dangerous and immediate threat to the party.",
+      "resolution": "",
+      "notes": "The nature of the pact and the imp's role needs further exploration.",
+      "confidence": "high",
+      "evidence": "Ismark slams it shut, pulls out a knife and points it at the two of you and says, who are you? ... Bluetooth attack. ... And he launches forward to attack."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "Yelp reviews",
+      "reason": "Temporary context/color commentary, not durable unresolved business."
+    },
+    {
+      "text": "Onyx's Manifestation and New Familiar",
+      "reason": "Appears to be a party joke, misunderstanding, or theory rather than durable unresolved campaign business."
+    },
+    {
+      "text": "Seeking Identity in Town",
+      "reason": "Appears to be a party joke, misunderstanding, or theory rather than durable unresolved campaign business."
+    }
+  ],
+  "uncertainties": [
+    {
+      "candidate": "Identity of the corpses",
+      "issue": "The identity or significance of the three dead bodies is currently unknown.",
+      "needs_human_decision": false
+    },
+    {
+      "candidate": "The nature of the building's construction",
+      "issue": "The exact nature of the threat or lore behind the statement 'built off of your bones' is unclear.",
+      "needs_human_decision": true
+    },
+    {
+      "candidate": "The significance of the envelope",
+      "issue": "The purpose or contents of the envelope are unknown, requiring future investigation.",
+      "needs_human_decision": true
+    },
+    {
+      "candidate": "Identity of the Triplets",
+      "issue": "The nature and significance of 'the triplets' and the conflict with them are unclear.",
+      "needs_human_decision": false
+    },
+    {
+      "candidate": "Nature of the Zombies",
+      "issue": "The session implies the zombies are acting in a way that is unusual (e.g., 'masseuse'), but the true nature of this threat or the zombies themselves is not yet defined.",
+      "needs_human_decision": true
+    },
+    {
+      "candidate": "Bluetooth's nature",
+      "issue": "The nature and role of the newly introduced familiar, Bluetooth, requires further definition.",
+      "needs_human_decision": true
+    },
+    {
+      "candidate": "Identity of the 'burger master'",
+      "issue": "The specific identity and relationship of the 'burger master' to Strahd and the resort management are established only by the party's goal, requiring future clarification.",
+      "needs_human_decision": false
+    },
+    {
+      "candidate": "Strahd's significance",
+      "issue": "The context of Strahd's warning is unclear; whether it is a direct threat, a piece of lore, or a promise requires further investigation.",
+      "needs_human_decision": true
+    },
+    {
+      "candidate": "Marina and Ismark's relationship",
+      "issue": "The context of Ismark's return and Marina's reaction is unclear, potentially indicating a faction or relationship that needs definition.",
+      "needs_human_decision": true
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "session": "session02",
+  "model": "gemma4:e2b",
+  "source": "auto",
+  "sources": [
+    {
+      "label": "curated_packet",
+      "path": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session02_curated.md",
+      "chars": 11048
+    }
+  ],
+  "chunked": false,
+  "chunk_count": 1,
+  "registry_rows_sent": [
+    11
+  ],
+  "avg_registry_rows_sent": 11.0,
+  "campaign_metadata": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/campaign.yaml",
+  "location_registry_count": 11,
+  "npc_registry_count": 10,
+  "duration_seconds": 45.84,
+  "guardrail_warning_count": 7,
+  "guardrail_warnings": [
+    "Dropped prior-session location mention not present after recap: Night Lotus Inn and Spa",
+    "Neutralized party-interpretation location update: Barovia",
+    "Neutralized party-interpretation location update: The Road",
+    "Neutralized party-interpretation location update: Blood on the Vine",
+    "Converted mismatched known location mention to new candidate: Strahd von Zarovich von Zarovich's Mansion != Overseer's Manor",
+    "Converted unknown known location mention to new candidate: Stone Pillar/Castle",
+    "Rejected duplicate existing location candidate: Blood on the Vine"
+  ],
+  "created_at": "2026-05-24T04:13:37",
+  "output": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/extracted/session02_locations.json"
+}

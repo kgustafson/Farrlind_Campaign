@@ -1,0 +1,368 @@
+{
+  "known_artifact_mentions": [],
+  "new_artifact_candidates": [
+    {
+      "proposed_name": "Leomund's secret chest",
+      "artifact_type": "treasure",
+      "description": "A chest given by Regan, strongly encouraged to hold the party's magic weapons and items.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Party",
+      "properties": [
+        "Container for magic weapons and items"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "Regan presented the party with a Leomund's secret chest and encouraged them to place all their magic weapons and items inside it."
+    },
+    {
+      "proposed_name": "Blood-red gemstone keycard",
+      "artifact_type": "relic",
+      "description": "A keycard given by Regan, used for finding the Overseer's Manor.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Party",
+      "properties": [
+        "Keycard to Overseer's Manor"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "Regan gave each of you a blood-red gemstone keycard and mentioned that you could find him at the Overseer's Manor further down the trail."
+    },
+    {
+      "proposed_name": "Speaking stones",
+      "artifact_type": "other",
+      "description": "Items that lost their service/function when the yurt power failed.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Party",
+      "properties": [
+        "Lost service when power failed"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "The service on the speaking stones ceased when the yurt's power went out."
+    },
+    {
+      "proposed_name": "Ghoul Tongue",
+      "artifact_type": "consumable",
+      "description": "Consumable item that, when consumed, triggers a magical effect (Bless spell) and inflicts necrotic damage.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Nayak",
+      "properties": [
+        "causes Bless spell for 10 minutes",
+        "inflicts 1D6 necrotic damage"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "Nayak slurps up a ghoul tongue like it's spaghetti... and you have the Bane spell cast on you."
+    },
+    {
+      "proposed_name": "Bloodstained Longbow",
+      "artifact_type": "weapon",
+      "description": "Found clutched by one of the corpses.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Unknown (corpse)",
+      "properties": [
+        "bloodstained"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "One body clutches a bloodstained longbow."
+    },
+    {
+      "proposed_name": "Rusty Short Swords",
+      "artifact_type": "weapon",
+      "description": "Found held by another corpse.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Unknown (corpse)",
+      "properties": [
+        "rusty"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "Another holds a set of rusty short swords."
+    },
+    {
+      "proposed_name": "Crumpled Envelope",
+      "artifact_type": "other",
+      "description": "Found cradled by the third corpse.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Unknown (corpse)",
+      "properties": [
+        "crumpled"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "The third bears no weapon, but cradles a crumpled envelope close to their chest."
+    },
+    {
+      "proposed_name": "Longbow",
+      "artifact_type": "weapon",
+      "description": "Nyack attempts to take the longbow from a zombie.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Nyack of the Ran'afor",
+      "properties": [],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "Nyack's gonna try to approach one of the zombies and take the longbow."
+    },
+    {
+      "proposed_name": "Pickled Tongues",
+      "artifact_type": "other",
+      "description": "Nyack demands the return of his pickled tongues.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Nyack of the Ran'afor",
+      "properties": [],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "Give me back my pickled tongues."
+    },
+    {
+      "proposed_name": "Envelope",
+      "artifact_type": "other",
+      "description": "A zombie was observed clutching an envelope.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Zombie",
+      "properties": [
+        "contains unknown contents"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "The zombie was seen clutching an envelope during the encounter."
+    },
+    {
+      "proposed_name": "Journal",
+      "artifact_type": "book",
+      "description": "The journal is described as powerful and used for manifesting.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Unknown",
+      "properties": [
+        "powerful"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "The character states, 'I'm going to take out my journal because ever since I cut the cord... my journal is so powerful.'"
+    },
+    {
+      "proposed_name": "Obsidian",
+      "artifact_type": "other",
+      "description": "Obsidian is described with unusual physical features: cucumbers on his eyes and a seaweed wrap on his horn.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Unknown",
+      "properties": [
+        "has cucumbers on his eyes",
+        "has a seaweed wrap on his horn"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "The character refers to 'Obsidian snoring blissfully on your bed' and describes him as having 'cucumbers on his eyes and a seaweed wrap on his horn.'"
+    },
+    {
+      "proposed_name": "Pact of the Chain Familiar",
+      "artifact_type": "other",
+      "description": "A familiar, an imp, was summoned via a spell/pact.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Unknown",
+      "properties": [
+        "Pact of the Chain",
+        "imp"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "The character states, 'And From the Page steps up a little imp who's now my Pact of the Chain familiar.'"
+    },
+    {
+      "proposed_name": "Trinket",
+      "artifact_type": "treasure",
+      "description": "A trinket found half-buried in the soil during an encounter.",
+      "lore_significance": "A discovered item from a random encounter.",
+      "discovered_session": 2,
+      "current_holder": "Nyack of the Ran'afor (via Niack)",
+      "properties": [
+        "found in the soil"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "medium",
+      "evidence": "The speaker mentions: \"there is something half buried there uh and you have found another trinket... niac stick your hand in there and get it\""
+    },
+    {
+      "proposed_name": "Keychain",
+      "artifact_type": "other",
+      "description": "Observed looking around and suggesting disguise.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Unknown",
+      "properties": [],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "medium",
+      "evidence": "The party observes Keychain looking around as they walk past a guard post."
+    },
+    {
+      "proposed_name": "Wooden Block",
+      "artifact_type": "other",
+      "description": "A wooden block used to facilitate movement, causing the holder to 'bounce along' while walking.",
+      "lore_significance": "Used as a magical focus or mechanism to aid in locomotion.",
+      "discovered_session": 2,
+      "current_holder": "Bluetooth",
+      "properties": [
+        "facilitates movement",
+        "causes bouncing effect"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "The party discussed putting the 'little wooden block' on Bluetooth's head, and it caused him to 'bounce along, balancing it perfectly' while walking."
+    },
+    {
+      "proposed_name": "Robot Keychain",
+      "artifact_type": "other",
+      "description": "A robot keychain that mixes up experimental elixirs.",
+      "lore_significance": "A mundane item that was present in the yurt.",
+      "discovered_session": 2,
+      "current_holder": "Party",
+      "properties": [
+        "Robot"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "medium",
+      "evidence": "The party found their 'faithful robot keychain' in the yurt."
+    },
+    {
+      "proposed_name": "Sword",
+      "artifact_type": "weapon",
+      "description": "A sword found among the human corpses.",
+      "lore_significance": "A mundane weapon found during the investigation of the corpses.",
+      "discovered_session": 2,
+      "current_holder": "Unknown",
+      "properties": [
+        "Mundane weapon"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "medium",
+      "evidence": "The party found a sword among the corpses."
+    },
+    {
+      "proposed_name": "Hunter's Mark",
+      "artifact_type": "effect",
+      "description": "A magical mark placed on a target, marking them as quarry.",
+      "lore_significance": "Used by the character to mark a target as quarry during combat.",
+      "discovered_session": 2,
+      "current_holder": "Nyack of the Ran'afor",
+      "properties": [
+        "marks target as quarry"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "I'm going to cast a bonus action hunter's mark on him and I'm gonna mark him as my quarry."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "Leomund's girthy yurt",
+      "reason": "Location/setting, not a portable artifact."
+    },
+    {
+      "text": "wine",
+      "reason": "Mundane consumable; not explicitly defined as a unique artifact or item of significance."
+    },
+    {
+      "text": "bow",
+      "reason": "Rejected as a candidate because it is an ordinary weapon, not explicitly defined as a magic item or relic in this context, though it is a physical object of significance."
+    },
+    {
+      "text": "phone",
+      "reason": "Ordinary mundane item, not magical or rare enough to be an artifact."
+    },
+    {
+      "text": "airpods",
+      "reason": "Ordinary modern technology, not a magical or campaign-relevant artifact."
+    },
+    {
+      "text": "Tongues",
+      "reason": "Appears to be a party joke, misunderstanding, nickname, or theory rather than a confirmed artifact."
+    },
+    {
+      "text": "Bloodstained Longbow",
+      "reason": "Duplicate of new artifact candidate: Bloodstained Longbow."
+    },
+    {
+      "text": "Rusty Short Swords",
+      "reason": "Duplicate of new artifact candidate: Rusty Short Swords."
+    },
+    {
+      "text": "Crumpled Envelope",
+      "reason": "Duplicate of new artifact candidate: Crumpled Envelope."
+    },
+    {
+      "text": "Zombie Envelope",
+      "reason": "Candidate name not found in session source."
+    },
+    {
+      "text": "Bluetooth",
+      "reason": "Appears to be a party joke, misunderstanding, nickname, or theory rather than a confirmed artifact."
+    },
+    {
+      "text": "Lantern of Green Flame",
+      "reason": "Candidate name not found in session source."
+    },
+    {
+      "text": "Trinket from the Soil",
+      "reason": "Candidate name not found in session source."
+    }
+  ],
+  "uncertainties": [
+    {
+      "candidate": "sword",
+      "issue": "No specific details (material, enchantment) were provided for the sword found.",
+      "needs_human_decision": false
+    }
+  ]
+}

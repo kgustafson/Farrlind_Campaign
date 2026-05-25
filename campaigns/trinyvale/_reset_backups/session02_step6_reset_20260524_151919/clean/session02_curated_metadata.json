@@ -1,0 +1,44 @@
+{
+  "model": "gemma4:e2b",
+  "session": "session02",
+  "transcript": "campaigns/trinyvale/raw/session02_transcript.txt",
+  "output": "campaigns/trinyvale/clean/session02_curated.md",
+  "chunk_count": 5,
+  "chunk_size_chars": 24000,
+  "chunk_overlap_chars": 1500,
+  "duration_seconds": 402.92,
+  "synthesis_duration_seconds": 87.95,
+  "chunks": [
+    {
+      "chunk": 1,
+      "chars": 20982,
+      "duration_seconds": 53.54,
+      "output": "campaigns/trinyvale/clean/session02_curated_chunks/chunk_001.md"
+    },
+    {
+      "chunk": 2,
+      "chars": 21964,
+      "duration_seconds": 46.41,
+      "output": "campaigns/trinyvale/clean/session02_curated_chunks/chunk_002.md"
+    },
+    {
+      "chunk": 3,
+      "chars": 21826,
+      "duration_seconds": 72.29,
+      "output": "campaigns/trinyvale/clean/session02_curated_chunks/chunk_003.md"
+    },
+    {
+      "chunk": 4,
+      "chars": 19875,
+      "duration_seconds": 79.52,
+      "output": "campaigns/trinyvale/clean/session02_curated_chunks/chunk_004.md"
+    },
+    {
+      "chunk": 5,
+      "chars": 17460,
+      "duration_seconds": 63.21,
+      "output": "campaigns/trinyvale/clean/session02_curated_chunks/chunk_005.md"
+    }
+  ],
+  "created_at": "2026-05-24T03:09:45"
+}

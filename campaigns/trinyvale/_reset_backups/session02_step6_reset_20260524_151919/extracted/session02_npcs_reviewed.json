@@ -1,0 +1,60 @@
+{
+  "session_number": 2,
+  "applied_at": "2026-05-24T08:07:11",
+  "known_npc_mentions": [
+    {
+      "index": 0,
+      "npc_id": 4,
+      "decision": "ignore"
+    },
+    {
+      "index": 1,
+      "npc_id": 9,
+      "decision": "ignore"
+    },
+    {
+      "index": 2,
+      "npc_id": 7,
+      "decision": "append_note"
+    },
+    {
+      "index": 3,
+      "npc_id": 6,
+      "decision": "append_note"
+    },
+    {
+      "index": 4,
+      "npc_id": 3,
+      "decision": "ignore"
+    },
+    {
+      "index": 5,
+      "npc_id": 8,
+      "decision": "append_note"
+    }
+  ],
+  "new_npc_candidates": [
+    {
+      "index": 0,
+      "proposed_name": "Dolphin",
+      "decision": "reject"
+    },
+    {
+      "index": 1,
+      "proposed_name": "Zombies (x3)",
+      "decision": "reject"
+    }
+  ],
+  "applied": [
+    "Updated Marina Kulyana",
+    "Updated Kolyan Indirovich",
+    "Updated Ismark"
+  ],
+  "skipped": [
+    "Ignored Strahd Von Zorovich",
+    "Ignored Bluetooth",
+    "Ignored Keychain",
+    "Rejected Dolphin",
+    "Rejected Zombies (x3)"
+  ]
+}

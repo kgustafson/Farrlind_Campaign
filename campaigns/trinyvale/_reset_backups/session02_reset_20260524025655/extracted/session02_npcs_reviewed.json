@@ -1,0 +1,42 @@
+{
+  "session_number": 2,
+  "applied_at": "2026-05-23T16:31:58",
+  "known_npc_mentions": [
+    {
+      "index": 0,
+      "npc_id": 4,
+      "decision": "append_note"
+    }
+  ],
+  "new_npc_candidates": [
+    {
+      "index": 0,
+      "proposed_name": "Burger Master",
+      "decision": "create"
+    },
+    {
+      "index": 1,
+      "proposed_name": "Marina Kuljana",
+      "decision": "create"
+    },
+    {
+      "index": 2,
+      "proposed_name": "Ismark",
+      "decision": "create"
+    },
+    {
+      "index": 3,
+      "proposed_name": "Imp",
+      "decision": "reject"
+    }
+  ],
+  "applied": [
+    "Updated Strahd Von Zorovich",
+    "Created Burger Master",
+    "Created Marina Kuljana",
+    "Created Ismark"
+  ],
+  "skipped": [
+    "Rejected Imp"
+  ]
+}

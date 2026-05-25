@@ -1,0 +1,48 @@
+{
+  "session_number": 2,
+  "applied_at": "2026-05-24T08:14:26",
+  "known_location_mentions": [
+    {
+      "index": 0,
+      "location_id": 4,
+      "decision": "ignore"
+    },
+    {
+      "index": 1,
+      "location_id": 7,
+      "decision": "ignore"
+    },
+    {
+      "index": 2,
+      "location_id": 10,
+      "decision": "ignore"
+    }
+  ],
+  "new_location_candidates": [
+    {
+      "index": 0,
+      "proposed_name": "Strahd von Zarovich's Mansion",
+      "decision": "create"
+    },
+    {
+      "index": 1,
+      "proposed_name": "Stone Pillar/Castle",
+      "decision": "reject"
+    },
+    {
+      "index": 2,
+      "proposed_name": "Village of Barovia",
+      "decision": "reject"
+    }
+  ],
+  "applied": [
+    "Created Strahd von Zarovich's Mansion"
+  ],
+  "skipped": [
+    "Ignored Barovia",
+    "Ignored The Road",
+    "Ignored Blood on the Vine",
+    "Rejected Stone Pillar/Castle",
+    "Rejected Village of Barovia"
+  ]
+}

@@ -1,0 +1,543 @@
+{
+  "known_location_mentions": [
+    {
+      "location_id": 4,
+      "canonical_name": "Barovia",
+      "mentioned_as": [
+        "Barovia"
+      ],
+      "new_information": "Mentioned in this session; no new canon update proposed.",
+      "session_number": 2,
+      "location_type": "country",
+      "parent_location": "Campaign Region",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "trek to complain to the man-anger of all of Barovia"
+    },
+    {
+      "location_id": 2,
+      "canonical_name": "Icewind Dale",
+      "mentioned_as": [
+        "Icewind Dale"
+      ],
+      "new_information": "The adventure began in the frozen peaks of Icewind Dale.",
+      "session_number": 2,
+      "location_type": "region",
+      "parent_location": "Campaign Region",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "Our adventure began in the frozen peaks of Icewind Dale"
+    },
+    {
+      "location_id": 3,
+      "canonical_name": "Overseer's Manor",
+      "mentioned_as": [
+        "Overseer's Manor"
+      ],
+      "new_information": "The party was directed to the Overseer's Manor to find Regan.",
+      "session_number": 2,
+      "location_type": "residence",
+      "parent_location": "Night Lotus Inn and Spa",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "you could find him at the Overseer's Manor further down the trail."
+    },
+    {
+      "location_id": 8,
+      "canonical_name": "Trail",
+      "mentioned_as": [
+        "trail"
+      ],
+      "new_information": "The trail was shrouded with a thick fog when the party proceeded towards the Overseer's Manor.",
+      "session_number": 2,
+      "location_type": "travel_lane",
+      "parent_location": "Campsite",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "bolted out the door and towards the Overseer's Manor, only to find the trail shrouded with a thick fog."
+    },
+    {
+      "location_id": 3,
+      "canonical_name": "Overseer's Manor",
+      "mentioned_as": [
+        "Overseer's Manor"
+      ],
+      "new_information": "The party begins the scene at the Overseer's Manor.",
+      "session_number": 2,
+      "location_type": "residence",
+      "parent_location": "Night Lotus Inn and Spa",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "s the Overseer's Manor,"
+    },
+    {
+      "location_id": 8,
+      "canonical_name": "Trail",
+      "mentioned_as": [
+        "trail"
+      ],
+      "new_information": "The trail was shrouded in thick fog when the party progressed.",
+      "session_number": 2,
+      "location_type": "travel_lane",
+      "parent_location": "Campsite",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "only to find the trail shrouded with a thick fog."
+    },
+    {
+      "location_id": 8,
+      "canonical_name": "Trail",
+      "mentioned_as": [
+        "muddy forest trail",
+        "trail",
+        "trail"
+      ],
+      "new_information": "The party is traveling down a muddy forest trail, avoiding black pools of rainwater.",
+      "session_number": 2,
+      "location_type": "travel_lane",
+      "parent_location": "Campsite",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "you're making your way down this muddy forest trail"
+    },
+    {
+      "location_id": 8,
+      "canonical_name": "Trail",
+      "mentioned_as": [
+        "trail",
+        "woods"
+      ],
+      "new_information": "The party wandered off the trail and into the woods.",
+      "session_number": 2,
+      "location_type": "travel_lane",
+      "parent_location": "Campsite",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "So, you wander off the trail and into the woods."
+    },
+    {
+      "location_id": 8,
+      "canonical_name": "Trail",
+      "mentioned_as": [
+        "trail"
+      ],
+      "new_information": "The party is deep in the woods off the trail.",
+      "session_number": 2,
+      "location_type": "travel_lane",
+      "parent_location": "Campsite",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "you're deep in the woods off the trail."
+    },
+    {
+      "location_id": 8,
+      "canonical_name": "Trail",
+      "mentioned_as": [
+        "trail",
+        "muddy trail"
+      ],
+      "new_information": "The party runs back towards the trail after escaping the mist.",
+      "session_number": 2,
+      "location_type": "travel_lane",
+      "parent_location": "Campsite",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "you find the nice, soft, muddy trail again. ... you're running back towards the trail."
+    },
+    {
+      "location_id": 4,
+      "canonical_name": "Barovia",
+      "mentioned_as": [
+        "Barovia"
+      ],
+      "new_information": "Mentioned in this session; no new canon update proposed.",
+      "session_number": 2,
+      "location_type": "country",
+      "parent_location": "Campaign Region",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "I, the Burgomaster of Barovia, send you honor with despair. ... within the walls of weeping Barovia."
+    },
+    {
+      "location_id": 42,
+      "canonical_name": "Svalich Road",
+      "mentioned_as": [
+        "Svalich road encounter"
+      ],
+      "new_information": "Mentioned in this session; no new canon update proposed.",
+      "session_number": 2,
+      "location_type": "travel_lane",
+      "parent_location": "Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "somebody roll me a D eight for a Svalich road encounter."
+    },
+    {
+      "location_id": 42,
+      "canonical_name": "Svalich Road",
+      "mentioned_as": [
+        "svalich road"
+      ],
+      "new_information": "Mentioned in this session; no new canon update proposed.",
+      "session_number": 2,
+      "location_type": "travel_lane",
+      "parent_location": "Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "roll me a svalich road encounter"
+    },
+    {
+      "location_id": 43,
+      "canonical_name": "Village of Barovia",
+      "mentioned_as": [
+        "village of barovia"
+      ],
+      "new_information": "The party arrives at the village, noting the presence of the burgomaster.",
+      "session_number": 2,
+      "location_type": "city",
+      "parent_location": "Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "that reads welcome to the village of barovia"
+    },
+    {
+      "location_id": 8,
+      "canonical_name": "Trail",
+      "mentioned_as": [
+        "trail"
+      ],
+      "new_information": "The trail leads into the area, eventually resting against the village.",
+      "session_number": 2,
+      "location_type": "travel_lane",
+      "parent_location": "Campsite",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "the trail dips gently until it comes to rest against a cluster of tall shapes"
+    },
+    {
+      "location_id": 34,
+      "canonical_name": "Blood on the Vine",
+      "mentioned_as": [
+        "Blood on the Vine"
+      ],
+      "new_information": "The party enters the tavern, which is described as shoddy with age and containing a blazing fire.",
+      "session_number": 2,
+      "location_type": "building",
+      "parent_location": "Village of Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "spilling from a tavern named Blood on the Vine... you burst through this door. ...appointed tavern has grown shoddy with age. There's a blazing fire in the hearth giving scant warmth..."
+    },
+    {
+      "location_id": 6,
+      "canonical_name": "The Gate",
+      "mentioned_as": [
+        "gate"
+      ],
+      "new_information": "The gate is a known feature of the area, used as a boundary or entry point.",
+      "session_number": 2,
+      "location_type": "feature",
+      "parent_location": "Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "Did you manage to post the warning on the outside of the gate? ... You were traveling all the way from the gate"
+    },
+    {
+      "location_id": 36,
+      "canonical_name": "Bildrath's Mercantile",
+      "mentioned_as": [
+        "Bildrath's Mercantile"
+      ],
+      "new_information": "A large shop labeled Bildrath's Mercantile is located on the lane.",
+      "session_number": 2,
+      "location_type": "building",
+      "parent_location": "Mansion",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "you see further down the lane from the tavern, a large shop labeled Bildrath's Mercantile"
+    },
+    {
+      "location_id": 37,
+      "canonical_name": "Madam Ava's Fortunes and Mortion",
+      "mentioned_as": [
+        "Madam Ava's Fortunes and Mortion"
+      ],
+      "new_information": "A smaller shop next to Bildrath's Mercantile has a sign reading Madam Ava's Fortunes and Mortion.",
+      "session_number": 2,
+      "location_type": "building",
+      "parent_location": "Mansion",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "and a smaller one next to it with an oddly clean sign reading Madam Ava's Fortunes and Mortion"
+    },
+    {
+      "location_id": 7,
+      "canonical_name": "The Road",
+      "mentioned_as": [
+        "road"
+      ],
+      "new_information": "Mentioned in this session; no new canon update proposed.",
+      "session_number": 2,
+      "location_type": "travel_lane",
+      "parent_location": "The Gate",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "Ismark leads you down the road to a weary-looking mansion"
+    },
+    {
+      "location_id": 35,
+      "canonical_name": "Mansion",
+      "mentioned_as": [
+        "house",
+        "mansion"
+      ],
+      "new_information": "The mansion is described as weary-looking, squatting behind a rusting iron fence, with heavy claw markings on the walls, and choked by weeds.",
+      "session_number": 2,
+      "location_type": "residence",
+      "parent_location": null,
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "It's the large house behind the fence... a weary-looking mansion squatting behind a rusting iron fence. Weeds choked the grounds and pressed with menace upon the house itself."
+    },
+    {
+      "location_id": 6,
+      "canonical_name": "The Gate",
+      "mentioned_as": [
+        "gates",
+        "gate"
+      ],
+      "new_information": "The party was instructed to tack a paper to the gates, and a copy was made at the gate.",
+      "session_number": 2,
+      "location_type": "feature",
+      "parent_location": "Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "We made a copy at the gate."
+    }
+  ],
+  "new_location_candidates": [
+    {
+      "proposed_name": "Yurt",
+      "location_type": "building",
+      "description": "The party retired to Leomund's yurt.",
+      "first_visited_session": 2,
+      "parent_location": "",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "you three retired to your Leomund's girthy yurt"
+    },
+    {
+      "proposed_name": "Woods",
+      "location_type": "wilderness",
+      "description": "Jynx searched into the woods in search of a manager.",
+      "first_visited_session": 2,
+      "parent_location": "Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "medium",
+      "evidence": "Jynx screamed into the woods in search of a manager"
+    },
+    {
+      "proposed_name": "Hotel Gift Shop 44",
+      "location_type": "building",
+      "description": "A specific shop mentioned as a destination.",
+      "first_visited_session": 2,
+      "parent_location": "",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "Hotel gift shop 44."
+    },
+    {
+      "proposed_name": "Grounds for the Night Lotus",
+      "location_type": "wilderness",
+      "description": "The location where the party is currently situated.",
+      "first_visited_session": 2,
+      "parent_location": "Woods",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "No, this is the grounds for the night lotus, actually."
+    },
+    {
+      "proposed_name": "Abandoned Guard Post",
+      "location_type": "landmark",
+      "description": "A specific landmark found ahead of the party in the village.",
+      "first_visited_session": 2,
+      "parent_location": "Village of Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "stands an abandoned guard post and a small sign"
+    },
+    {
+      "proposed_name": "Town Square",
+      "location_type": "district",
+      "description": "The lane leading to the mansion passes the town square.",
+      "first_visited_session": 2,
+      "parent_location": "",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "which is down a lane to the north past the town square"
+    },
+    {
+      "proposed_name": "Tavern",
+      "location_type": "building",
+      "description": "The party leaves the tavern when Ismark leads them out.",
+      "first_visited_session": 2,
+      "parent_location": "",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "Ismark leads you out of the tavern"
+    },
+    {
+      "proposed_name": "Church",
+      "location_type": "landmark",
+      "description": "An old church is set against a big cliff of stone down the lane.",
+      "first_visited_session": 2,
+      "parent_location": "",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "an old church set against a big cliff of stone"
+    },
+    {
+      "proposed_name": "Village",
+      "location_type": "settlement",
+      "description": "A massive stone pillar rises from the edge of the village.",
+      "first_visited_session": 2,
+      "parent_location": "",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "medium",
+      "evidence": "revealing for the first time a massive stone pillar rising from the edge of the village"
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "8379 Sudley Road",
+      "reason": "Specific real-world address; not a reusable campaign location."
+    },
+    {
+      "text": "Manassas",
+      "reason": "Brand/store name; not a reusable campaign location."
+    },
+    {
+      "text": "fog",
+      "reason": "Generic atmospheric condition, not a reusable campaign location."
+    },
+    {
+      "text": "surface",
+      "reason": "Generic directional reference, not a reusable campaign location."
+    },
+    {
+      "text": "campus",
+      "reason": "Too generic; context suggests it was dismissed in favor of the specific grounds."
+    },
+    {
+      "text": "fog",
+      "reason": "Generic environmental description, not a reusable campaign location."
+    },
+    {
+      "text": "large plain",
+      "reason": "Generic environmental description, not a reusable campaign location."
+    },
+    {
+      "text": "surface",
+      "reason": "Generic directional reference, not a reusable campaign location."
+    },
+    {
+      "text": "ilapidated house",
+      "reason": "Too generic; lacks specific naming or context for reuse."
+    },
+    {
+      "text": "surface",
+      "reason": "Generic directional reference, not a reusable campaign location."
+    },
+    {
+      "text": "town",
+      "reason": "Too generic; no specific settlement or landmark was named."
+    },
+    {
+      "text": "new york city",
+      "reason": "External location reference; no context provided regarding party interaction or canon facts within the Trinyvale campaign world."
+    },
+    {
+      "text": "Mansion",
+      "reason": "Duplicate of existing location: Mansion."
+    },
+    {
+      "text": "Village",
+      "reason": "Duplicate of new location candidate: Village."
+    },
+    {
+      "text": "Barovia Gate",
+      "reason": "Candidate name not found in session source."
+    },
+    {
+      "text": "Resort",
+      "reason": "Appears to be a party joke, misunderstanding, nickname, or theory rather than a confirmed location."
+    },
+    {
+      "text": "Night Lotus Grounds",
+      "reason": "Candidate name not found in session source."
+    },
+    {
+      "text": "Village Streets",
+      "reason": "Candidate name not found in session source."
+    },
+    {
+      "text": "Dilapidated District",
+      "reason": "Candidate name not found in session source."
+    },
+    {
+      "text": "The Butcher's Daughter",
+      "reason": "Appears to be a party joke, misunderstanding, nickname, or theory rather than a confirmed location."
+    },
+    {
+      "text": "Cobblestone Lane",
+      "reason": "Candidate name not found in session source."
+    },
+    {
+      "text": "Tavern",
+      "reason": "Duplicate of new location candidate: Tavern."
+    }
+  ],
+  "uncertainties": [
+    {
+      "candidate": "Corky",
+      "issue": "Unclear if this is a location or a name/alias.",
+      "needs_human_decision": true
+    },
+    {
+      "candidate": "sunas",
+      "issue": "Unclear if this is a specific place, item, or lore concept.",
+      "needs_human_decision": true
+    }
+  ]
+}

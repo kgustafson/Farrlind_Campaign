@@ -1,0 +1,69 @@
+{
+  "known_lore_mentions": [
+    {
+      "lore_item_id": 2,
+      "canonical_title": "The Metaphysical Shift",
+      "new_information": "Onyx Lumiere Lumiere and Nyack of the Ran'afor of the Ran'afor experienced a metaphysical shift related to their connection to their phones/weapons.",
+      "session_number": 2,
+      "category": "magic",
+      "source_npc": "Onyx Lumiere Lumiere, Nyack of the Ran'afor of the Ran'afor",
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "Onyx Lumiere Lumiere and Nyack of the Ran'afor of the Ran'afor experienced a metaphysical shift related to their connection to their phones/weapons."
+    }
+  ],
+  "new_lore_candidates": [
+    {
+      "proposed_title": "Barovia's Curse and History",
+      "category": "history",
+      "description": "A historical/magical conflict exists in Barovia involving a vampire draining the lifeblood of the people for over 400 years, and the Burgomaster requests the party to 'encircle this land with the symbols of good' and contain the devil within the walls of weeping Barovia.",
+      "source_npc": "Burgomaster of Barovia",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "The party read a message from the Burgomaster of Barovia detailing a curse and a request to encircle the land with symbols of good, referencing Marina Kuljana and a vampire."
+    },
+    {
+      "proposed_title": "Strahd's Authority",
+      "category": "faction_lore",
+      "description": "Strahd Von Zorovich is the manager of the establishment and the father/manager of the Burger Master, establishing a central conflict between the two figures.",
+      "source_npc": "Strahd Von Zorovich, Burger Master",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "Strahd revealed that the Burger Master was the father of the owners and the manager of the establishment."
+    },
+    {
+      "proposed_title": "Zombie Nature",
+      "category": "threat",
+      "description": "The zombies encountered are described as being more capable and possessing a 'fire' within them, suggesting a non-standard undead nature.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "The zombies are described as being more capable and possessing a 'fire' within them, suggesting a non-standard undead nature."
+    },
+    {
+      "proposed_title": "The Vampire's Curse of Barovia",
+      "category": "history",
+      "description": "The land of Barovia is cursed by a vampire who has been draining the lifeblood of the people for over four centuries. The Burgomaster seeks to use symbols of good to contain the devil within the land.",
+      "source_npc": "Burgomaster of Barovia",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "The note reveals a historical/magical conflict in Barovia involving a vampire draining the lifeblood of the people for over 400 years. The Burgomaster requests the party to 'encircle this land with the symbols of good' and contain the devil within the walls of weeping Barovia."
+    },
+    {
+      "proposed_title": "The Burger Master's Legacy",
+      "category": "faction_lore",
+      "description": "The Burger Master is the father and manager of the establishment in Barovia, placing him in a central conflict with Strahd Von Zorovich over ownership and secrets.",
+      "source_npc": "Strahd Von Zorovich, Burger Master",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "Strahd revealed that the Burger Master was the father of the owners and the manager of the establishment."
+    }
+  ],
+  "rejected_candidates": [],
+  "uncertainties": []
+}

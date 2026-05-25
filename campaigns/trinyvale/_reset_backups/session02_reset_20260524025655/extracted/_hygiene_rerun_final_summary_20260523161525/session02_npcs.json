@@ -1,0 +1,100 @@
+{
+  "known_npc_mentions": [
+    {
+      "npc_id": 95,
+      "canonical_name": "Kolyan Indirovich",
+      "mentioned_as": [
+        "Kolyan Indirovich",
+        "Burgomaster"
+      ],
+      "new_information": "The letter stated Marina Kulyana has been bitten by a vampire and asks outsiders to seal Barovia away with holy power.",
+      "session_number": 2,
+      "location": "Village of Barovia",
+      "confidence": "high",
+      "evidence": "The stolen envelope contains a desperate letter from Kolyan Indirovich, Burgomaster of Barovia. It says Marina Kulyana has been bitten by a vampire, that the vampire has terrorized Barovia for over 400 years, and asks outsiders to seal Barovia away with holy power so the evil cannot escape."
+    },
+    {
+      "npc_id": 93,
+      "canonical_name": "Marina Kulyana",
+      "mentioned_as": [
+        "Marina"
+      ],
+      "new_information": "Mentioned as the person bitten by a vampire, referenced in Kolyan's letter.",
+      "session_number": 2,
+      "location": "Burgomaster's House / Marina's Doorway",
+      "confidence": "high",
+      "evidence": "Kolyan Indirovich's letter says Marina Kulyana has been bitten by a vampire."
+    },
+    {
+      "npc_id": 94,
+      "canonical_name": "Ismark",
+      "mentioned_as": [
+        "Ismark"
+      ],
+      "new_information": "Recognized Onyx's disguise as Dolphin, revealed Kolyan is his father, and explained that Strahd and his minions have repeatedly attacked.",
+      "session_number": 2,
+      "location": "Blood on the Vine",
+      "confidence": "high",
+      "evidence": "The blonde man recognizes Onyx's Dolphin disguise and asks whether he posted Kolyan's warning at the gate. He reveals Kolyan is his father, making him likely Ismark, and explains that Strahd and his minions have repeatedly attacked."
+    },
+    {
+      "npc_id": 97,
+      "canonical_name": "Bluetooth / Jens Z",
+      "mentioned_as": [
+        "Bluetooth",
+        "Jens Z",
+        "Jens Z. Bluetooth"
+      ],
+      "new_information": "Onyx summoned him as a new imp familiar; he is rude, Gen Z-coded, iPad-using, and pacifier-spitting.",
+      "session_number": 2,
+      "location": "Svalich Road",
+      "confidence": "high",
+      "evidence": "Onyx summons a new imp familiar named Bluetooth, also nicknamed Jens Z. Bluetooth is rude, Gen Z-coded, iPad-using, and pacifier-spitting."
+    },
+    {
+      "npc_id": 4,
+      "canonical_name": "Strahd von Zarovich",
+      "mentioned_as": [
+        "Strahd"
+      ],
+      "new_information": "Mentioned as the vampire terrorizing Barovia and attacking Marina Kulyana.",
+      "session_number": 2,
+      "location": "Barovia",
+      "confidence": "high",
+      "evidence": "Ismark... explains that Strahd and his minions have repeatedly attacked."
+    }
+  ],
+  "new_npc_candidates": [
+    {
+      "proposed_name": "Barkeep",
+      "npc_kind": "named_individual",
+      "role": "Bartender in Blood on the Vine",
+      "description": "A person observed inside Blood on the Vine.",
+      "first_seen_session": 2,
+      "first_seen_location": "Blood on the Vine",
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "medium",
+      "evidence": "Inside they see a barkeep, a lone patron, three boisterous women by the fire, and a blonde man in fine leathers."
+    },
+    {
+      "proposed_name": "Lone Patron",
+      "npc_kind": "named_individual",
+      "role": "Patron in Blood on the Vine",
+      "description": "A person observed inside Blood on the Vine.",
+      "first_seen_session": 2,
+      "first_seen_location": "Blood on the Vine",
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "medium",
+      "evidence": "Inside they see a barkeep, a lone patron, three boisterous women by the fire, and a blonde man in fine leathers."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "three boisterous women",
+      "reason": "Generic background people, not individually important yet."
+    }
+  ],
+  "uncertainties": []
+}

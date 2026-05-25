@@ -1,0 +1,78 @@
+{
+  "session_number": 2,
+  "applied_at": "2026-05-23T12:35:57",
+  "known_location_mentions": [
+    {
+      "index": 0,
+      "location_id": 1,
+      "decision": "ignore"
+    },
+    {
+      "index": 1,
+      "location_id": 4,
+      "decision": "ignore"
+    },
+    {
+      "index": 2,
+      "location_id": 3,
+      "decision": "ignore"
+    },
+    {
+      "index": 3,
+      "location_id": 8,
+      "decision": "ignore"
+    },
+    {
+      "index": 4,
+      "location_id": 7,
+      "decision": "ignore"
+    },
+    {
+      "index": 5,
+      "location_id": 2,
+      "decision": "ignore"
+    },
+    {
+      "index": 6,
+      "location_id": 6,
+      "decision": "ignore"
+    }
+  ],
+  "new_location_candidates": [
+    {
+      "index": 0,
+      "proposed_name": "Blood on the Vine",
+      "decision": "create"
+    },
+    {
+      "index": 1,
+      "proposed_name": "Mansion",
+      "decision": "create"
+    },
+    {
+      "index": 2,
+      "proposed_name": "Bildrath's Mercantile",
+      "decision": "create"
+    },
+    {
+      "index": 3,
+      "proposed_name": "Madam Ava's Fortunes and Mortion",
+      "decision": "create"
+    }
+  ],
+  "applied": [
+    "Created Blood on the Vine",
+    "Created Mansion",
+    "Created Bildrath's Mercantile",
+    "Created Madam Ava's Fortunes and Mortion"
+  ],
+  "skipped": [
+    "Ignored Night Lotus Inn and Spa",
+    "Ignored Barovia",
+    "Ignored Overseer's Manor",
+    "Ignored Trail",
+    "Ignored The Road",
+    "Ignored Icewind Dale",
+    "Ignored The Gate"
+  ]
+}

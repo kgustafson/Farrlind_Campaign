@@ -1,0 +1,86 @@
+{
+  "proposed_combat_encounters": [
+    {
+      "title": "Zombie Encounter",
+      "session_number": 2,
+      "subtype": "zombie_battle",
+      "location": "Woods",
+      "participants": "Party, three zombies",
+      "outcome": "unknown",
+      "confidence": "medium",
+      "notes": "The party faced three rising zombies in the woods, resulting in combat. Specific outcomes of the fight are not detailed.",
+      "enemies": [
+        {
+          "name": "Zombie",
+          "enemy_type": "zombie",
+          "quantity": 3,
+          "quantity_killed": null,
+          "outcome": "unknown",
+          "confidence": "medium",
+          "notes": "Three zombies were encountered and fought."
+        }
+      ],
+      "evidence": "The party then faced three rising zombies, which resulted in combat."
+    },
+    {
+      "title": "Strahd's Confrontation",
+      "session_number": 2,
+      "subtype": "boss_fight",
+      "location": "Mansion",
+      "participants": "Party, Strahd, minions, Ismark, Marina, Imp",
+      "outcome": "unknown",
+      "confidence": "medium",
+      "notes": "A confrontation ensued involving Strahd and his minions, as well as Ismark, Marina, and an imp.",
+      "enemies": [
+        {
+          "name": "Strahd Von Zorovich",
+          "enemy_type": "vampire",
+          "quantity": 1,
+          "quantity_killed": null,
+          "outcome": "unknown",
+          "confidence": "medium",
+          "notes": "Confronted Strahd and his minions."
+        },
+        {
+          "name": "Minions",
+          "enemy_type": "minion",
+          "quantity": null,
+          "quantity_killed": null,
+          "outcome": "unknown",
+          "confidence": "low",
+          "notes": "Strahd's minions were present during the confrontation."
+        },
+        {
+          "name": "Ismark",
+          "enemy_type": "person",
+          "quantity": 1,
+          "quantity_killed": null,
+          "outcome": "unknown",
+          "confidence": "medium",
+          "notes": "Involved in the confrontation."
+        },
+        {
+          "name": "Marina Kuljana",
+          "enemy_type": "person",
+          "quantity": 1,
+          "quantity_killed": null,
+          "outcome": "unknown",
+          "confidence": "medium",
+          "notes": "Involved in the confrontation."
+        },
+        {
+          "name": "Imp",
+          "enemy_type": "imp",
+          "quantity": 1,
+          "quantity_killed": null,
+          "outcome": "unknown",
+          "confidence": "medium",
+          "notes": "Involved in the confrontation."
+        }
+      ],
+      "evidence": "The party confronted Strahd and his minions... A confrontation ensued involving Ismark, Marina, and an imp, resulting in violence."
+    }
+  ],
+  "rejected_candidates": [],
+  "uncertainties": []
+}

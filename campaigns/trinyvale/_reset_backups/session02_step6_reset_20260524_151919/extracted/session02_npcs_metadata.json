@@ -1,0 +1,52 @@
+{
+  "session": "session02",
+  "model": "gemma4:e2b",
+  "source": "auto",
+  "sources": [
+    {
+      "label": "curated_packet",
+      "path": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session02_curated.md",
+      "chars": 11048
+    }
+  ],
+  "chunked": false,
+  "chunk_count": 1,
+  "registry_rows_sent": [
+    9
+  ],
+  "avg_registry_rows_sent": 9.0,
+  "campaign_metadata": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/campaign.yaml",
+  "party_character_names": [
+    "Jake",
+    "Jens",
+    "Jens Lindell",
+    "Jens Lyndelle",
+    "Jins",
+    "Murph",
+    "Nayak",
+    "Niac",
+    "Nyac",
+    "Nyack",
+    "Nyack of the Ran'afor",
+    "Onyx",
+    "Onyx Lumiere",
+    "Onyx back"
+  ],
+  "npc_registry_count": 9,
+  "location_count": 9,
+  "duration_seconds": 80.46,
+  "guardrail_warning_count": 9,
+  "guardrail_warnings": [
+    "Dropped known mention not present in session source: The Elf",
+    "Neutralized party-interpretation NPC update: Bluetooth",
+    "Neutralized party-interpretation NPC update: Marina Kulyana",
+    "Neutralized party-framed NPC update: Keychain",
+    "Recovered mismatched-id known mention as new NPC candidate: Dolphin != Reagan",
+    "Recovered unknown-id known mention as new NPC candidate: Zombies (x3)",
+    "Recovered mismatched-id known mention as new NPC candidate: Nyack of the Ran'afor of the Ran'afor != Bluetooth",
+    "Rejected party-interpretation NPC candidate: Nyack of the Ran'afor of the Ran'afor",
+    "Rejected party-interpretation NPC candidate: Burger Master"
+  ],
+  "created_at": "2026-05-24T04:02:06",
+  "output": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/extracted/session02_npcs.json"
+}

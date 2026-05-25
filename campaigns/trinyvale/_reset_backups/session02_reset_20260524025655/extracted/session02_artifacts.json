@@ -1,0 +1,89 @@
+{
+  "known_artifact_mentions": [
+    {
+      "artifact_id": 7,
+      "canonical_name": "Champagne de l'Estompe",
+      "mentioned_as": [
+        "wine"
+      ],
+      "new_information": "No new canon update proposed.",
+      "session_number": 2,
+      "artifact_type": "",
+      "current_holder": "",
+      "properties": [],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "low",
+      "evidence": "No mention of Champagne de l'Estompe in this session source material."
+    },
+    {
+      "artifact_id": 2,
+      "canonical_name": "Magical Chest",
+      "mentioned_as": [
+        "chest"
+      ],
+      "new_information": "No new canon update proposed.",
+      "session_number": 2,
+      "artifact_type": "",
+      "current_holder": "",
+      "properties": [],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "low",
+      "evidence": "No mention of Magical Chest in this session source material."
+    }
+  ],
+  "new_artifact_candidates": [
+    {
+      "proposed_name": "Short Sword",
+      "artifact_type": "weapon",
+      "description": "The party acquired two short swords from a zombie corpse.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Jens Lyndelle",
+      "properties": [],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "Jens Lyndelle pulled items from the corpses, including two short swords..."
+    },
+    {
+      "proposed_name": "Longbow",
+      "artifact_type": "weapon",
+      "description": "The party attempted to take a longbow from a zombie.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Nyack of the Ran'afor of the Ran'afor",
+      "properties": [],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "Nyack of the Ran'afor of the Ran'afor attempted to take the longbow from a zombie..."
+    },
+    {
+      "proposed_name": "Envelope",
+      "artifact_type": "other",
+      "description": "A zombie clutched an envelope.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Unknown",
+      "properties": [],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "another zombie clutched an envelope."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "Zombie Corpse Items",
+      "reason": "Candidate name not found in session source."
+    }
+  ],
+  "uncertainties": []
+}

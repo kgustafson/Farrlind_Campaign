@@ -1,0 +1,847 @@
+{
+  "known_npc_mentions": [
+    {
+      "npc_id": 97,
+      "canonical_name": "Bluetooth / Jens Z",
+      "mentioned_as": [
+        "Bluetooth"
+      ],
+      "new_information": "Mentioned in the context of a product purchase.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "Get up to 60% off on motorcycle gear and top brands, plus a free Bluetooth unit with any qualifying helmet purchase of $319 or more."
+    },
+    {
+      "npc_id": 3,
+      "canonical_name": "Keychain",
+      "mentioned_as": [
+        "robot keychain"
+      ],
+      "new_information": "Mixing up some experimental elixirs.",
+      "session_number": 2,
+      "location": "yurt",
+      "confidence": "high",
+      "evidence": "you three retired to your Leomund's girthy yurt to find your faithful robot keychain mixing up some experimental elixirs."
+    },
+    {
+      "npc_id": 4,
+      "canonical_name": "Strahd von Zarovich",
+      "mentioned_as": [
+        "Strahd Von Zarovich",
+        "your host"
+      ],
+      "new_information": "Brought the party to Barovia and looked forward to their meeting. Sent a letter containing pastries, a tote bag, a bottle of wine, and a letter.",
+      "session_number": 2,
+      "location": "Barovia",
+      "confidence": "high",
+      "evidence": "one of the wolves returned bearing a basket containing pastries, a tote bag, a bottle of wine, and a letter from your host, Strahd Von Zarovich. The letter explained that Strahd had brought you to Barovia to witness your potential and he looked forward to your meeting."
+    },
+    {
+      "npc_id": 4,
+      "canonical_name": "Strahd von Zarovich",
+      "mentioned_as": [
+        "manager of all Barovia",
+        "Strahd Von Zarovich"
+      ],
+      "new_information": "The party is hunting for the manager of all Barovia.",
+      "session_number": 2,
+      "location": "Barovia",
+      "confidence": "high",
+      "evidence": "and began hunting for the manager of all Barovia, Strahd Von Zarovich."
+    },
+    {
+      "npc_id": 3,
+      "canonical_name": "Keychain",
+      "mentioned_as": [
+        "Keychain"
+      ],
+      "new_information": "Was holding wine.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "Nayak reaches absently for the wine that Keychain is holding."
+    },
+    {
+      "npc_id": 3,
+      "canonical_name": "Keychain",
+      "mentioned_as": [
+        "Keychain"
+      ],
+      "new_information": "Mentioned in this session; no new canon update proposed.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "Nayak reaches absently for the wine that Keychain is holding."
+    },
+    {
+      "npc_id": 97,
+      "canonical_name": "Bluetooth / Jens Z",
+      "mentioned_as": [
+        "Bluetooth"
+      ],
+      "new_information": "Onyx kicked Bluetooth.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "I absolutely kicked Bluetooth."
+    },
+    {
+      "npc_id": 97,
+      "canonical_name": "Bluetooth / Jens Z",
+      "mentioned_as": [
+        "Bluetooth",
+        "Jens Z"
+      ],
+      "new_information": "Described as an imp dressed in Jens Z style with a middle part and broccoli hair.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "He has broccoli hair that is a middle part. ... He was going to be like an imp, but now I think he is an imp, but dressed in Jens Z style. ... He has broccoli hair and a middle part."
+    },
+    {
+      "npc_id": 97,
+      "canonical_name": "Bluetooth / Jens Z",
+      "mentioned_as": [
+        "bluetooth"
+      ],
+      "new_information": "The speaker gave Bluetooth a dismissive way.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "i will give it bluetooth in a dismissive way"
+    },
+    {
+      "npc_id": 97,
+      "canonical_name": "Bluetooth / Jens Z",
+      "mentioned_as": [
+        "bluetooth"
+      ],
+      "new_information": "The party sought approval from Bluetooth regarding an action.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "wait bluetooth can i have your approval"
+    },
+    {
+      "npc_id": 3,
+      "canonical_name": "Keychain",
+      "mentioned_as": [
+        "keychain"
+      ],
+      "new_information": "Tried to lunge at the party member.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "keychain tries to lunge at you but misses just at 13"
+    },
+    {
+      "npc_id": 97,
+      "canonical_name": "Bluetooth / Jens Z",
+      "mentioned_as": [
+        "bluetooth",
+        "gen z"
+      ],
+      "new_information": "Is referred to as 'gen z' and flies.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "bluetooth aka gen z flies so he was flying"
+    },
+    {
+      "npc_id": 97,
+      "canonical_name": "Bluetooth / Jens Z",
+      "mentioned_as": [
+        "bluetooth",
+        "gen z"
+      ],
+      "new_information": "Bluetooth is mentioned as flying.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "just want everyone to know that actually bluetooth aka gen z flies so he was flying"
+    },
+    {
+      "npc_id": 3,
+      "canonical_name": "Keychain",
+      "mentioned_as": [
+        "Keychain"
+      ],
+      "new_information": "Keychain was looking around.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "As you do, you see Keychain looks around"
+    },
+    {
+      "npc_id": 3,
+      "canonical_name": "Keychain",
+      "mentioned_as": [
+        "Keychain"
+      ],
+      "new_information": "Observed by the party; disguised himself as a steel defender robotic dog.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "you see Keychain looks around, says, perhaps it would be best if I disguised myself. And you see his gears shift and grind as he falls to all fours and transforms into a steel defender robotic dog."
+    },
+    {
+      "npc_id": 97,
+      "canonical_name": "Bluetooth / Jens Z",
+      "mentioned_as": [
+        "Bluetooth"
+      ],
+      "new_information": "Looking at iPads while walking into town with Onyx.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "Me and Bluetooth are just looking at iPads as we walk into town."
+    },
+    {
+      "npc_id": 96,
+      "canonical_name": "Dolphin",
+      "mentioned_as": [
+        "Dolphin"
+      ],
+      "new_information": "Mentioned in this session; no new canon update proposed.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "You see the man with blonde hair and fine leathers stands up and says, Dolphin, is that you? ... I think Dolphin could use a free meal for Dolphin's service. ... Corky and Dolphin?"
+    },
+    {
+      "npc_id": 96,
+      "canonical_name": "Dolphin",
+      "mentioned_as": [
+        "Dolphin"
+      ],
+      "new_information": "Mentioned in this session; no new canon update proposed.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "Corky and Dolphin?"
+    },
+    {
+      "npc_id": 97,
+      "canonical_name": "Bluetooth / Jens Z",
+      "mentioned_as": [
+        "bluetooth"
+      ],
+      "new_information": "Mentioned in this session; no new canon update proposed.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "look at bluetooth and wonder if he's a cat"
+    },
+    {
+      "npc_id": 97,
+      "canonical_name": "Bluetooth / Jens Z",
+      "mentioned_as": [
+        "bluetooth"
+      ],
+      "new_information": "Mentioned in context of a conversation.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "bluetooth and wonder if he's a cat look"
+    },
+    {
+      "npc_id": 94,
+      "canonical_name": "Ismark",
+      "mentioned_as": [
+        "Ismark"
+      ],
+      "new_information": "Spoke up during the interaction.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "You see Ismark speaks up."
+    },
+    {
+      "npc_id": 97,
+      "canonical_name": "Bluetooth / Jens Z",
+      "mentioned_as": [
+        "Bluetooth"
+      ],
+      "new_information": "The player put a sleep mask on him.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "I put a sleep mask on Bluetooth tonight."
+    },
+    {
+      "npc_id": 94,
+      "canonical_name": "Ismark",
+      "mentioned_as": [
+        "Ismark"
+      ],
+      "new_information": "Leads the party out of the tavern.",
+      "session_number": 2,
+      "location": "tavern",
+      "confidence": "high",
+      "evidence": "So Ismark leads you out of the tavern."
+    },
+    {
+      "npc_id": 97,
+      "canonical_name": "Bluetooth / Jens Z",
+      "mentioned_as": [
+        "Bluetooth"
+      ],
+      "new_information": "A wooden block was placed on his head.",
+      "session_number": 2,
+      "location": "mansion",
+      "confidence": "high",
+      "evidence": "I think that we can just put it on Bluetooth's head. Put the little wooden block on his head."
+    },
+    {
+      "npc_id": 94,
+      "canonical_name": "Ismark",
+      "mentioned_as": [
+        "Ismark"
+      ],
+      "new_information": "Led the party down the road to the mansion.",
+      "session_number": 2,
+      "location": "Mansion",
+      "confidence": "high",
+      "evidence": "Ismark leads you down the road to a weary-looking mansion"
+    },
+    {
+      "npc_id": 94,
+      "canonical_name": "Ismark",
+      "mentioned_as": [
+        "Ismark"
+      ],
+      "new_information": "Ismark returned and brought help; he slammed the door shut, pulled out a knife, and questioned the party.",
+      "session_number": 2,
+      "location": "The Gate",
+      "confidence": "high",
+      "evidence": "Ismark goes up to the door and knocks slowly and says, Marina, it's me. I've returned and I've brought help. Ismark slams it shut, pulls out a knife and points it at the two of you and says, who are you? Who are you really? What are you doing here?"
+    },
+    {
+      "npc_id": 97,
+      "canonical_name": "Bluetooth / Jens Z",
+      "mentioned_as": [
+        "Bluetooth"
+      ],
+      "new_information": "Bluetooth attacked the party member (imp) after being provoked.",
+      "session_number": 2,
+      "location": null,
+      "confidence": "high",
+      "evidence": "Bluetooth attack."
+    }
+  ],
+  "new_npc_candidates": [
+    {
+      "proposed_name": "Elvin Ranger",
+      "npc_kind": "named_individual",
+      "role": "Person seeking to speak to the man-anger",
+      "description": "A character who wants to talk to the man-anger.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "Elvin Ranger, who wants to talk to the man-anger, Nyack of the Ranafore."
+    },
+    {
+      "proposed_name": "Regan",
+      "npc_kind": "named_individual",
+      "role": "Elven wellness advisor",
+      "description": "An elven wellness advisor who provided the party with a secret chest and keycards.",
+      "first_seen_session": 2,
+      "first_seen_location": "Night Lotus / Yurt",
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "you were interrupted by Regan, your elven wellness advisor."
+    },
+    {
+      "proposed_name": "Crew",
+      "npc_kind": "group",
+      "role": "The two individuals who were shouted out.",
+      "description": "The two crew members mentioned in the transcript.",
+      "first_seen_session": 2,
+      "first_seen_location": "Trail",
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "medium",
+      "evidence": "Shout out to the two crew."
+    },
+    {
+      "proposed_name": "Kuljan Indirovich",
+      "npc_kind": "named_individual",
+      "role": "Burgomaster of Barovia",
+      "description": "The ruler of Barovia who sent a letter regarding Marina Kuljana.",
+      "first_seen_session": 2,
+      "first_seen_location": "Barovia",
+      "aliases": [
+        "Burgomaster"
+      ],
+      "status": "known",
+      "confidence": "high",
+      "evidence": "I, the Burgomaster of Barovia, send you honor with despair. Kuljan Indirovich, Burgomaster."
+    },
+    {
+      "proposed_name": "Burger Tycoon",
+      "npc_kind": "named_individual",
+      "role": "Owner of the hotel/burger magnate",
+      "description": "The wealthy individual who will pay cash to destroy the hotel.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [
+        "burger magnate"
+      ],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "this rich burger tycoon will pay us cash."
+    },
+    {
+      "proposed_name": "Burgomaster Kolian Indirovich",
+      "npc_kind": "named_individual",
+      "role": "Burgomaster of Barovia",
+      "description": "The current burgomaster of the village of Barovia.",
+      "first_seen_session": 2,
+      "first_seen_location": "Village of Barovia",
+      "aliases": [
+        "Kolyan",
+        "Burgomaster Kolyan"
+      ],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "someone has added current burgomaster kolian indirovich"
+    },
+    {
+      "proposed_name": "Burgomaster Kolian Indirovich",
+      "npc_kind": "named_individual",
+      "role": "Burgomaster of the resort town",
+      "description": "The individual who is the burgomaster of the resort town.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "neath that you see someone has added current burgomaster kolian indirovich oh wow um i also"
+    },
+    {
+      "proposed_name": "Kulian",
+      "npc_kind": "named_individual",
+      "role": "Father of the speaker",
+      "description": "The father of the character who was discussing the meal plan.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [
+        "Kulian"
+      ],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "Kulian is my father, yes."
+    },
+    {
+      "proposed_name": "Strahd",
+      "npc_kind": "named_individual",
+      "role": "Manager",
+      "description": "The manager of the establishment.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [
+        "Strahd von Zarovich",
+        "Strahd"
+      ],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "Strahd's the manager."
+    },
+    {
+      "proposed_name": "Corka",
+      "npc_kind": "named_individual",
+      "role": "Person mentioned in context of meal",
+      "description": "A person mentioned in the context of the meal plan.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [
+        "Corker"
+      ],
+      "status": "unknown",
+      "confidence": "medium",
+      "evidence": "Corka, please. Corker?"
+    },
+    {
+      "proposed_name": "Strahd",
+      "npc_kind": "named_individual",
+      "role": "Manager of the establishment",
+      "description": "The manager with whom the party has a dispute.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [
+        "manager"
+      ],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "I have a bone to pick with the manager, Strahd."
+    },
+    {
+      "proposed_name": "Arik",
+      "npc_kind": "named_individual",
+      "role": "Person who went into the back.",
+      "description": "A person who briefly went into the back.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "You see Arik goes into the back for a second."
+    },
+    {
+      "proposed_name": "Elinka",
+      "npc_kind": "named_individual",
+      "role": "Owner of the nut cheese.",
+      "description": "One of the owners of the nut cheese.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "You showed it to the owners over there, to Elinka, Mirabel and Solvia"
+    },
+    {
+      "proposed_name": "Mirabel",
+      "npc_kind": "named_individual",
+      "role": "Owner of the nut cheese.",
+      "description": "One of the owners of the nut cheese.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "You showed it to the owners over there, to Elinka, Mirabel and Solvia"
+    },
+    {
+      "proposed_name": "Solvia",
+      "npc_kind": "named_individual",
+      "role": "Owner of the nut cheese.",
+      "description": "One of the owners of the nut cheese.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "You showed it to the owners over there, to Elinka, Mirabel and Solvia"
+    },
+    {
+      "proposed_name": "Adik",
+      "npc_kind": "named_individual",
+      "role": "Figure who suggested something about the resort.",
+      "description": "A character who suggested something about the resort.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "medium",
+      "evidence": "Maybe Adik was onto something. Hey, Curtsy."
+    },
+    {
+      "proposed_name": "Curtsy",
+      "npc_kind": "named_individual",
+      "role": "Figure addressed by Adik.",
+      "description": "A character addressed by Adik.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "medium",
+      "evidence": "Hey, Curtsy."
+    },
+    {
+      "proposed_name": "Strahd",
+      "npc_kind": "intelligent_monster",
+      "role": "Antagonist",
+      "description": "The entity repeatedly harassing the party.",
+      "first_seen_session": 2,
+      "first_seen_location": "Mansion",
+      "aliases": [
+        "Strahd von Zarovich",
+        "Strahd"
+      ],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "Strahd and his minions have repeatedly harassed us"
+    },
+    {
+      "proposed_name": "Marina",
+      "npc_kind": "named_individual",
+      "role": "Person Marina was speaking to by Ismark.",
+      "description": "A person who was at the door when Ismark returned.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "medium",
+      "evidence": "Ismark knocks slowly and says, Marina, it's me."
+    },
+    {
+      "proposed_name": "Stevie Wags",
+      "npc_kind": "named_individual",
+      "role": "Named entity/character",
+      "description": "A named entity mentioned in the transcript.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "medium",
+      "evidence": "The Cobalt, Targat, Stevie Wags, Hellish, Rebuker, The NBDMPHD, Princess Yar, Jory S, Jack L, Nicholas C"
+    },
+    {
+      "proposed_name": "The Aladrin",
+      "npc_kind": "named_individual",
+      "role": "Character/Figure",
+      "description": "A character mentioned in relation to wanting to hang out.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "medium",
+      "evidence": "The Aladrin Who Just Wants to Hang Out"
+    },
+    {
+      "proposed_name": "Cal and Her Cats",
+      "npc_kind": "group",
+      "role": "Group",
+      "description": "A group consisting of Cal and her cats.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "medium",
+      "evidence": "Cal and Her Cats"
+    },
+    {
+      "proposed_name": "Marcos",
+      "npc_kind": "named_individual",
+      "role": "PhD Student",
+      "description": "Marcos, a PhD Student.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "Marcos, PhD Student"
+    },
+    {
+      "proposed_name": "Meg",
+      "npc_kind": "named_individual",
+      "role": "Mail Carrier of Bohemia",
+      "description": "Meg, the Mail Carrier of Bohemia.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "Meg the Mail Carrier of Bohemia"
+    },
+    {
+      "proposed_name": "Shane C",
+      "npc_kind": "named_individual",
+      "role": "Bard",
+      "description": "Shane C, a Bard.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "Oreo, Shane C, Barpo Good Barrel Bard"
+    },
+    {
+      "proposed_name": "Kit",
+      "npc_kind": "named_individual",
+      "role": "Companion",
+      "description": "Kit and their cat.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "medium",
+      "evidence": "Kit and their cat"
+    },
+    {
+      "proposed_name": "Tim M.",
+      "npc_kind": "named_individual",
+      "role": "Companion",
+      "description": "Tim M., companion.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "medium",
+      "evidence": "Kit and their cat, Tim M."
+    },
+    {
+      "proposed_name": "Jennery",
+      "npc_kind": "named_individual",
+      "role": "Individual",
+      "description": "Jennery, Kelsey A.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "Jennery, Kelsey A."
+    },
+    {
+      "proposed_name": "Ethan",
+      "npc_kind": "named_individual",
+      "role": "Mailman",
+      "description": "Ethan the mailman.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "Ethan the mailman"
+    },
+    {
+      "proposed_name": "Maple",
+      "npc_kind": "named_individual",
+      "role": "Bookworm",
+      "description": "Maple the shy bookworm.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "Maple the shy bookworm"
+    },
+    {
+      "proposed_name": "Ashasaurus",
+      "npc_kind": "named_individual",
+      "role": "Creature/Entity",
+      "description": "Ashasaurus.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "Ashasaurus"
+    },
+    {
+      "proposed_name": "Carl B.",
+      "npc_kind": "named_individual",
+      "role": "Plumber",
+      "description": "Carl B., plumber of the realm.",
+      "first_seen_session": 2,
+      "first_seen_location": null,
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "Michael L. S. II., Carl B., plumber of the realm"
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "Caldwell Tanner",
+      "reason": "DM, not an NPC."
+    },
+    {
+      "text": "Jens",
+      "reason": "Party member, not an NPC."
+    },
+    {
+      "text": "hotel",
+      "reason": "Location/structure, not an individual NPC."
+    },
+    {
+      "text": "gardeners",
+      "reason": "Generic background people, not individually important yet."
+    },
+    {
+      "text": "gardeners",
+      "reason": "Generic background people, not individually important yet."
+    },
+    {
+      "text": "Jens",
+      "reason": "Party member."
+    },
+    {
+      "text": "Naya",
+      "reason": "Party member."
+    },
+    {
+      "text": "vegan",
+      "reason": "Generic background person, not individually important yet."
+    },
+    {
+      "text": "Elinka, Mirabel, Solvia",
+      "reason": "Generic background people, not individually important yet."
+    },
+    {
+      "text": "two crew",
+      "reason": "Generic group reference; lacks specific identity or meaningful interaction beyond being mentioned in relation to the gate."
+    },
+    {
+      "text": "The Cobalt",
+      "reason": "Abstract lore/title, not an individually important NPC."
+    },
+    {
+      "text": "Star of Every Film Ever Made in Bohemia",
+      "reason": "Abstract title/reference, not an individually important NPC."
+    },
+    {
+      "text": "gardeners",
+      "reason": "Generic background people, not individually important yet."
+    },
+    {
+      "text": "hi mom",
+      "reason": "Generic background people, not individually important yet."
+    },
+    {
+      "text": "Zombie Group",
+      "reason": "Candidate name not found in session source."
+    },
+    {
+      "text": "Burger Master",
+      "reason": "Appears to be a party joke, nickname, misunderstanding, or theory rather than a confirmed NPC."
+    },
+    {
+      "text": "Vampire Daughter",
+      "reason": "Candidate name not found in session source."
+    },
+    {
+      "text": "Burger Master",
+      "reason": "Appears to be a party joke, nickname, misunderstanding, or theory rather than a confirmed NPC."
+    },
+    {
+      "text": "Burger Master",
+      "reason": "Appears to be a party joke, nickname, misunderstanding, or theory rather than a confirmed NPC."
+    },
+    {
+      "text": "Wes Alding / The Envelope",
+      "reason": "Candidate name not found in session source."
+    },
+    {
+      "text": "The Butcher's Daughter",
+      "reason": "Appears to be a party joke, nickname, misunderstanding, or theory rather than a confirmed NPC."
+    },
+    {
+      "text": "Burger Master",
+      "reason": "Appears to be a party joke, nickname, misunderstanding, or theory rather than a confirmed NPC."
+    },
+    {
+      "text": "Burger Master",
+      "reason": "Appears to be a party joke, nickname, misunderstanding, or theory rather than a confirmed NPC."
+    },
+    {
+      "text": "Big Bad Beardo the Mad",
+      "reason": "Appears to be a party joke, nickname, misunderstanding, or theory rather than a confirmed NPC."
+    },
+    {
+      "text": "ell",
+      "reason": "Appears to be a party joke, nickname, misunderstanding, or theory rather than a confirmed NPC."
+    }
+  ],
+  "uncertainties": [
+    {
+      "candidate": "Jory S",
+      "issue": "Name spelling uncertain.",
+      "needs_human_decision": false
+    }
+  ]
+}

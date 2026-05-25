@@ -1,0 +1,50 @@
+{
+  "proposed_combat_encounters": [
+    {
+      "title": "Fast Zombies in the Woods",
+      "session_number": 2,
+      "subtype": "zombie_encounter",
+      "location": "Svalich Road",
+      "participants": "Party, three fast zombies",
+      "outcome": "fled",
+      "confidence": "high",
+      "notes": "The Triplets encountered three fast zombies in the woods but chose to steal items and flee without defeating them.",
+      "enemies": [
+        {
+          "name": "Fast Zombies",
+          "enemy_type": "zombie",
+          "quantity": 3,
+          "quantity_killed": 0,
+          "outcome": "fled",
+          "confidence": "high",
+          "notes": "The Triplets failed to defeat the zombies and fled."
+        }
+      ],
+      "evidence": "Fast Zombies in the Woods: the three corpses rise as unusually fast zombies. Instead of defeating them, the Triplets steal the rusty short swords, bloodstained longbow, and envelope, then flee into the mist without killing the zombies."
+    },
+    {
+      "title": "Cliffhanger Attack",
+      "session_number": 2,
+      "subtype": "imminent_combat",
+      "location": "Burgomaster's House / Marina's Doorway",
+      "participants": "Party, Bluetooth, people",
+      "outcome": "cliffhanger",
+      "confidence": "high",
+      "notes": "The session ends with Onyx ordering Bluetooth to attack, putting the party on the verge of fighting the people they were supposed to help.",
+      "enemies": [
+        {
+          "name": "People",
+          "enemy_type": "humanoid",
+          "quantity": null,
+          "quantity_killed": 0,
+          "outcome": "cliffhanger",
+          "confidence": "medium",
+          "notes": "The party is on the verge of fighting the people."
+        }
+      ],
+      "evidence": "The session ends on a cliffhanger when Onyx orders Bluetooth to attack; the imp spits out his pacifier and launches forward, putting the party on the verge of fighting the people they were probably supposed to help."
+    }
+  ],
+  "rejected_candidates": [],
+  "uncertainties": []
+}

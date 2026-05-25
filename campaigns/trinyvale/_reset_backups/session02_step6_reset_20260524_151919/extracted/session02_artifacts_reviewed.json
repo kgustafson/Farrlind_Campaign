@@ -1,0 +1,47 @@
+{
+  "session_number": 2,
+  "applied_at": "2026-05-24T08:17:44",
+  "known_artifact_mentions": [
+    {
+      "index": 0,
+      "artifact_id": 6,
+      "decision": "ignore"
+    },
+    {
+      "index": 1,
+      "artifact_id": 1,
+      "decision": "ignore"
+    }
+  ],
+  "new_artifact_candidates": [
+    {
+      "index": 0,
+      "proposed_name": "Hunter's Mark",
+      "decision": "reject"
+    },
+    {
+      "index": 1,
+      "proposed_name": "Zephyr's Strike",
+      "decision": "reject"
+    },
+    {
+      "index": 2,
+      "proposed_name": "Leomund's Secret Chest",
+      "decision": "reject"
+    },
+    {
+      "index": 3,
+      "proposed_name": "Gloomstalker Ranger Transformation",
+      "decision": "reject"
+    }
+  ],
+  "applied": [],
+  "skipped": [
+    "Ignored Champagne de l'Estompe",
+    "Ignored Magical Chest",
+    "Rejected Hunter's Mark",
+    "Rejected Zephyr's Strike",
+    "Rejected Leomund's Secret Chest",
+    "Rejected Gloomstalker Ranger Transformation"
+  ]
+}

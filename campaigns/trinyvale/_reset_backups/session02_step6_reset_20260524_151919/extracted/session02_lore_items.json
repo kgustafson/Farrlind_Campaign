@@ -1,0 +1,63 @@
+{
+  "known_lore_mentions": [],
+  "new_lore_candidates": [
+    {
+      "proposed_title": "Strahd's Paranoia and Resort Finances",
+      "category": "faction_lore",
+      "description": "Strahd von Zarovich was paranoid about spies, and the resort town was financially unstable due to lost guests.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "They learned that Strahd von Zarovich was paranoid about spies and that the resort town was financially unstable due to lost guests."
+    },
+    {
+      "proposed_title": "Marina Kulyana's History",
+      "category": "history",
+      "description": "Marina Kulyana Kulyana Kulyana has been bitten by a vampire for over 400 years, draining the lifeblood from Kolyan Indirovich Indirovich's people.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "Marina Kulyana Kulyana Kulyana has been bitten by a vampire for over 400 years, draining the lifeblood from Kolyan Indirovich Indirovich's people."
+    },
+    {
+      "proposed_title": "Nature of the Barovian Undead",
+      "category": "threat",
+      "description": "Undead in Barovia, specifically zombies, possess unusual physical properties, including internal fire and firmness, suggesting a unique, perhaps corrupted, nature.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "The zombies encountered in the woods were noted to possess a strange firmness and internal fire, suggesting they were more capable than normal undead."
+    },
+    {
+      "proposed_title": "The Kulyana Bloodline Curse",
+      "category": "history",
+      "description": "The Kulyana family lineage is tied to a long-standing vampiric curse, where the bloodline has been drained for centuries, impacting the people of Kolyan Indirovich Indirovich.",
+      "source_npc": "Kolyan Indirovich Indirovich",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "Marina Kulyana Kulyana Kulyana has been bitten by a vampire for over 400 years, draining the lifeblood from Kolyan Indirovich Indirovich's people."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "The party used Hunter's Mark and Zephyr's Strike to combat the zombies and escape.",
+      "reason": "Tactical action/magic usage, not durable world lore."
+    }
+  ],
+  "uncertainties": [
+    {
+      "candidate": "The specific identity of the person the party was disguising themselves as (Wes Alding/The Envelope)",
+      "issue": "The source material explicitly states this identity is uncertain, requiring further investigation.",
+      "needs_human_decision": false
+    },
+    {
+      "candidate": "The exact nature of the 'wealth' mentioned in the note and the reward promised",
+      "issue": "The session source explicitly notes this information is uncertain, requiring further investigation.",
+      "needs_human_decision": false
+    }
+  ]
+}

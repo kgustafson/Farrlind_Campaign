@@ -1,0 +1,73 @@
+{
+  "known_thread_mentions": [
+    {
+      "thread_id": 1,
+      "canonical_title": "Who is Targeting Jens Lindell?",
+      "new_information": "Jens Lyndelle was found pulling items from a zombie corpse, including two short swords and a longbow, while another zombie clutched an envelope.",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 1,
+      "last_session": 2,
+      "related_location": "Night Lotus Inn and Spa",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "Jens Lyndelle pulled items from the corpses, including two short swords and a longbow, while another zombie clutched an envelope."
+    },
+    {
+      "thread_id": 66,
+      "canonical_title": "How can Marina Kulyana be protected from Strahd?",
+      "new_information": "The party confronted Ismark and Marina, resulting in a violent outcome involving a knife and an imp.",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Burgomaster's House / Marina's Doorway",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "The party confronted Ismark and Marina, resulting in a violent outcome involving a knife and an imp."
+    },
+    {
+      "thread_id": 68,
+      "canonical_title": "What burger-master misunderstanding will the Triplets pursue?",
+      "new_information": "The party established a plan to shut down the hotel and franchise the proprietary burger recipe, deciding to murder the daughter of a vampire who worked at the hotel, seeking to bring the Burger Master in to learn his secrets and eventually eliminate him.",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Village of Barovia",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "The party established a plan to shut down the hotel and franchise the proprietary burger recipe, deciding to murder the daughter of a vampire who worked at the hotel. They sought to bring the Burger Master in to learn his secrets and eventually eliminate him."
+    }
+  ],
+  "new_thread_candidates": [
+    {
+      "proposed_title": "Fate of the Corpses and Found Items",
+      "thread_type": "lore_mystery",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "The Woods",
+      "description": "The fate of the three human corpses found near the new construction site and the items they possessed (swords, longbow, envelope) remains unknown.",
+      "resolution": "",
+      "notes": "The items found on the corpses are a key mystery. Future sessions should determine if these items are relevant to the main quest or if the corpses hold further secrets.",
+      "confidence": "high",
+      "evidence": "The party discovered three human corpses in the woods near the new building. Jens Lyndelle pulled items from the corpses, including two short swords and a longbow, while another zombie clutched an envelope."
+    },
+    {
+      "proposed_title": "Outcome of Confrontation with Ismark and Marina",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Mansion",
+      "description": "The specific outcome of the confrontation involving Ismark, Marina, and the imp is not fully detailed.",
+      "resolution": "",
+      "notes": "The session noted a violent outcome, but the specific results of the confrontation need to be clarified.",
+      "confidence": "medium",
+      "evidence": "The party confronted Ismark and Marina, resulting in a violent outcome involving a knife and an imp."
+    }
+  ],
+  "rejected_candidates": [],
+  "uncertainties": []
+}

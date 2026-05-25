@@ -1,0 +1,21 @@
+{
+  "audio_file_path": "campaigns/trinyvale/audio/session02.mp3",
+  "campaign_name": "trinyvale",
+  "commands": [
+    "transcribe_audio",
+    "source_status_check",
+    "curate_transcript",
+    "extract_npcs",
+    "extract_locations",
+    "extract_artifacts",
+    "extract_lore_items",
+    "extract_combat_encounters",
+    "extract_open_threads",
+    "extract_events",
+    "postextract_shortcut"
+  ],
+  "queued_at": "2026-05-23T15:40:30.884308+00:00",
+  "session_name": "session02",
+  "session_number": 2,
+  "stop_before": "review_npc_extraction"
+}

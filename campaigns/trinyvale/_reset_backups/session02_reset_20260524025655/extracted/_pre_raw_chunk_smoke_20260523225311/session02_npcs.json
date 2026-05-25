@@ -1,0 +1,73 @@
+{
+  "known_npc_mentions": [
+    {
+      "npc_id": 4,
+      "canonical_name": "Strahd Von Zorovich",
+      "mentioned_as": [
+        "Strahd"
+      ],
+      "new_information": "Revealed that the Burger Master was the father of the owners and the manager of the establishment.",
+      "session_number": 2,
+      "location": "Blood on the Vine",
+      "confidence": "high",
+      "evidence": "Strahd revealed that the Burger Master was the father of the owners and the manager of the establishment."
+    }
+  ],
+  "new_npc_candidates": [
+    {
+      "proposed_name": "Burger Master",
+      "npc_kind": "named_individual",
+      "role": "Father/Manager of the establishment",
+      "description": "The father of the owners and manager of the establishment at the resort town.",
+      "first_seen_session": 2,
+      "first_seen_location": "Blood on the Vine",
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "Strahd revealed that the Burger Master was the father of the owners and the manager of the establishment."
+    },
+    {
+      "proposed_name": "Marina Kuljana",
+      "npc_kind": "named_individual",
+      "role": "Daughter of the Burgomaster, bitten by a vampire",
+      "description": "A character referenced in the letter from the Burgomaster and present during the final confrontation.",
+      "first_seen_session": 2,
+      "first_seen_location": "Mansion",
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "The party confronted Ismark and Marina, resulting in a violent outcome involving a knife and an imp."
+    },
+    {
+      "proposed_name": "Ismark",
+      "npc_kind": "named_individual",
+      "role": "Character involved in the confrontation",
+      "description": "A character who attempted to return with help and was involved in the confrontation with the party.",
+      "first_seen_session": 2,
+      "first_seen_location": "Mansion",
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "A confrontation ensued involving Ismark, Marina, and an imp, resulting in violence."
+    },
+    {
+      "proposed_name": "Imp",
+      "npc_kind": "intelligent_monster",
+      "role": "Entity involved in the confrontation",
+      "description": "An entity that was involved in the confrontation, obeying the party's pact and attacking.",
+      "first_seen_session": 2,
+      "first_seen_location": "Mansion",
+      "aliases": [],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "A confrontation ensued involving Ismark, Marina, and an imp, resulting in violence."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "Zombies",
+      "reason": "Generic monster type; specific individuals (Strahd, Burger Master, Marina, Ismark, Imp) are more relevant for tracking specific interactions."
+    }
+  ],
+  "uncertainties": []
+}

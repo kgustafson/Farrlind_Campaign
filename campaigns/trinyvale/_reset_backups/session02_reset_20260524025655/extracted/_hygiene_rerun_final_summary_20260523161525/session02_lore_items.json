@@ -1,0 +1,48 @@
+{
+  "known_lore_mentions": [],
+  "new_lore_candidates": [
+    {
+      "proposed_title": "Bluetooth / Jens Z.",
+      "category": "artifact_lore",
+      "description": "Onyx summoned a new imp familiar named Bluetooth, who is rude, Gen Z-coded, iPad-using, and pacifier-spitting, leading Onyx to become attached to him in a BoyMom way.",
+      "source_npc": "Onyx Lumiere",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "Onyx summons a new imp familiar named Bluetooth, also nicknamed Jens Z. Bluetooth is rude, Gen Z-coded, iPad-using, and pacifier-spitting; Onyx becomes attached to him in a BoyMom way."
+    },
+    {
+      "proposed_title": "Green Flame Lantern",
+      "category": "artifact_lore",
+      "description": "Jens discovered a lantern with a black candle that burns with green flame and never runs out.",
+      "source_npc": "Jens Lyndelle",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "Jens discovers a lantern with a black candle that burns with green flame and never runs out."
+    },
+    {
+      "proposed_title": "Fast Zombies",
+      "category": "threat",
+      "description": "Fast Zombies in the Woods are unusually fast zombies that appear when the Triplets travel the Svalich Road.",
+      "source_npc": "Party",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "Fast Zombies in the Woods: the three corpses rise as unusually fast zombies."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "The Triplets misread the letter as a burger-magnate problem involving a proprietary recipe, Yelp reviews, and a threatened mom-and-pop burger business.",
+      "reason": "Character interpretation/humor, not durable campaign lore."
+    }
+  ],
+  "uncertainties": [
+    {
+      "candidate": "The specific nature of the 'holy power' requested by the Burgomaster.",
+      "issue": "The exact nature of the holy power requested by Kolyan Indirovich to seal Barovia is not defined.",
+      "needs_human_decision": false
+    }
+  ]
+}

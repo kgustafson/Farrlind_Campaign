@@ -1,0 +1,32 @@
+{
+  "session": "session02",
+  "model": "gemma4:e2b",
+  "source": "auto",
+  "sources": [
+    {
+      "label": "curated_packet",
+      "path": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session02_curated.md",
+      "chars": 11048
+    }
+  ],
+  "chunked": false,
+  "chunk_count": 1,
+  "registry_rows_sent": [
+    2
+  ],
+  "avg_registry_rows_sent": 2.0,
+  "campaign_metadata": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/campaign.yaml",
+  "lore_registry_count": 2,
+  "npc_registry_count": 5,
+  "location_count": 8,
+  "artifact_registry_count": 6,
+  "duration_seconds": 28.73,
+  "guardrail_warning_count": 3,
+  "guardrail_warnings": [
+    "Dropped known lore mention whose canonical title does not match lore_item_id 1: The Zombies Possess Internal Fire and Firmness != The Trinivale Triplets",
+    "Converted mismatched known lore mention to new candidate: Strahd's Paranoia and Resort Finances",
+    "Converted unknown known lore mention to new candidate: Marina Kulyana's History"
+  ],
+  "created_at": "2026-05-24T03:36:27",
+  "output": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/extracted/session02_lore_items.json"
+}

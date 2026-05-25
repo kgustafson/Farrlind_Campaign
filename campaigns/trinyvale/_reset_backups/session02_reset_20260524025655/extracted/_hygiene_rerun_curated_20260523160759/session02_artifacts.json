@@ -1,0 +1,113 @@
+{
+  "known_artifact_mentions": [
+    {
+      "artifact_id": 7,
+      "canonical_name": "Champagne de l'Estompe",
+      "mentioned_as": [
+        "wine"
+      ],
+      "new_information": "No new canon update proposed.",
+      "session_number": 2,
+      "artifact_type": "",
+      "current_holder": "",
+      "properties": [
+        "Wine"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "The party received a basket containing wine, pastries, and a letter from Strahd Von Zorovich."
+    },
+    {
+      "artifact_id": 11,
+      "canonical_name": "Jar of Pickled Ghoul Tongues",
+      "mentioned_as": [
+        "jar of pickled ghoul tongues"
+      ],
+      "new_information": "No new canon update proposed.",
+      "session_number": 2,
+      "artifact_type": "consumable",
+      "current_holder": "",
+      "properties": [
+        "Pickled ghoul tongues"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "The party found a jar of pickled ghouls tongues."
+    }
+  ],
+  "new_artifact_candidates": [
+    {
+      "proposed_name": "Hunter's Mark",
+      "artifact_type": "spell/mark",
+      "description": "No new canon update proposed.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Nyack of the Ran'afor of the Ran'afor",
+      "properties": [
+        "Used to mark a zombie as quarry"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "Nyack of the Ran'afor of the Ran'afor attempted to take the longbow from a zombie, resulting in a contested strength check, and used Hunter's Mark on a zombie."
+    },
+    {
+      "proposed_name": "Short Swords",
+      "artifact_type": "weapon",
+      "description": "No new canon update proposed.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Jens Lyndelle",
+      "properties": [
+        "Short swords"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "Jens Lyndelle pulled items from the corpses, including two short swords and a longbow."
+    },
+    {
+      "proposed_name": "Longbow",
+      "artifact_type": "weapon",
+      "description": "No new canon update proposed.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Nyack of the Ran'afor of the Ran'afor",
+      "properties": [
+        "Taken from a zombie"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "Nyack of the Ran'afor of the Ran'afor attempted to take the longbow from a zombie."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "short swords",
+      "reason": "Mundane weapons found in the session; not a unique artifact."
+    },
+    {
+      "text": "envelope",
+      "reason": "Mundane item found in the session; not a unique artifact."
+    },
+    {
+      "text": "Z's Alpha Wolf Brain",
+      "reason": "Candidate name not found in session source."
+    }
+  ],
+  "uncertainties": [
+    {
+      "candidate": "Zombies' Nature",
+      "issue": "The zombies are described as possessing a 'strange internal fire,' suggesting a non-standard undead nature. The exact nature and consequences of this fire and their non-standard undead nature are still unfolding.",
+      "needs_human_decision": false
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "known_npc_mentions": [
+    {
+      "npc_id": 4,
+      "canonical_name": "Strahd Von Zorovich",
+      "mentioned_as": [
+        "Strahd von Zarovich von Zarovich",
+        "Strahd"
+      ],
+      "new_information": "Was paranoid about spies and the resort town was financially unstable due to lost guests.",
+      "session_number": 2,
+      "location": "Barovia",
+      "confidence": "high",
+      "evidence": "They learned that Strahd von Zarovich was paranoid about spies and that the resort town was financially unstable due to lost guests."
+    },
+    {
+      "npc_id": 9,
+      "canonical_name": "Bluetooth",
+      "mentioned_as": [
+        "Bluetooth"
+      ],
+      "new_information": "Mentioned in this session; no new canon update proposed.",
+      "session_number": 2,
+      "location": "Strahd von Zarovich von Zarovich's Mansion",
+      "confidence": "high",
+      "evidence": "A deception check failed during the interaction with Ismark and Marina Kulyana Kulyana Kulyana, resulting in an attack by Bluetooth."
+    },
+    {
+      "npc_id": 7,
+      "canonical_name": "Marina Kulyana",
+      "mentioned_as": [
+        "Marina Kulyana Kulyana Kulyana"
+      ],
+      "new_information": "Mentioned in this session; no new canon update proposed.",
+      "session_number": 2,
+      "location": "Strahd von Zarovich von Zarovich's Mansion",
+      "confidence": "high",
+      "evidence": "A deception check failed during the interaction with Ismark and Marina Kulyana Kulyana, resulting in an attack by Bluetooth."
+    },
+    {
+      "npc_id": 6,
+      "canonical_name": "Kolyan Indirovich",
+      "mentioned_as": [
+        "Burgomaster of Barovia"
+      ],
+      "new_information": "Sender of the note regarding Marina Kulyana Kulyana Kulyana.",
+      "session_number": 2,
+      "location": "Barovia",
+      "confidence": "high",
+      "evidence": "The party received an envelope/letter containing a message from the Burgomaster of Barovia regarding Marina Kulyana Kulyana Kulyana."
+    },
+    {
+      "npc_id": 3,
+      "canonical_name": "Keychain",
+      "mentioned_as": [
+        "Keychain"
+      ],
+      "new_information": "Mentioned in this session; no new canon update proposed.",
+      "session_number": 2,
+      "location": "Blood on the Vine",
+      "confidence": "high",
+      "evidence": "They used a disguise, with Keychain transforming into a steel defender robotic dog, and the gloom stalker used the disguise self spell to transform into a zombie to navigate the area."
+    },
+    {
+      "npc_id": 8,
+      "canonical_name": "Ismark",
+      "mentioned_as": [
+        "Ismark"
+      ],
+      "new_information": "Led the party out of the tavern to the mansion and returned to retrieve a note from Marina Kulyana Kulyana.",
+      "session_number": 2,
+      "location": "Blood on the Vine",
+      "confidence": "high",
+      "evidence": "Ismark led the party out of the tavern to the mansion and returned to retrieve a note from Marina Kulyana Kulyana."
+    }
+  ],
+  "new_npc_candidates": [
+    {
+      "proposed_name": "Dolphin",
+      "npc_kind": "named_individual",
+      "role": "The bartender at Blood on the Vine who recognized one of the party members.",
+      "description": "The bartender at Blood on the Vine who recognized one of the party members.",
+      "first_seen_session": 2,
+      "first_seen_location": "Blood on the Vine",
+      "aliases": [
+        "Dolphin"
+      ],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "They found a tavern named Blood on the Vine, where the bartender, Dolphin, recognized one of the party members."
+    },
+    {
+      "proposed_name": "Zombies (x3)",
+      "npc_kind": "named_individual",
+      "role": "Possessed a strange firmness and internal fire, suggesting they were more capable than normal undead.",
+      "description": "Possessed a strange firmness and internal fire, suggesting they were more capable than normal undead.",
+      "first_seen_session": 2,
+      "first_seen_location": "The Woods/Trail",
+      "aliases": [
+        "three human corpses",
+        "three zombies"
+      ],
+      "status": "unknown",
+      "confidence": "high",
+      "evidence": "The party encountered three zombies in the woods, which were noted to possess a strange firmness and internal fire, suggesting they were more capable than normal undead."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "gardeners",
+      "reason": "Generic background people, not individually important yet."
+    },
+    {
+      "text": "Nyack of the Ran'afor of the Ran'afor",
+      "reason": "Appears to be a party joke, nickname, misunderstanding, or theory rather than a confirmed NPC."
+    },
+    {
+      "text": "Burger Master",
+      "reason": "Appears to be a party joke, nickname, misunderstanding, or theory rather than a confirmed NPC."
+    }
+  ],
+  "uncertainties": []
+}

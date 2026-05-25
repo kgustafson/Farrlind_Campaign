@@ -1,0 +1,118 @@
+description: Campaign lookup values exported from Project Utilities. This file is
+  used to regenerate init/20_lookup_overrides.sql after lookup edits.
+lookups:
+  artifact-types:
+    table: artifact_type
+    value_column: type_name
+    description_column: null
+    values:
+    - value: armor
+    - value: axe
+    - value: bow
+    - value: cap
+    - value: container
+    - value: grimoire
+    - value: magic item
+    - value: orb
+    - value: other
+    - value: relic
+    - value: shield
+    - value: spell
+    - value: staff
+    - value: tool
+    - value: treasure
+    - value: trinket
+    - value: wand
+    - value: weapon
+  location-types:
+    table: location_type
+    value_column: type_name
+    description_column: null
+    values:
+    - value: building
+    - value: city
+    - value: coastal
+    - value: dungeon
+    - value: dwarven_hold
+    - value: feywild
+    - value: inn
+    - value: island
+    - value: landmark
+    - value: monastery
+    - value: road
+    - value: settlement
+    - value: tavern
+    - value: temple
+    - value: town
+    - value: underwater
+    - value: wilderness
+  combat-outcomes:
+    table: combat_outcome
+    value_column: outcome_code
+    description_column: description
+    values:
+    - value: captured
+      description: Enemy was captured.
+    - value: defeated
+      description: Enemy or encounter was overcome.
+    - value: escaped
+      description: Enemy escaped the encounter.
+    - value: fled
+      description: Enemy fled the encounter.
+    - value: killed
+      description: Enemy was killed.
+    - value: summoned
+      description: Enemy was summoned or appeared.
+    - value: unknown
+      description: Outcome has not been established.
+  npc-status:
+    table: entity_status
+    value_column: status_code
+    description_column: description
+    values:
+    - value: alive
+      description: Confirmed living
+    - value: dead
+      description: Confirmed dead
+    - value: fled
+      description: Escaped encounter
+    - value: imprisoned
+      description: Captured or confined
+    - value: missing
+      description: Last known location unknown
+    - value: unknown
+      description: Status not confirmed
+  workflow-status-states:
+    table: workflow_status_state
+    value_column: status_code
+    description_column: description
+    values:
+    - value: blocked
+      description: Step cannot proceed until a blocker is cleared.
+    - value: completed
+      description: Step or workflow completed successfully.
+    - value: failed
+      description: Step or workflow failed.
+    - value: initialized
+      description: Workflow has been created but not started.
+    - value: needs_attention
+      description: Human attention is required.
+    - value: partially_completed
+      description: Workflow has completed some but not all steps.
+    - value: pending
+      description: Step is waiting to run.
+    - value: running
+      description: Step is currently running.
+    - value: skipped
+      description: Step was intentionally skipped.
+  artifact-flags:
+    table: artifact_flag
+    value_column: flag_code
+    description_column: description
+    values:
+    - value: cursed
+      description: Artifact carries a harmful curse.
+    - value: infernal
+      description: Artifact has infernal origin, influence, or binding.
+    - value: sentient
+      description: Artifact has awareness or agency.

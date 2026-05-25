@@ -1,0 +1,32 @@
+{
+  "session": "session02",
+  "model": "gemma4:e2b",
+  "source": "auto",
+  "sources": [
+    {
+      "label": "curated_packet",
+      "path": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session02_curated.md",
+      "chars": 11048
+    }
+  ],
+  "chunked": false,
+  "chunk_count": 1,
+  "registry_rows_sent": [
+    6
+  ],
+  "avg_registry_rows_sent": 6.0,
+  "campaign_metadata": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/campaign.yaml",
+  "artifact_registry_count": 6,
+  "npc_registry_count": 5,
+  "location_count": 8,
+  "duration_seconds": 39.13,
+  "guardrail_warning_count": 4,
+  "guardrail_warnings": [
+    "Dropped known artifact mention not present in session source: Blood Red Jasper Strips",
+    "Converted unknown known artifact mention to new candidate: Hunter's Mark",
+    "Converted unknown known artifact mention to new candidate: Zephyr's Strike",
+    "Converted mismatched known artifact mention to new candidate: Leomund's Secret Chest != Magical Chest"
+  ],
+  "created_at": "2026-05-24T03:35:58",
+  "output": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/extracted/session02_artifacts.json"
+}

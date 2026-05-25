@@ -1,0 +1,41 @@
+{
+  "session_number": 2,
+  "applied_at": "2026-05-24T08:20:21",
+  "known_thread_mentions": [
+    {
+      "index": 0,
+      "thread_id": 1,
+      "decision": "ignore"
+    },
+    {
+      "index": 1,
+      "thread_id": 2,
+      "decision": "ignore"
+    }
+  ],
+  "new_thread_candidates": [
+    {
+      "index": 0,
+      "proposed_title": "The Context of the Gate Warning",
+      "decision": "reject"
+    },
+    {
+      "index": 1,
+      "proposed_title": "The Nature of the Zombies",
+      "decision": "reject"
+    },
+    {
+      "index": 2,
+      "proposed_title": "The Identity of the Disguise",
+      "decision": "reject"
+    }
+  ],
+  "applied": [],
+  "skipped": [
+    "Ignored The Fate of Jens Lindell",
+    "Ignored The Significance of Artifacts and Lore",
+    "Rejected The Context of the Gate Warning",
+    "Rejected The Nature of the Zombies",
+    "Rejected The Identity of the Disguise"
+  ]
+}

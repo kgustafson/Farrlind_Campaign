@@ -1,0 +1,47 @@
+session: session02
+status: in_review
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: Session 02
+session_date: '2026-05-23'
+in_game_date: ''
+primary_location: ''
+source_files:
+  draft_summary: /app/campaigns/trinyvale/clean/session02_summary.md
+  curated_packet: /app/campaigns/trinyvale/clean/session02_curated.md
+  merged_events: /app/campaigns/trinyvale/clean/session02_merged.md
+  validation_report: /app/campaigns/trinyvale/clean/session02_validation.md
+items:
+- id: event-001
+  sequence: 1
+  source_type: db_event
+  source_text: Zombie Encounter
+  decision: pending
+  canonical_text: ''
+  event_type: combat
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-002
+  sequence: 2
+  source_type: db_event
+  source_text: Imp Familiar Attack
+  decision: pending
+  canonical_text: ''
+  event_type: combat
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+added_items: []

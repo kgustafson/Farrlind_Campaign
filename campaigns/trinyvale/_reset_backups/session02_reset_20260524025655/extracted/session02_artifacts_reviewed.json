@@ -1,0 +1,41 @@
+{
+  "session_number": 2,
+  "applied_at": "2026-05-23T16:48:06",
+  "known_artifact_mentions": [
+    {
+      "index": 0,
+      "artifact_id": 7,
+      "decision": "ignore"
+    },
+    {
+      "index": 1,
+      "artifact_id": 2,
+      "decision": "ignore"
+    }
+  ],
+  "new_artifact_candidates": [
+    {
+      "index": 0,
+      "proposed_name": "Short Sword",
+      "decision": "reject"
+    },
+    {
+      "index": 1,
+      "proposed_name": "Longbow",
+      "decision": "reject"
+    },
+    {
+      "index": 2,
+      "proposed_name": "Envelope",
+      "decision": "reject"
+    }
+  ],
+  "applied": [],
+  "skipped": [
+    "Ignored Champagne de l'Estompe",
+    "Ignored Magical Chest",
+    "Rejected Short Sword",
+    "Rejected Longbow",
+    "Rejected Envelope"
+  ]
+}

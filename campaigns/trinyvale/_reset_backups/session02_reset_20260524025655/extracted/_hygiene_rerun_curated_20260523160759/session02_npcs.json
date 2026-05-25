@@ -1,0 +1,57 @@
+{
+  "known_npc_mentions": [
+    {
+      "npc_id": 4,
+      "canonical_name": "Strahd von Zarovich",
+      "mentioned_as": [
+        "Strahd",
+        "the manager"
+      ],
+      "new_information": "Strahd revealed that the Burger Master was the father of the owners and the manager of the establishment.",
+      "session_number": 2,
+      "location": "Blood on the Vine",
+      "confidence": "high",
+      "evidence": "Strahd revealed that the Burger Master was the father of the owners and the manager of the establishment."
+    },
+    {
+      "npc_id": 93,
+      "canonical_name": "Marina Kulyana",
+      "mentioned_as": [
+        "Marina"
+      ],
+      "new_information": "Marina was referenced in the Burgomaster's letter and was involved in the final confrontation with Ismark.",
+      "session_number": 2,
+      "location": "Village of Barovia",
+      "confidence": "high",
+      "evidence": "The party read a message from the Burgomaster of Barovia detailing a curse and a request to encircle the land with symbols of good, referencing Marina Kuljana."
+    },
+    {
+      "npc_id": 94,
+      "canonical_name": "Ismark",
+      "mentioned_as": [
+        "Ismark"
+      ],
+      "new_information": "Ismark was involved in the final confrontation with the party, Marina, and an imp.",
+      "session_number": 2,
+      "location": "Mansion",
+      "confidence": "high",
+      "evidence": "A confrontation ensued involving Ismark, Marina, and an imp, resulting in violence."
+    },
+    {
+      "npc_id": 97,
+      "canonical_name": "Bluetooth / Jens Z",
+      "mentioned_as": [
+        "Onyx Lumiere Lumiere",
+        "Nyack of the Ran'afor of the Ran'afor"
+      ],
+      "new_information": "Onyx and Nyack experienced a metaphysical shift related to their connection to their phones/weapons.",
+      "session_number": 2,
+      "location": "Svalich Road",
+      "confidence": "high",
+      "evidence": "Onyx Lumiere Lumiere and Nyack of the Ran'afor of the Ran'afor experienced a metaphysical shift related to their connection to their phones/weapons."
+    }
+  ],
+  "new_npc_candidates": [],
+  "rejected_candidates": [],
+  "uncertainties": []
+}

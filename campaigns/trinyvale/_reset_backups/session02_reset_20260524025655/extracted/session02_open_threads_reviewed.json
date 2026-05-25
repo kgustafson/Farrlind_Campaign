@@ -1,0 +1,42 @@
+{
+  "session_number": 2,
+  "applied_at": "2026-05-23T16:46:51",
+  "known_thread_mentions": [
+    {
+      "index": 0,
+      "thread_id": 1,
+      "decision": "ignore"
+    }
+  ],
+  "new_thread_candidates": [
+    {
+      "index": 0,
+      "proposed_title": "Fate of the Corpses and Stolen Items",
+      "decision": "reject"
+    },
+    {
+      "index": 1,
+      "proposed_title": "The Burger Master's Legacy and Conflict",
+      "decision": "create"
+    },
+    {
+      "index": 2,
+      "proposed_title": "Consequences of Metaphysical Shifts",
+      "decision": "reject"
+    },
+    {
+      "index": 3,
+      "proposed_title": "Outcome of the Confrontation with Ismark and Marina",
+      "decision": "reject"
+    }
+  ],
+  "applied": [
+    "Created The Burger Master's Legacy and Conflict"
+  ],
+  "skipped": [
+    "Ignored Who is Targeting Jens Lindell?",
+    "Rejected Fate of the Corpses and Stolen Items",
+    "Rejected Consequences of Metaphysical Shifts",
+    "Rejected Outcome of the Confrontation with Ismark and Marina"
+  ]
+}

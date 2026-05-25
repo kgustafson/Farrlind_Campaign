@@ -1,0 +1,385 @@
+{
+  "known_lore_mentions": [],
+  "new_lore_candidates": [
+    {
+      "proposed_title": "The Party's Journey to Barovia",
+      "category": "location_lore",
+      "description": "The party is planning a trek to complain to the 'man-anger of all of Barovia', indicating a known relationship or grievance with the region.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "Now, folks, before we begin our trek to complain to the man-anger of all of Barovia,"
+    },
+    {
+      "proposed_title": "The Fog of Lethargy",
+      "category": "magic",
+      "description": "A thick fog shrouded the trail, and as the party progressed, their bodies felt oddly lethargic.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "As you progressed, the fog grew even thicker and your bodies felt oddly lethargic."
+    },
+    {
+      "proposed_title": "Jar of Pickled Ghouls Tongues",
+      "category": "artifact_lore",
+      "description": "The party discovered a jar of pickled ghouls tongues in a gift shop.",
+      "source_npc": "Nayak",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "You find a jar of pickled ghouls tongues."
+    },
+    {
+      "proposed_title": "The Grounds of the Night Lotus",
+      "category": "location_lore",
+      "description": "The area where the party was found is the grounds for the night lotus.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "No, this is the grounds for the night lotus, actually."
+    },
+    {
+      "proposed_title": "Nyack's Position",
+      "category": "faction_lore",
+      "description": "Nyack holds a position at the top of an established order.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "And that brings us to Nyack at the top of the order."
+    },
+    {
+      "proposed_title": "The Burgomaster of Barovia",
+      "category": "faction_lore",
+      "description": "The Burgomaster of Barovia is Kolyan Indirovich, who is seeking aid from the recipient of the letter to save his people from the vampire.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "The letter is signed by 'Kuljan Indirovich, Burgomaster.'"
+    },
+    {
+      "proposed_title": "The Proprietary Burger Recipe",
+      "category": "artifact_lore",
+      "description": "A specific proprietary recipe is tied to the hotel/business, which is linked to vampire activity.",
+      "source_npc": "Party",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "It's all about this proprietary recipe, because then it's a licensing matter."
+    },
+    {
+      "proposed_title": "Lantern of Eternal Green Flame",
+      "category": "artifact_lore",
+      "description": "A lantern with a black candle that never runs out and burns with a green flame was found in the soil.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "you get a lantern with a black candle that never runs out and burns with a green flame"
+    },
+    {
+      "proposed_title": "Village of Barovia",
+      "category": "location_lore",
+      "description": "The village of Barovia is characterized by ghastly structures and is ruled by a Burgomaster named Kolyan Indirovich.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "The transcript describes emerging into a village where the sign reads 'welcome to the village of barovia' and mentions the Burgomaster Kolyan Indirovich."
+    },
+    {
+      "proposed_title": "Burgomaster Kolian Indirovich",
+      "category": "faction_lore",
+      "description": "The party encountered or referenced the title of Burgomaster Kolian Indirovich while in the resort town.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "neath that you see someone has added current burgomaster kolian indirovich oh wow um i also"
+    },
+    {
+      "proposed_title": "Blood on the Vine",
+      "category": "location_lore",
+      "description": "The tavern named Blood on the Vine is located in the town square.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "To your left, you see light, spilling from a tavern named Blood on the Vine."
+    },
+    {
+      "proposed_title": "Bildrath's Mercantile",
+      "category": "location_lore",
+      "description": "A shop named Bildrath's Mercantile is located on a lane near the town square.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "you see further down the lane from the tavern, a large shop labeled Bildrath's Mercantile..."
+    },
+    {
+      "proposed_title": "Madam Ava's Fortunes and Mortion",
+      "category": "location_lore",
+      "description": "A smaller shop with an oddly clean sign reading Madam Ava's Fortunes and Mortion is located next to Bildrath's Mercantile.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "and a smaller one next to it with an oddly clean sign reading Madam Ava's Fortunes and Mortion."
+    },
+    {
+      "proposed_title": "The Gates Have Copies",
+      "category": "location_lore",
+      "description": "Copies of whatever was meant to be tacked to the gates exist, suggesting the gates are a point of duplication or multiple access points.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "We made a copy at the gate. Yeah, we made a copy. We have two. There's two."
+    },
+    {
+      "proposed_title": "Worcestershire Infection",
+      "category": "threat",
+      "description": "The entities Dunkle and Snailus are actively infecting Worcestershire.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "Dunkle, Snailus, who is infecting Worcestershire."
+    },
+    {
+      "proposed_title": "Toxic Triplets",
+      "category": "faction_lore",
+      "description": "A group referred to as the Toxic Triplets exists within the campaign world.",
+      "source_npc": "",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "toxic T-T-T-Triplets."
+    },
+    {
+      "proposed_title": "Icewind Dale Setting",
+      "category": "location_lore",
+      "description": "Icewind Dale is a region characterized by frozen peaks and harsh environments.",
+      "source_npc": null,
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "Our adventure began in the frozen peaks of Icewind Dale"
+    },
+    {
+      "proposed_title": "The Nature of Barovia's Rule",
+      "category": "faction_lore",
+      "description": "Barovia is ruled by a manager named Strahd Von Zarovich.",
+      "source_npc": "Strahd Von Zarovich",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "Strahd Von Zarovich is the manager of all Barovia."
+    },
+    {
+      "proposed_title": "Barovia's Current State",
+      "category": "location_lore",
+      "description": "The resort area within Barovia is currently undergoing construction, characterized by poor sanitation and the use of septic systems.",
+      "source_npc": "Party",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "The party observed the construction of a new area of the resort and noted the presence of septic tank activity."
+    },
+    {
+      "proposed_title": "Pickled Ghouls Tongues",
+      "category": "artifact_lore",
+      "description": "A jar containing pickled tongues of ghouls.",
+      "source_npc": "Nayak",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "You find a jar of pickled ghouls tongues."
+    },
+    {
+      "proposed_title": "Ghoul Tongue Consumption Effects",
+      "category": "magic",
+      "description": "Eating pickled ghoul tongues inflicts necrotic damage, applies a Bane spell, and results in the recipient being charged by an angel.",
+      "source_npc": "Nayak",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "You take 1D6 necrotic damage, that's two damage, and you have the Bane spell cast on you. ... Frenched by an angel."
+    },
+    {
+      "proposed_title": "The Nature of the Undead",
+      "category": "cosmology",
+      "description": "Zombies in Trinyvale are not standard undead; they possess an internal firmness and a burning fire, suggesting a unique, perhaps magical, nature.",
+      "source_npc": null,
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "The zombies do kind of have like a firmness to them... They have sort of a fire burning within them that normal zombies do not."
+    },
+    {
+      "proposed_title": "The Order of Nyack",
+      "category": "faction_lore",
+      "description": "Nyack is positioned at the top of an established order, implying a hierarchical structure among the undead or related entities.",
+      "source_npc": "Nyack of the Ran'afor",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "And that brings us to Nyack at the top of the order."
+    },
+    {
+      "proposed_title": "The Nature of the Vampire's Power",
+      "category": "magic",
+      "description": "The vampire is described as a creature that drains the lifeblood from the people of Barovia, and is currently too powerful to conquer.",
+      "source_npc": "Burgomaster Kolyan Indirovich",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "The letter explicitly states the creature 'has been drained the lifeblood from my people' and 'He has become too powerful to conquer.'"
+    },
+    {
+      "proposed_title": "Vampire Hotel Franchise",
+      "category": "faction_lore",
+      "description": "A hotel or business operation linked to vampire activity, potentially involving proprietary recipes and licensing.",
+      "source_npc": "Onyx Lumiere",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "The hotel is linked to the proprietary recipe and the vampire situation."
+    },
+    {
+      "proposed_title": "Journal Manifestation",
+      "category": "magic",
+      "description": "Journals possess inherent power that can be utilized for manifestation, suggesting they are potent tools for magical effect.",
+      "source_npc": "Onyx Lumiere",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "medium",
+      "evidence": "my journal is so powerful."
+    },
+    {
+      "proposed_title": "Bluetooth Naming Convention",
+      "category": "culture",
+      "description": "A specific naming convention exists where the character 'Jens' is known by the alias 'Jens Z' or 'Bluetooth'.",
+      "source_npc": "Jens Lyndelle",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "Jens Z and Bluetooth are established aliases for the character Jens."
+    },
+    {
+      "proposed_title": "Svalich Road Encounter",
+      "category": "location_lore",
+      "description": "An encounter related to the Svalich Road was rolled during the session.",
+      "source_npc": "Party",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "medium",
+      "evidence": "roll me a svalich road encounter"
+    },
+    {
+      "proposed_title": "Resort Town All-Inclusive System",
+      "category": "culture",
+      "description": "The resort town operates under an all-inclusive system that includes continental and unlimited food and beverage options.",
+      "source_npc": null,
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "medium",
+      "evidence": "we technically have money on us but we should really dig our eels in and say that so we're gonna look for a vegan restaurant that's part of the yeah i actually would prefer that both of you eat bacon as well that's fine with me honestly that's fine with me i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon i'm gonna go eat bacon"
+    },
+    {
+      "proposed_title": "The Butcher's Daughter Restaurant",
+      "category": "culture",
+      "description": "A restaurant exists in the area, possibly named The Butcher's Daughter, which operates with a vegan menu.",
+      "source_npc": "Narrator/Environment",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "medium",
+      "evidence": "I think there's a restaurant called, like, The Butcher's Daughter or something like that. ... Blood on the Vine is on the table. It's vegan."
+    },
+    {
+      "proposed_title": "The Nature of the Mists",
+      "category": "magic",
+      "description": "The mists are a known, potentially hazardous feature of the region, requiring caution for travelers.",
+      "source_npc": null,
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "The characters explicitly discussed traveling through mists and the method of passage."
+    },
+    {
+      "proposed_title": "The Mansion Location",
+      "category": "location_lore",
+      "description": "The mansion is located down a lane to the north past the town square, near the old church and the cliff.",
+      "source_npc": "Ismark",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "high",
+      "evidence": "which is down a lane to the north past the town square"
+    },
+    {
+      "proposed_title": "The Castle's Watch",
+      "category": "canon_ambiguity",
+      "description": "The castle atop the stone pillar is perceived by the villagers as actively watching them, suggesting a potential supernatural or ominous presence.",
+      "source_npc": "Party",
+      "discovered_session": 2,
+      "is_confirmed": false,
+      "confidence": "medium",
+      "evidence": "You avert your gaze from the castle, but can't shake the feeling that somehow it's watching."
+    },
+    {
+      "proposed_title": "Bluetooth Attack",
+      "category": "magic",
+      "description": "A specific method or type of attack or compulsion known as a 'Bluetooth attack', likely related to pacts or magical influence.",
+      "source_npc": "N/A",
+      "discovered_session": 2,
+      "is_confirmed": false,
+      "confidence": "medium",
+      "evidence": "Bluetooth attack."
+    },
+    {
+      "proposed_title": "Troll Lore Pages",
+      "category": "magic",
+      "description": "Specific rules or pages (Page 42 and Page 69) exist that govern the interaction, management, or fate of Trolls.",
+      "source_npc": "Party Wayfarer",
+      "discovered_session": 2,
+      "is_confirmed": true,
+      "confidence": "medium",
+      "evidence": "The party was told to 'Turn to Page 42' and 'Turn to Page 69' regarding the Trolls."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "The plan to murder the daughter and the manager",
+      "reason": "Tactical plot points, not durable world lore."
+    },
+    {
+      "text": "The phone became a weapon.",
+      "reason": "This is a character's internal, metaphorical reflection on a magical/philosophical state, not a confirmed world fact."
+    },
+    {
+      "text": "Yelping from inside",
+      "reason": "Ordinary scene description/banter, not durable world lore."
+    },
+    {
+      "text": "Lorelai the Succubi",
+      "reason": "Character name/description, not durable world lore."
+    }
+  ],
+  "uncertainties": [
+    {
+      "candidate": "Niaxpo",
+      "issue": "Mentioned in context of Onyx's thoughts, but no further lore is established regarding this entity.",
+      "needs_human_decision": false
+    },
+    {
+      "candidate": "Worcestershire",
+      "issue": "The nature of the infection caused by Dunkle and Snailus is undefined.",
+      "needs_human_decision": false
+    }
+  ]
+}

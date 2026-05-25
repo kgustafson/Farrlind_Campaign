@@ -1,0 +1,48 @@
+{
+  "session_number": 2,
+  "applied_at": "2026-05-23T16:45:39",
+  "known_lore_mentions": [
+    {
+      "index": 0,
+      "lore_item_id": 2,
+      "decision": "ignore"
+    }
+  ],
+  "new_lore_candidates": [
+    {
+      "index": 0,
+      "proposed_title": "Barovia's Curse and History",
+      "decision": "create"
+    },
+    {
+      "index": 1,
+      "proposed_title": "Strahd's Authority",
+      "decision": "create"
+    },
+    {
+      "index": 2,
+      "proposed_title": "Zombie Nature",
+      "decision": "reject"
+    },
+    {
+      "index": 3,
+      "proposed_title": "The Vampire's Curse of Barovia",
+      "decision": "create"
+    },
+    {
+      "index": 4,
+      "proposed_title": "The Burger Master's Legacy",
+      "decision": "create"
+    }
+  ],
+  "applied": [
+    "Created Barovia's Curse and History",
+    "Created Strahd's Authority",
+    "Created The Vampire's Curse of Barovia",
+    "Created The Burger Master's Legacy"
+  ],
+  "skipped": [
+    "Ignored The Metaphysical Shift",
+    "Rejected Zombie Nature"
+  ]
+}

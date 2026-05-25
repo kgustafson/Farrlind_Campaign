@@ -1,0 +1,170 @@
+{
+  "known_location_mentions": [
+    {
+      "location_id": 1,
+      "canonical_name": "Night Lotus Inn and Spa",
+      "mentioned_as": [
+        "Night Lotus Inn and Spa"
+      ],
+      "new_information": "The party traveled from this location to Barovia.",
+      "session_number": 2,
+      "location_type": "",
+      "parent_location": "Icewind Dale",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The party traveled from the Night Lotus Inn and Spa in Icewind Dale to Barovia."
+    },
+    {
+      "location_id": 4,
+      "canonical_name": "Barovia",
+      "mentioned_as": [
+        "Barovia"
+      ],
+      "new_information": "The destination reached after traveling from Icewind Dale; the location where the party sought Strahd Von Zorovich.",
+      "session_number": 2,
+      "location_type": "",
+      "parent_location": "",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The party traveled from the Night Lotus Inn and Spa in Icewind Dale to Barovia."
+    },
+    {
+      "location_id": 3,
+      "canonical_name": "Overseer's Manor",
+      "mentioned_as": [
+        "Overseer's Manor"
+      ],
+      "new_information": "The location the party sought out via the trail, where they found a letter from Strahd Von Zorovich.",
+      "session_number": 2,
+      "location_type": "",
+      "parent_location": "Night Lotus Inn and Spa",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "Upon arrival, the party navigated a trail shrouded in thick fog, leading them to the Overseer's Manor."
+    },
+    {
+      "location_id": 8,
+      "canonical_name": "Trail",
+      "mentioned_as": [
+        "trail"
+      ],
+      "new_information": "The path the party followed from the Manor into the woods.",
+      "session_number": 2,
+      "location_type": "",
+      "parent_location": "Campsite",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The party navigated a trail shrouded in thick fog, leading them to the Overseer's Manor."
+    },
+    {
+      "location_id": 7,
+      "canonical_name": "The Road",
+      "mentioned_as": [
+        "road"
+      ],
+      "new_information": "The road the party traveled, encountering a Svalich road roll.",
+      "session_number": 2,
+      "location_type": "road",
+      "parent_location": "The Gate",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The party traveled down the road, encountering a Svalich road roll."
+    },
+    {
+      "location_id": 2,
+      "canonical_name": "Icewind Dale",
+      "mentioned_as": [
+        "Icewind Dale"
+      ],
+      "new_information": "The frozen realm where the Night Lotus Inn and Spa is located.",
+      "session_number": 2,
+      "location_type": "",
+      "parent_location": "",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The frozen realm where the Night Lotus Inn and Spa is located."
+    },
+    {
+      "location_id": 6,
+      "canonical_name": "The Gate",
+      "mentioned_as": [
+        "gate"
+      ],
+      "new_information": "A feature set into a crumbling stone wall, guarded by headless statues, leading into Barovia.",
+      "session_number": 2,
+      "location_type": "",
+      "parent_location": "Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "A feature set into a crumbling stone wall, guarded by headless statues, leading into Barovia."
+    }
+  ],
+  "new_location_candidates": [
+    {
+      "proposed_name": "Blood on the Vine",
+      "location_type": "tavern",
+      "description": "A tavern in the resort town where the party entered.",
+      "first_visited_session": 2,
+      "parent_location": "Resort Town",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The party entered the resort town, finding a tavern named \"Blood on the Vine.\""
+    },
+    {
+      "proposed_name": "Mansion",
+      "location_type": "building",
+      "description": "A weary-looking mansion squatting behind a rusting iron fence, heavily marked with \"Great black marks\" and signs of fire damage.",
+      "first_visited_session": 2,
+      "parent_location": "",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The party traveled towards a mansion, passing shops like Bildrath's Mercantile and Madam Ava's Fortunes and Mortion."
+    },
+    {
+      "proposed_name": "Bildrath's Mercantile",
+      "location_type": "building",
+      "description": "A shop passed on the path to the mansion.",
+      "first_visited_session": 2,
+      "parent_location": "Mansion",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The party traveled towards a mansion, passing shops like Bildrath's Mercantile and Madam Ava's Fortunes and Mortion."
+    },
+    {
+      "proposed_name": "Madam Ava's Fortunes and Mortion",
+      "location_type": "building",
+      "description": "A shop passed on the path to the mansion.",
+      "first_visited_session": 2,
+      "parent_location": "Mansion",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The party traveled towards a mansion, passing shops like Bildrath's Mercantile and Madam Ava's Fortunes and Mortion."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "surface",
+      "reason": "Generic directional reference, not a reusable campaign location."
+    },
+    {
+      "text": "Blood on the Vine",
+      "reason": "Duplicate of new location candidate: Blood on the Vine."
+    },
+    {
+      "text": "Mansion",
+      "reason": "Duplicate of new location candidate: Mansion."
+    }
+  ],
+  "uncertainties": []
+}

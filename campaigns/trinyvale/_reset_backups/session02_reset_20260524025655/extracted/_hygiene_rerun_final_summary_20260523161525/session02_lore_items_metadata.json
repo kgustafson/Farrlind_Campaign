@@ -1,0 +1,27 @@
+{
+  "session": "session02",
+  "model": "gemma4:e2b",
+  "source": "final_summary",
+  "sources": [
+    {
+      "label": "final_summary",
+      "path": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/final/session02_summary.md",
+      "chars": 3868
+    }
+  ],
+  "campaign_metadata": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/campaign.yaml",
+  "lore_registry_count": 6,
+  "npc_registry_count": 10,
+  "location_count": 18,
+  "artifact_registry_count": 10,
+  "duration_seconds": 57.65,
+  "guardrail_warning_count": 4,
+  "guardrail_warnings": [
+    "Dropped known lore mention not present in session source: Barovia's Curse and History",
+    "Dropped known lore mention not present in session source: The Metaphysical Shift",
+    "Converted unknown known lore mention to new candidate: Bluetooth / Jens Z.",
+    "Converted unknown known lore mention to new candidate: Green Flame Lantern"
+  ],
+  "created_at": "2026-05-23T16:13:06",
+  "output": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/extracted/session02_lore_items.json"
+}

@@ -1,0 +1,129 @@
+{
+  "known_location_mentions": [
+    {
+      "location_id": 1,
+      "canonical_name": "Night Lotus Inn and Spa",
+      "mentioned_as": [
+        "Night Lotus Inn and Spa"
+      ],
+      "new_information": "The starting location for the party, where they underwent a 'magical detox' and received a magical chest.",
+      "session_number": 2,
+      "location_type": "building",
+      "parent_location": "",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The party traveled from the Night Lotus Inn and Spa in Icewind Dale to Barovia."
+    },
+    {
+      "location_id": 4,
+      "canonical_name": "Barovia",
+      "mentioned_as": [
+        "Barovia"
+      ],
+      "new_information": "The destination reached after traveling from Icewind Dale; the location where the party sought Strahd Von Zorovich.",
+      "session_number": 2,
+      "location_type": "country",
+      "parent_location": "",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "They traveled from the Night Lotus Inn and Spa in Icewind Dale to Barovia."
+    },
+    {
+      "location_id": 3,
+      "canonical_name": "Overseer's Manor",
+      "mentioned_as": [
+        "Overseer's Manor"
+      ],
+      "new_information": "A location the party sought out via the trail, where they found a letter from Strahd Von Zorovich.",
+      "session_number": 2,
+      "location_type": "residence",
+      "parent_location": "Night Lotus Inn and Spa",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "Upon arrival, the party navigated a trail shrouded in thick fog, leading them to the Overseer's Manor."
+    },
+    {
+      "location_id": 42,
+      "canonical_name": "Svalich Road",
+      "mentioned_as": [
+        "Svalich road"
+      ],
+      "new_information": "The road encountered during the journey, resulting in a roll.",
+      "session_number": 2,
+      "location_type": "travel_lane",
+      "parent_location": "Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The party traveled down the road, encountering a Svalich road roll."
+    },
+    {
+      "location_id": 34,
+      "canonical_name": "Blood on the Vine",
+      "mentioned_as": [
+        "Blood on the Vine"
+      ],
+      "new_information": "A tavern in the resort town where the party entered.",
+      "session_number": 2,
+      "location_type": "building",
+      "parent_location": "Resort Town",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The party entered the resort town, finding a tavern named \"Blood on the Vine.\""
+    },
+    {
+      "location_id": 36,
+      "canonical_name": "Bildrath's Mercantile",
+      "mentioned_as": [
+        "Bildrath's Mercantile"
+      ],
+      "new_information": "A shop passed on the path to the mansion.",
+      "session_number": 2,
+      "location_type": "building",
+      "parent_location": "Mansion",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The party traveled towards a mansion, passing shops like Bildrath's Mercantile and Madam Ava's Fortunes and Mortion."
+    },
+    {
+      "location_id": 37,
+      "canonical_name": "Madam Ava's Fortunes and Mortion",
+      "mentioned_as": [
+        "Madam Ava's Fortunes and Mortion"
+      ],
+      "new_information": "A shop passed on the path to the mansion.",
+      "session_number": 2,
+      "location_type": "building",
+      "parent_location": "Mansion",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The party traveled towards a mansion, passing shops like Bildrath's Mercantile and Madam Ava's Fortunes and Mortion."
+    }
+  ],
+  "new_location_candidates": [
+    {
+      "proposed_name": "New Construction Site",
+      "location_type": "building",
+      "description": "A new structure being built in the woods near the Overseer's Manor.",
+      "first_visited_session": 2,
+      "parent_location": "The Woods",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "medium",
+      "evidence": "The party followed the trail, encountering a new building under construction."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "surface",
+      "reason": "Generic directional reference, not a reusable campaign location."
+    }
+  ],
+  "uncertainties": []
+}

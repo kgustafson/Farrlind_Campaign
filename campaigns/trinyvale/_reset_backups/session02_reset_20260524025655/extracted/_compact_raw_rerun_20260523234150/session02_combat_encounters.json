@@ -1,0 +1,138 @@
+{
+  "proposed_combat_encounters": [
+    {
+      "title": "Dire Wolf Ambush",
+      "session_number": 2,
+      "subtype": "ambush",
+      "location": "Gate/Stone Wall",
+      "participants": "Party, three dire wolves",
+      "outcome": "enemies_defeated",
+      "confidence": "high",
+      "notes": "The party engaged three dire wolves waiting to ambush them. The fight raged until the wolves departed after the party intervened.",
+      "enemies": [
+        {
+          "name": "Dire Wolf",
+          "enemy_type": "dire_wolf",
+          "quantity": 3,
+          "quantity_killed": 0,
+          "outcome": "fled",
+          "confidence": "medium",
+          "notes": "Three dire wolves were present during the ambush. One wolf was killed by Jynx, and the others departed after the battle raged."
+        }
+      ],
+      "evidence": "You also noticed three dire wolves waiting to ambush you. The battle raged on until the wolves and bats instantly departed."
+    },
+    {
+      "title": "Zombie Ambush",
+      "session_number": 2,
+      "subtype": "ambush",
+      "location": "Deep in the woods off the trail",
+      "participants": "Party, 3 zombies",
+      "outcome": "cliffhanger",
+      "confidence": "high",
+      "notes": "The party is ambushed by three zombies who rise and lunge at them. Initiative was rolled, indicating combat is about to begin.",
+      "enemies": [
+        {
+          "name": "Zombie",
+          "enemy_type": "zombie",
+          "quantity": 3,
+          "quantity_killed": 0,
+          "outcome": "unknown",
+          "confidence": "high",
+          "notes": "Three zombies rose and lunged at the party, initiating combat."
+        }
+      ],
+      "evidence": "These three zombies have just started to rise. Everybody roll initiative."
+    },
+    {
+      "title": "Zombie Ambush",
+      "session_number": 2,
+      "subtype": "ambush",
+      "location": "",
+      "participants": "Party, 3 zombies",
+      "outcome": "cliffhanger",
+      "confidence": "high",
+      "notes": "The zombies start shambling towards the party. The source ends just as the zombies are about to attack Nyack and the party.",
+      "enemies": [
+        {
+          "name": "Zombies",
+          "enemy_type": "zombie",
+          "quantity": 3,
+          "quantity_killed": 0,
+          "outcome": "unknown",
+          "confidence": "high",
+          "notes": "Three zombies are approaching the party and are about to attack."
+        }
+      ],
+      "evidence": "The zombies start shambling towards you... there's three of them. They're gonna start with Nyack."
+    },
+    {
+      "title": "Zombie Attack Sequence",
+      "session_number": 2,
+      "subtype": "melee_attack",
+      "location": "",
+      "participants": "Party, zombies",
+      "outcome": "ongoing",
+      "confidence": "high",
+      "notes": "The party is engaged in combat with multiple zombies, experiencing damage from bite and claw attacks.",
+      "enemies": [
+        {
+          "name": "Zombie",
+          "enemy_type": "zombie",
+          "quantity": 3,
+          "quantity_killed": 0,
+          "outcome": "ongoing",
+          "confidence": "high",
+          "notes": "Three zombies were present and actively attacking the party."
+        }
+      ],
+      "evidence": "The source mentions three zombies, describes bite and claw attacks, and calculates damage taken."
+    },
+    {
+      "title": "Zombie Attack",
+      "session_number": 2,
+      "subtype": "standard_combat",
+      "location": "",
+      "participants": "Party, zombies",
+      "outcome": "ongoing",
+      "confidence": "high",
+      "notes": "The party is engaged in combat with fast zombies. The transcript shows the zombies taking their turn.",
+      "enemies": [
+        {
+          "name": "zombies",
+          "enemy_type": "zombie",
+          "quantity": null,
+          "quantity_killed": 0,
+          "outcome": "ongoing",
+          "confidence": "high",
+          "notes": "Zombies are actively attacking the party."
+        }
+      ],
+      "evidence": "Fast fucking zombies. ... Okay, so that is the zombies' turn."
+    },
+    {
+      "title": "Imp Attack",
+      "session_number": 2,
+      "subtype": "combat_encounter",
+      "location": "The Gate",
+      "participants": "Party, imp",
+      "outcome": "cliffhanger",
+      "confidence": "high",
+      "notes": "The encounter involves the party and an imp who launches an attack. The source indicates this is where the session ends, meaning the fight has not resolved.",
+      "enemies": [
+        {
+          "name": "Imp",
+          "enemy_type": "imp",
+          "quantity": 1,
+          "quantity_killed": 0,
+          "outcome": "unknown",
+          "confidence": "high",
+          "notes": "The imp launched an attack, leading to a cliffhanger ending for the session."
+        }
+      ],
+      "evidence": "The imp launches forward to attack, leading to the end of the session."
+    }
+  ],
+  "rejected_candidates": [],
+  "uncertainties": []
+}

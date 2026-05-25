@@ -1,0 +1,20 @@
+{
+  "session": "session02",
+  "model": "gemma4:e2b",
+  "source": "final_summary",
+  "sources": [
+    {
+      "label": "final_summary",
+      "path": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/final/session02_summary.md",
+      "chars": 3868
+    }
+  ],
+  "campaign_metadata": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/campaign.yaml",
+  "location_registry_count": 18,
+  "npc_registry_count": 10,
+  "duration_seconds": 68.69,
+  "guardrail_warning_count": 0,
+  "guardrail_warnings": [],
+  "created_at": "2026-05-23T16:11:07",
+  "output": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/extracted/session02_locations.json"
+}

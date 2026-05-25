@@ -1,0 +1,93 @@
+{
+  "known_thread_mentions": [
+    {
+      "thread_id": 1,
+      "canonical_title": "The Fate of Jens Lindell",
+      "new_information": "",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 1,
+      "last_session": 1,
+      "related_location": "Night Lotus Inn and Spa",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "No new information was added to this thread in session 2."
+    },
+    {
+      "thread_id": 2,
+      "canonical_title": "The Significance of Artifacts and Lore",
+      "new_information": "The party received a basket containing pastries, wine, a tote bag, and a letter from Strahd von Zarovich von Zarovich. The contents of the letter and the promised reward remain uncertain.",
+      "thread_type": "lore_mystery",
+      "status": "open",
+      "first_session": 1,
+      "last_session": 2,
+      "related_location": "Barovia",
+      "resolution": "",
+      "confidence": "medium",
+      "evidence": "The party received a basket containing pastries, wine, a tote bag, and a letter from Strahd von Zarovich von Zarovich. The exact nature of the reward and the contents of the letter are uncertain."
+    }
+  ],
+  "new_thread_candidates": [
+    {
+      "proposed_title": "The Context of the Gate Warning",
+      "thread_type": "lore_mystery",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Strahd von Zarovich von Zarovich's Mansion",
+      "description": "The full context of the warning posted on the gate leading to the mansion remains uncertain.",
+      "resolution": "",
+      "notes": "The specific content of the warning posted on the gate is unknown.",
+      "confidence": "high",
+      "evidence": "The full context of the warning posted on the gate is uncertain."
+    },
+    {
+      "proposed_title": "The Nature of the Zombies",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "The Woods/Trail",
+      "description": "The nature of the three human corpses/zombies, specifically the 'pickled goo packs' they pound, remains unclear.",
+      "resolution": "",
+      "notes": "The specific physical nature and origin of the zombies' internal fire and firmness, and the nature of the 'pickled goo packs,' are unresolved.",
+      "confidence": "medium",
+      "evidence": "The specific nature of the 'pickled goo packs' the zombies pound remains unclear."
+    },
+    {
+      "proposed_title": "The Identity of the Disguise",
+      "thread_type": "character_hook",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Blood on the Vine",
+      "description": "The specific identity of the person the party was disguising themselves as (Wes Alding/The Envelope) remains uncertain.",
+      "resolution": "",
+      "notes": "The identity of the person the party was disguising themselves as is unknown.",
+      "confidence": "high",
+      "evidence": "The specific identity of the person the party was disguising themselves as (Wes Alding/The Envelope) is uncertain."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "A hero dislikes boats",
+      "reason": "Character color, not unresolved campaign business."
+    },
+    {
+      "text": "The Identity of the Burger Master and Family",
+      "reason": "Appears to be a party joke, misunderstanding, or theory rather than durable unresolved campaign business."
+    }
+  ],
+  "uncertainties": [
+    {
+      "candidate": "Contents of the Letter/Reward",
+      "issue": "The exact nature of the reward promised by Strahd or the contents of the letter are unknown.",
+      "needs_human_decision": true
+    },
+    {
+      "candidate": "Gate Warning Content",
+      "issue": "The full context of the warning posted on the gate is unknown.",
+      "needs_human_decision": true
+    }
+  ]
+}

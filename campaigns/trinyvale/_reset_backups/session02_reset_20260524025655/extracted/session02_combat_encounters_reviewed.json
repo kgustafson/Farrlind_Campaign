@@ -1,0 +1,22 @@
+{
+  "session_number": 2,
+  "applied_at": "2026-05-23T16:46:03",
+  "proposed_combat_encounters": [
+    {
+      "index": 0,
+      "title": "Fast Zombies in the Woods",
+      "decision": "create"
+    },
+    {
+      "index": 1,
+      "title": "Confrontation at the Mansion",
+      "decision": "reject"
+    }
+  ],
+  "applied": [
+    "Created Fast Zombies in the Woods"
+  ],
+  "skipped": [
+    "Rejected Confrontation at the Mansion; the Ismark scene is an unresolved cliffhanger, not a completed combat encounter."
+  ]
+}

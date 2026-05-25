@@ -1,0 +1,1227 @@
+session: session02
+status: in_review
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: Session 02
+session_date: '2026-05-23'
+in_game_date: ''
+primary_location: ''
+source_files:
+  draft_summary: /Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session02_summary.md
+  curated_packet: /Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session02_curated.md
+  merged_events: /Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session02_merged.md
+  validation_report: /Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session02_validation.md
+db_event_context: []
+items:
+- id: event-001
+  sequence: 1
+  source_type: draft_merged_event
+  source_text: Bartender Dolphin recognizes one of the party members
+  source_context: '[00:46:09 - 00:46:11] Knock, knock, we''re coming in.
+
+    [00:46:11 - 00:46:13] Table for four and a dog.
+
+    [00:46:14 - 00:46:16] You see the man with blonde hair and fine leathers
+
+    [00:46:16 - 00:46:17] stands up and says,
+
+    [00:46:18 - 00:46:19] Dolphin, is that you?
+
+    [00:46:20 - 00:46:21] It''s been...
+
+    [00:46:21 - 00:46:23] Why did you guys do this?
+
+    [00:46:23 - 00:46:24] It''s been days.
+
+    [00:46:25 - 00:46:27] Did you manage to post the warning'
+  timestamps: ''
+  actors: Party
+  targets: Dolphin
+  mechanical_tags: ''
+  story_tags: NPC, Lore
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: Blood on the Vine Tavern
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-002
+  sequence: 2
+  source_type: draft_merged_event
+  source_text: 'The party experiences the consequences of their prior actions, including
+    Bluetooth attacking them after a failed deception check. Outcome: The party faces
+    the repercussions of their previous decisions.'
+  source_context: '[00:30:28 - 00:30:31] And I guess with this, I''m going to cast
+    Find Familiar.
+
+    [00:30:31 - 00:30:37] And From the Page steps up, because now that I don''t have
+    a phone, actually, my journal is so powerful.
+
+    [00:30:37 - 00:30:38] And I''m so enlightened.
+
+    [00:30:39 - 00:30:44] And From the Page steps up a little imp who''s now my Pact
+    of the Chain familiar.
+
+    [00:30:45 - 00:30:49] And I''m going to say, everyone, meet Bluetooth.
+
+    [00:30:50 - 00:30:51] Hello.
+
+    [00:30:53 - 00:30:54] That voice is terrible.
+
+    [00:30:55 - 00:30:57] I absolutely kicked Bluetooth.
+
+    [00:30:57 - 00:30:59] You kicked me instead.'
+  timestamps: ''
+  actors: Bluetooth (Bluetooth), Onyx Lumiere Lumiere Lumiere
+  targets: Party members
+  mechanical_tags: ''
+  story_tags: consequence
+  confidence: high
+  verify: ''
+  related_db_events:
+  - sequence_order: '2'
+    event_type: combat
+    location: ''
+    description: Imp Familiar Attack
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: Town
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-003
+  sequence: 3
+  source_type: draft_merged_event
+  source_text: 'The party experiences the consequences of their prior actions, including
+    being harassed by Strahd von Zarovich von Zarovich von Zarovich and his minions.
+    Outcome: The party faces the repercussions of their previous decisions.'
+  source_context: '[00:57:42 - 00:57:46] survey the mansion''s exterior and you notice
+    that amongst these weeds that have been trampled down,
+
+    [00:57:47 - 00:57:52] there''s a lot of freshly trampled ones, as well as several
+    sets of footprints, both human and
+
+    [00:57:52 - 00:57:56] canine in nature. Yes, I''m sorry about the appearance.
+
+    [00:57:57 - 00:58:03] Um, there have been several attacks, unfortunately. These
+    past few nights, uh, well, Strahd and his
+
+    [00:58:03 - 00:58:12] minions have repeatedly harassed us. Just for writing bad
+    Yelp reviews? Well, there was much
+
+    [00:58:12 - 00:58:18] Yelping from inside, yes. Good. Yes, you have to bury them.
+    Um, please follow me. Ismark goes up to
+
+    [00:58:18 - 00:58:25] the door and knocks slowly and says, Marina, it''s me. I''ve
+    returned and I''ve brought help. Wait, Marina?
+
+    [00:58:26 - 00:58:28] The Yelp review?
+
+    [00:58:30 - 00:58:36] Pull out the paper and double check. You were supposed to
+    tack that to the gates. Why have you'
+  timestamps: ''
+  actors: Strahd von Zarovich von Zarovich von Zarovich, Minions
+  targets: Party members
+  mechanical_tags: ''
+  story_tags: consequence
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: exploration
+  location: Overseer's Manor
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-004
+  sequence: 4
+  source_type: draft_merged_event
+  source_text: Party travels to Barovia
+  source_context: '[00:24:25 - 00:24:27] Okay, yeah, I crack the note.
+
+    [00:24:28 - 00:24:28] Awesome.
+
+    [00:24:28 - 00:24:32] You crack the note, and you read the following.
+
+    [00:24:33 - 00:24:34] Hail thee of might and valor.
+
+    [00:24:35 - 00:24:38] I, the Burgomaster of Barovia,
+
+    [00:24:38 - 00:24:40] send you honor with despair.
+
+    [00:24:41 - 00:24:44] My adopted daughter, the fair Marina Kuljana,
+
+    [00:24:45 - 00:24:48] has been these past nights bitten by a vampire.
+
+    [00:24:49 - 00:24:51] For over 400 years,'
+  timestamps: ''
+  actors: Party
+  targets: ''
+  mechanical_tags: ''
+  story_tags: Travel, Arrival, Lore
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: exploration
+  location: Barovia
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-005
+  sequence: 5
+  source_type: draft_merged_event
+  source_text: Party investigates area around new construction and finds three human
+    corpses with weapons
+  source_context: '[00:24:25 - 00:24:27] Okay, yeah, I crack the note.
+
+    [00:24:28 - 00:24:28] Awesome.
+
+    [00:24:28 - 00:24:32] You crack the note, and you read the following.
+
+    [00:24:33 - 00:24:34] Hail thee of might and valor.
+
+    [00:24:35 - 00:24:38] I, the Burgomaster of Barovia,
+
+    [00:24:38 - 00:24:40] send you honor with despair.
+
+    [00:24:41 - 00:24:44] My adopted daughter, the fair Marina Kuljana,
+
+    [00:24:45 - 00:24:48] has been these past nights bitten by a vampire.
+
+    [00:24:49 - 00:24:51] For over 400 years,'
+  timestamps: ''
+  actors: Party
+  targets: ''
+  mechanical_tags: ''
+  story_tags: Exploration, Lore
+  confidence: medium
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: exploration
+  location: Barovia
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-006
+  sequence: 6
+  source_type: draft_merged_event
+  source_text: 'The party travels through physical movement during travel, with Bluetooth
+    manifesting as an imp familiar and being used to transport objects. Outcome: The
+    party reaches a new location.'
+  source_context: '[00:30:28 - 00:30:31] And I guess with this, I''m going to cast
+    Find Familiar.
+
+    [00:30:31 - 00:30:37] And From the Page steps up, because now that I don''t have
+    a phone, actually, my journal is so powerful.
+
+    [00:30:37 - 00:30:38] And I''m so enlightened.
+
+    [00:30:39 - 00:30:44] And From the Page steps up a little imp who''s now my Pact
+    of the Chain familiar.
+
+    [00:30:45 - 00:30:49] And I''m going to say, everyone, meet Bluetooth.
+
+    [00:30:50 - 00:30:51] Hello.
+
+    [00:30:53 - 00:30:54] That voice is terrible.
+
+    [00:30:55 - 00:30:57] I absolutely kicked Bluetooth.
+
+    [00:30:57 - 00:30:59] You kicked me instead.'
+  timestamps: ''
+  actors: Ismark, Bluetooth (Bluetooth)
+  targets: None
+  mechanical_tags: ''
+  story_tags: exploration, travel
+  confidence: high
+  verify: ''
+  related_db_events:
+  - sequence_order: '2'
+    event_type: combat
+    location: ''
+    description: Imp Familiar Attack
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: character
+  location: Town
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-007
+  sequence: 7
+  source_type: draft_merged_event
+  source_text: Nyack of the Ran'afor of the Ran'afor becomes a gloomstalker ranger
+  source_context: ''
+  timestamps: ''
+  actors: Nyack of the Ran'afor of the Ran'afor
+  targets: ''
+  mechanical_tags: ''
+  story_tags: Character Development, Lore
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: character
+  location: ''
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-008
+  sequence: 8
+  source_type: draft_merged_event
+  source_text: Party receives basket containing wine, pastries, tote bag, and letter
+    from Strahd von Zarovich von Zarovich
+  source_context: '[00:20:04 - 00:20:05] It is your turn.
+
+    [00:20:05 - 00:20:07] So you can kill the crow,
+
+    [00:20:07 - 00:20:08] but are you gonna run or what you''re thinking?
+
+    [00:20:08 - 00:20:09] Yeah, can I sleight of hand
+
+    [00:20:09 - 00:20:11] and try to steal the letter?
+
+    [00:20:11 - 00:20:13] The letter, yes, awesome, cool.
+
+    [00:20:14 - 00:20:17] Oh boy, that''s an 11.
+
+    [00:20:17 - 00:20:19] Okay, I''ll say that the zombie''s gonna make
+
+    [00:20:19 - 00:20:20] an insight check to see if it notices,'
+  timestamps: ''
+  actors: Party
+  targets: ''
+  mechanical_tags: ''
+  story_tags: Quest Objectives, Rewards, Lore
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: items
+  location: ''
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-009
+  sequence: 9
+  source_type: draft_merged_event
+  source_text: 'Regan provides the party with a magical chest and keycards, which
+    they can use to access the Overseer''s Manor. Outcome: The party gains new items
+    and resources.'
+  source_context: ''
+  timestamps: ''
+  actors: Regan
+  targets: Party members
+  mechanical_tags: ''
+  story_tags: resource
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: items
+  location: The Night Lotus Inn and Spa
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-010
+  sequence: 10
+  source_type: draft_merged_event
+  source_text: 'The party receives a basket/letter from Strahd von Zarovich von Zarovich
+    von Zarovich, containing unknown contents. Outcome: The party gains new items
+    and resources.'
+  source_context: '[00:20:04 - 00:20:05] It is your turn.
+
+    [00:20:05 - 00:20:07] So you can kill the crow,
+
+    [00:20:07 - 00:20:08] but are you gonna run or what you''re thinking?
+
+    [00:20:08 - 00:20:09] Yeah, can I sleight of hand
+
+    [00:20:09 - 00:20:11] and try to steal the letter?
+
+    [00:20:11 - 00:20:13] The letter, yes, awesome, cool.
+
+    [00:20:14 - 00:20:17] Oh boy, that''s an 11.
+
+    [00:20:17 - 00:20:19] Okay, I''ll say that the zombie''s gonna make
+
+    [00:20:19 - 00:20:20] an insight check to see if it notices,'
+  timestamps: ''
+  actors: Strahd von Zarovich von Zarovich von Zarovich
+  targets: Party members
+  mechanical_tags: ''
+  story_tags: resource
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: combat
+  location: Overseer's Manor
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-011
+  sequence: 11
+  source_type: draft_merged_event
+  source_text: Party engages in combat with three zombies in the woods
+  source_context: '[00:21:40 - 00:21:41] We have to move on.
+
+    [00:21:41 - 00:21:42] Hold him down.
+
+    [00:21:42 - 00:21:43] I''ll get his tongue.
+
+    [00:21:43 - 00:21:45] So I''m going to drop concentration on Hunter''s Mark
+
+    [00:21:45 - 00:21:48] and cast Zephyr''s Strike as a bonus action,
+
+    [00:21:48 - 00:21:50] which makes me move like the wind
+
+    [00:21:50 - 00:21:53] and not provoke opportunity attacks.
+
+    [00:21:54 - 00:21:58] And I want to try to strafe up to the zombie with the bow.
+
+    [00:21:59 - 00:22:02] And potentially, if I''m moving like the wind,'
+  timestamps: ''
+  actors: Party
+  targets: Zombies
+  mechanical_tags: Hunter's Mark, Zephyr's Strike, Zombie abilities
+  story_tags: Combat, Exploration
+  confidence: high
+  verify: ''
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: ''
+    description: Zombie Encounter
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: combat
+  location: Woods
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-012
+  sequence: 12
+  source_type: draft_merged_event
+  source_text: Party uses disguise to navigate the area and finds a tavern named Blood
+    on the Vine
+  source_context: '[00:44:15 - 00:44:17] Inside them, you hear a mixture of muffled
+    sobs,
+
+    [00:44:18 - 00:44:21] panicked prayers, and occasionally hysterical laughter.
+
+    [00:44:22 - 00:44:24] Soon, you reach the town square.
+
+    [00:44:25 - 00:44:27] To your left, you see light,
+
+    [00:44:27 - 00:44:30] spilling from a tavern named Blood on the Vine.
+
+    [00:44:30 - 00:44:31] Not vegan.
+
+    [00:44:32 - 00:44:33] Oh, vine!
+
+    [00:44:34 - 00:44:35] It''s wine.
+
+    [00:44:35 - 00:44:35] Yeah, that''s vegan.'
+  timestamps: ''
+  actors: Party
+  targets: ''
+  mechanical_tags: ''
+  story_tags: Exploration, Lore
+  confidence: medium
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: story
+  location: Barovia
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-013
+  sequence: 13
+  source_type: draft_merged_event
+  source_text: Party discusses their overarching goal and decides to eliminate Burger
+    Master and his daughter
+  source_context: '[00:27:08 - 00:27:12] Well, if we can shut down this hotel, then
+    we could go to the mom and shop pop.
+
+    [00:27:12 - 00:27:13] Yeah.
+
+    [00:27:13 - 00:27:15] And see if we can help them franchise.
+
+    [00:27:16 - 00:27:16] Yes, we found it.
+
+    [00:27:16 - 00:27:22] The mom and shop pop is where we will have the burger master
+    work for us, creating his fantastic burgers.
+
+    [00:27:24 - 00:27:26] And this, I mean, this hotel is a shit show.
+
+    [00:27:26 - 00:27:27] It should be destroyed.
+
+    [00:27:27 - 00:27:36] Ever since I got rid of my phone, because I became a phone,
+    actually, I am so concerned about mom and shop pops.
+
+    [00:27:36 - 00:27:36] Yeah.'
+  timestamps: ''
+  actors: Party
+  targets: ''
+  mechanical_tags: ''
+  story_tags: Quest Objectives, Character Development
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: story
+  location: Blood on the Vine Tavern
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-014
+  sequence: 14
+  source_type: draft_merged_event
+  source_text: 'The party travels to a new location, with Bluetooth manifesting as
+    an imp familiar and attacking the party after a failed deception check. Outcome:
+    The party successfully travels to a new location.'
+  source_context: '[00:30:28 - 00:30:31] And I guess with this, I''m going to cast
+    Find Familiar.
+
+    [00:30:31 - 00:30:37] And From the Page steps up, because now that I don''t have
+    a phone, actually, my journal is so powerful.
+
+    [00:30:37 - 00:30:38] And I''m so enlightened.
+
+    [00:30:39 - 00:30:44] And From the Page steps up a little imp who''s now my Pact
+    of the Chain familiar.
+
+    [00:30:45 - 00:30:49] And I''m going to say, everyone, meet Bluetooth.
+
+    [00:30:50 - 00:30:51] Hello.
+
+    [00:30:53 - 00:30:54] That voice is terrible.
+
+    [00:30:55 - 00:30:57] I absolutely kicked Bluetooth.
+
+    [00:30:57 - 00:30:59] You kicked me instead.'
+  timestamps: ''
+  actors: Onyx Lumiere Lumiere Lumiere, Keychain, Ismark, Bluetooth (Bluetooth)
+  targets: None
+  mechanical_tags: ''
+  story_tags: travel, exploration
+  confidence: high
+  verify: ''
+  related_db_events:
+  - sequence_order: '2'
+    event_type: combat
+    location: ''
+    description: Imp Familiar Attack
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: story
+  location: Town
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-015
+  sequence: 15
+  source_type: draft_merged_event
+  source_text: 'Onyx Lumiere Lumiere Lumiere discusses the possibility of killing
+    the burger master''s daughter with **Onyx Lumiere Lumiere Lumiere**. Outcome:
+    The party considers a moral dilemma.'
+  source_context: '[00:39:54 - 00:39:55] you
+
+    [00:39:55 - 00:40:02] beneath that you see someone has added current burgomaster
+    kolian indirovich oh wow um i also
+
+    [00:40:02 - 00:40:10] just want everyone to know that actually um bluetooth aka
+    gen z flies so he was flying
+
+    [00:40:10 - 00:40:18] he glides on his ipad okay um all right so we''re gonna
+    find this
+
+    [00:40:18 - 00:40:24] burgomaster but now that we''re in the resort town should
+    we get a quick dinner like i feel
+
+    [00:40:24 - 00:40:54] like it should be on the meal plan i would assume yeah as
+    long as it''s vegan nyack you you booked the meal plan right well i yeah the price
+    i it should be all it should be all inclusive it should be all inclusive yeah
+    yeah we have the continental and the unlimited uh food and beverage we technically
+    have money on us but we should really dig our eels in and say that so we''re gonna
+    look for a vegan restaurant that''s part of the yeah i actually would prefer that
+    both of you eat bacon as well that''s fine with me honestly that''s fine with
+    me i''m gonna go eat bacon i''m gonna go eat bacon i''m gonna go eat bacon i''m
+    gonna go eat bacon i''m gonna go eat bacon i''m gonna go eat bacon i''m gonna
+    go eat bacon i''m gonna go eat bacon i''m gonna go eat bacon i''m gonna go eat
+    bacon i''m gonna go eat bacon i''m gonna go eat bacon i''m gonna go eat bacon
+    i''m gonna go eat bacon i''m gonna go eat bacon i''m gonna go eat bacon i''m gonna
+    go eat bacon i''m gonna
+
+    [00:40:54 - 00:41:24] i like burger and i mostly just eat the top bun that''s
+    kind of yeah after seeing everything that''s been going on with nyack today i
+    just don''t have much of an appetite a nice little like oh well i frenched one
+    zombie and you''re being weird about it yeah and you french the mud as well right
+    i licked my candle i frenched a zombie yeah and you frenched a zombie a ghoul
+    a ghoul great i frenched a ghoul are you jealous because everyone''s hooking up
+    on this vacation and you can''t close brother no i''m not that you haven''t hooked
+    up
+
+    [00:41:24 - 00:41:54] you haven''t hooked up none of you have hooked up i hooked
+    up i hooked up i hooked up you hooked up with what you ate pickled tongues that''s
+    not do you all have you all forgotten first base i had a ghoul stung down my throat
+    okay i would show you what hooking up is but i don''t have access to ai okay let''s
+    get going into town okay yeah let''s get the all-inclusive vegan restaurant all-inclusive
+    vegan restaurant well this is the first person we see we''ll flag him down
+
+    [00:41:54 - 00:42:00] i''ll knock on the first door yeah let''s just look for
+    we''ll look for signs for like a restaurant yeah'
+  timestamps: ''
+  actors: Onyx Lumiere Lumiere Lumiere, **Onyx Lumiere Lumiere Lumiere**
+  targets: None
+  mechanical_tags: ''
+  story_tags: roleplay
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: story
+  location: Town
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-016
+  sequence: 16
+  source_type: draft_merged_event
+  source_text: 'The session''s open threads have been resolved, and new ones have
+    emerged. Outcome: The party received rewards and items, and their goal was reaffirmed
+    to kill Strahd von Zarovich.'
+  source_context: '[00:24:25 - 00:24:27] Okay, yeah, I crack the note.
+
+    [00:24:28 - 00:24:28] Awesome.
+
+    [00:24:28 - 00:24:32] You crack the note, and you read the following.
+
+    [00:24:33 - 00:24:34] Hail thee of might and valor.
+
+    [00:24:35 - 00:24:38] I, the Burgomaster of Barovia,
+
+    [00:24:38 - 00:24:40] send you honor with despair.
+
+    [00:24:41 - 00:24:44] My adopted daughter, the fair Marina Kuljana,
+
+    [00:24:45 - 00:24:48] has been these past nights bitten by a vampire.
+
+    [00:24:49 - 00:24:51] For over 400 years,'
+  timestamps: ''
+  actors: Party
+  targets: N/A
+  mechanical_tags: Golden Wooden Chest, Blood Red Jasper, Champagne de l'Estompe,
+    Wine, Nut Cheese, Nut Milk, Leomund's Secret Chest, Hunter's Mark, Zephyr's Strike,
+    Misty Step
+  story_tags: Marina Kulyana Kulyana Kulyana Kulyana, Burgomaster of Barovia, Strahd
+    von Zarovich von Zarovich von Zarovich
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: story
+  location: Overseer's Manor
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-017
+  sequence: 17
+  source_type: draft_merged_event
+  source_text: 'The party received a message from the Burgomaster of Barovia detailing
+    the plight of Marina Kulyana Kulyana Kulyana Kulyana and the history of the land.
+    Outcome: The party learned about the history of the land and their goal to kill
+    Strahd von Zarovich.'
+  source_context: '[00:24:25 - 00:24:27] Okay, yeah, I crack the note.
+
+    [00:24:28 - 00:24:28] Awesome.
+
+    [00:24:28 - 00:24:32] You crack the note, and you read the following.
+
+    [00:24:33 - 00:24:34] Hail thee of might and valor.
+
+    [00:24:35 - 00:24:38] I, the Burgomaster of Barovia,
+
+    [00:24:38 - 00:24:40] send you honor with despair.
+
+    [00:24:41 - 00:24:44] My adopted daughter, the fair Marina Kuljana,
+
+    [00:24:45 - 00:24:48] has been these past nights bitten by a vampire.
+
+    [00:24:49 - 00:24:51] For over 400 years,'
+  timestamps: ''
+  actors: Party
+  targets: N/A
+  mechanical_tags: N/A
+  story_tags: Burgomaster of Barovia, Marina Kulyana Kulyana Kulyana Kulyana
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: story
+  location: Overseer's Manor
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-018
+  sequence: 18
+  source_type: draft_merged_event
+  source_text: 'The party''s goal is to kill Strahd von Zarovich von Zarovich von
+    Zarovich and make things right with the Burger Master. Outcome: The party reaffirmed
+    their goal to kill Strahd von Zarovich.'
+  source_context: '[00:24:25 - 00:24:27] Okay, yeah, I crack the note.
+
+    [00:24:28 - 00:24:28] Awesome.
+
+    [00:24:28 - 00:24:32] You crack the note, and you read the following.
+
+    [00:24:33 - 00:24:34] Hail thee of might and valor.
+
+    [00:24:35 - 00:24:38] I, the Burgomaster of Barovia,
+
+    [00:24:38 - 00:24:40] send you honor with despair.
+
+    [00:24:41 - 00:24:44] My adopted daughter, the fair Marina Kuljana,
+
+    [00:24:45 - 00:24:48] has been these past nights bitten by a vampire.
+
+    [00:24:49 - 00:24:51] For over 400 years,'
+  timestamps: ''
+  actors: Party
+  targets: N/A
+  mechanical_tags: N/A
+  story_tags: Burgomaster of Barovia, Strahd von Zarovich von Zarovich von Zarovich
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: lore
+  location: Overseer's Manor
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-019
+  sequence: 19
+  source_type: draft_merged_event
+  source_text: 'The party learns that Marina Kulyana Kulyana Kulyana has been bitten
+    by a vampire for over 400 years, draining the lifeblood from Kolyan Indirovich
+    Indirovich''s people. Outcome: The party gains new information about the world.'
+  source_context: '[00:24:33 - 00:24:34] Hail thee of might and valor.
+
+    [00:24:35 - 00:24:38] I, the Burgomaster of Barovia,
+
+    [00:24:38 - 00:24:40] send you honor with despair.
+
+    [00:24:41 - 00:24:44] My adopted daughter, the fair Marina Kuljana,
+
+    [00:24:45 - 00:24:48] has been these past nights bitten by a vampire.
+
+    [00:24:49 - 00:24:51] For over 400 years,
+
+    [00:24:51 - 00:24:54] this creature has drained the lifeblood from my people.
+
+    [00:24:54 - 00:24:58] Now my dear Marina languishes and dies
+
+    [00:24:58 - 00:25:02] from an unholy wound caused by this vile beast.'
+  timestamps: ''
+  actors: None
+  targets: None
+  mechanical_tags: ''
+  story_tags: lore
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: lore
+  location: Town
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-020
+  sequence: 20
+  source_type: draft_merged_event
+  source_text: 'The specific nature of the "pickled goo packs" the zombies pound remains
+    unclear. Outcome: The party did not learn more about the pickled goo packs.'
+  source_context: '[00:14:35 - 00:14:36] 6.
+
+    [00:14:36 - 00:14:36] 21.
+
+    [00:14:36 - 00:14:37] 14.
+
+    [00:14:37 - 00:14:39] OK, so you''re deep in the woods off the trail.
+
+    [00:14:39 - 00:14:42] These three zombies have just started to rise.
+
+    [00:14:42 - 00:14:44] Jins, you have pulled the two short swords
+
+    [00:14:44 - 00:14:45] from this one zombie.
+
+    [00:14:45 - 00:14:47] The other one is still clutching an envelope,
+
+    [00:14:47 - 00:14:49] and the other one still has a longbow.'
+  timestamps: ''
+  actors: N/A
+  targets: N/A
+  mechanical_tags: N/A
+  story_tags: pickled goo packs, zombies
+  confidence: medium
+  verify: ''
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: ''
+    description: Zombie Encounter
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: lore
+  location: Overseer's Manor
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-021
+  sequence: 21
+  source_type: draft_merged_event
+  source_text: 'The exact nature of the "wealth" mentioned in the note and the reward
+    promised is uncertain. Outcome: The party did not learn more about the wealth.'
+  source_context: ''
+  timestamps: ''
+  actors: N/A
+  targets: N/A
+  mechanical_tags: N/A
+  story_tags: wealth, note
+  confidence: medium
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: lore
+  location: Overseer's Manor
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-022
+  sequence: 22
+  source_type: draft_merged_event
+  source_text: 'The identity of the "burger tycoon" and the specific nature of the
+    hotel/community mentioned in the note are uncertain. Outcome: The party did not
+    learn more about the burger tycoon or the hotel/community.'
+  source_context: ''
+  timestamps: ''
+  actors: N/A
+  targets: N/A
+  mechanical_tags: N/A
+  story_tags: burger tycoon, note
+  confidence: medium
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: lore
+  location: Overseer's Manor
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-023
+  sequence: 23
+  source_type: draft_merged_event
+  source_text: 'The specific identity of the person the party was disguising themselves
+    as (Wes Alding/The Envelope) is uncertain. Outcome: The party did not learn more
+    about the person they were disguising themselves as.'
+  source_context: '=== 00:18:00 ===
+
+
+    [00:18:00 - 00:18:02] Zombie clutching the envelope in its hands.
+
+    [00:18:03 - 00:18:04] It''s got one hand clutching this envelope
+
+    [00:18:04 - 00:18:06] and the other one is like reaching out to claw at you.
+
+    [00:18:06 - 00:18:08] But your AC is?
+
+    [00:18:08 - 00:18:09] It''s 16 now.'
+  timestamps: ''
+  actors: N/A
+  targets: N/A
+  mechanical_tags: N/A
+  story_tags: Wes Alding, The Envelope
+  confidence: medium
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: lore
+  location: Overseer's Manor
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-024
+  sequence: 24
+  source_type: draft_merged_event
+  source_text: 'The full context of the warning posted on the gate is uncertain. Outcome:
+    The party did not learn more about the warning.'
+  source_context: ''
+  timestamps: ''
+  actors: N/A
+  targets: N/A
+  mechanical_tags: N/A
+  story_tags: warning, gate
+  confidence: medium
+  verify: These event records capture the non-combat events from this session packet
+    chunk, including recap events, roleplay events, lore events, and new open threads.
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: lore
+  location: Overseer's Manor
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-025
+  sequence: 25
+  source_type: draft_merged_event
+  source_text: 'The party travels through fog and emerges into a village setting in
+    Barovia. Outcome: Party arrives at destination'
+  source_context: '[00:24:25 - 00:24:27] Okay, yeah, I crack the note.
+
+    [00:24:28 - 00:24:28] Awesome.
+
+    [00:24:28 - 00:24:32] You crack the note, and you read the following.
+
+    [00:24:33 - 00:24:34] Hail thee of might and valor.
+
+    [00:24:35 - 00:24:38] I, the Burgomaster of Barovia,
+
+    [00:24:38 - 00:24:40] send you honor with despair.
+
+    [00:24:41 - 00:24:44] My adopted daughter, the fair Marina Kuljana,
+
+    [00:24:45 - 00:24:48] has been these past nights bitten by a vampire.
+
+    [00:24:49 - 00:24:51] For over 400 years,'
+  timestamps: unknown
+  actors: The party
+  targets: None
+  mechanical_tags: Travel
+  story_tags: Environment, location
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: exploration
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-026
+  sequence: 26
+  source_type: draft_merged_event
+  source_text: 'The party approaches Strahd von Zarovich von Zarovich von Zarovich''s
+    mansion and finds a massive stone pillar and castle. Outcome: Party observes the
+    environment'
+  source_context: '[00:54:13 - 00:54:14] Okay, we''ll take the balcony.
+
+    [00:54:14 - 00:54:15] Al fresco.
+
+    [00:54:15 - 00:54:15] Yeah.
+
+    [00:54:15 - 00:54:17] A hot tub would be great.
+
+    [00:54:17 - 00:54:19] I was going to suggest perhaps to go to my mansion,
+
+    [00:54:19 - 00:54:21] but if you want to climb onto the roof.
+
+    [00:54:21 - 00:54:23] Oh, al fresco at your mansion.
+
+    [00:54:23 - 00:54:24] We''ll go to the mansion, yeah.
+
+    [00:54:24 - 00:54:25] Okay, yes, might.'
+  timestamps: unknown
+  actors: The party
+  targets: None
+  mechanical_tags: Environment, location
+  story_tags: Location, setting
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: exploration
+  location: Strahd von Zarovich von Zarovich von Zarovich's Mansion
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-027
+  sequence: 27
+  source_type: draft_merged_event
+  source_text: 'Nyack of the Ran''afor of the Ran''afor experiences a metaphysical
+    shift and becomes a gloomstalker ranger. Outcome: Nyack of the Ran''afor''s character
+    changes'
+  source_context: ''
+  timestamps: unknown
+  actors: Nyack of the Ran'afor of the Ran'afor
+  targets: None
+  mechanical_tags: Metaphysical shift, new abilities
+  story_tags: Character development
+  confidence: high
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: items
+  location: ''
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-028
+  sequence: 28
+  source_type: draft_merged_event
+  source_text: 'Three human corpses rise as zombies and attack the party. Outcome:
+    Party defends against zombie attack'
+  source_context: '[00:14:35 - 00:14:36] 6.
+
+    [00:14:36 - 00:14:36] 21.
+
+    [00:14:36 - 00:14:37] 14.
+
+    [00:14:37 - 00:14:39] OK, so you''re deep in the woods off the trail.
+
+    [00:14:39 - 00:14:42] These three zombies have just started to rise.
+
+    [00:14:42 - 00:14:44] Jins, you have pulled the two short swords
+
+    [00:14:44 - 00:14:45] from this one zombie.
+
+    [00:14:45 - 00:14:47] The other one is still clutching an envelope,
+
+    [00:14:47 - 00:14:49] and the other one still has a longbow.'
+  timestamps: unknown
+  actors: The party, three human corpses
+  targets: The party
+  mechanical_tags: Zombie encounter, initiative begins
+  story_tags: None
+  confidence: high
+  verify: ''
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: ''
+    description: Zombie Encounter
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: combat
+  location: The new construction
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-029
+  sequence: 29
+  source_type: draft_merged_event
+  source_text: 'The party encounters three zombies in the woods with internal fire
+    and firmness. Outcome: Party defeats or escapes from zombies'
+  source_context: '[00:21:40 - 00:21:41] We have to move on.
+
+    [00:21:41 - 00:21:42] Hold him down.
+
+    [00:21:42 - 00:21:43] I''ll get his tongue.
+
+    [00:21:43 - 00:21:45] So I''m going to drop concentration on Hunter''s Mark
+
+    [00:21:45 - 00:21:48] and cast Zephyr''s Strike as a bonus action,
+
+    [00:21:48 - 00:21:50] which makes me move like the wind
+
+    [00:21:50 - 00:21:53] and not provoke opportunity attacks.
+
+    [00:21:54 - 00:21:58] And I want to try to strafe up to the zombie with the bow.
+
+    [00:21:59 - 00:22:02] And potentially, if I''m moving like the wind,'
+  timestamps: unknown
+  actors: The party, three zombies
+  targets: The party
+  mechanical_tags: Zombie encounter, Hunter's Mark, Zephyr's Strike
+  story_tags: None
+  confidence: high
+  verify: ''
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: ''
+    description: Zombie Encounter
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: story
+  location: The Woods/Trail
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-030
+  sequence: 30
+  source_type: draft_merged_event
+  source_text: 'The party discusses plans to eliminate the Burgomaster and his daughter.
+    Outcome: Party decides on course of action'
+  source_context: '[00:44:15 - 00:44:17] Inside them, you hear a mixture of muffled
+    sobs,
+
+    [00:44:18 - 00:44:21] panicked prayers, and occasionally hysterical laughter.
+
+    [00:44:22 - 00:44:24] Soon, you reach the town square.
+
+    [00:44:25 - 00:44:27] To your left, you see light,
+
+    [00:44:27 - 00:44:30] spilling from a tavern named Blood on the Vine.
+
+    [00:44:30 - 00:44:31] Not vegan.
+
+    [00:44:32 - 00:44:33] Oh, vine!
+
+    [00:44:34 - 00:44:35] It''s wine.
+
+    [00:44:35 - 00:44:35] Yeah, that''s vegan.'
+  timestamps: unknown
+  actors: The party
+  targets: None
+  mechanical_tags: None
+  story_tags: Quest objective, party decision
+  confidence: medium
+  verify: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: story
+  location: Blood on the Vine tavern
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+added_items: []

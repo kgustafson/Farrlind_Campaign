@@ -1,0 +1,127 @@
+{
+  "known_artifact_mentions": [
+    {
+      "artifact_id": 6,
+      "canonical_name": "Champagne de l'Estompe",
+      "mentioned_as": [
+        "basket containing wine"
+      ],
+      "new_information": "The party found a basket containing wine, pastries, a tote bag, and a letter from Strahd von Zarovich von Zarovich.",
+      "session_number": 2,
+      "artifact_type": "consumable",
+      "current_holder": "Party",
+      "properties": [
+        "Wine"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "The session source material explicitly states: 'The party found a basket containing wine, pastries, a tote bag, and a letter from Strahd von Zarovich von Zarovich.'"
+    },
+    {
+      "artifact_id": 1,
+      "canonical_name": "Magical Chest",
+      "mentioned_as": [
+        "magical chest"
+      ],
+      "new_information": "The party received a magical chest from Regan at the Night Lotus Inn and Spa.",
+      "session_number": 2,
+      "artifact_type": "treasure",
+      "current_holder": "Party",
+      "properties": [
+        "Golden wooden chest",
+        "Materialized from a gemstone and a key"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "The session source material mentions the party received a magical chest from Regan at the Night Lotus Inn and Spa."
+    }
+  ],
+  "new_artifact_candidates": [
+    {
+      "proposed_name": "Hunter's Mark",
+      "artifact_type": "magic_item",
+      "description": "Nyack of the Ran'afor used Hunter's Mark to manage the combat against the zombies.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Nyack of the Ran'afor",
+      "properties": [
+        "Used to manage combat"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "The Artifacts / Magic Items section lists Hunter's Mark, and the session source material states: 'Nyack of the Ran'afor used Hunter's Mark and Zephyr's Strike to combat the zombies and escape.'"
+    },
+    {
+      "proposed_name": "Zephyr's Strike",
+      "artifact_type": "magic_item",
+      "description": "Nyack of the Ran'afor used Zephyr's Strike to move and attack the zombies.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Nyack of the Ran'afor",
+      "properties": [
+        "Used to move and attack"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "The Artifacts / Magic Items section lists Zephyr's Strike, and the session source material states: 'Nyack of the Ran'afor used Hunter's Mark and Zephyr's Strike to combat the zombies and escape.'"
+    },
+    {
+      "proposed_name": "Leomund's Secret Chest",
+      "artifact_type": "treasure",
+      "description": "This item is listed in the artifact registry but was not explicitly mentioned or used in this session.",
+      "lore_significance": "",
+      "discovered_session": 2,
+      "current_holder": "Unknown",
+      "properties": [],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "low",
+      "evidence": "The artifact is listed in the registry but is not referenced in the session source material."
+    },
+    {
+      "proposed_name": "Gloomstalker Ranger Transformation",
+      "artifact_type": "transformation",
+      "description": "The metaphysical shift experienced by Nyack of the Ran'afor, transforming him into a gloomstalker ranger with an alpha attitude and new abilities.",
+      "lore_significance": "Represents a profound change in Nyack's nature and abilities during the journey through Barovia.",
+      "discovered_session": 2,
+      "current_holder": "Nyack of the Ran'afor",
+      "properties": [
+        "Gloomstalker Ranger form",
+        "Alpha attitude",
+        "New abilities"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "The session source material states: 'Nyack of the Ran'afor underwent a profound metaphysical shift, transforming into a gloomstalker ranger with an alpha attitude and new abilities.'"
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "pickled goo packs",
+      "reason": "Unclear nature; not confirmed as a canon artifact or item."
+    }
+  ],
+  "uncertainties": [
+    {
+      "candidate": "Burger Master / Daughter",
+      "issue": "The specific identity of the 'burger tycoon' and the specific nature of the hotel/community mentioned in the note are uncertain.",
+      "needs_human_decision": true
+    },
+    {
+      "candidate": "Wealth/Reward",
+      "issue": "The exact nature of the 'wealth' mentioned in the note and the reward promised is uncertain.",
+      "needs_human_decision": true
+    }
+  ]
+}

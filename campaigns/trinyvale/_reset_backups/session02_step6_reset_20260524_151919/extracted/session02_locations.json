@@ -1,0 +1,92 @@
+{
+  "known_location_mentions": [
+    {
+      "location_id": 4,
+      "canonical_name": "Barovia",
+      "mentioned_as": [
+        "Barovia",
+        "gothic domain"
+      ],
+      "new_information": "Mentioned in this session; no new canon update proposed.",
+      "session_number": 2,
+      "location_type": "settlement",
+      "parent_location": "The Mist",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "Upon arrival, the party found themselves in Barovia, a realm where they sought Strahd von Zarovich von Zarovich von Zarovich."
+    },
+    {
+      "location_id": 7,
+      "canonical_name": "The Road",
+      "mentioned_as": [
+        "trail"
+      ],
+      "new_information": "Mentioned in this session; no new canon update proposed.",
+      "session_number": 2,
+      "location_type": "road",
+      "parent_location": "The Gate",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The party then traveled through fog and emerged into a village setting in Barovia."
+    },
+    {
+      "location_id": 10,
+      "canonical_name": "Blood on the Vine",
+      "mentioned_as": [
+        "tavern"
+      ],
+      "new_information": "Mentioned in this session; no new canon update proposed.",
+      "session_number": 2,
+      "location_type": "tavern",
+      "parent_location": "Town Square",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "They found a tavern named Blood on the Vine, where the bartender, Dolphin, recognized one of the party members."
+    }
+  ],
+  "new_location_candidates": [
+    {
+      "proposed_name": "Strahd von Zarovich's Mansion",
+      "location_type": "mansion",
+      "description": "The location the party negotiated access to; described as being behind a rusting iron fence.",
+      "first_visited_session": 2,
+      "parent_location": "Village of Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The party negotiated access to Strahd von Zarovich von Zarovich's mansion, which was located behind a rusting iron fence."
+    },
+    {
+      "proposed_name": "Stone Pillar/Castle",
+      "location_type": "landmark",
+      "description": "A massive stone pillar and a castle atop it, revealed when approaching the mansion.",
+      "first_visited_session": 2,
+      "parent_location": "Strahd von Zarovich's Mansion",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "As they approached the mansion, the environment shifted dramatically, revealing a massive stone pillar and a castle atop it."
+    },
+    {
+      "proposed_name": "Village of Barovia",
+      "location_type": "village",
+      "description": "A village marked by a welcome sign.",
+      "first_visited_session": 2,
+      "parent_location": "Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "Source sign reads welcome to the village of Barovia."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "Blood on the Vine",
+      "reason": "Duplicate of existing location: Blood on the Vine."
+    }
+  ],
+  "uncertainties": []
+}

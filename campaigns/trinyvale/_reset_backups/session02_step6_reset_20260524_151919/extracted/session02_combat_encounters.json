@@ -1,0 +1,103 @@
+{
+  "proposed_combat_encounters": [
+    {
+      "title": "Dire Wolves and Alpha",
+      "session_number": 2,
+      "subtype": "wildlife_combat",
+      "location": "Trail",
+      "participants": "Party, dire wolves, Alpha",
+      "outcome": "defeated",
+      "confidence": "high",
+      "notes": "Combat occurred while traveling from the Night Lotus Inn and Spa into Barovia against dire wolves and an Alpha.",
+      "enemies": [
+        {
+          "name": "Dire Wolves",
+          "enemy_type": "dire wolf",
+          "quantity": null,
+          "quantity_killed": null,
+          "outcome": "defeated",
+          "confidence": "high",
+          "notes": "Encountered during travel."
+        },
+        {
+          "name": "Alpha",
+          "enemy_type": "alpha",
+          "quantity": 1,
+          "quantity_killed": 0,
+          "outcome": "defeated",
+          "confidence": "high",
+          "notes": "Encountered during travel."
+        }
+      ],
+      "evidence": "The party encountered dire wolves and an Alpha, resulting in a combat encounter."
+    },
+    {
+      "title": "Corpse Attack",
+      "session_number": 2,
+      "subtype": "corpse_attack",
+      "location": "The new construction",
+      "participants": "Party, three human corpses",
+      "outcome": "unknown",
+      "confidence": "medium",
+      "notes": "Three human corpses with weapons rose and lunged towards the party. The source does not specify the outcome of this engagement.",
+      "enemies": [
+        {
+          "name": "Human Corpses",
+          "enemy_type": "human corpse",
+          "quantity": 3,
+          "quantity_killed": null,
+          "outcome": "unknown",
+          "confidence": "medium",
+          "notes": "Three human corpses with weapons that rose to attack the party."
+        }
+      ],
+      "evidence": "The party investigated the area around the new construction, discovering three human corpses with weapons. The three corpses rose and lunged towards the party."
+    },
+    {
+      "title": "Zombie Encounter",
+      "session_number": 2,
+      "subtype": "undead_combat",
+      "location": "The Woods/Trail",
+      "participants": "Party, three zombies",
+      "outcome": "defeated",
+      "confidence": "high",
+      "notes": "The party engaged in combat with three zombies that possessed internal fire and firmness. Nyack used abilities to manage the fight and escape.",
+      "enemies": [
+        {
+          "name": "Zombies",
+          "enemy_type": "zombie",
+          "quantity": 3,
+          "quantity_killed": null,
+          "outcome": "defeated",
+          "confidence": "high",
+          "notes": "Zombies possessed internal fire and firmness."
+        }
+      ],
+      "evidence": "The party encountered three zombies in the woods, which possessed internal fire and firmness. Jens Lyndelle retrieved weapons... and Nyack of the Ran'afor used Hunter's Mark and Zephyr's Strike to combat the zombies and escape."
+    },
+    {
+      "title": "Imp Familiar Attack",
+      "session_number": 2,
+      "subtype": "attack",
+      "location": "Strahd von Zarovich von Zarovich's Mansion",
+      "participants": "Party, Bluetooth",
+      "outcome": "cliffhanger",
+      "confidence": "high",
+      "notes": "A failed deception check resulted in an immediate attack by the imp familiar, Bluetooth. Combat has not yet resolved.",
+      "enemies": [
+        {
+          "name": "Bluetooth",
+          "enemy_type": "imp familiar",
+          "quantity": 1,
+          "quantity_killed": 0,
+          "outcome": "cliffhanger",
+          "confidence": "high",
+          "notes": "Attacked the party after a failed deception check."
+        }
+      ],
+      "evidence": "A deception check failed during the interaction with Ismark and Marina Kulyana Kulyana Kulyana, resulting in an attack by Bluetooth."
+    }
+  ],
+  "rejected_candidates": [],
+  "uncertainties": []
+}

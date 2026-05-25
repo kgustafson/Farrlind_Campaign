@@ -1,0 +1,84 @@
+{
+  "known_thread_mentions": [
+    {
+      "thread_id": 1,
+      "canonical_title": "Who is Targeting Jens Lindell?",
+      "new_information": "Jens Lyndelle found items (two short swords and a longbow) and an envelope among the corpses, and the party established a plan to murder the daughter of a vampire who worked at the hotel.",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 1,
+      "last_session": 2,
+      "related_location": "Night Lotus Inn and Spa",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "Jens Lyndelle pulled items from the corpses, including two short swords and a longbow, while another zombie clutched an envelope. The party established a plan to shut down the hotel and franchise the proprietary burger recipe. The party decided to murder the daughter of a vampire who worked at the hotel."
+    }
+  ],
+  "new_thread_candidates": [
+    {
+      "proposed_title": "Fate of the Corpses and Stolen Items",
+      "thread_type": "lore_mystery",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "New Construction/Building",
+      "description": "The fate of the three human corpses found near the construction site and the items they possessed (swords, longbow, envelope) remains unknown.",
+      "resolution": "",
+      "notes": "The items found were potentially important clues related to the larger conflict involving the Burger Master and the vampire.",
+      "confidence": "high",
+      "evidence": "The party discovered three human corpses in the woods near the new building. Jens Lyndelle pulled items from the corpses, including two short swords and a longbow, while another zombie clutched an envelope."
+    },
+    {
+      "proposed_title": "The Burger Master's Legacy and Conflict",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Blood on the Vine",
+      "description": "The party is actively pursuing a plan to shut down the hotel, franchise the burger recipe, and eliminate the daughter of the vampire, seeking justice for the Burger Master.",
+      "resolution": "",
+      "notes": "The Burger Master is revealed to be the father of the owners and manager of the establishment, establishing a clear conflict of ownership and management.",
+      "confidence": "high",
+      "evidence": "The party established a plan to shut down the hotel and franchise the proprietary burger recipe. The party decided to murder the daughter of a vampire who worked at the hotel. Strahd revealed that the Burger Master was the father of the owners and the manager of the establishment."
+    },
+    {
+      "proposed_title": "Consequences of Metaphysical Shifts",
+      "thread_type": "lore_mystery",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Barovia",
+      "description": "The metaphysical shift experienced by Onyx Lumiere Lumiere and Nyack of the Ran'afor of the Ran'afor related to their connection to their phones/weapons is unresolved.",
+      "resolution": "",
+      "notes": "The nature and long-term consequences of the metaphysical shift need further exploration.",
+      "confidence": "high",
+      "evidence": "Onyx Lumiere Lumiere and Nyack of the Ran'afor of the Ran'afor experienced a metaphysical shift related to their connection to their phones/weapons."
+    },
+    {
+      "proposed_title": "Outcome of the Confrontation with Ismark and Marina",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Mansion",
+      "description": "The full outcome of the violent confrontation involving Ismark, Marina, and the imp is not fully detailed.",
+      "resolution": "",
+      "notes": "The session only describes the violence; the specific results of the confrontation are pending.",
+      "confidence": "medium",
+      "evidence": "The party confronted Ismark and Marina, resulting in a violent outcome involving a knife and an imp."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "The exact outcome of the Svalich road encounter rolls",
+      "reason": "While noted as unresolved, it is a minor detail of travel and does not represent a major, durable campaign business requiring extraction unless the outcome directly impacts a major plot point. It is better left as a note for the DM."
+    }
+  ],
+  "uncertainties": [
+    {
+      "candidate": "The specific nature of the metaphysical shift",
+      "issue": "The exact nature and long-term consequences of the metaphysical shift experienced by Onyx and Nyack are still unfolding.",
+      "needs_human_decision": false
+    }
+  ]
+}

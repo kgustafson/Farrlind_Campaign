@@ -1,0 +1,25 @@
+{
+  "session": "session02",
+  "model": "gemma4:e2b",
+  "source": "auto",
+  "sources": [
+    {
+      "label": "curated_packet",
+      "path": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session02_curated.md",
+      "chars": 11048
+    }
+  ],
+  "chunked": false,
+  "chunk_count": 1,
+  "location_names_sent": [
+    8
+  ],
+  "avg_location_names_sent": 8.0,
+  "campaign_metadata": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/campaign.yaml",
+  "location_count": 8,
+  "duration_seconds": 40.46,
+  "guardrail_warning_count": 0,
+  "guardrail_warnings": [],
+  "created_at": "2026-05-24T03:37:08",
+  "output": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/extracted/session02_combat_encounters.json"
+}

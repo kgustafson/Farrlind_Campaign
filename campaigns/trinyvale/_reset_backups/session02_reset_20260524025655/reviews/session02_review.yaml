@@ -1,0 +1,291 @@
+session: session02
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: Session 02 - Trinyvale X Strahd
+session_date: '2026-05-23'
+in_game_date: N/A
+primary_location: Village of Barovia
+source_files:
+  draft_summary: /Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session02_summary.md
+  curated_packet: /Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session02_curated.md
+  merged_events: /Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session02_merged.md
+  validation_report: /Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session02_validation.md
+items:
+- id: event-001
+  sequence: 1
+  source_type: true_summary
+  source_text: The Triplets travel down the muddy Svalich Road after being trapped
+    in Barovia.
+  decision: corrected
+  canonical_text: The Triplets travel down the muddy Svalich Road after being dragged
+    from the Night Lotus into Barovia. Their power has been reduced, their original
+    gear remains missing, and they keep interpreting Barovia as bad resort management.
+  event_type: travel
+  location: Svalich Road
+  significance: 4
+  reason: Corrected from user-provided true session 2 summary.
+  decided_by: user
+  decided_on: '2026-05-23'
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-001
+- id: event-002
+  sequence: 2
+  source_type: true_summary
+  source_text: The party finds three dead commoners off the Svalich Road.
+  decision: corrected
+  canonical_text: Jens notices the smell of death and metal glinting off the trail;
+    the party finds three dead commoners with muddy clothing, claw marks, crows, paw
+    prints, and several days of decay.
+  event_type: discovery
+  location: Svalich Road
+  significance: 4
+  reason: Adds the missed corpse discovery before the zombie encounter.
+  decided_by: user
+  decided_on: '2026-05-23'
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-001
+- id: event-003
+  sequence: 3
+  source_type: true_summary
+  source_text: Nyack finds a jar of pickled ghoul tongues.
+  decision: corrected
+  canonical_text: Nyack finds a jar of pickled ghoul tongues. Nyack eats one and gains
+    Bless for 10 minutes; Onyx eats one, suffers necrotic damage and Bane, and decides
+    she is now vegan.
+  event_type: discovery
+  location: Svalich Road
+  significance: 4
+  reason: Restores the missed item and character consequences.
+  decided_by: user
+  decided_on: '2026-05-23'
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-001
+- id: event-004
+  sequence: 4
+  source_type: true_summary
+  source_text: Fast Zombies in the Woods
+  decision: corrected
+  canonical_text: 'Fast Zombies in the Woods: the three corpses rise as unusually
+    fast zombies. Instead of defeating them, the Triplets steal the rusty short swords,
+    bloodstained longbow, and envelope, then flee into the mist without killing the
+    zombies.'
+  event_type: combat
+  location: Svalich Road
+  significance: 5
+  reason: Corrects the combat outcome and location; no zombie kills occurred.
+  decided_by: user
+  decided_on: '2026-05-23'
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-001
+- id: event-005
+  sequence: 5
+  source_type: true_summary
+  source_text: The stolen envelope contains Kolyan Indirovich's letter.
+  decision: corrected
+  canonical_text: The stolen envelope contains a desperate letter from Kolyan Indirovich,
+    Burgomaster of Barovia. It says Marina Kulyana has been bitten by a vampire, that
+    the vampire has terrorized Barovia for over 400 years, and asks outsiders to seal
+    Barovia away with holy power so the evil cannot escape.
+  event_type: discovery
+  location: Svalich Road
+  significance: 5
+  reason: Restores the letter's actual contents.
+  decided_by: user
+  decided_on: '2026-05-23'
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-002
+- id: event-006
+  sequence: 6
+  source_type: true_summary
+  source_text: The Triplets misunderstand Burgomaster as Burger Master.
+  decision: corrected
+  canonical_text: Because of the title Burgomaster, the Triplets misread the letter
+    as a burger-magnate problem involving a proprietary recipe, Yelp reviews, and
+    a threatened mom-and-pop burger business.
+  event_type: social
+  location: Svalich Road
+  significance: 3
+  reason: Keeps the misunderstanding as character comedy, not world canon.
+  decided_by: user
+  decided_on: '2026-05-23'
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-002
+- id: event-007
+  sequence: 7
+  source_type: true_summary
+  source_text: Onyx summons Bluetooth / Jens Z.
+  decision: corrected
+  canonical_text: Onyx summons a new imp familiar named Bluetooth, also nicknamed
+    Jens Z. Bluetooth is rude, Gen Z-coded, iPad-using, and pacifier-spitting; Onyx
+    becomes attached to him in a BoyMom way.
+  event_type: acquisition
+  location: Svalich Road
+  significance: 4
+  reason: Restores Onyx's major character turn and new familiar.
+  decided_by: user
+  decided_on: '2026-05-23'
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-003
+- id: event-008
+  sequence: 8
+  source_type: true_summary
+  source_text: Jens finds the black candle lantern.
+  decision: corrected
+  canonical_text: During a road encounter, Nyack trips while protecting the pickled
+    tongue jar and Jens discovers a lantern with a black candle that burns with green
+    flame and never runs out.
+  event_type: discovery
+  location: Svalich Road
+  significance: 4
+  reason: Restores the missed gothic trinket discovery.
+  decided_by: user
+  decided_on: '2026-05-23'
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-003
+- id: event-009
+  sequence: 9
+  source_type: true_summary
+  source_text: The party reaches the Village of Barovia.
+  decision: corrected
+  canonical_text: The forest gives way to the Village of Barovia, a bleak settlement
+    of boarded houses, fearful watchers, sobbing, prayers, and hysterical laughter.
+    A sign names Kolyan Indirovich as current Burgomaster.
+  event_type: discovery
+  location: Village of Barovia
+  significance: 4
+  reason: Restores the missed settlement arrival.
+  decided_by: user
+  decided_on: '2026-05-23'
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-004
+- id: event-010
+  sequence: 10
+  source_type: true_summary
+  source_text: The party enters Blood on the Vine.
+  decision: corrected
+  canonical_text: The Triplets enter Blood on the Vine while looking for vegan food
+    and all-inclusive resort dining. Inside they see a barkeep, a lone patron, three
+    boisterous women by the fire, and a blonde man in fine leathers.
+  event_type: social
+  location: Blood on the Vine
+  significance: 4
+  reason: Corrects the tavern context and party motivation.
+  decided_by: user
+  decided_on: '2026-05-23'
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-004
+- id: event-011
+  sequence: 11
+  source_type: true_summary
+  source_text: The party uses disguises before and during the tavern visit.
+  decision: corrected
+  canonical_text: Keychain disguises himself as a robotic dog wearing a wolf pelt;
+    Onyx disguises herself as the dead messenger Dolphin; Nyack disguises himself
+    as the zombie he necked with; Jens remains undisguised and is briefly pacified
+    with Onyx's iPad and AirPod setup.
+  event_type: social
+  location: Blood on the Vine
+  significance: 3
+  reason: Restores the disguise setup needed for the Ismark scene.
+  decided_by: user
+  decided_on: '2026-05-23'
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-004
+- id: event-012
+  sequence: 12
+  source_type: true_summary
+  source_text: Ismark recognizes the Dolphin disguise and explains Strahd's attacks.
+  decision: corrected
+  canonical_text: The blonde man recognizes Onyx's Dolphin disguise and asks whether
+    he posted Kolyan's warning at the gate. He reveals Kolyan is his father, making
+    him likely Ismark, and explains that Strahd and his minions have repeatedly attacked.
+  event_type: social
+  location: Blood on the Vine
+  significance: 5
+  reason: Corrects the NPC identification and lore reveal.
+  decided_by: user
+  decided_on: '2026-05-23'
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-004
+- id: event-013
+  sequence: 13
+  source_type: true_summary
+  source_text: Ismark confronts the party at Marina's doorway.
+  decision: corrected
+  canonical_text: Ismark leads the party toward Marina, but realizes the warning letter
+    was not posted and that the Triplets are lying badly under suspicious disguises.
+    He slams the door before Marina can open it, draws a knife, and demands to know
+    who they really are.
+  event_type: social
+  location: Burgomaster's House / Marina's Doorway
+  significance: 5
+  reason: Replaces the vague Mansion confrontation with the actual cliffhanger setup.
+  decided_by: user
+  decided_on: '2026-05-23'
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-005
+- id: event-014
+  sequence: 14
+  source_type: true_summary
+  source_text: Onyx orders Bluetooth to attack.
+  decision: corrected
+  canonical_text: The session ends on a cliffhanger when Onyx orders Bluetooth to
+    attack; the imp spits out his pacifier and launches forward, putting the party
+    on the verge of fighting the people they were probably supposed to help.
+  event_type: combat
+  location: Burgomaster's House / Marina's Doorway
+  significance: 5
+  reason: Records the cliffhanger as an attempted combat trigger, not a completed
+    fight.
+  decided_by: user
+  decided_on: '2026-05-23'
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-005
+added_items: []
+macro_events:
+- id: macro-001
+  order: 1
+  description: Svalich Road corpses and zombie looting
+  location: Svalich Road
+- id: macro-002
+  order: 2
+  description: Burgomaster's letter and burger-master misreadings
+  location: Svalich Road
+- id: macro-003
+  order: 3
+  description: Bluetooth and the green-flame lantern
+  location: Svalich Road
+- id: macro-004
+  order: 4
+  description: Village of Barovia and Blood on the Vine
+  location: Blood on the Vine
+- id: macro-005
+  order: 5
+  description: Ismark confrontation at Marina's doorway
+  location: Burgomaster's House / Marina's Doorway
+timeline:
+  start_location: Svalich Road
+  end_location: Burgomaster's House / Marina's Doorway
+  in_game_date: N/A
+review_stage: event_resolution
+reviewed_on: '2026-05-23'
+applied_on: '2026-05-23'

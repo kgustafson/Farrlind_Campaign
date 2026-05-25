@@ -1,0 +1,28 @@
+{
+  "session": "session02",
+  "model": "gemma4:e2b",
+  "source": "auto",
+  "sources": [
+    {
+      "label": "curated_packet",
+      "path": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session02_curated.md",
+      "chars": 11048
+    }
+  ],
+  "chunked": false,
+  "chunk_count": 1,
+  "registry_rows_sent": [
+    2
+  ],
+  "avg_registry_rows_sent": 2.0,
+  "campaign_metadata": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/campaign.yaml",
+  "open_thread_count": 2,
+  "location_count": 8,
+  "duration_seconds": 30.27,
+  "guardrail_warning_count": 1,
+  "guardrail_warnings": [
+    "Rejected party-interpretation open thread candidate: The Identity of the Burger Master and Family"
+  ],
+  "created_at": "2026-05-24T03:37:39",
+  "output": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/extracted/session02_open_threads.json"
+}

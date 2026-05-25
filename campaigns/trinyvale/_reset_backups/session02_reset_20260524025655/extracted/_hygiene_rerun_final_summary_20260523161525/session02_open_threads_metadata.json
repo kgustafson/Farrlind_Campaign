@@ -1,0 +1,22 @@
+{
+  "session": "session02",
+  "model": "gemma4:e2b",
+  "source": "final_summary",
+  "sources": [
+    {
+      "label": "final_summary",
+      "path": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/final/session02_summary.md",
+      "chars": 3868
+    }
+  ],
+  "campaign_metadata": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/campaign.yaml",
+  "open_thread_count": 7,
+  "location_count": 18,
+  "duration_seconds": 94.56,
+  "guardrail_warning_count": 1,
+  "guardrail_warnings": [
+    "Rejected party-interpretation open thread candidate: Acquisition of Bluetooth Familiar"
+  ],
+  "created_at": "2026-05-23T16:15:19",
+  "output": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/extracted/session02_open_threads.json"
+}

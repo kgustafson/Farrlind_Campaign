@@ -1,0 +1,114 @@
+{
+  "known_thread_mentions": [
+    {
+      "thread_id": 64,
+      "canonical_title": "What is Barovia and why are the Triplets trapped there?",
+      "new_information": "The Triplets are traveling through Barovia, still misinterpreting it as bad resort management.",
+      "thread_type": "lore_mystery",
+      "status": "open",
+      "first_session": 1,
+      "last_session": 2,
+      "related_location": "Barovia",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "The Triplets travel down the muddy Svalich Road after being dragged from the Night Lotus into Barovia. Their power has been reduced, their original gear remains missing, and they keep interpreting Barovia as bad resort management."
+    },
+    {
+      "thread_id": 65,
+      "canonical_title": "Where are the Triplets' original weapons and magic items?",
+      "new_information": "The party stole rusty short swords, a bloodstained longbow, and an envelope, and discovered a lantern with a black candle that burns with green flame and never runs out.",
+      "thread_type": "pending_quest",
+      "status": "open",
+      "first_session": 1,
+      "last_session": 2,
+      "related_location": "Svalich Road",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "Instead of defeating the fast zombies, the Triplets stole the rusty short swords, bloodstained longbow, and envelope, then fled into the mist. Jens also discovered a lantern with a black candle that burns with green flame and never runs out."
+    },
+    {
+      "thread_id": 66,
+      "canonical_title": "How can Marina Kulyana be protected from Strahd?",
+      "new_information": "The stolen envelope contained a letter from Kolyan Indirovich stating Marina Kulyana has been bitten by a vampire who has terrorized Barovia for 400 years, and asking outsiders to seal Barovia away with holy power.",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Burgomaster's House / Marina's Doorway",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "The stolen envelope contains a desperate letter from Kolyan Indirovich, Burgomaster of Barovia. It says Marina Kulyana has been bitten by a vampire, that the vampire has terrorized Barovia for over 400 years, and asks outsiders to seal Barovia away with holy power so the evil cannot escape."
+    },
+    {
+      "thread_id": 68,
+      "canonical_title": "What burger-master misunderstanding will the Triplets pursue?",
+      "new_information": "The Triplets misread the letter as a burger-magnate problem involving a proprietary recipe, Yelp reviews, and a threatened mom-and-pop burger business.",
+      "thread_type": "pending_quest",
+      "status": "resolved",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Svalich Road",
+      "resolution": "The Triplets misinterpreted Kolyan's warning as a dispute over a burger-magnate business involving a proprietary recipe, Yelp reviews, and a threatened mom-and-pop burger business.",
+      "confidence": "high",
+      "evidence": "Because of the title Burgomaster, the Triplets misread the letter as a burger-magnate problem involving a proprietary recipe, Yelp reviews, and a threatened mom-and-pop burger business."
+    },
+    {
+      "thread_id": 67,
+      "canonical_title": "Will Ismark trust the disguised Triplets after Bluetooth attacks?",
+      "new_information": "Ismark suspects the party are impostors or agents of Strahd, and he demands to know who they really are after realizing the warning letter was not posted.",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Burgomaster's House / Marina's Doorway",
+      "resolution": "",
+      "confidence": "high",
+      "evidence": "Ismark leads the party toward Marina, but realizes the warning letter was not posted and that the Triplets are lying badly under suspicious disguises. He slams the door before Marina can open it, draws a knife, and demands to know who they really are."
+    }
+  ],
+  "new_thread_candidates": [
+    {
+      "proposed_title": "Discovery of Dead Commoners and Stolen Gear",
+      "thread_type": "active_threat",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Svalich Road",
+      "description": "The party discovered three dead commoners with signs of violence and found the stolen weapons and an envelope while traveling through the woods.",
+      "resolution": "",
+      "notes": "This event sets up the immediate threat and the acquisition of key items (weapons, envelope).",
+      "confidence": "high",
+      "evidence": "Jens notices the smell of death and metal glinting off the trail; the party finds three dead commoners with muddy clothing, claw marks, crows, paw prints, and several days of decay. The Triplets steal the rusty short swords, bloodstained longbow, and envelope..."
+    },
+    {
+      "proposed_title": "The Green Flame Lantern",
+      "thread_type": "lore_mystery",
+      "status": "open",
+      "first_session": 2,
+      "last_session": 2,
+      "related_location": "Svalich Road",
+      "description": "Jens discovered a unique lantern with a black candle that burns with green flame and never runs out.",
+      "resolution": "",
+      "notes": "A unique artifact discovery found during the journey.",
+      "confidence": "high",
+      "evidence": "Nyack trips while protecting the pickled tongue jar and Jens discovers a lantern with a black candle that burns with green flame and never runs out."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "text": "The Triplets are bad at finding vegan food.",
+      "reason": "Party misunderstanding/color, not durable campaign business."
+    },
+    {
+      "text": "Acquisition of Bluetooth Familiar",
+      "reason": "Appears to be a party joke, misunderstanding, or theory rather than durable unresolved campaign business."
+    }
+  ],
+  "uncertainties": [
+    {
+      "candidate": "The identity of the blonde man in fine leathers",
+      "issue": "The session only establishes him as likely Ismark, but this is an inference based on the letter. Further confirmation is needed.",
+      "needs_human_decision": false
+    }
+  ]
+}

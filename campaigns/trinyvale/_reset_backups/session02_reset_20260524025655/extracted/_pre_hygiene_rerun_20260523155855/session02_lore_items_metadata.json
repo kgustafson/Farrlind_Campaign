@@ -1,0 +1,27 @@
+{
+  "session": "session02",
+  "model": "gemma4:e2b",
+  "source": "auto",
+  "sources": [
+    {
+      "label": "curated_packet",
+      "path": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session02_curated.md",
+      "chars": 13075
+    }
+  ],
+  "campaign_metadata": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/campaign.yaml",
+  "lore_registry_count": 2,
+  "npc_registry_count": 5,
+  "location_count": 11,
+  "artifact_registry_count": 7,
+  "duration_seconds": 32.81,
+  "guardrail_warning_count": 4,
+  "guardrail_warnings": [
+    "Dropped known lore mention not present in session source: The Trinivale Triplets",
+    "Converted unknown known lore mention to new candidate: Barovia's Curse and History",
+    "Converted unknown known lore mention to new candidate: Strahd's Authority",
+    "Converted unknown known lore mention to new candidate: Zombie Nature"
+  ],
+  "created_at": "2026-05-23T12:26:45",
+  "output": "/Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/extracted/session02_lore_items.json"
+}

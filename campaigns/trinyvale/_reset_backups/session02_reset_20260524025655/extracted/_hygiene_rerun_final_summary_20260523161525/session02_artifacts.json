@@ -1,0 +1,36 @@
+{
+  "known_artifact_mentions": [
+    {
+      "artifact_id": 11,
+      "canonical_name": "Jar of Pickled Ghoul Tongues",
+      "mentioned_as": [
+        "jar of pickled ghoul tongues"
+      ],
+      "new_information": "Onyx ate one, suffering necrotic damage and Bane.",
+      "session_number": 2,
+      "artifact_type": "",
+      "current_holder": "Onyx",
+      "properties": [
+        "Gained Bless for 10 minutes (when eaten by Nyack)",
+        "Caused necrotic damage and Bane (when eaten by Onyx)"
+      ],
+      "is_sentient": false,
+      "is_cursed": false,
+      "is_infernal": false,
+      "confidence": "high",
+      "evidence": "Nyack finds a jar of pickled ghoul tongues. Nyack eats one and gains Bless for 10 minutes; Onyx eats one, suffers necrotic damage and Bane."
+    }
+  ],
+  "new_artifact_candidates": [],
+  "rejected_candidates": [
+    {
+      "text": "rusty short swords, bloodstained longbow, and envelope",
+      "reason": "Ordinary gear/weapons/containers, not named or explicitly magical artifacts. Stolen items are not proposed as canon artifacts unless they are unique relics."
+    },
+    {
+      "text": "Bluetooth / Jens Z. Bluetooth",
+      "reason": "Appears to be a party joke, misunderstanding, nickname, or theory rather than a confirmed artifact."
+    }
+  ],
+  "uncertainties": []
+}

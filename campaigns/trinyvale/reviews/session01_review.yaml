@@ -1,0 +1,477 @@
+session: session01
+status: applied
+review_instructions:
+- For each item, set decision to accepted, rejected, corrected, or added.
+- For corrected or added items, fill canonical_text and any changed metadata.
+- Use sequence to keep final events chronological; decimals can insert added items
+  between drafted events.
+- Leave applied_status as pending until an apply-review step updates the database.
+session_title: Session 01
+session_date: ''
+in_game_date: ''
+primary_location: ''
+source_files:
+  draft_summary: /Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session01_summary.md
+  curated_packet: /Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session01_curated.md
+  merged_events: /Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session01_merged.md
+  validation_report: /Volumes/T7_WORK/AI_RAG/campaigns/trinyvale/clean/session01_validation.md
+items:
+- id: event-001
+  sequence: 1
+  source_type: draft_merged_event
+  source_text: The party is on vacation in various realms throughout the multiverse,
+    currently staying at the Night Lotus Inn and Spa in Icewind Dale.
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Night Lotus Inn and Spa
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-001
+- id: event-002
+  sequence: 2
+  source_type: draft_merged_event
+  source_text: A mysterious elf with cloudy gray skin and a flowing fur-lined cloak
+    enters the room.
+  decision: accepted
+  canonical_text: ''
+  event_type: social
+  location: Night Lotus Inn and Spa
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-001
+- id: event-003
+  sequence: 3
+  source_type: draft_merged_event
+  source_text: The party materializes a golden wooden chest from a gemstone and a
+    key.
+  decision: corrected
+  canonical_text: A Golden Wooden Chest materializes.  It is made from gemstone and
+    a key.
+  event_type: lore
+  location: Night Lotus Inn and Spa
+  significance: 3
+  reason: Corrected text with more clear writing
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-001
+- id: event-004
+  sequence: 4
+  source_type: draft_merged_event
+  source_text: The party uses key cards to leave via a gate and key cards, leading
+    to the Overseer's Manor.
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Night Lotus Inn and Spa
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-001
+- id: event-005
+  sequence: 5
+  source_type: draft_merged_event
+  source_text: 'Gray fog envelops the campsite Outcome: Campsite becomes shrouded
+    in gray fog'
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Trail
+  significance: 1
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-002
+- id: event-006
+  sequence: 6
+  source_type: draft_merged_event
+  source_text: 'Party follows trail indicated by Keychain to Strahd Von Zorovich Outcome:
+    Party reaches Strahd Von Zorovich''s location'
+  decision: accepted
+  canonical_text: ''
+  event_type: travel
+  location: Trail
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-002
+- id: event-007
+  sequence: 7
+  source_type: draft_merged_event
+  source_text: 'Party uses the gate to enter Barovia Outcome: Party enters Barovia'
+  decision: accepted
+  canonical_text: ''
+  event_type: travel
+  location: Barovia
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-003
+- id: event-008
+  sequence: 8
+  source_type: draft_merged_event
+  source_text: Jens Lindell is being set up to be murdered at the Night Lotus.
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Barovia
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-003
+- id: event-009
+  sequence: 1.5
+  source_type: draft_merged_event
+  source_text: The party decides to undergo a "magical detox" from aggression and
+    violence.
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Night Lotus Inn and Spa
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-001
+- id: event-010
+  sequence: 1.6
+  source_type: draft_merged_event
+  source_text: Reagan establishes a policy requiring visitors to surrender weapons
+    and magic items during their stay.
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Barovia
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-003
+- id: event-011
+  sequence: 11
+  source_type: draft_merged_event
+  source_text: 'Party finds note and wine in a basket with message from Strahd Von
+    Zorovich Outcome: Party receives message from Strahd Von Zorovich'
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Barovia
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-003
+- id: event-012
+  sequence: 12
+  source_type: draft_merged_event
+  source_text: 'Party rewards and resources after metaphysical shift. Outcome: Party
+    gains rewards and resources'
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Barovia
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-003
+- id: event-013
+  sequence: 13
+  source_type: draft_merged_event
+  source_text: 'Party engages dire wolves and Alpha using acupuncture needles Outcome:
+    Party defeats the dire wolves'
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Night Lotus Inn and Spa
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-001
+- id: event-014
+  sequence: 14
+  source_type: draft_merged_event
+  source_text: 'Nyack experiences metaphysical shift, gaining new abilities Outcome:
+    Nyack gains new abilities'
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Barovia
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-003
+- id: event-015
+  sequence: 15
+  source_type: draft_merged_event
+  source_text: 'Unresolved lore points from the session. Outcome: Lore points remain
+    unresolved'
+  decision: rejected
+  canonical_text: ''
+  event_type: lore
+  location: None specified
+  significance: 5
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: ''
+- id: event-016
+  sequence: 16
+  source_type: draft_merged_event
+  source_text: 'Uncertainties from the session. Outcome: Uncertainties remain'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: None specified
+  significance: 5
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: ''
+- id: event-017
+  sequence: 17
+  source_type: draft_merged_event
+  source_text: 'The party decided to consume two glasses of Champagne de l''Estompe.
+    Outcome: N/A'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Barovia
+  significance: 1
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: ''
+- id: event-018
+  sequence: 18
+  source_type: draft_merged_event
+  source_text: 'The party is known as the Trinivale triplets and previously pursued
+    noble warrior pursuits. Outcome: N/A'
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Barovia
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-003
+- id: event-019
+  sequence: 19
+  source_type: draft_merged_event
+  source_text: 'The Night Lotus operates a policy encouraging visitors to surrender
+    weapons and magic items. Outcome: N/A'
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Night Lotus Inn and Spa
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-001
+- id: event-020
+  sequence: 20
+  source_type: draft_merged_event
+  source_text: 'The party gained access to spell slots after the transformation. Outcome:
+    N/A'
+  decision: accepted
+  canonical_text: ''
+  event_type: combat
+  location: Barovia
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-003
+- id: event-021
+  sequence: 21
+  source_type: draft_merged_event
+  source_text: 'The gate crest depicts a castle guarded by a raven with the letters
+    ''s v z um'' and a stylized ''z''. Outcome: N/A'
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Barovia
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-003
+- id: event-022
+  sequence: 22
+  source_type: draft_merged_event
+  source_text: 'The party rolled a D100 and took the two lowest results, resulting
+    in 43 gold being slipped into envelopes. Outcome: N/A'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Barovia
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: ''
+- id: event-023
+  sequence: 23
+  source_type: draft_merged_event
+  source_text: 'The party gained access to their spell slots after the transformation.
+    Outcome: N/A'
+  decision: rejected
+  canonical_text: ''
+  event_type: ''
+  location: Barovia
+  significance: 3
+  reason: Rejected during bucketing pass.
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: ''
+- id: event-024
+  sequence: 24
+  source_type: draft_merged_event
+  source_text: 'The party received 3 strips of Blood Red Jasper. Outcome: N/A'
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Night Lotus Inn and Spa
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-001
+- id: event-025
+  sequence: 0.5
+  source_type: draft_merged_event
+  source_text: 'The party received a Magical Chest. Outcome: N/A'
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Night Lotus Inn and Spa
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-001
+- id: event-026
+  sequence: 26
+  source_type: draft_merged_event
+  source_text: 'The party received Champagne de l''Estompe. Outcome: N/A'
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Barovia
+  significance: 1
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-003
+- id: event-027
+  sequence: 27
+  source_type: draft_merged_event
+  source_text: 'The party received a Note from Strahd Von Zorovich. Outcome: N/A'
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Trail
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-002
+- id: event-028
+  sequence: 28
+  source_type: draft_merged_event
+  source_text: 'The party received a Basket containing wine, a canvas tote bag, and
+    pastries. Outcome: N/A'
+  decision: accepted
+  canonical_text: ''
+  event_type: lore
+  location: Barovia
+  significance: 1
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: applied
+  applied_on: '2026-05-23'
+  macro_event_id: macro-003
+added_items: []
+review_stage: event_resolution
+macro_events:
+- id: macro-001
+  order: 1
+  description: Party relaxes at Night Lotus Inn
+  location: Night Lotus Inn and Spa
+- id: macro-002
+  order: 2
+  description: Party Travels to Barovia
+  location: Trail
+- id: macro-003
+  order: 3
+  description: Barovia
+  location: Barovia
+reviewed_on: '2026-05-23'
+applied_on: '2026-05-23'

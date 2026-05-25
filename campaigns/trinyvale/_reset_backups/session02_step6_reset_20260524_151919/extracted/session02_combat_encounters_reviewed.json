@@ -1,0 +1,34 @@
+{
+  "session_number": 2,
+  "applied_at": "2026-05-24T08:18:56",
+  "proposed_combat_encounters": [
+    {
+      "index": 0,
+      "title": "Dire Wolves and Alpha",
+      "decision": "reject"
+    },
+    {
+      "index": 1,
+      "title": "Corpse Attack",
+      "decision": "reject"
+    },
+    {
+      "index": 2,
+      "title": "Zombie Encounter",
+      "decision": "create"
+    },
+    {
+      "index": 3,
+      "title": "Imp Familiar Attack",
+      "decision": "create"
+    }
+  ],
+  "applied": [
+    "Created Zombie Encounter",
+    "Created Imp Familiar Attack"
+  ],
+  "skipped": [
+    "Rejected Dire Wolves and Alpha",
+    "Rejected Corpse Attack"
+  ]
+}

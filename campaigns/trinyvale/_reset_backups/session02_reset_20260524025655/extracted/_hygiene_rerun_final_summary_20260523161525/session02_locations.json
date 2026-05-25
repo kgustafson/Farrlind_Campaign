@@ -1,0 +1,67 @@
+{
+  "known_location_mentions": [
+    {
+      "location_id": 42,
+      "canonical_name": "Svalich Road",
+      "mentioned_as": [
+        "Svalich Road"
+      ],
+      "new_information": "The Triplets traveled down this muddy road, discovering dead commoners and finding a letter from Kolyan Indirovich.",
+      "session_number": 2,
+      "location_type": "travel_lane",
+      "parent_location": "Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The Triplets travel down the muddy Svalich Road after being dragged from the Night Lotus into Barovia. [Svalich Road] (travel)"
+    },
+    {
+      "location_id": 43,
+      "canonical_name": "Village of Barovia",
+      "mentioned_as": [
+        "Village of Barovia"
+      ],
+      "new_information": "A bleak settlement of boarded houses where the Triplets found signs of Kolyan Indirovich as the Burgomaster.",
+      "session_number": 2,
+      "location_type": "city",
+      "parent_location": "Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The forest gives way to the Village of Barovia, a bleak settlement of boarded houses, fearful watchers, sobbing, prayers, and hysterical laughter. [Village of Barovia] (discovery)"
+    },
+    {
+      "location_id": 34,
+      "canonical_name": "Blood on the Vine",
+      "mentioned_as": [
+        "Blood on the Vine"
+      ],
+      "new_information": "The Triplets entered this location while looking for vegan food and all-inclusive resort dining, where they encountered a barkeep and other patrons.",
+      "session_number": 2,
+      "location_type": "building",
+      "parent_location": "Village of Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "The Triplets enter Blood on the Vine while looking for vegan food and all-inclusive resort dining. Inside they see a barkeep, a lone patron, three boisterous women by the fire, and a blonde man in fine leathers. [Blood on the Vine] (social)"
+    },
+    {
+      "location_id": 44,
+      "canonical_name": "Burgomaster's House / Marina's Doorway",
+      "mentioned_as": [
+        "Burgomaster's House / Marina's Doorway"
+      ],
+      "new_information": "Ismark attempted to lead the party to Marina, but realized the warning letter was false, leading to a confrontation where Ismark drew a knife.",
+      "session_number": 2,
+      "location_type": "residence",
+      "parent_location": "Village of Barovia",
+      "is_underwater": false,
+      "is_feywild": false,
+      "confidence": "high",
+      "evidence": "Ismark leads the party toward Marina, but realizes the warning letter was not posted and that the Triplets are lying badly under suspicious disguises. He slams the door before Marina can open it, draws a knife, and demands to know who they really are. [Burgomaster's House / Marina's Doorway] (social)"
+    }
+  ],
+  "new_location_candidates": [],
+  "rejected_candidates": [],
+  "uncertainties": []
+}

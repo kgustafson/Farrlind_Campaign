@@ -1,0 +1,77 @@
+{
+  "proposed_combat_encounters": [
+    {
+      "title": "Fast Zombies in the Woods",
+      "session_number": 2,
+      "subtype": "monster_fight",
+      "location": "Svalich Road",
+      "participants": "Party, three zombies",
+      "outcome": "The party looted the zombies and fled without killing them.",
+      "confidence": "high",
+      "notes": "Three dead commoners rose as unusually fast zombies. Jens stole short swords and the envelope, Nyack stole the longbow, and the party escaped into the mist without killing any zombies.",
+      "enemies": [
+        {
+          "name": "Zombie",
+          "enemy_type": "zombie",
+          "quantity": 3,
+          "quantity_killed": 0,
+          "outcome": "encountered",
+          "confidence": "high",
+          "notes": "Three zombies encountered; none were killed in session 2."
+        }
+      ],
+      "evidence": "The corpses rose as fast zombies; the Triplets stole their possessions and fled."
+    },
+    {
+      "title": "Confrontation at the Mansion",
+      "session_number": 2,
+      "subtype": "boss_fight",
+      "location": "Mansion",
+      "participants": "Party, Strahd's minions, Ismark, Marina, Imp",
+      "outcome": "cliffhanger",
+      "confidence": "medium",
+      "notes": "Ismark drew a knife after realizing the party was lying and disguised. Onyx ordered Bluetooth to attack, but the session ended before a completed combat outcome.",
+      "enemies": [
+        {
+          "name": "Strahd's Minions",
+          "enemy_type": "minion",
+          "quantity": null,
+          "quantity_killed": null,
+          "outcome": "unknown",
+          "confidence": "medium",
+          "notes": "Strahd's minions were present and harassed the party."
+        },
+        {
+          "name": "Ismark",
+          "enemy_type": "person",
+          "quantity": 1,
+          "quantity_killed": null,
+          "outcome": "unknown",
+          "confidence": "medium",
+          "notes": "Involved in the confrontation."
+        },
+        {
+          "name": "Marina",
+          "enemy_type": "person",
+          "quantity": 1,
+          "quantity_killed": null,
+          "outcome": "unknown",
+          "confidence": "medium",
+          "notes": "Involved in the confrontation."
+        },
+        {
+          "name": "Imp",
+          "enemy_type": "imp",
+          "quantity": 1,
+          "quantity_killed": null,
+          "outcome": "unknown",
+          "confidence": "medium",
+          "notes": "Involved in the confrontation."
+        }
+      ],
+      "evidence": "Ismark drew a knife and Onyx ordered Bluetooth to attack as the session ended."
+    }
+  ],
+  "rejected_candidates": [],
+  "uncertainties": []
+}
