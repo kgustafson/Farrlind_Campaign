@@ -332,6 +332,7 @@ def session_initiation_form_values(form) -> dict:
         "session_date": (form.get("session_date") or "").strip(),
         "title": (form.get("title") or "").strip(),
         "audio_file_path": (form.get("audio_file_path") or "").strip(),
+        "transcript_policy": (form.get("transcript_policy") or "use_existing").strip(),
         "notes": (form.get("notes") or "").strip(),
     }
 
@@ -1837,7 +1838,7 @@ async def project_utilities_initiate_session(request: Request):
         return RedirectResponse(url=f"/project-utilities?command_result={token}&modal=initiate-session", status_code=303)
     if workflow.auto_intake_enabled():
         try:
-            workflow.enqueue_auto_intake(session_number)
+            workflow.enqueue_auto_intake(session_number, values.get("transcript_policy", "use_existing"))
         except workflow.WorkflowWriteError as exc:
             token = store_command_result("Queue Auto Intake", commands.CommandResult(1, "", str(exc)))
             return RedirectResponse(url=f"/project-utilities?command_result={token}&modal=initiate-session", status_code=303)

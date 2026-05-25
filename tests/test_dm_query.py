@@ -418,6 +418,8 @@ class DmQueryTest(unittest.TestCase):
         self.assertEqual(events[0]["location"], "Hallway of the city")
         self.assertEqual(events[0]["significance"], 5)
         self.assertEqual(events[0]["source_type"], "draft_merged_event")
+        self.assertEqual(events[0]["timestamps"], "00:04:15")
+        self.assertEqual(events[0]["actors"], "")
         self.assertIn("Outcome: The group sees", events[0]["description"])
         self.assertEqual(events[1]["location"], "")
         self.assertEqual(events[1]["significance"], 1)
@@ -425,9 +427,94 @@ class DmQueryTest(unittest.TestCase):
     def test_review_events_for_init_prefers_db_events(self):
         db_events = [{"sequence_order": "1", "description": "Loaded canon draft"}]
 
-        selected = dm_query.review_events_for_init(args(), 21, db_events)
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch("dm_query.merged_events_path", return_value=Path(tmp) / "missing.md"):
+                selected = dm_query.review_events_for_init(args(), 21, db_events)
 
-        self.assertEqual(selected, db_events)
+        self.assertEqual(selected[0]["description"], "Loaded canon draft")
+        self.assertEqual(selected[0]["source_type"], "db_event")
+
+    def test_review_events_for_init_adds_db_context_to_draft_events(self):
+        db_events = [
+            {"sequence_order": "1", "description": "Zombie Encounter"},
+            {"sequence_order": "2", "description": "Imp Familiar Attack"},
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            merged_path = Path(tmp) / "session02_merged.md"
+            merged_path.write_text(
+                textwrap.dedent(
+                    """\
+                    # Merged Session Events
+
+                    ## Event 1: Finds Corpses
+
+                    - summary: The party finds three dead commoners in the woods before they rise as zombies.
+                    - location: Svalich Road
+                    - lane: discovery
+                    - importance: high
+
+                    ## Event 2: Reads Letter
+
+                    - summary: The party reads Kolyan's letter about Marina.
+                    - location: Svalich Road
+                    - lane: lore
+                    - importance: high
+
+                    ## Event 3: Reaches Tavern
+
+                    - summary: The party enters Blood on the Vine.
+                    - location: Village of Barovia
+                    - lane: social
+                    - importance: medium
+                    """
+                ),
+                encoding="utf-8",
+            )
+            with patch("dm_query.merged_events_path", return_value=merged_path):
+                with patch("dm_query.transcript_context_text", return_value=""):
+                    selected = dm_query.review_events_for_init(args(), 2, db_events)
+
+        self.assertEqual(len(selected), 3)
+        self.assertEqual(selected[0]["source_type"], "draft_merged_event")
+        self.assertIn("dead commoners", selected[0]["description"])
+        self.assertEqual(selected[0]["related_db_events"][0]["description"], "Zombie Encounter")
+
+    def test_enrich_events_with_transcript_context_adds_matching_window(self):
+        events = [{
+            "sequence_order": "1",
+            "description": "The party enters Blood on the Vine.",
+            "location": "Blood on the Vine",
+        }]
+        transcript = "\n".join([
+            "[00:01] road",
+            "[00:02] fog",
+            "[00:03] Soon you reach the town square.",
+            "[00:04] spilling from a tavern named Blood on the Vine.",
+            "[00:05] Oh vine!",
+        ])
+
+        with patch("dm_query.transcript_context_text", return_value=transcript):
+            enriched = dm_query.enrich_events_with_transcript_context(events, 2)
+
+        self.assertIn("Blood on the Vine", enriched[0]["source_context"])
+
+    def test_enrich_events_with_model_summary_context_adds_matching_window(self):
+        events = [{
+            "sequence_order": "1",
+            "description": "The party reads Kolyan's letter about Marina.",
+            "story_tags": "Kolyan, Marina",
+        }]
+        summary = "\n".join([
+            "The party travels down the road.",
+            "The stolen envelope contains a desperate letter from Kolyan Indirovich.",
+            "The letter says Marina Kulyana has been bitten by a vampire.",
+        ])
+
+        with patch("dm_query.model_summary_context_text", return_value=summary):
+            enriched = dm_query.enrich_events_with_model_summary_context(events, 2)
+
+        self.assertIn("Kolyan", enriched[0]["summary_context"])
+        self.assertIn("Marina", enriched[0]["summary_context"])
 
     def test_review_events_for_init_falls_back_to_merged_draft(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -734,10 +821,12 @@ class DmQueryTest(unittest.TestCase):
             ],
         }
 
-        with patch("dm_query.query_event_review", return_value=review_data):
-            with patch("dm_query.load_canon_decisions", return_value=canon):
-                with contextlib.redirect_stdout(io.StringIO()) as output:
-                    dm_query.review_events(args(session_number=20))
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch("dm_query.merged_events_path", return_value=Path(tmp) / "missing.md"):
+                with patch("dm_query.query_event_review", return_value=review_data):
+                    with patch("dm_query.load_canon_decisions", return_value=canon):
+                        with contextlib.redirect_stdout(io.StringIO()) as output:
+                            dm_query.review_events(args(session_number=20))
 
         rendered = output.getvalue()
         self.assertIn("Session 20 Event Review", rendered)

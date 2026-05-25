@@ -20,6 +20,7 @@ from raglib.extraction_hygiene import (
 from raglib.io_utils import read_text, write_text
 from raglib.ollama_client import generate
 from raglib.prompts import load_prompt
+from raglib.transcript_cleaner import clean_source_text
 from web_review.services import canon
 
 
@@ -39,10 +40,24 @@ EXPECTED_TOP_LEVEL_KEYS = [
 ARTIFACT_ALIASES = {
     "black blade": "acheron blade",
     "black bladed rapier": "acheron blade",
+    "black candle lantern": "lantern with black candle",
     "faban s blade": "acheron blade",
+    "green flame lantern": "lantern with black candle",
+    "lantern of green flame": "lantern with black candle",
     "orb fragments": "orb of control fragments",
     "fragments of the broken orb": "orb of control fragments",
     "broken orb fragments": "orb of control fragments",
+    "trinket from the soil": "trinket",
+}
+ARTIFACT_STOPWORDS = {
+    "a",
+    "an",
+    "and",
+    "from",
+    "in",
+    "of",
+    "the",
+    "with",
 }
 
 
@@ -91,6 +106,75 @@ def normalized_name(value: Any) -> str:
 def source_contains_any(source_text: str, values: list[Any]) -> bool:
     source = normalized_name(source_text)
     return any(value and normalized_name(value) in source for value in values)
+
+
+def meaningful_tokens(value: Any) -> list[str]:
+    tokens = normalized_name(value).split()
+    return [token for token in tokens if token not in ARTIFACT_STOPWORDS and len(token) > 2]
+
+
+def source_contains_token_set(source_text: str, value: Any) -> bool:
+    tokens = meaningful_tokens(value)
+    if len(tokens) < 2:
+        return False
+    source = f" {normalized_name(source_text)} "
+    return all(f" {token} " in source for token in tokens)
+
+
+def source_contains_lantern_paraphrase(source_text: str, value: Any) -> bool:
+    tokens = set(meaningful_tokens(value))
+    if "lantern" not in tokens:
+        return False
+    source = normalized_name(source_text)
+    return "lantern" in source and ("green flame" in source or "black candle" in source)
+
+
+def artifact_candidate_source_terms(candidate: dict[str, Any]) -> list[Any]:
+    return [
+        candidate.get("proposed_name"),
+        candidate.get("evidence"),
+        candidate.get("description"),
+        candidate.get("lore_significance"),
+        *(candidate.get("properties") or []),
+    ]
+
+
+def artifact_candidate_is_source_grounded(source_text: str, candidate: dict[str, Any]) -> bool:
+    if not source_text:
+        return True
+    terms = artifact_candidate_source_terms(candidate)
+    if source_contains_any(source_text, terms):
+        return True
+    proposed_name = candidate.get("proposed_name")
+    return (
+        source_contains_lantern_paraphrase(source_text, proposed_name)
+        or source_contains_token_set(source_text, proposed_name)
+    )
+
+
+def rejected_artifact_can_be_salvaged(text: Any) -> bool:
+    tokens = set(meaningful_tokens(text))
+    return bool(tokens & {"lantern", "trinket"})
+
+
+def rejected_artifact_to_candidate(item: dict[str, Any], session_name: str) -> dict[str, Any]:
+    text = item.get("text") or "Unknown Artifact"
+    tokens = set(meaningful_tokens(text))
+    artifact_type = "trinket" if "trinket" in tokens else "other"
+    return {
+        "proposed_name": text,
+        "artifact_type": artifact_type,
+        "description": f"Recovered from extractor rejection because the item is grounded in the session source: {text}.",
+        "lore_significance": "",
+        "discovered_session": session_number(session_name),
+        "current_holder": "unknown",
+        "properties": [],
+        "is_sentient": False,
+        "is_cursed": False,
+        "is_infernal": False,
+        "confidence": "medium",
+        "evidence": item.get("reason") or "",
+    }
 
 
 def mentioned_as_values(item: dict[str, Any]) -> list[str]:
@@ -224,7 +308,7 @@ def postprocess_extraction(
             artifact_id = int(item.get("artifact_id"))
         except (TypeError, ValueError):
             candidate = known_mention_to_candidate(item, session_name)
-            if source_text and candidate["proposed_name"] and source_contains_any(source_text, [candidate["proposed_name"]]):
+            if artifact_candidate_is_source_grounded(source_text, candidate):
                 salvaged_candidates.append(candidate)
                 warnings.append(f"Converted invalid known artifact mention to new candidate: {candidate['proposed_name']}")
             else:
@@ -233,7 +317,7 @@ def postprocess_extraction(
         registry_row = by_id.get(artifact_id)
         if not registry_row:
             candidate = known_mention_to_candidate(item, session_name)
-            if source_text and candidate["proposed_name"] and source_contains_any(source_text, [candidate["proposed_name"]]):
+            if artifact_candidate_is_source_grounded(source_text, candidate):
                 salvaged_candidates.append(candidate)
                 warnings.append(f"Converted unknown known artifact mention to new candidate: {candidate['proposed_name']}")
             else:
@@ -241,7 +325,7 @@ def postprocess_extraction(
             continue
         if not canonical_matches_registry(item, registry_row):
             candidate = known_mention_to_candidate(item, session_name)
-            if source_text and candidate["proposed_name"] and source_contains_any(source_text, [candidate["proposed_name"]]):
+            if artifact_candidate_is_source_grounded(source_text, candidate):
                 salvaged_candidates.append(candidate)
                 warnings.append(
                     f"Converted mismatched known artifact mention to new candidate: "
@@ -269,6 +353,19 @@ def postprocess_extraction(
     cleaned["known_artifact_mentions"] = known_mentions
     if salvaged_candidates:
         cleaned["new_artifact_candidates"] = [*salvaged_candidates, *cleaned["new_artifact_candidates"]]
+    rescued_rejections = []
+    remaining_rejections = []
+    for item in cleaned["rejected_candidates"]:
+        if rejected_artifact_can_be_salvaged(item.get("text")):
+            candidate = rejected_artifact_to_candidate(item, session_name)
+            if artifact_candidate_is_source_grounded(source_text, candidate):
+                rescued_rejections.append(candidate)
+                warnings.append(f"Recovered source-grounded rejected artifact candidate: {candidate['proposed_name']}")
+                continue
+        remaining_rejections.append(item)
+    if rescued_rejections:
+        cleaned["rejected_candidates"] = remaining_rejections
+        cleaned["new_artifact_candidates"] = [*rescued_rejections, *cleaned["new_artifact_candidates"]]
     known_ids = existing_known_artifact_ids(cleaned)
     new_candidates = []
     seen_new_names = set()
@@ -298,7 +395,7 @@ def postprocess_extraction(
         if registry_row:
             registry_id = int(registry_row["id"])
             if registry_id not in known_ids:
-                if source_text and not source_contains_any(source_text, [proposed_name, registry_row.get("name")]):
+                if source_text and not artifact_candidate_is_source_grounded(source_text, candidate):
                     reject_candidate(cleaned, candidate, f"Existing artifact candidate not present in session source: {registry_row.get('name')}.")
                     warnings.append(f"Rejected existing artifact candidate not present in source: {proposed_name}")
                 else:
@@ -310,7 +407,7 @@ def postprocess_extraction(
                 warnings.append(f"Rejected duplicate existing artifact candidate: {proposed_name}")
             continue
 
-        if source_text and not source_contains_any(source_text, [proposed_name]):
+        if source_text and not artifact_candidate_is_source_grounded(source_text, candidate):
             reject_candidate(cleaned, candidate, "Candidate name not found in session source.")
             warnings.append(f"Rejected artifact candidate not present in source: {proposed_name}")
             continue
@@ -329,7 +426,7 @@ def load_session_sources(session_name: str, source: str = "auto") -> list[dict[s
         if any(label == "final_summary" for label, _path in selected):
             selected = [item for item in selected if item[0] in {"final_summary", "diary"}]
         elif any(label == "curated_packet" for label, _path in selected):
-            selected = [item for item in selected if item[0] in {"curated_packet", "diary"}]
+            selected = [item for item in selected if item[0] in {"draft_summary", "curated_packet", "diary"}]
         else:
             selected = selected[:2]
     else:
@@ -338,7 +435,7 @@ def load_session_sources(session_name: str, source: str = "auto") -> list[dict[s
             raise ValueError(f"Unsupported artifact extraction source: {source}")
         selected = [(source, known[source])]
 
-    return [{"label": label, "path": str(path), "text": read_text(path)} for label, path in selected]
+    return [{"label": label, "path": str(path), "text": clean_source_text(label, read_text(path))} for label, path in selected]
 
 
 def build_prompt(

@@ -99,6 +99,61 @@ class CombatEncounterExtractorTest(unittest.TestCase):
         self.assertEqual(cleaned["rejected_candidates"][0]["text"], "Fight With The Resort Manager")
         self.assertIn("party-interpretation combat", warnings[0])
 
+    def test_postprocess_merges_duplicate_chunked_combat_encounters(self):
+        document = {
+            "proposed_combat_encounters": [
+                {
+                    "title": "Zombie Ambush",
+                    "session_number": 2,
+                    "subtype": "ambush",
+                    "location": "Deep in the woods off the trail",
+                    "participants": "Party, 3 zombies",
+                    "outcome": "cliffhanger",
+                    "confidence": "high",
+                    "notes": "Three zombies rose and initiative was rolled.",
+                    "evidence": "These three zombies have just started to rise.",
+                    "enemies": [{"name": "Zombie", "enemy_type": "zombie", "quantity": 3, "quantity_killed": 0, "outcome": "unknown"}],
+                },
+                {
+                    "title": "Zombie Attack Sequence",
+                    "session_number": 2,
+                    "subtype": "melee_attack",
+                    "location": "",
+                    "participants": "Party, zombies",
+                    "outcome": "ongoing",
+                    "confidence": "high",
+                    "notes": "The party takes claw and bite attacks.",
+                    "evidence": "Fast zombies. That is the zombies' turn.",
+                    "enemies": [{"name": "Zombies", "enemy_type": "zombie", "quantity": 3, "quantity_killed": 0, "outcome": "ongoing"}],
+                },
+                {
+                    "title": "Imp Attack",
+                    "session_number": 2,
+                    "subtype": "cliffhanger",
+                    "location": "Burgomaster's House",
+                    "participants": "Party, imp",
+                    "outcome": "cliffhanger",
+                    "confidence": "high",
+                    "notes": "Bluetooth launches forward.",
+                    "evidence": "The imp launches forward to attack.",
+                    "enemies": [{"name": "Imp", "enemy_type": "imp", "quantity": 1, "quantity_killed": 0, "outcome": "unknown"}],
+                },
+            ],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = combat_encounter_extractor.postprocess_extraction(document, "session02")
+
+        self.assertEqual(len(cleaned["proposed_combat_encounters"]), 2)
+        zombie = cleaned["proposed_combat_encounters"][0]
+        self.assertEqual(zombie["title"], "Zombie Attack Sequence")
+        self.assertEqual(zombie["location"], "Deep in the woods off the trail")
+        self.assertEqual(zombie["outcome"], "ongoing")
+        self.assertEqual(zombie["enemies"][0]["quantity"], 3)
+        self.assertEqual(zombie["enemies"][0]["quantity_killed"], 0)
+        self.assertIn("Merged duplicate combat encounter candidates", warnings[0])
+
     def test_extract_combat_encounters_writes_review_json(self):
         output = {
             "proposed_combat_encounters": [{

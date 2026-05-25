@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 
 from raglib.workflow_state import (
     historical_step_state,
@@ -8,6 +9,7 @@ from raglib.workflow_state import (
     parse_session_number,
     render_session_refs,
     session_name,
+    stale_input_paths,
     workflow_state_schema_sql,
 )
 
@@ -66,14 +68,17 @@ class WorkflowStateTest(unittest.TestCase):
         self.assertIn("ON CONFLICT (session_id, workflow_id, workflow_version)", self.sql)
         self.assertIn("'farrlind_session_canon'", self.sql)
         self.assertIn("'source_audio_registered', 1", self.sql)
-        self.assertIn("'extract_npcs', 7", self.sql)
-        self.assertIn("'extract_open_threads', 12", self.sql)
-        self.assertIn("'review_npc_extraction', 20", self.sql)
-        self.assertIn("'initialize_review', 26", self.sql)
-        self.assertIn("'git_push', 39", self.sql)
+        self.assertIn("'generate_narrative_summary', 6", self.sql)
+        self.assertIn("'extract_session_spine', 7", self.sql)
+        self.assertIn("'validate_session_spine', 8", self.sql)
+        self.assertIn("'extract_npcs', 10", self.sql)
+        self.assertIn("'extract_open_threads', 15", self.sql)
+        self.assertIn("'review_npc_extraction', 23", self.sql)
+        self.assertIn("'initialize_review', 29", self.sql)
+        self.assertIn("'git_push', 42", self.sql)
 
     def test_initialize_sql_uses_rendered_session_inputs_outputs_and_commands(self):
-        self.assertIn("audio/session21.wav", self.sql)
+        self.assertIn("audio/session21.*", self.sql)
         self.assertIn("campaigns/farrlind/raw/session21_transcript.txt", self.sql)
         self.assertIn("./rag-env/bin/python scripts/rag.py transcribe session21", self.sql)
         self.assertNotIn("sessionXX", self.sql)
@@ -101,6 +106,28 @@ class WorkflowStateTest(unittest.TestCase):
         review_step = next(step for step in self.definition["steps"] if step["id"] == "apply_review")
         state = historical_step_state(20, review_step)
         self.assertEqual(state["status"], "complete")
+
+    def test_stale_input_paths_flags_newer_inputs(self):
+        import tempfile
+        import time
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            input_path = root / "campaigns" / "test" / "clean" / "session02_narrative.md"
+            output_path = root / "campaigns" / "test" / "clean" / "session02_spine.yaml"
+            input_path.parent.mkdir(parents=True)
+            output_path.write_text("old", encoding="utf-8")
+            time.sleep(0.01)
+            input_path.write_text("new", encoding="utf-8")
+
+            with patch("raglib.workflow_state.REPO_ROOT", root):
+                stale = stale_input_paths(
+                    ["campaigns/test/clean/session02_narrative.md"],
+                    ["campaigns/test/clean/session02_spine.yaml"],
+                )
+
+        self.assertEqual(stale, ["campaigns/test/clean/session02_narrative.md"])
 
 
 if __name__ == "__main__":

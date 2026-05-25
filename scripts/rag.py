@@ -6,7 +6,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from raglib.campaign import audio_dir, campaign_container_name, campaign_database_name
+from raglib.campaign import campaign_container_name, campaign_database_name
+from raglib.audio import AUDIO_EXTENSIONS, session_audio_candidates
 from raglib.config import CLEAN, RAW, SESSIONS
 from raglib.extract import extract_session
 from raglib.filter_events import filter_session
@@ -16,6 +17,9 @@ from raglib.merge import merge_session
 from raglib.validate import validate_session
 from raglib.summarize import summarize_session
 from raglib.curate import curate_session
+from raglib.narrative import generate_narrative_summary
+from raglib.session_spine import extract_session_spine
+from raglib.session_spine_validation import validate_session_spine
 from raglib.npc_extractor import extract_npcs
 from raglib.location_extractor import extract_locations
 from raglib.artifact_extractor import extract_artifacts
@@ -33,6 +37,9 @@ from raglib.workflow_state import write_historical_workflow_seed_sql, write_work
 
 STAGES = {
     "curate": curate_session,
+    "generate-narrative-summary": generate_narrative_summary,
+    "extract-session-spine": extract_session_spine,
+    "validate-session-spine": validate_session_spine,
     "extract": extract_session,
     "filter": filter_session,
     "classify": classify_session,
@@ -61,6 +68,9 @@ STATUS_FILES = [
     ("diary", CLEAN, "{session}_diary.md"),
     ("transcript", RAW, "{session}_transcript.txt"),
     ("curated", CLEAN, "{session}_curated.md"),
+    ("narrative", CLEAN, "{session}_narrative.md"),
+    ("spine", CLEAN, "{session}_spine.yaml"),
+    ("spine_validation", CLEAN, "{session}_spine_validation.md"),
     ("context", SESSIONS, "{session}_context.yaml"),
     ("events", CLEAN, "{session}_events.md"),
     ("filtered", CLEAN, "{session}_filtered.md"),
@@ -71,14 +81,11 @@ STATUS_FILES = [
     ("summary", CLEAN, "{session}_summary.md"),
 ]
 
-AUDIO_EXTENSIONS = [".wav", ".mp3", ".m4a", ".flac", ".aac", ".ogg"]
-
-
 def print_status(session_name: str):
     print(f"Workflow status for {session_name}")
     print("")
 
-    audio_paths = [audio_dir() / f"{session_name}{extension}" for extension in AUDIO_EXTENSIONS]
+    audio_paths = session_audio_candidates(session_name)
     audio_path = next((path for path in audio_paths if path.exists()), audio_paths[0])
     audio_marker = "ok" if audio_path.exists() else "missing"
     print(f"{audio_marker:7} {'audio':11} {audio_path}")
@@ -122,7 +129,7 @@ def parse_args():
     parser.add_argument("--user", default="admin", help="Postgres user.")
     parser.add_argument("--database", default=campaign_database_name(), help="Postgres database.")
     parser.add_argument("--backup-output", type=Path, default=None, help="Optional db-backup output path.")
-    parser.add_argument("--audio-file", type=Path, default=None, help="Transcribe command input. Defaults to audio/<session>.wav.")
+    parser.add_argument("--audio-file", type=Path, default=None, help="Transcribe command input. Defaults to the first existing audio/<session> file with a supported extension.")
     parser.add_argument("--output", type=Path, default=None, help="Transcribe command output. Defaults to raw/<session>_transcript.txt.")
     parser.add_argument("--model", default=None, help="Model override for commands that support one.")
     parser.add_argument(

@@ -51,6 +51,9 @@ class WorkflowDefinitionTest(unittest.TestCase):
             "diary_source_available",
             "source_status_check",
             "curate_transcript",
+            "generate_narrative_summary",
+            "extract_session_spine",
+            "validate_session_spine",
             "extract_events",
             "extract_npcs",
             "extract_locations",
@@ -93,8 +96,11 @@ class WorkflowDefinitionTest(unittest.TestCase):
         }
         for step_id, command_name in expected_extractors.items():
             self.assertEqual(by_id[step_id]["lane"], "entity_extraction")
-            self.assertIn("curate_transcript", by_id[step_id]["dependencies"])
+            self.assertIn("validate_session_spine", by_id[step_id]["dependencies"])
             self.assertIn(command_name, by_id[step_id]["command"])
+
+        self.assertIn("extract_session_spine", by_id["validate_session_spine"]["dependencies"])
+        self.assertIn("validate_session_spine", by_id["extract_events"]["dependencies"])
 
         review_dependencies = {
             "review_npc_extraction": "extract_npcs",

@@ -101,6 +101,33 @@ class OpenThreadExtractorTest(unittest.TestCase):
         self.assertEqual(cleaned["rejected_candidates"][0]["text"], "The Burger Master's Secret Recipe")
         self.assertIn("party-interpretation open thread", warnings[0])
 
+    def test_postprocess_rejects_party_plan_framed_as_world_business(self):
+        document = {
+            "known_thread_mentions": [],
+            "new_thread_candidates": [{
+                "proposed_title": "Destroying the Hotel for the Tycoon's Cash",
+                "thread_type": "pending_quest",
+                "status": "open",
+                "description": "The party plans to destroy the hotel because they think a burger tycoon will pay them.",
+                "evidence": "Maybe this rich burger tycoon will pay us cash.",
+            }],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        with patch("web_review.services.canon.open_thread_statuses", return_value=self.statuses()), \
+             patch("web_review.services.canon.open_thread_types", return_value=self.types()):
+            cleaned, warnings = open_thread_extractor.postprocess_extraction(
+                document,
+                [],
+                "session02",
+                "Maybe this rich burger tycoon will pay us cash. The party keeps joking about the Burgomaster.",
+            )
+
+        self.assertEqual(cleaned["new_thread_candidates"], [])
+        self.assertEqual(cleaned["rejected_candidates"][0]["text"], "Destroying the Hotel for the Tycoon's Cash")
+        self.assertIn("party-interpretation open thread", warnings[0])
+
     def test_extract_open_threads_writes_review_json(self):
         output = {
             "known_thread_mentions": [],

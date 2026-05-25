@@ -1,6 +1,6 @@
 workflow:
   id: farrlind_session_canon
-  version: 1
+  version: 2
   display_name: Campaign Session Canon Workflow
   scope: per_session
   description: >
@@ -24,12 +24,12 @@ steps:
     dependencies: []
     command: null
     expected_inputs:
-      - campaigns/{campaign}/audio/sessionXX.wav
+      - campaigns/{campaign}/audio/sessionXX.*
     expected_outputs:
-      - campaigns/{campaign}/audio/sessionXX.wav
+      - campaigns/{campaign}/audio/sessionXX.*
     status_rules:
       complete_when:
-        - campaigns/{campaign}/audio/sessionXX.wav exists
+        - campaigns/{campaign}/audio/sessionXX.wav or sessionXX.mp3 exists
       blocked_when:
         - audio file is missing and no transcript/diary-only fallback is declared
     gate: operator_supplied
@@ -44,7 +44,7 @@ steps:
       - source_audio_registered
     command: ./rag-env/bin/python scripts/rag.py transcribe sessionXX
     expected_inputs:
-      - campaigns/{campaign}/audio/sessionXX.wav
+      - campaigns/{campaign}/audio/sessionXX.*
     expected_outputs:
       - campaigns/{campaign}/raw/sessionXX_transcript.txt
     status_rules:
@@ -85,7 +85,7 @@ steps:
     dependency_mode: any
     command: ./rag-env/bin/python scripts/rag.py status sessionXX
     expected_inputs:
-      - campaigns/{campaign}/audio/sessionXX.wav
+      - campaigns/{campaign}/audio/sessionXX.*
       - campaigns/{campaign}/raw/sessionXX_transcript.txt
       - campaigns/{campaign}/clean/sessionXX_diary.md
     expected_outputs:
@@ -119,20 +119,104 @@ steps:
     gate: automatic_allowed_before_review
     rerun_policy: safe_before_review
     canon_impact: draft_only
-    notes: Uses compact per-chunk registry context for large raw transcript extraction.
     notes: >
       Uses gemma4:e2b by default via FARRLIND_CURATION_MODEL to produce a
       draft canon packet: narrative summary, major events, NPCs/entities,
       locations, artifacts/items, lore items, combat encounters, open threads,
       timeline notes, and inventory/resource notes.
 
+  - id: generate_narrative_summary
+    display_name: Generate Narrative Summary
+    lane: draft_generation
+    dependencies:
+      - curate_transcript
+    command: ./rag-env/bin/python scripts/rag.py generate-narrative-summary sessionXX
+    expected_inputs:
+      - campaigns/{campaign}/campaign.yaml
+      - campaigns/{campaign}/raw/sessionXX_transcript.txt
+      - campaigns/{campaign}/clean/sessionXX_curated.md
+      - campaigns/{campaign}/clean/sessionXX_diary.md
+      - campaigns/{campaign}/sessions/sessionXX_context.yaml
+    expected_outputs:
+      - campaigns/{campaign}/clean/sessionXX_narrative.md
+      - campaigns/{campaign}/clean/sessionXX_narrative_metadata.json
+      - campaigns/{campaign}/clean/sessionXX_narrative_chunks/chunk_*.md
+    status_rules:
+      complete_when:
+        - narrative draft exists
+      stale_when:
+        - raw transcript or curated packet mtime is newer than narrative draft mtime
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+    notes: >
+      Step 6 synthesis pass. It may use only artifacts available from steps 1-5:
+      campaign config/glossary, raw transcript, curated packet, optional diary
+      source, and optional session context. It must not use database canon,
+      reviewed extraction files, draft event files, final summaries, or later
+      review artifacts.
+
+  - id: extract_session_spine
+    display_name: Extract Session Spine
+    lane: draft_generation
+    dependencies:
+      - generate_narrative_summary
+    command: ./rag-env/bin/python scripts/rag.py extract-session-spine sessionXX
+    expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_narrative.md
+    expected_outputs:
+      - campaigns/{campaign}/clean/sessionXX_spine.yaml
+      - campaigns/{campaign}/clean/sessionXX_spine_metadata.yaml
+    status_rules:
+      complete_when:
+        - session spine YAML exists
+      stale_when:
+        - narrative draft mtime is newer than spine YAML mtime
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+    notes: >
+      Step 7 spine pass. Turns the step 6 narrative draft into ordered major
+      chronological event buckets for later event review and bucketing.
+
+  - id: validate_session_spine
+    display_name: Validate Session Spine
+    lane: draft_generation
+    dependencies:
+      - extract_session_spine
+    command: ./rag-env/bin/python scripts/rag.py validate-session-spine sessionXX
+    expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_spine.yaml
+      - campaigns/{campaign}/clean/sessionXX_narrative.md
+      - campaigns/{campaign}/clean/sessionXX_curated.md
+      - campaigns/{campaign}/raw/sessionXX_transcript.txt
+      - campaigns/{campaign}/campaign.yaml
+    expected_outputs:
+      - campaigns/{campaign}/clean/sessionXX_spine_validation.md
+    status_rules:
+      complete_when:
+        - session spine validation report exists
+      stale_when:
+        - session spine YAML or narrative draft mtime is newer than spine validation report mtime
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+    notes: >
+      Step 8 validation pass. Checks the session spine against only artifacts
+      available through step 7, including the raw transcript, curated packet,
+      narrative draft, and campaign config. It flags missing support, missing
+      obvious beats, and party-interpretation versus world-fact issues before
+      downstream event/entity extraction.
+
   - id: extract_events
     display_name: Extract Events
     lane: draft_generation
     dependencies:
-      - curate_transcript
+      - validate_session_spine
     command: ./rag-env/bin/python scripts/rag.py extract sessionXX
     expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_spine.yaml
+      - campaigns/{campaign}/clean/sessionXX_narrative.md
       - campaigns/{campaign}/clean/sessionXX_curated.md
       - campaigns/{campaign}/raw/sessionXX_transcript.txt
       - campaigns/{campaign}/clean/sessionXX_diary.md
@@ -152,9 +236,11 @@ steps:
     display_name: Extract NPCs
     lane: entity_extraction
     dependencies:
-      - curate_transcript
+      - validate_session_spine
     command: ./rag-env/bin/python scripts/rag.py extract-npcs sessionXX
     expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_spine.yaml
+      - campaigns/{campaign}/clean/sessionXX_narrative.md
       - campaigns/{campaign}/clean/sessionXX_curated.md
       - campaigns/{campaign}/final/sessionXX_summary.md
       - campaigns/{campaign}/clean/sessionXX_diary.md
@@ -174,9 +260,11 @@ steps:
     display_name: Extract Locations
     lane: entity_extraction
     dependencies:
-      - curate_transcript
+      - validate_session_spine
     command: ./rag-env/bin/python scripts/rag.py extract-locations sessionXX
     expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_spine.yaml
+      - campaigns/{campaign}/clean/sessionXX_narrative.md
       - campaigns/{campaign}/clean/sessionXX_curated.md
       - campaigns/{campaign}/final/sessionXX_summary.md
       - campaigns/{campaign}/clean/sessionXX_diary.md
@@ -196,9 +284,11 @@ steps:
     display_name: Extract Artifacts
     lane: entity_extraction
     dependencies:
-      - curate_transcript
+      - validate_session_spine
     command: ./rag-env/bin/python scripts/rag.py extract-artifacts sessionXX
     expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_spine.yaml
+      - campaigns/{campaign}/clean/sessionXX_narrative.md
       - campaigns/{campaign}/clean/sessionXX_curated.md
       - campaigns/{campaign}/final/sessionXX_summary.md
       - campaigns/{campaign}/clean/sessionXX_diary.md
@@ -218,9 +308,11 @@ steps:
     display_name: Extract Lore Items
     lane: entity_extraction
     dependencies:
-      - curate_transcript
+      - validate_session_spine
     command: ./rag-env/bin/python scripts/rag.py extract-lore-items sessionXX
     expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_spine.yaml
+      - campaigns/{campaign}/clean/sessionXX_narrative.md
       - campaigns/{campaign}/clean/sessionXX_curated.md
       - campaigns/{campaign}/final/sessionXX_summary.md
       - campaigns/{campaign}/clean/sessionXX_diary.md
@@ -240,9 +332,11 @@ steps:
     display_name: Extract Combat Encounters
     lane: entity_extraction
     dependencies:
-      - curate_transcript
+      - validate_session_spine
     command: ./rag-env/bin/python scripts/rag.py extract-combat-encounters sessionXX
     expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_spine.yaml
+      - campaigns/{campaign}/clean/sessionXX_narrative.md
       - campaigns/{campaign}/clean/sessionXX_curated.md
       - campaigns/{campaign}/final/sessionXX_summary.md
       - campaigns/{campaign}/clean/sessionXX_diary.md
@@ -261,9 +355,11 @@ steps:
     display_name: Extract Open Threads
     lane: entity_extraction
     dependencies:
-      - curate_transcript
+      - validate_session_spine
     command: ./rag-env/bin/python scripts/rag.py extract-open-threads sessionXX
     expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_spine.yaml
+      - campaigns/{campaign}/clean/sessionXX_narrative.md
       - campaigns/{campaign}/clean/sessionXX_curated.md
       - campaigns/{campaign}/final/sessionXX_summary.md
       - campaigns/{campaign}/clean/sessionXX_diary.md

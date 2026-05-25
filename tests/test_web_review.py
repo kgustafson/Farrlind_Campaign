@@ -89,9 +89,12 @@ class WebReviewServiceTest(unittest.TestCase):
             reviews_dir = root / "reviews"
             clean.mkdir()
             final.mkdir()
+            raw = root / "raw"
+            raw.mkdir()
             (clean / "session03_diary.md").write_text("diary text", encoding="utf-8")
             (clean / "session03_summary.md").write_text("draft text", encoding="utf-8")
             (final / "session03_summary.md").write_text("final text", encoding="utf-8")
+            (raw / "session03_transcript.txt").write_text("raw transcript text", encoding="utf-8")
             self.write_review(root, "session03", {
                 "session": "session03",
                 "status": "applied",
@@ -107,11 +110,15 @@ class WebReviewServiceTest(unittest.TestCase):
 
             with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
                  patch.object(reviews, "CLEAN_DIR", clean), \
-                 patch.object(reviews, "FINAL_DIR", final):
+                 patch.object(reviews, "FINAL_DIR", final), \
+                 patch.object(reviews, "RAW_DIR", raw):
                 workspace = reviews.session_workspace(3, source="final")
+                transcript_workspace = reviews.session_workspace(3, source="transcript")
 
         self.assertEqual(workspace["source_label"], "Final Summary")
         self.assertEqual(workspace["source_text"], "final text")
+        self.assertEqual(transcript_workspace["source_label"], "Raw Transcript")
+        self.assertEqual(transcript_workspace["source_text"], "raw transcript text")
         self.assertEqual(workspace["source_view"], "raw")
         self.assertTrue(workspace["review_locked"])
         self.assertEqual([item["id"] for item in workspace["items"]], ["event-001", "added-001", "event-002"])
@@ -1826,7 +1833,8 @@ class CanonServiceTest(unittest.TestCase):
         self.assertIn("FROM combat_outcome", fetch.call_args.args[0])
 
     def test_lookup_crud_services_run_expected_statements(self):
-        with patch("web_review.db.execute") as execute:
+        with patch("web_review.db.execute") as execute, \
+             patch("web_review.services.canon.persist_lookup_overrides") as persist:
             canon.create_lookup_value("location-types", "ruin")
             canon.update_lookup_value("location-types", 3, "ancient_ruin")
             canon.delete_lookup_value("location-types", 3)
@@ -1834,6 +1842,26 @@ class CanonServiceTest(unittest.TestCase):
         self.assertIn("INSERT INTO location_type", execute.call_args_list[0].args[0])
         self.assertIn("UPDATE location_type", execute.call_args_list[1].args[0])
         self.assertIn("DELETE FROM location_type", execute.call_args_list[2].args[0])
+        self.assertEqual(persist.call_count, 3)
+
+    def test_lookup_override_sql_syncs_campaign_lookup_values(self):
+        snapshot = {
+            "lookups": {
+                "location-types": {
+                    "values": [{"value": "settlement"}, {"value": "tavern"}],
+                },
+                "combat-outcomes": {
+                    "values": [{"value": "banished", "description": "Sent away."}],
+                },
+            },
+        }
+
+        sql = canon.lookup_override_sql(snapshot)
+
+        self.assertIn("DELETE FROM location_type WHERE type_name NOT IN ('settlement', 'tavern');", sql)
+        self.assertIn("INSERT INTO location_type (type_name) VALUES ('settlement')", sql)
+        self.assertIn("DELETE FROM combat_outcome WHERE outcome_code NOT IN ('banished');", sql)
+        self.assertIn("ON CONFLICT (outcome_code) DO UPDATE SET description = EXCLUDED.description", sql)
 
 
 class LocationRouteTest(unittest.TestCase):
@@ -3387,6 +3415,9 @@ class ProjectUtilitiesRouteTest(unittest.TestCase):
         self.assertIn('name="session_number"', response.text)
         self.assertIn('value="21"', response.text)
         self.assertIn('name="audio_file_path"', response.text)
+        self.assertIn('name="transcript_policy"', response.text)
+        self.assertIn('value="use_existing" checked', response.text)
+        self.assertIn('value="recreate"', response.text)
         self.assertIn("/project-utilities/initiate-session", response.text)
 
     def test_project_utilities_session_initiation_posts_to_workflow(self):
@@ -3400,6 +3431,7 @@ class ProjectUtilitiesRouteTest(unittest.TestCase):
                     "session_date": "2026-05-17",
                     "title": "Storm over Catur",
                     "audio_file_path": "/tmp/session21.wav",
+                    "transcript_policy": "recreate",
                     "notes": "Fresh session.",
                 },
                 follow_redirects=False,
@@ -3412,9 +3444,10 @@ class ProjectUtilitiesRouteTest(unittest.TestCase):
             "session_date": "2026-05-17",
             "title": "Storm over Catur",
             "audio_file_path": "/tmp/session21.wav",
+            "transcript_policy": "recreate",
             "notes": "Fresh session.",
         })
-        enqueue.assert_called_once_with(21)
+        enqueue.assert_called_once_with(21, "recreate")
 
     def lookup_context_patches(self, editing=None):
         return (
@@ -3688,6 +3721,7 @@ class WorkflowServiceTest(unittest.TestCase):
                 "session_date": "2026-05-17",
                 "title": "Storm over Catur",
                 "audio_file_path": audio.name,
+                "transcript_policy": "recreate",
                 "notes": "Fresh session.",
             })
 
@@ -3700,8 +3734,9 @@ class WorkflowServiceTest(unittest.TestCase):
         self.assertIn("source_audio_registered", joined_sql)
         audio_step = next(params for _sql, params in statements if params.get("status") == "complete")
         self.assertEqual(audio_step["artifacts"], f'["{audio.name}"]')
-        transcribe_step = next(params for _sql, params in statements if params.get("summary_comment") == "Transcription will use the registered source audio.")
+        transcribe_step = next(params for _sql, params in statements if params.get("summary_comment") == "Auto-intake will recreate the raw transcript from registered source audio.")
         self.assertEqual(transcribe_step["inputs"], f'["{audio.name}"]')
+        self.assertIn('"transcript_policy": "recreate"', transcribe_step["metadata"])
 
     def test_initiate_session_normalizes_repo_absolute_mp3_path_for_docker(self):
         definition = {
@@ -3736,8 +3771,52 @@ class WorkflowServiceTest(unittest.TestCase):
         statements = execute.call_args.args[0]
         session_update = next(params for _sql, params in statements if params.get("title") == "Trinyvale Begins")
         self.assertEqual(session_update["audio_file_path"], "campaigns/trinyvale/audio/session01.mp3")
-        transcribe_step = next(params for _sql, params in statements if params.get("summary_comment") == "Transcription will use the registered source audio.")
+        transcribe_step = next(params for _sql, params in statements if params.get("summary_comment") == "Auto-intake will use an existing raw transcript if present.")
         self.assertEqual(transcribe_step["inputs"], '["campaigns/trinyvale/audio/session01.mp3"]')
+
+    def test_initiate_session_discovers_existing_mp3_when_path_is_blank(self):
+        definition = {
+            "workflow": {
+                "id": "farrlind_session_canon",
+                "version": 1,
+                "display_name": "Farrlind Session Canon Workflow",
+                "definition_format": "test",
+                "scope": "per_session",
+                "state_persistence": "database",
+            },
+            "steps": [{
+                "id": "source_audio_registered",
+                "display_name": "Source Audio Registered",
+                "lane": "intake",
+                "expected_inputs": ["campaigns/{campaign}/audio/sessionXX.*"],
+                "expected_outputs": ["campaigns/{campaign}/audio/sessionXX.*"],
+                "dependencies": [],
+            }],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            audio = root / "campaigns" / "trinyvale" / "audio" / "session02.mp3"
+            audio.parent.mkdir(parents=True)
+            audio.write_text("audio", encoding="utf-8")
+            with patch("raglib.workflow_state.load_workflow_definition", return_value=definition), \
+                 patch("web_review.services.reviews.REPO_ROOT", root), \
+                 patch("web_review.services.workflow.campaign.audio_dir", return_value=audio.parent), \
+                 patch("web_review.services.workflow.campaign.raw_dir", return_value=root / "campaigns" / "trinyvale" / "raw"), \
+                 patch("web_review.services.workflow.campaign.clean_dir", return_value=root / "campaigns" / "trinyvale" / "clean"), \
+                 patch("web_review.services.workflow._execute_transaction") as execute:
+                workflow.initiate_session({
+                    "session_number": "2",
+                    "session_date": "2026-05-22",
+                    "title": "Trinyvale Continues",
+                    "audio_file_path": "",
+                    "notes": "",
+                })
+
+        statements = execute.call_args.args[0]
+        session_update = next(params for _sql, params in statements if params.get("title") == "Trinyvale Continues")
+        self.assertEqual(session_update["audio_file_path"], "campaigns/trinyvale/audio/session02.mp3")
+        metadata = next(params for _sql, params in statements if params.get("summary_comment", "").startswith("Session workflow initiated"))
+        self.assertIn('"audio_extension": ".mp3"', metadata["metadata"])
 
     def test_enqueue_auto_intake_writes_queue_file_for_registered_audio(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -3748,17 +3827,21 @@ class WorkflowServiceTest(unittest.TestCase):
             audio.write_text("audio", encoding="utf-8")
             with patch("web_review.services.workflow.QUEUE_DIR", queue_dir), \
                  patch("web_review.services.reviews.REPO_ROOT", root), \
-                 patch("web_review.services.workflow._fetch", return_value=[{"audio_file_path": "audio/session21.wav"}]), \
+                patch("web_review.services.workflow._fetch", return_value=[{"audio_file_path": "audio/session21.wav"}]), \
                  patch("web_review.services.workflow._execute_transaction") as execute:
-                queued = workflow.enqueue_auto_intake(21)
+                queued = workflow.enqueue_auto_intake(21, "recreate")
             self.assertEqual(queued, queue_dir / "session21.json")
             payload = json.loads((queue_dir / "session21.json").read_text(encoding="utf-8"))
             self.assertEqual(payload["session_number"], 21)
+            self.assertEqual(payload["transcript_policy"], "recreate")
             self.assertEqual(payload["commands"], [
-                "transcribe_audio",
-                "source_status_check",
-                "curate_transcript",
-                "extract_npcs",
+            "transcribe_audio",
+            "source_status_check",
+            "curate_transcript",
+            "generate_narrative_summary",
+            "extract_session_spine",
+            "validate_session_spine",
+            "extract_npcs",
                 "extract_locations",
                 "extract_artifacts",
                 "extract_lore_items",

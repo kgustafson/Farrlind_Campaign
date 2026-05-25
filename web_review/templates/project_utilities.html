@@ -114,6 +114,17 @@
         <span>Audio File Path</span>
         <input type="text" name="audio_file_path" placeholder="{{ campaign_audio_dir() }}/session{{ "%02d"|format(next_session_number) }}.mp3 or .wav">
       </label>
+      <fieldset class="field-block">
+        <span>Transcript</span>
+        <label>
+          <input type="radio" name="transcript_policy" value="use_existing" checked>
+          Use existing raw transcript if present
+        </label>
+        <label>
+          <input type="radio" name="transcript_policy" value="recreate">
+          Recreate transcript from audio
+        </label>
+      </fieldset>
       <label class="field-block">
         <span>Operator Notes</span>
         <textarea name="notes" rows="4" placeholder="Anything useful about source files, recording quality, or session setup."></textarea>

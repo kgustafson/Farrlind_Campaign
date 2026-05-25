@@ -30,6 +30,28 @@ class NpcExtractorTest(unittest.TestCase):
         self.assertEqual([source["label"] for source in sources], ["final_summary", "diary"])
         self.assertEqual([source["text"] for source in sources], ["final", "diary"])
 
+    def test_load_session_sources_includes_model_summary_with_curated_packet(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            base = root / "knowledge" / "Faban"
+            clean = base / "clean"
+            raw = base / "raw"
+            final = base / "final"
+            for path in [clean, raw, final]:
+                path.mkdir(parents=True)
+            (clean / "session21_curated.md").write_text("curated", encoding="utf-8")
+            (clean / "session21_summary.md").write_text("model summary", encoding="utf-8")
+            (clean / "session21_diary.md").write_text("diary", encoding="utf-8")
+            (raw / "session21_transcript.txt").write_text("transcript", encoding="utf-8")
+
+            with patch.object(npc_extractor, "BASE", base), \
+                 patch.object(npc_extractor, "CLEAN", clean), \
+                 patch.object(npc_extractor, "RAW", raw):
+                sources = npc_extractor.load_session_sources("session21")
+
+        self.assertEqual([source["label"] for source in sources], ["curated_packet", "draft_summary", "diary"])
+        self.assertEqual([source["text"] for source in sources], ["curated", "model summary", "diary"])
+
     def test_extract_json_object_accepts_markdown_wrapped_json(self):
         document = npc_extractor.extract_json_object("""```json
 {
@@ -207,6 +229,39 @@ party:
         )
         self.assertIn("Neutralized party-interpretation NPC update", warnings[0])
 
+    def test_postprocess_neutralizes_existing_npc_candidate_with_party_framed_role(self):
+        registry = [{"id": 4, "name": "Strahd von Zarovich", "alias": "Strahd"}]
+        document = {
+            "known_npc_mentions": [],
+            "new_npc_candidates": [{
+                "proposed_name": "Strahd",
+                "npc_kind": "named_individual",
+                "role": "Manager of the establishment",
+                "description": "The manager the party wants to complain to.",
+                "first_seen_session": 2,
+                "confidence": "high",
+                "evidence": "I have a bone to pick with the manager, Strahd.",
+            }],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = npc_extractor.postprocess_extraction(
+            document,
+            registry,
+            {"party": []},
+            "session02",
+            "I have a bone to pick with the manager, Strahd. Kolyan's letter describes Strahd as a vampire threat.",
+        )
+
+        self.assertEqual(cleaned["new_npc_candidates"], [])
+        self.assertEqual(cleaned["known_npc_mentions"][0]["canonical_name"], "Strahd von Zarovich")
+        self.assertEqual(
+            cleaned["known_npc_mentions"][0]["new_information"],
+            "Mentioned in this session; no new canon update proposed.",
+        )
+        self.assertIn("Neutralized party-framed NPC candidate update", warnings[0])
+
     def test_postprocess_allows_combined_name_alias_canonical(self):
         registry = [{"id": 43, "name": "Niebain", "alias": "Nebain"}]
         document = {
@@ -225,6 +280,226 @@ party:
         )
 
         self.assertEqual(cleaned["known_npc_mentions"][0]["canonical_name"], "Niebain")
+
+    def test_postprocess_allows_repeated_name_drift(self):
+        registry = [{"id": 4, "name": "Strahd Von Zorovich", "alias": "Strahd"}]
+        document = {
+            "known_npc_mentions": [{
+                "npc_id": 4,
+                "canonical_name": "Strahd von Zarovich von Zarovich",
+                "mentioned_as": ["Strahd"],
+            }],
+            "new_npc_candidates": [],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, _warnings = npc_extractor.postprocess_extraction(
+            document,
+            registry,
+            {"party": []},
+            "session02",
+            "Strahd von Zarovich is named in Kolyan's letter.",
+        )
+
+        self.assertEqual(cleaned["known_npc_mentions"][0]["canonical_name"], "Strahd Von Zorovich")
+
+    def test_postprocess_recovers_unknown_glossary_known_mention_as_new_candidate(self):
+        document = {
+            "known_npc_mentions": [{
+                "npc_id": 99,
+                "canonical_name": "Marina Kulyana Kulyana",
+                "mentioned_as": ["Marina"],
+                "new_information": "Kolyan's adopted daughter has been bitten by a vampire.",
+                "location": "Barovia",
+                "confidence": "high",
+                "evidence": "My adopted daughter, the fair Marina Kuljana...",
+            }],
+            "new_npc_candidates": [],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = npc_extractor.postprocess_extraction(
+            document,
+            [],
+            {
+                "party": [],
+                "glossary": [{
+                    "term": "Marina Kulyana",
+                    "note": "Kolyan's adopted daughter, bitten by a vampire.",
+                    "aliases": ["Marina", "Marina Kuljana"],
+                }],
+            },
+            "session02",
+            "My adopted daughter, the fair Marina Kuljana, languishes and dies.",
+        )
+
+        self.assertEqual(cleaned["known_npc_mentions"], [])
+        self.assertEqual(cleaned["new_npc_candidates"][0]["proposed_name"], "Marina Kulyana")
+        self.assertIn("Recovered unknown-id known mention", warnings[0])
+
+    def test_postprocess_recovers_mismatched_glossary_known_mention_as_new_candidate(self):
+        registry = [{"id": 2, "name": "Reagan", "alias": ""}]
+        document = {
+            "known_npc_mentions": [{
+                "npc_id": 2,
+                "canonical_name": "Bluetooth",
+                "mentioned_as": ["Bluetooth"],
+                "new_information": "Onyx's imp familiar.",
+                "confidence": "high",
+                "evidence": "Everyone, meet Bluetooth.",
+            }],
+            "new_npc_candidates": [],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = npc_extractor.postprocess_extraction(
+            document,
+            registry,
+            {
+                "party": [],
+                "glossary": [{
+                    "term": "Bluetooth",
+                    "note": "Onyx's imp familiar.",
+                    "aliases": ["Jens Z"],
+                }],
+            },
+            "session02",
+            "Everyone, meet Bluetooth.",
+        )
+
+        self.assertEqual(cleaned["known_npc_mentions"], [])
+        self.assertEqual(cleaned["new_npc_candidates"][0]["proposed_name"], "Bluetooth")
+        self.assertIn("Recovered mismatched-id known mention", warnings[0])
+
+    def test_postprocess_adds_glossary_names_found_in_source(self):
+        cleaned, _warnings = npc_extractor.postprocess_extraction(
+            {
+                "known_npc_mentions": [],
+                "new_npc_candidates": [],
+                "rejected_candidates": [],
+                "uncertainties": [],
+            },
+            [],
+            {
+                "party": [{"character_name": "Onyx"}],
+                "glossary": [
+                    {"term": "Ismark", "note": "Kolyan's son.", "aliases": ["Ismark the Lesser"]},
+                    {"term": "Onyx", "note": "Party member.", "aliases": []},
+                ],
+            },
+            "session02",
+            "Ismark leads you out of the tavern.",
+        )
+
+        self.assertEqual([item["proposed_name"] for item in cleaned["new_npc_candidates"]], ["Ismark"])
+
+    def test_postprocess_does_not_add_location_glossary_names_as_npcs(self):
+        cleaned, _warnings = npc_extractor.postprocess_extraction(
+            {
+                "known_npc_mentions": [],
+                "new_npc_candidates": [],
+                "rejected_candidates": [],
+                "uncertainties": [],
+            },
+            [],
+            {
+                "party": [],
+                "glossary": [{
+                    "term": "Barovia",
+                    "note": "Gothic domain where the Triplets are trapped.",
+                    "aliases": ["Borovia"],
+                }],
+            },
+            "session02",
+            "The party enters Barovia.",
+        )
+
+        self.assertEqual(cleaned["new_npc_candidates"], [])
+
+    def test_postprocess_rejects_burger_master_variants(self):
+        cleaned, warnings = npc_extractor.postprocess_extraction(
+            {
+                "known_npc_mentions": [],
+                "new_npc_candidates": [{
+                    "proposed_name": "Burger Master's Daughter",
+                    "role": "Daughter of the burger master",
+                    "description": "The party thinks the Burgomaster is a burger master.",
+                    "evidence": "The party jokes about the Burger Master and his daughter.",
+                }],
+                "rejected_candidates": [],
+                "uncertainties": [],
+            },
+            [],
+            {"party": []},
+            "session02",
+            "The party jokes about the Burger Master and his daughter.",
+        )
+
+        self.assertEqual(cleaned["new_npc_candidates"], [])
+        self.assertEqual(cleaned["rejected_candidates"][0]["text"], "Burger Master's Daughter")
+        self.assertIn("Burger Master", warnings[0])
+
+    def test_postprocess_dedupes_candidates_and_removes_matching_rejections(self):
+        cleaned, _warnings = npc_extractor.postprocess_extraction(
+            {
+                "known_npc_mentions": [],
+                "new_npc_candidates": [
+                    {"proposed_name": "Dolphin", "evidence": "Dolphin speaks."},
+                    {"proposed_name": "Dolphin", "evidence": "Dolphin is recognized."},
+                ],
+                "rejected_candidates": [{"text": "Dolphin", "reason": "Earlier bad model pass."}],
+                "uncertainties": [],
+            },
+            [],
+            {"party": []},
+            "session02",
+            "Dolphin speaks.",
+        )
+
+        self.assertEqual([item["proposed_name"] for item in cleaned["new_npc_candidates"]], ["Dolphin"])
+        self.assertEqual(cleaned["rejected_candidates"], [])
+
+    def test_postprocess_treats_regan_as_reagan(self):
+        cleaned, _warnings = npc_extractor.postprocess_extraction(
+            {
+                "known_npc_mentions": [],
+                "new_npc_candidates": [{"proposed_name": "Regan", "evidence": "Regan appears."}],
+                "rejected_candidates": [],
+                "uncertainties": [],
+            },
+            [{"id": 2, "name": "Reagan", "alias": ""}],
+            {"party": []},
+            "session02",
+            "Regan appears.",
+        )
+
+        self.assertEqual(cleaned["new_npc_candidates"], [])
+        self.assertEqual(cleaned["known_npc_mentions"][0]["canonical_name"], "Reagan")
+
+    def test_postprocess_rejects_known_mapping_when_only_generic_role_is_in_source(self):
+        cleaned, warnings = npc_extractor.postprocess_extraction(
+            {
+                "known_npc_mentions": [{
+                    "npc_id": 2,
+                    "canonical_name": "Reagan",
+                    "mentioned_as": ["bartender"],
+                    "evidence": "The bartender, Dolphin, recognized one of the party members.",
+                }],
+                "new_npc_candidates": [],
+                "rejected_candidates": [],
+                "uncertainties": [],
+            },
+            [{"id": 2, "name": "Reagan", "alias": ""}],
+            {"party": []},
+            "session02",
+            "The bartender, Dolphin, recognized one of the party members.",
+        )
+
+        self.assertEqual(cleaned["known_npc_mentions"], [])
+        self.assertIn("not present in session source", warnings[0])
 
     def test_postprocess_moves_existing_candidate_to_known_mentions(self):
         registry = [{"id": 26, "name": "Orsydon", "alias": ""}]

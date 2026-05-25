@@ -1351,6 +1351,34 @@ button:disabled {
   font-size: 13px;
 }
 .source-snippet { margin: 0; }
+.item-context {
+  margin-top: 8px;
+  border: 1px solid rgba(139, 95, 39, .22);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .55);
+}
+.item-context summary {
+  cursor: pointer;
+  padding: 7px 9px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.item-context pre {
+  margin: 0;
+  padding: 0 9px 9px;
+  white-space: pre-wrap;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.db-context-line {
+  margin: 0;
+  padding: 0 9px 9px;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.45;
+}
 .canonical-text {
   margin-top: 10px;
   padding-left: 10px;

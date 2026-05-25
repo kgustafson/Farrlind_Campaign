@@ -21,6 +21,8 @@ class CanonWriteError(RuntimeError):
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CANON_DECISIONS_PATH = campaign_path("canon_decisions.yaml")
+LOOKUP_OVERRIDES_PATH = campaign_path("lookup_overrides.yaml")
+LOOKUP_OVERRIDES_SQL_PATH = campaign_path("init") / "20_lookup_overrides.sql"
 FARRLIND_MONTH_ORDER = {
     "Sha'al": 1,
     "Amoral": 2,
@@ -631,6 +633,12 @@ def lookup_definition(lookup_key: str) -> dict[str, Any]:
     return LOOKUP_TABLES[lookup_key]
 
 
+def sql_quote(value: Any) -> str:
+    if value is None:
+        return "NULL"
+    return "'" + str(value).replace("'", "''") + "'"
+
+
 def _ensure_custom_lookup_table(definition: dict[str, Any]) -> None:
     if not definition.get("custom"):
         return
@@ -666,6 +674,78 @@ def lookup_rows(lookup_key: str) -> list[dict[str, Any]]:
     """)
 
 
+def lookup_override_snapshot() -> dict[str, Any]:
+    lookups: dict[str, Any] = {}
+    for key, definition in LOOKUP_TABLES.items():
+        rows = lookup_rows(key)
+        values = []
+        for row in rows:
+            item = {"value": row["value"]}
+            if definition["description_column"]:
+                item["description"] = row.get("description") or ""
+            values.append(item)
+        lookups[key] = {
+            "table": definition["table"],
+            "value_column": definition["value_column"],
+            "description_column": definition["description_column"],
+            "values": values,
+        }
+    return {
+        "description": "Campaign lookup values exported from Project Utilities. This file is used to regenerate init/20_lookup_overrides.sql after lookup edits.",
+        "lookups": lookups,
+    }
+
+
+def lookup_override_sql(snapshot: dict[str, Any]) -> str:
+    lines = [
+        "-- Generated from campaign lookup_overrides.yaml by web_review.services.canon.",
+        "-- Intended for fresh campaign database initialization after generic lookup seeds.",
+        "",
+    ]
+    for key, payload in snapshot.get("lookups", {}).items():
+        definition = LOOKUP_TABLES.get(key)
+        if not definition:
+            continue
+        table = definition["table"]
+        value_column = definition["value_column"]
+        description_column = definition["description_column"]
+        values = payload.get("values") or []
+        quoted_values = ", ".join(sql_quote(item.get("value")) for item in values if item.get("value"))
+        lines.append(f"-- {definition['label']}")
+        if quoted_values:
+            lines.append(f"DELETE FROM {table} WHERE {value_column} NOT IN ({quoted_values});")
+        else:
+            lines.append(f"DELETE FROM {table};")
+        for item in values:
+            value = item.get("value")
+            if not value:
+                continue
+            if description_column:
+                lines.append(
+                    f"INSERT INTO {table} ({value_column}, {description_column}) "
+                    f"VALUES ({sql_quote(value)}, {sql_quote(item.get('description') or '')}) "
+                    f"ON CONFLICT ({value_column}) DO UPDATE SET {description_column} = EXCLUDED.{description_column};"
+                )
+            else:
+                lines.append(
+                    f"INSERT INTO {table} ({value_column}) "
+                    f"VALUES ({sql_quote(value)}) "
+                    f"ON CONFLICT ({value_column}) DO NOTHING;"
+                )
+        lines.append("")
+    return "\n".join(lines)
+
+
+def persist_lookup_overrides() -> None:
+    snapshot = lookup_override_snapshot()
+    LOOKUP_OVERRIDES_PATH.write_text(
+        yaml.safe_dump(snapshot, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+    LOOKUP_OVERRIDES_SQL_PATH.parent.mkdir(parents=True, exist_ok=True)
+    LOOKUP_OVERRIDES_SQL_PATH.write_text(lookup_override_sql(snapshot), encoding="utf-8")
+
+
 def lookup_detail(lookup_key: str, lookup_id: int) -> Optional[dict[str, Any]]:
     definition = lookup_definition(lookup_key)
     _ensure_custom_lookup_table(definition)
@@ -697,6 +777,7 @@ def create_lookup_value(lookup_key: str, value: str, description: str = "") -> N
             INSERT INTO {table} ({value_column})
             VALUES (:value);
         """, {"value": value})
+    persist_lookup_overrides()
 
 
 def update_lookup_value(lookup_key: str, lookup_id: int, value: str, description: str = "") -> None:
@@ -718,12 +799,14 @@ def update_lookup_value(lookup_key: str, lookup_id: int, value: str, description
             SET {value_column} = :value
             WHERE id = :id;
         """, {"id": lookup_id, "value": value})
+    persist_lookup_overrides()
 
 
 def delete_lookup_value(lookup_key: str, lookup_id: int) -> None:
     definition = lookup_definition(lookup_key)
     _ensure_custom_lookup_table(definition)
     _execute(f"DELETE FROM {definition['table']} WHERE id = :id;", {"id": lookup_id})
+    persist_lookup_overrides()
 
 
 def open_thread_rows() -> list[dict[str, Any]]:

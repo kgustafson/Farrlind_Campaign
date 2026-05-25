@@ -1,4 +1,16 @@
-# Revision History
+# Revision History - D&D Campaign Manager
+
+## v0.6.2 - 5/25/2026
+
+Baselined the cleaned Trinyvale audio-first workflow through the session spine validation stage.
+
+- Workflow: Added active-session narrative generation that separates podcast recap/context from live session material before chunking.
+- Workflow: Added narrative post-hygiene for recap-only facts, unsupported found-location claims, known role conflicts, and PC/familiar ownership confusion.
+- Workflow: Added session spine extraction and validation stages, including workflow status wiring, auto-intake queue integration, and stale-step detection when upstream draft artifacts are newer.
+- Workflow: Strengthened spine extraction with preservation-aware handling for key items, character/resource beats, and final cliffhangers.
+- Extraction: Added compact source/context handling and shared hygiene improvements across entity extractors to reduce campaign bleed and unsupported candidates.
+- App: Continued Trinyvale workflow support with campaign-specific metadata, lookup overrides, review wiring, and map/sidebar cleanup from Farrlind-specific assumptions.
+- Tests: Added coverage for narrative active-session boundaries, session spine extraction/validation, workflow stale detection, audio extension handling, campaign metadata seeding, and extractor hygiene.
 
 ## v0.6.1 - 5/24/2026
 

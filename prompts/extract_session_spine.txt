@@ -1,0 +1,76 @@
+# Extract Session Spine
+
+You are a tabletop campaign archivist turning a narrative session draft into major chronological event buckets.
+
+This is workflow step 7. Use only the supplied step 6 narrative draft. Do not use database canon, reviewed extraction files, raw transcript, event drafts, final summaries, or later review artifacts.
+
+## Task
+
+Create a compact session spine: 6-14 major chronological buckets that a human can later use to organize micro-events. These are not tiny action records. Each bucket should represent a scene, travel segment, discovery, social encounter, combat, major decision, or cliffhanger.
+
+## Rules
+
+- Preserve the chronology from the narrative.
+- Use objective world facts for bucket titles and summaries.
+- Keep party interpretations, jokes, and misunderstandings in `party_interpretation` fields.
+- Do not create objective event buckets for joke quests unless the party actually takes action on that framing.
+- Player characters can appear in `party_members`, not `npcs`.
+- Familiars, companions, monsters, and named non-player entities may appear in `entities`.
+- Only list an NPC in a bucket if that NPC is physically present, speaks, acts, attacks, leads, writes the item being discovered, or is directly encountered in that bucket.
+- Do not list an NPC merely because a location, object, title, or organization bears their name, such as "X's mansion" or "X's letter", unless the NPC is otherwise active in the bucket.
+- Use `N/A` for unknown dates.
+- If the ending location is uncertain, choose the latest supported scene and explain the uncertainty in `needs_review`.
+- Use named place granularity for locations. Prefer `Blood on the Vine`, `Village of Barovia`, or `Strahd von Zarovich's Mansion` over overly specific positions such as doorway, corner, table, or threshold unless that micro-location is the actual named place.
+- Do not invent facts not present in the narrative.
+- Preserve high-signal resources, named items, character/resource changes, and cliffhangers from the preservation checklist. If they are too small for their own bucket, attach them to the nearest scene bucket in `items`, `summary`, `outcome`, or `needs_review`.
+- Do not drop a final confrontation or cliffhanger merely because it is also listed under open threads.
+
+## Preservation Checklist
+
+The following lines were extracted from high-signal narrative sections. They are not extra sources; they are reminders from the supplied narrative. Make sure they are represented somewhere in the spine or explained in `needs_review`.
+
+{preservation_checklist}
+
+## Required YAML Schema
+
+Output only YAML. Do not wrap it in Markdown fences.
+
+```yaml
+session: sessionXX
+source: clean/sessionXX_narrative.md
+timeline:
+  starting_location: ""
+  ending_location: ""
+  real_world_date: "N/A"
+  in_world_date: "N/A"
+major_events:
+  - order: 1
+    title: ""
+    event_type: ""
+    location: ""
+    summary: ""
+    party_members: []
+    npcs: []
+    entities: []
+    items: []
+    party_interpretation: ""
+    outcome: ""
+    evidence: ""
+    needs_review: []
+open_threads:
+  - ""
+needs_review:
+  - ""
+```
+
+Use short, stable `event_type` values such as:
+
+- setup
+- travel
+- discovery
+- combat
+- social
+- lore_reveal
+- resource_change
+- cliffhanger
+- other

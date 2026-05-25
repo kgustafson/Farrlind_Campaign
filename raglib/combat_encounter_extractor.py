@@ -18,6 +18,7 @@ from raglib.extraction_hygiene import (
 from raglib.io_utils import read_text, write_text
 from raglib.ollama_client import generate
 from raglib.prompts import load_prompt
+from raglib.transcript_cleaner import clean_source_text
 from web_review.services import canon
 
 
@@ -76,6 +77,141 @@ def normalize_quantity(value: Any) -> Optional[int]:
         return int(value)
     except (TypeError, ValueError):
         return None
+
+
+def normalized_key(value: Any) -> str:
+    normalized = re.sub(r"[^a-z0-9]+", " ", str(value or "").lower()).strip()
+    normalized = re.sub(r"\b(zombies)\b", "zombie", normalized)
+    normalized = re.sub(r"\b(wolves)\b", "wolf", normalized)
+    normalized = re.sub(r"\s+", " ", normalized)
+    return normalized
+
+
+def enemy_family(enemy: dict[str, Any]) -> str:
+    enemy_type = normalized_key(enemy.get("enemy_type"))
+    name = normalized_key(enemy.get("name"))
+    value = enemy_type or name
+    if value.endswith("s") and len(value) > 3:
+        value = value[:-1]
+    return value or "unknown"
+
+
+def encounter_enemy_families(encounter: dict[str, Any]) -> tuple[str, ...]:
+    families = sorted({
+        enemy_family(enemy)
+        for enemy in encounter.get("enemies", [])
+        if enemy_family(enemy) != "unknown"
+    })
+    return tuple(families)
+
+
+def merge_text_values(*values: Any, separator: str = " ") -> str:
+    seen = set()
+    parts = []
+    for value in values:
+        text = str(value or "").strip()
+        if not text:
+            continue
+        normalized = normalized_key(text)
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        parts.append(text)
+    return separator.join(parts)
+
+
+def better_title(current: str, candidate: str) -> str:
+    generic_words = {"attack", "ambush", "sequence", "combat", "fight", "encounter"}
+
+    def score(value: str) -> tuple[int, int]:
+        tokens = set(normalized_key(value).split())
+        specific_tokens = tokens - generic_words
+        return (len(specific_tokens), len(value))
+
+    return candidate if score(candidate) > score(current) else current
+
+
+def better_confidence(current: str, candidate: str) -> str:
+    rank = {"low": 1, "medium": 2, "high": 3}
+    return candidate if rank.get(candidate, 0) > rank.get(current, 0) else current
+
+
+def better_outcome(current: str, candidate: str) -> str:
+    rank = {
+        "unknown": 0,
+        "cliffhanger": 1,
+        "ongoing": 2,
+        "encountered": 3,
+        "fled": 4,
+        "escaped": 4,
+        "resolved": 5,
+        "defeated": 6,
+        "enemies_defeated": 6,
+    }
+    return candidate if rank.get(candidate, 0) > rank.get(current, 0) else current
+
+
+def merge_enemy_rows(existing: dict[str, Any], incoming: dict[str, Any]) -> dict[str, Any]:
+    existing["name"] = better_title(existing.get("name", ""), incoming.get("name", ""))
+    existing["enemy_type"] = existing.get("enemy_type") or incoming.get("enemy_type") or ""
+    for key in ["quantity", "quantity_killed"]:
+        values = [value for value in [existing.get(key), incoming.get(key)] if value is not None]
+        existing[key] = max(values) if values else None
+    existing["outcome"] = better_outcome(existing.get("outcome") or "unknown", incoming.get("outcome") or "unknown")
+    existing["confidence"] = better_confidence(existing.get("confidence") or "medium", incoming.get("confidence") or "medium")
+    existing["notes"] = merge_text_values(existing.get("notes"), incoming.get("notes"), separator=" ")
+    return existing
+
+
+def merge_combat_encounter(existing: dict[str, Any], incoming: dict[str, Any]) -> dict[str, Any]:
+    existing["title"] = better_title(existing.get("title", ""), incoming.get("title", ""))
+    existing["subtype"] = existing.get("subtype") or incoming.get("subtype") or ""
+    existing["location"] = better_title(existing.get("location", ""), incoming.get("location", ""))
+    existing["participants"] = merge_text_values(existing.get("participants"), incoming.get("participants"), separator="; ")
+    existing["outcome"] = better_outcome(existing.get("outcome") or "unknown", incoming.get("outcome") or "unknown")
+    existing["confidence"] = better_confidence(existing.get("confidence") or "medium", incoming.get("confidence") or "medium")
+    existing["notes"] = merge_text_values(existing.get("notes"), incoming.get("notes"), separator=" ")
+    existing["evidence"] = merge_text_values(existing.get("evidence"), incoming.get("evidence"), separator=" ")
+
+    enemy_rows = {enemy_family(enemy): enemy for enemy in existing.get("enemies", [])}
+    for enemy in incoming.get("enemies", []):
+        family = enemy_family(enemy)
+        if family in enemy_rows:
+            merge_enemy_rows(enemy_rows[family], enemy)
+        else:
+            existing.setdefault("enemies", []).append(enemy)
+            enemy_rows[family] = enemy
+    return existing
+
+
+def duplicate_combat_key(encounter: dict[str, Any]) -> Optional[tuple[Any, tuple[str, ...]]]:
+    families = encounter_enemy_families(encounter)
+    if not families:
+        return None
+    return (encounter.get("session_number"), families)
+
+
+def merge_duplicate_combat_encounters(encounters: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[str]]:
+    merged: list[dict[str, Any]] = []
+    by_key: dict[tuple[Any, tuple[str, ...]], dict[str, Any]] = {}
+    warnings: list[str] = []
+
+    for encounter in encounters:
+        key = duplicate_combat_key(encounter)
+        if key is None:
+            merged.append(encounter)
+            continue
+        existing = by_key.get(key)
+        if existing is None:
+            by_key[key] = encounter
+            merged.append(encounter)
+            continue
+        previous_title = existing.get("title") or "untitled combat"
+        incoming_title = encounter.get("title") or "untitled combat"
+        merge_combat_encounter(existing, encounter)
+        warnings.append(f"Merged duplicate combat encounter candidates: {previous_title} + {incoming_title}")
+
+    return merged, warnings
 
 
 def normalize_extraction(document: dict[str, Any]) -> dict[str, Any]:
@@ -161,7 +297,8 @@ def postprocess_extraction(
         encounter["enemies"] = enemies
         encounters.append(encounter)
 
-    cleaned["proposed_combat_encounters"] = encounters
+    cleaned["proposed_combat_encounters"], merge_warnings = merge_duplicate_combat_encounters(encounters)
+    warnings.extend(merge_warnings)
     return cleaned, warnings
 
 
@@ -173,7 +310,7 @@ def load_session_sources(session_name: str, source: str = "auto") -> list[dict[s
         if any(label == "final_summary" for label, _path in selected):
             selected = [item for item in selected if item[0] in {"final_summary", "diary"}]
         elif any(label == "curated_packet" for label, _path in selected):
-            selected = [item for item in selected if item[0] in {"curated_packet", "diary"}]
+            selected = [item for item in selected if item[0] in {"draft_summary", "curated_packet", "diary"}]
         else:
             selected = selected[:2]
     else:
@@ -182,7 +319,7 @@ def load_session_sources(session_name: str, source: str = "auto") -> list[dict[s
             raise ValueError(f"Unsupported combat encounter extraction source: {source}")
         selected = [(source, known[source])]
 
-    return [{"label": label, "path": str(path), "text": read_text(path)} for label, path in selected]
+    return [{"label": label, "path": str(path), "text": clean_source_text(label, read_text(path))} for label, path in selected]
 
 
 def build_prompt(

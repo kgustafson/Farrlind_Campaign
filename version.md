@@ -1,6 +1,6 @@
 # Version
 
-v0.6.1
+v0.6.2
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.6.1` passes the configured Git commit hash through Docker and displays the short build hash in the archive footer.
+`v0.6.2` adds the cleaned Trinyvale audio workflow baseline with active-session narrative generation, session spine validation, and preservation-aware spine extraction.

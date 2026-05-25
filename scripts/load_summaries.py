@@ -1437,9 +1437,15 @@ ON CONFLICT (name) DO UPDATE SET
 """.strip()
 
 
+def session_audio_path(number: int):
+    stem = f"session{number:02d}"
+    candidates = [audio_dir() / f"{stem}{extension}" for extension in [".wav", ".mp3", ".m4a", ".flac", ".aac", ".ogg"]]
+    return next((path for path in candidates if path.exists()), candidates[0])
+
+
 def session_sql(session: dict) -> str:
     number = session["session_number"]
-    audio_path = audio_dir() / f"session{number:02d}.wav"
+    audio_path = session_audio_path(number)
     transcript_path = campaign_path("raw", f"session{number:02d}_transcript.txt")
 
     return f"""

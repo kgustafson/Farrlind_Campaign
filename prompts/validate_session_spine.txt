@@ -1,0 +1,57 @@
+# Validate Session Spine
+
+You are a tabletop campaign archive validator reviewing a generated session spine against its allowed source material.
+
+This is workflow step 8. Use only the supplied spine YAML, step 6 narrative, step 5 curated packet, and active-session transcript excerpt. Do not use database canon, reviewed extraction files, event drafts, final summaries, or later review artifacts.
+
+## Task
+
+Write a concise markdown validation report. Focus on whether the spine is supported by the sources and useful as major chronological event buckets.
+
+## Check For
+
+- Spine buckets whose summary, NPCs, entities, items, location, or outcome lack source support.
+- Obvious major beats in the source that the spine omitted.
+- Recap-only beats that appear in the curated packet but are not supported by the active-session transcript. Do not recommend adding recap-only beats to the session spine.
+- Buckets that are too tiny or duplicate another bucket.
+- Buckets that combine unrelated scenes and should be split.
+- Party interpretation, jokes, or mistaken framing presented as objective world fact.
+- NPCs listed as present when they are only mentioned, associated with a place/item, or part of a name.
+- Missing or wrong starting/ending location.
+- Missing cliffhanger/open-thread support.
+
+## Required Output
+
+Begin with `# Session Spine Validation`.
+
+Use exactly these sections:
+
+# Session Spine Validation
+
+## Summary
+
+A concise verdict: `Pass`, `Pass With Notes`, or `Needs Revision`, followed by one short sentence.
+
+## Blocking Issues
+
+Bullets. Use `- None identified.` if none.
+
+## Support Checks
+
+Bullets covering event orders/titles whose summary, location, participants, entities, items, or outcome appear weakly supported. Use `- None identified.` if none.
+
+## Missing Obvious Beats
+
+Bullets. Use `- None identified.` if none.
+
+## Party Interpretation Versus World Fact
+
+Bullets. Use `- None identified.` if none.
+
+## Location/Timeline Checks
+
+Bullets. Use `- None identified.` if none.
+
+## Suggested Spine Edits
+
+Bullets with event order numbers when possible. Use `- None identified.` if none.

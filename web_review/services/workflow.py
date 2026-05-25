@@ -8,11 +8,13 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from raglib import workflow_state
 from raglib import campaign
+from raglib.audio import is_supported_audio_path, resolve_session_audio_path
 from web_review import db
 from web_review.services import reviews
 
 
 QUEUE_DIR = reviews.REPO_ROOT / "ops" / "workflow_queue"
+TRANSCRIPT_POLICIES = {"use_existing", "recreate"}
 
 
 class WorkflowReadError(RuntimeError):
@@ -124,6 +126,24 @@ def repo_artifact(path: Path) -> str:
         return storage_artifact_path(str(path))
 
 
+def discovered_audio_artifact(session_name: str) -> str:
+    path = resolve_session_audio_path(session_name)
+    return repo_artifact(path) if path.exists() else ""
+
+
+def registered_audio_artifact(original_audio_path: str, session_name: str) -> str:
+    if original_audio_path:
+        if not is_supported_audio_path(original_audio_path):
+            raise WorkflowWriteError("Audio file must use a supported extension: .wav, .mp3, .m4a, .flac, .aac, or .ogg.")
+        return storage_artifact_path(original_audio_path)
+    return discovered_audio_artifact(session_name)
+
+
+def normalize_transcript_policy(value: Optional[str]) -> str:
+    policy = (value or "").strip()
+    return policy if policy in TRANSCRIPT_POLICIES else "use_existing"
+
+
 def initiate_session(values: dict[str, Any]) -> int:
     try:
         session_number = workflow_state.parse_session_number(values["session_number"])
@@ -132,11 +152,12 @@ def initiate_session(values: dict[str, Any]) -> int:
 
     title = (values.get("title") or f"Session {session_number:02d}").strip()
     session_date = (values.get("session_date") or "").strip() or None
-    original_audio_path = (values.get("audio_file_path") or "").strip()
-    audio_path = storage_artifact_path(original_audio_path) if original_audio_path else ""
+    transcript_policy = normalize_transcript_policy(values.get("transcript_policy"))
     notes = (values.get("notes") or "").strip()
     definition = workflow_state.load_workflow_definition()
     session_name = workflow_state.session_name(session_number)
+    original_audio_path = (values.get("audio_file_path") or "").strip()
+    audio_path = registered_audio_artifact(original_audio_path, session_name)
     transcript_artifact = repo_artifact(campaign.raw_dir() / f"{session_name}_transcript.txt")
     diary_artifact = repo_artifact(campaign.clean_dir() / f"{session_name}_diary.md")
 
@@ -144,6 +165,9 @@ def initiate_session(values: dict[str, Any]) -> int:
         "initiated_from": "project_utilities",
         "real_session_date": session_date,
         "audio_file_path": audio_path or None,
+        "audio_extension": Path(audio_path).suffix.lower() if audio_path else None,
+        "audio_stem": Path(audio_path).stem if audio_path else None,
+        "transcript_policy": transcript_policy,
     }
     if original_audio_path and original_audio_path != audio_path:
         metadata["original_audio_file_path"] = original_audio_path
@@ -258,8 +282,16 @@ def initiate_session(values: dict[str, Any]) -> int:
                 "workflow_version": int(definition["workflow"]["version"]),
                 "inputs": json.dumps([audio_path]),
                 "outputs": json.dumps([transcript_artifact]),
-                "summary_comment": "Transcription will use the registered source audio.",
-                "metadata": json.dumps({"audio_file_path": audio_path, "audio_file_exists": audio_exists}),
+                "summary_comment": (
+                    "Auto-intake will use an existing raw transcript if present."
+                    if transcript_policy == "use_existing"
+                    else "Auto-intake will recreate the raw transcript from registered source audio."
+                ),
+                "metadata": json.dumps({
+                    "audio_file_path": audio_path,
+                    "audio_file_exists": audio_exists,
+                    "transcript_policy": transcript_policy,
+                }),
             },
         ))
         statements.append((
@@ -290,7 +322,7 @@ def auto_intake_enabled() -> bool:
     return True
 
 
-def enqueue_auto_intake(session_number: int) -> Optional[Path]:
+def enqueue_auto_intake(session_number: int, transcript_policy: str = "use_existing") -> Optional[Path]:
     rows = _fetch("""
         SELECT audio_file_path
         FROM session
@@ -309,18 +341,23 @@ def enqueue_auto_intake(session_number: int) -> Optional[Path]:
     if not resolved_audio.exists():
         return None
 
+    transcript_policy = normalize_transcript_policy(transcript_policy)
     QUEUE_DIR.mkdir(parents=True, exist_ok=True)
     payload = {
         "campaign_name": campaign.active_campaign_name(),
         "session_number": session_number,
         "session_name": session_key(session_number),
         "audio_file_path": audio_path,
+        "transcript_policy": transcript_policy,
         "queued_at": datetime.now(timezone.utc).isoformat(),
         "stop_before": "review_npc_extraction",
         "commands": [
             "transcribe_audio",
             "source_status_check",
             "curate_transcript",
+            "generate_narrative_summary",
+            "extract_session_spine",
+            "validate_session_spine",
             "extract_npcs",
             "extract_locations",
             "extract_artifacts",
@@ -349,7 +386,11 @@ def enqueue_auto_intake(session_number: int) -> Optional[Path]:
         """, {
             "session_number": session_number,
             "summary_comment": "Auto-intake queued through draft extraction; extraction reviews are the next human gate.",
-            "metadata": json.dumps({"auto_intake_queued": True, "auto_intake_queue_path": str(queue_path.relative_to(reviews.REPO_ROOT))}),
+            "metadata": json.dumps({
+                "auto_intake_queued": True,
+                "auto_intake_queue_path": str(queue_path.relative_to(reviews.REPO_ROOT)),
+                "transcript_policy": transcript_policy,
+            }),
         }),
         ("""
         UPDATE workflow_step_state wss
@@ -362,7 +403,11 @@ def enqueue_auto_intake(session_number: int) -> Optional[Path]:
           AND wss.status = 'pending';
         """, {
             "session_number": session_number,
-            "summary_comment": "Queued for automatic intake after session initiation.",
+            "summary_comment": (
+                "Queued for automatic intake; existing raw transcript will be preserved if present."
+                if transcript_policy == "use_existing"
+                else "Queued for automatic intake; raw transcript will be recreated from audio."
+            ),
         }),
     ])
     return queue_path

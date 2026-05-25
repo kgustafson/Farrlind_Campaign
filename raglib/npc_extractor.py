@@ -13,13 +13,16 @@ from raglib.extraction_hygiene import (
     compact_name_list_for_chunk,
     compact_registry_for_chunk,
     looks_like_party_interpretation,
+    looks_like_unconfirmed_party_framing,
     merge_extraction_documents,
+    neutralize_party_framed_update,
     neutralize_interpretive_update,
     rejection_text,
 )
 from raglib.io_utils import read_text, write_text
 from raglib.ollama_client import generate
 from raglib.prompts import load_prompt
+from raglib.transcript_cleaner import clean_source_text
 from web_review.services import canon
 
 
@@ -95,7 +98,23 @@ def party_character_names(metadata: dict[str, Any]) -> list[str]:
 
 
 def normalized_name(value: Any) -> str:
-    return re.sub(r"[^a-z0-9]+", " ", str(value or "").lower()).strip()
+    normalized = re.sub(r"[^a-z0-9]+", " ", str(value or "").lower()).strip()
+    tokens = ["reagan" if token == "regan" else "zarovich" if token == "zorovich" else token for token in normalized.split()]
+    return " ".join(tokens)
+
+
+def collapse_repeated_name_tokens(value: Any) -> str:
+    normalized = normalized_name(value)
+    tokens = normalized.split()
+    collapsed: list[str] = []
+    index = 0
+    while index < len(tokens):
+        collapsed.append(tokens[index])
+        lookahead = index + 1
+        while lookahead < len(tokens) and tokens[lookahead] == tokens[index]:
+            lookahead += 1
+        index = lookahead
+    return " ".join(collapsed)
 
 
 def registry_indexes(registry: list[dict[str, Any]]) -> tuple[dict[int, dict[str, Any]], dict[str, dict[str, Any]]]:
@@ -126,10 +145,10 @@ def mentioned_as_values(item: dict[str, Any]) -> list[str]:
 
 
 def canonical_matches_registry(item: dict[str, Any], registry_row: dict[str, Any]) -> bool:
-    canonical = normalized_name(item.get("canonical_name"))
+    canonical = collapse_repeated_name_tokens(item.get("canonical_name"))
     valid = {
-        normalized_name(registry_row.get("name")),
-        normalized_name(registry_row.get("alias")),
+        collapse_repeated_name_tokens(registry_row.get("name")),
+        collapse_repeated_name_tokens(registry_row.get("alias")),
     }
     valid = {name for name in valid if name}
     return canonical in valid or any(name and name in canonical for name in valid)
@@ -145,7 +164,6 @@ def known_mention_source_terms(item: dict[str, Any], registry_row: dict[str, Any
         registry_row.get("name"),
         registry_row.get("alias"),
         item.get("canonical_name"),
-        *mentioned_as_values(item),
     ]
 
 
@@ -179,6 +197,156 @@ def candidate_to_known_mention(candidate: dict[str, Any], registry_row: dict[str
     }
 
 
+def metadata_glossary_names(metadata: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    names: dict[str, dict[str, Any]] = {}
+    for entry in metadata.get("glossary", []) or []:
+        term = (entry.get("term") or "").strip()
+        if not term or not glossary_entry_is_npc_hint(entry):
+            continue
+        aliases = [str(alias) for alias in entry.get("aliases", []) or [] if alias]
+        detail = {
+            "term": term,
+            "aliases": aliases,
+            "note": entry.get("note") or "",
+        }
+        for value in [term, *aliases]:
+            normalized = normalized_name(value)
+            if normalized:
+                names[normalized] = detail
+    return names
+
+
+def glossary_entry_is_npc_hint(entry: dict[str, Any]) -> bool:
+    text = normalized_name(f"{entry.get('term', '')} {entry.get('note', '')}")
+    non_npc_terms = {
+        "campaign world",
+        "domain",
+        "location",
+        "place",
+        "city",
+        "town",
+        "village",
+        "road",
+        "tavern",
+        "inn",
+        "realm",
+        "settlement",
+        "party nickname",
+    }
+    if any(term in text for term in non_npc_terms):
+        return False
+    npc_terms = {
+        "lord",
+        "vampire",
+        "burgomaster",
+        "father",
+        "daughter",
+        "son",
+        "familiar",
+        "imp",
+        "npc",
+        "companion",
+        "enemy",
+        "ally",
+        "mentor",
+    }
+    return any(term in text for term in npc_terms)
+
+
+def source_mention_for_item(item: dict[str, Any], metadata_names: dict[str, dict[str, Any]]) -> tuple[str, Optional[dict[str, Any]]]:
+    values = [item.get("canonical_name"), *mentioned_as_values(item)]
+    for value in values:
+        normalized = normalized_name(value)
+        if normalized in metadata_names:
+            return str(value), metadata_names[normalized]
+    for value in values:
+        if value:
+            return str(value), None
+    return "", None
+
+
+def known_mention_to_candidate(item: dict[str, Any], session_name: str, metadata_entry: Optional[dict[str, Any]]) -> dict[str, Any]:
+    proposed_name = (metadata_entry or {}).get("term") or item.get("canonical_name") or next(iter(mentioned_as_values(item)), "")
+    return {
+        "proposed_name": proposed_name,
+        "npc_kind": "named_individual",
+        "role": item.get("new_information") or (metadata_entry or {}).get("note") or "Mentioned in this session.",
+        "description": (metadata_entry or {}).get("note") or item.get("new_information") or "Mentioned in this session.",
+        "first_seen_session": session_number(session_name),
+        "first_seen_location": item.get("location") or "",
+        "aliases": (metadata_entry or {}).get("aliases") or mentioned_as_values(item),
+        "status": "unknown",
+        "confidence": item.get("confidence") or "medium",
+        "evidence": item.get("evidence") or "",
+    }
+
+
+def metadata_entry_to_candidate(entry: dict[str, Any], session_name: str, source_text: str) -> dict[str, Any]:
+    term = entry["term"]
+    aliases = entry.get("aliases") or []
+    mentioned = next((value for value in [term, *aliases] if source_contains_any(source_text, [value])), term)
+    return {
+        "proposed_name": term,
+        "npc_kind": "named_individual",
+        "role": entry.get("note") or "Mentioned in this session.",
+        "description": entry.get("note") or "Mentioned in this session.",
+        "first_seen_session": session_number(session_name),
+        "first_seen_location": "",
+        "aliases": aliases,
+        "status": "unknown",
+        "confidence": "medium",
+        "evidence": f"Source mentions {mentioned}.",
+    }
+
+
+def add_glossary_candidates(
+    candidates: list[dict[str, Any]],
+    metadata_names: dict[str, dict[str, Any]],
+    registry_by_name: dict[str, dict[str, Any]],
+    party_names: set[str],
+    session_name: str,
+    source_text: str,
+) -> list[dict[str, Any]]:
+    seen = {normalized_name(candidate.get("proposed_name")) for candidate in candidates}
+    added: list[dict[str, Any]] = []
+    unique_entries: dict[str, dict[str, Any]] = {}
+    for entry in metadata_names.values():
+        unique_entries[normalized_name(entry["term"])] = entry
+    for entry in unique_entries.values():
+        names = [entry["term"], *(entry.get("aliases") or [])]
+        normalized_term = normalized_name(entry["term"])
+        if normalized_term in seen or normalized_term in party_names or normalized_term in registry_by_name:
+            continue
+        if any(normalized_name(alias) in party_names for alias in names):
+            continue
+        if source_text and not source_contains_any(source_text, names):
+            continue
+        added.append(metadata_entry_to_candidate(entry, session_name, source_text))
+        seen.add(normalized_term)
+    return [*candidates, *added]
+
+
+def dedupe_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    deduped: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for candidate in candidates:
+        key = normalized_name(candidate.get("proposed_name"))
+        if not key or key in seen:
+            continue
+        deduped.append(candidate)
+        seen.add(key)
+    return deduped
+
+
+def remove_rejections_for_accepted_candidates(document: dict[str, Any]) -> None:
+    accepted = {normalized_name(candidate.get("proposed_name")) for candidate in document["new_npc_candidates"]}
+    accepted = {item for item in accepted if item}
+    document["rejected_candidates"] = [
+        item for item in document["rejected_candidates"]
+        if normalized_name(item.get("text")) not in accepted
+    ]
+
+
 def postprocess_extraction(
     document: dict[str, Any],
     registry: list[dict[str, Any]],
@@ -189,23 +357,41 @@ def postprocess_extraction(
     cleaned = normalize_extraction(document)
     warnings = []
     party_names = {normalized_name(name) for name in party_character_names(campaign_metadata)}
+    metadata_names = metadata_glossary_names(campaign_metadata)
     by_id, by_name = registry_indexes(registry)
 
     known_mentions = []
+    recovered_candidates = []
     for item in cleaned["known_npc_mentions"]:
-        if any(is_party_reference(value, party_names) for value in mentioned_as_values(item)):
+        if any(is_party_reference(value, party_names) for value in [item.get("canonical_name"), *mentioned_as_values(item)]):
             warnings.append(f"Dropped known mention mapped from party member: {item.get('mentioned_as')}")
             continue
+        mention_value, metadata_entry = source_mention_for_item(item, metadata_names)
         try:
             npc_id = int(item.get("npc_id"))
         except (TypeError, ValueError):
-            warnings.append(f"Dropped known mention with invalid npc_id: {item.get('canonical_name')}")
+            if mention_value and (not source_text or source_contains_any(source_text, [mention_value])):
+                recovered_candidates.append(known_mention_to_candidate(item, session_name, metadata_entry))
+                warnings.append(f"Recovered invalid-id known mention as new NPC candidate: {item.get('canonical_name')}")
+            else:
+                warnings.append(f"Dropped known mention with invalid npc_id: {item.get('canonical_name')}")
             continue
         registry_row = by_id.get(npc_id)
         if not registry_row:
-            warnings.append(f"Dropped known mention with unknown npc_id {npc_id}: {item.get('canonical_name')}")
+            if mention_value and (not source_text or source_contains_any(source_text, [mention_value])):
+                recovered_candidates.append(known_mention_to_candidate(item, session_name, metadata_entry))
+                warnings.append(f"Recovered unknown-id known mention as new NPC candidate: {item.get('canonical_name')}")
+            else:
+                warnings.append(f"Dropped known mention with unknown npc_id {npc_id}: {item.get('canonical_name')}")
             continue
         if not canonical_matches_registry(item, registry_row):
+            if mention_value and (not source_text or source_contains_any(source_text, [mention_value])):
+                recovered_candidates.append(known_mention_to_candidate(item, session_name, metadata_entry))
+                warnings.append(
+                    f"Recovered mismatched-id known mention as new NPC candidate: "
+                    f"{item.get('canonical_name')} != {registry_row.get('name')}"
+                )
+                continue
             warnings.append(
                 f"Dropped known mention whose canonical name does not match npc_id {npc_id}: "
                 f"{item.get('canonical_name')} != {registry_row.get('name')}"
@@ -222,26 +408,50 @@ def postprocess_extraction(
             context_fields=["new_information", "evidence"],
         ):
             warnings.append(f"Neutralized party-interpretation NPC update: {registry_row.get('name')}")
+        elif neutralize_party_framed_update(
+            item,
+            source_text,
+            name_fields=["canonical_name", "mentioned_as"],
+            context_fields=["new_information", "evidence"],
+        ):
+            warnings.append(f"Neutralized party-framed NPC update: {registry_row.get('name')}")
         known_mentions.append(item)
 
     cleaned["known_npc_mentions"] = known_mentions
     known_ids = existing_known_npc_ids(cleaned)
     new_candidates = []
-    for candidate in cleaned["new_npc_candidates"]:
+    for candidate in [*recovered_candidates, *cleaned["new_npc_candidates"]]:
         proposed_name = candidate.get("proposed_name", "")
         normalized_proposed = normalized_name(proposed_name)
-        if looks_like_party_interpretation(
+        registry_row = by_name.get(normalized_proposed)
+        if not registry_row and normalized_proposed in FISHERMEN_TERMS:
+            registry_row = by_name.get("giant fishermen")
+        party_framed = looks_like_party_interpretation(
             candidate,
             source_text,
             name_fields=["proposed_name"],
             context_fields=["role", "description", "evidence"],
-        ):
+        ) or looks_like_unconfirmed_party_framing(
+            candidate,
+            source_text,
+            name_fields=["proposed_name"],
+            context_fields=["role", "description", "evidence"],
+        )
+        if party_framed and not registry_row:
             reject_candidate(
                 cleaned,
                 candidate,
                 "Appears to be a party joke, nickname, misunderstanding, or theory rather than a confirmed NPC.",
             )
             warnings.append(f"Rejected party-interpretation NPC candidate: {rejection_text(candidate, 'proposed_name')}")
+            continue
+        if "burger master" in normalized_proposed:
+            reject_candidate(
+                cleaned,
+                candidate,
+                "Appears to be a party joke, nickname, misunderstanding, or theory rather than a confirmed NPC.",
+            )
+            warnings.append(f"Rejected Burger Master NPC candidate: {proposed_name}")
             continue
         if is_party_reference(proposed_name, party_names):
             reject_candidate(cleaned, candidate, "Party member; not an NPC candidate.")
@@ -253,10 +463,6 @@ def postprocess_extraction(
             warnings.append(f"Rejected representative group candidate: {proposed_name}")
             continue
 
-        registry_row = by_name.get(normalized_proposed)
-        if not registry_row and normalized_proposed in FISHERMEN_TERMS:
-            registry_row = by_name.get("giant fishermen")
-
         if registry_row:
             registry_id = int(registry_row["id"])
             if registry_id not in known_ids:
@@ -264,7 +470,11 @@ def postprocess_extraction(
                     reject_candidate(cleaned, candidate, f"Existing NPC candidate not present in session source: {registry_row.get('name')}.")
                     warnings.append(f"Rejected existing NPC candidate not present in source: {proposed_name}")
                 else:
-                    cleaned["known_npc_mentions"].append(candidate_to_known_mention(candidate, registry_row, session_name))
+                    mention = candidate_to_known_mention(candidate, registry_row, session_name)
+                    if party_framed:
+                        mention["new_information"] = "Mentioned in this session; no new canon update proposed."
+                        warnings.append(f"Neutralized party-framed NPC candidate update: {registry_row.get('name')}")
+                    cleaned["known_npc_mentions"].append(mention)
                     known_ids.add(registry_id)
                     warnings.append(f"Moved existing NPC candidate to known mention: {proposed_name}")
             else:
@@ -272,14 +482,22 @@ def postprocess_extraction(
                 warnings.append(f"Rejected duplicate existing NPC candidate: {proposed_name}")
             continue
 
-        if source_text and not source_contains_any(source_text, [proposed_name]):
+        if source_text and not source_contains_any(source_text, [proposed_name, *(candidate.get("aliases") or [])]):
             reject_candidate(cleaned, candidate, "Candidate name not found in session source.")
             warnings.append(f"Rejected NPC candidate not present in source: {proposed_name}")
             continue
 
         new_candidates.append(candidate)
 
-    cleaned["new_npc_candidates"] = new_candidates
+    cleaned["new_npc_candidates"] = dedupe_candidates(add_glossary_candidates(
+        new_candidates,
+        metadata_names,
+        by_name,
+        party_names,
+        session_name,
+        source_text,
+    ))
+    remove_rejections_for_accepted_candidates(cleaned)
     return cleaned, warnings
 
 
@@ -292,7 +510,7 @@ def load_session_sources(session_name: str, source: str = "auto") -> list[dict[s
         if any(label == "final_summary" for label, _path in selected):
             selected = [item for item in selected if item[0] in {"final_summary", "diary"}]
         elif any(label == "curated_packet" for label, _path in selected):
-            selected = [item for item in selected if item[0] in {"curated_packet", "diary"}]
+            selected = [item for item in selected if item[0] in {"draft_summary", "curated_packet", "diary"}]
         else:
             selected = selected[:2]
     else:
@@ -303,7 +521,7 @@ def load_session_sources(session_name: str, source: str = "auto") -> list[dict[s
 
     sources = []
     for label, path in selected:
-        text = read_text(path)
+        text = clean_source_text(label, read_text(path))
         sources.append({
             "label": label,
             "path": str(path),

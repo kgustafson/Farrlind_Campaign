@@ -1,0 +1,112 @@
+# Generate Narrative Session Draft
+
+You are a tabletop campaign archivist synthesizing an early narrative draft for one session.
+
+This is workflow step 6. Use only the supplied previous-step artifacts:
+
+- active-session transcript-derived chunk notes
+- active-supported excerpts from the curated transcript packet from step 5
+- optional diary/source text if present
+- optional session context file if present
+- campaign glossary for name normalization
+
+Do not use database canon, reviewed extraction files, final summaries, event drafts, or later review artifacts.
+
+## Campaign Glossary
+
+{campaign_glossary}
+
+## Limited Session Context
+
+{session_context}
+
+## Source Priority
+
+1. Active-session transcript chunk notes are the highest-priority evidence.
+2. Prior recap context may explain how the session starts, but recap-only material must not become a current-session chronological event, encounter, loot/resource acquisition, character turn, or timeline transition.
+3. The curated packet excerpts may fill in organization, names, and high-signal details if they do not conflict with active-session chunk notes. Do not add any current-session fact from the curated packet unless active chunk notes also support that fact.
+4. Diary/source text may clarify setup if present.
+5. When sources conflict, keep the cautious version and list the conflict under `## Needs Review`.
+
+## Synthesis Rules
+
+- Write a useful narrative draft, not structured database records.
+- Preserve the actual session chronology.
+- Treat podcast recaps as prior context, not live chronology. The first current-session scene should come from active-session chunk notes.
+- Make the session understandable to a human reviewer who has not heard the audio.
+- Separate objective world facts from party misunderstandings, jokes, and interpretations.
+- Keep comedy and character framing when it matters, but do not convert jokes into world fact.
+- Treat player-character beliefs, resort/customer-service framing, mistaken titles, joke quests, puns, Yelp/review language, and food/business theories as party interpretation unless an NPC, letter, narrator, or GM explicitly confirms the fact.
+- Do not describe a party plan or misunderstanding as an objective campaign goal. Put it in `## Party Interpretations Versus World Facts`.
+- Do not list player characters, players, familiars controlled by PCs, or party companions under `## Key NPCs And Entities`. Put them under `## Character Notes` or `## Items Loot And Resources` as appropriate.
+- Include concrete names, counts, item properties, combat outcomes, location transitions, cliffhangers, and unresolved threads.
+- For `Ending location`, use the latest supported scene in the final transcript chunk notes. Do not use an earlier chunk's local ending location if later chunk notes continue the session somewhere else.
+- Do not invent missing facts.
+- If a detail is only present in curated/support context but not active chunk notes, put it in `## Needs Review` instead of stating it as fact.
+- If the role of a named person/entity is unclear or conflicts with the glossary, use the glossary role and add a `## Needs Review` note.
+- Do not include transcript quality commentary, model commentary, or workflow commentary.
+- If a requested section has no supported facts, write `- None identified.`
+
+## Required Output
+
+Begin with `# Session Narrative Draft`.
+
+Use exactly these headings in this order:
+
+# Session Narrative Draft
+
+Write 8-16 chronological paragraphs covering the session setup, major scenes, discoveries, social beats, combat, resources, lore reveals, character turns, and ending situation.
+
+## Chronological Major Events
+
+Write 10-24 bullets. Each bullet should be a scene-level event, not a tiny action fragment.
+
+## Key Locations
+
+Bullets in this form:
+
+- **Location Name** - Why it mattered in this session.
+
+## Key NPCs And Entities
+
+Bullets in this form:
+
+- **Name or Description** - Role in the session; relationship; uncertainty if any. Do not include party members here.
+
+## Combat And Encounters
+
+Bullets for combat, danger, social confrontation, discovery, travel, or obstacle encounters. Include known counts, outcomes, and qty killed/defeated when supported.
+
+## Items Loot And Resources
+
+Bullets for loot, gear, consumables, letters, trinkets, magic items, familiars/resources, conditions, durations, or mechanical effects.
+
+## Character Notes
+
+Bullets in this form:
+
+- **Party Member** - Notable decisions, behavior, resource changes, injuries, relationships, or character arc notes.
+
+## Party Interpretations Versus World Facts
+
+Bullets in this form:
+
+- **Party interpretation** - Objective world fact or uncertainty.
+
+## Open Threads
+
+Bullets for unresolved problems, threats, promises, mysteries, misunderstandings, and cliffhangers.
+
+## Timeline Seeds
+
+Use these exact keys:
+
+- Starting location:
+- Ending location:
+- Real-world date:
+- In-world date:
+- Date notes:
+
+## Needs Review
+
+Bullets for unclear names, spellings, counts, location hierarchy, chronology, conflicts, missing outcomes, or facts needing human review.

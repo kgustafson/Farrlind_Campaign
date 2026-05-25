@@ -2,7 +2,7 @@
 
 ## Goal
 
-Build a clear workflow graph for the Farrlind campaign pipeline, starting lightweight and only adding heavier orchestration if it earns its keep.
+Build a clear workflow graph for any campaign pipeline, starting lightweight and only adding heavier orchestration if it earns its keep.
 
 The workflow should eventually make it easy to see where each session is in the path from raw source material to queryable canon.
 

@@ -89,6 +89,33 @@ class LoreItemExtractorTest(unittest.TestCase):
         self.assertEqual(cleaned["rejected_candidates"][0]["text"], "Burgomaster Means Burger Master")
         self.assertIn("party-interpretation lore", warnings[0])
 
+    def test_postprocess_rejects_confirmed_party_framed_lore(self):
+        document = {
+            "known_lore_mentions": [],
+            "new_lore_candidates": [{
+                "proposed_title": "Strahd's Authority",
+                "category": "faction_lore",
+                "description": "Strahd is the manager of the establishment.",
+                "source_npc": "Strahd",
+                "is_confirmed": True,
+                "confidence": "high",
+                "evidence": "I have a bone to pick with the manager, Strahd.",
+            }],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = lore_item_extractor.postprocess_extraction(
+            document,
+            [],
+            "session02",
+            "I have a bone to pick with the manager, Strahd. The letter says Strahd is a vampire threat.",
+        )
+
+        self.assertEqual(cleaned["new_lore_candidates"], [])
+        self.assertEqual(cleaned["rejected_candidates"][0]["text"], "Strahd's Authority")
+        self.assertIn("party-interpretation lore", warnings[0])
+
     def test_postprocess_converts_unknown_known_mentions_to_new_candidates(self):
         document = {
             "known_lore_mentions": [{

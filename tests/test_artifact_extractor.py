@@ -51,6 +51,97 @@ class ArtifactExtractorTest(unittest.TestCase):
         self.assertEqual(cleaned["rejected_candidates"][0]["text"], "Imaginary Wand")
         self.assertIn("not present", warnings[0])
 
+    def test_postprocess_keeps_lantern_paraphrase_grounded_by_source(self):
+        document = {
+            "known_artifact_mentions": [],
+            "new_artifact_candidates": [{
+                "proposed_name": "Lantern of Green Flame",
+                "artifact_type": "tool",
+                "description": "A lantern with a black candle that burns green and never runs out.",
+                "current_holder": "Jens",
+                "evidence": "Jens fishes a lantern out of the soil.",
+            }],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = artifact_extractor.postprocess_extraction(
+            document,
+            [],
+            "session02",
+            "You get a lantern with a black candle that never runs out and burns with a green flame.",
+        )
+
+        self.assertEqual(cleaned["new_artifact_candidates"][0]["proposed_name"], "Lantern of Green Flame")
+        self.assertEqual(cleaned["rejected_candidates"], [])
+        self.assertEqual(warnings, [])
+
+    def test_postprocess_keeps_trinket_from_soil_paraphrase(self):
+        document = {
+            "known_artifact_mentions": [],
+            "new_artifact_candidates": [{
+                "proposed_name": "Trinket from the Soil",
+                "artifact_type": "trinket",
+                "description": "A small trinket found half-buried in the mud.",
+                "evidence": "There is something half buried there, and you have found another trinket.",
+            }],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        cleaned, _warnings = artifact_extractor.postprocess_extraction(
+            document,
+            [],
+            "session02",
+            "In the soil next to him there is something half buried there, and you have found another trinket.",
+        )
+
+        self.assertEqual(cleaned["new_artifact_candidates"][0]["proposed_name"], "Trinket from the Soil")
+        self.assertEqual(cleaned["rejected_candidates"], [])
+
+    def test_postprocess_recovers_source_grounded_lantern_from_rejections(self):
+        document = {
+            "known_artifact_mentions": [],
+            "new_artifact_candidates": [],
+            "rejected_candidates": [{
+                "text": "Lantern of Green Flame",
+                "reason": "Candidate name not found in session source.",
+            }],
+            "uncertainties": [],
+        }
+
+        cleaned, warnings = artifact_extractor.postprocess_extraction(
+            document,
+            [],
+            "session02",
+            "You get a lantern with a black candle that never runs out and burns with a green flame.",
+        )
+
+        self.assertEqual(cleaned["new_artifact_candidates"][0]["proposed_name"], "Lantern of Green Flame")
+        self.assertEqual(cleaned["rejected_candidates"], [])
+        self.assertIn("Recovered source-grounded rejected artifact candidate", warnings[0])
+
+    def test_postprocess_does_not_recover_unrelated_rejected_artifact(self):
+        document = {
+            "known_artifact_mentions": [],
+            "new_artifact_candidates": [],
+            "rejected_candidates": [{
+                "text": "Zombie Envelope",
+                "reason": "Candidate name not found in session source.",
+            }],
+            "uncertainties": [],
+        }
+
+        cleaned, _warnings = artifact_extractor.postprocess_extraction(
+            document,
+            [],
+            "session02",
+            "A zombie clutches an envelope.",
+        )
+
+        self.assertEqual(cleaned["new_artifact_candidates"], [])
+        self.assertEqual(cleaned["rejected_candidates"][0]["text"], "Zombie Envelope")
+
     def test_postprocess_rejects_party_interpretation_artifact(self):
         document = {
             "known_artifact_mentions": [],

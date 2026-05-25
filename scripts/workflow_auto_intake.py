@@ -31,6 +31,8 @@ class WorkflowCommand:
     step_id: str
     argv: list[str]
     completed_steps: tuple[str, ...]
+    skip_status: str = "not_applicable"
+    skip_comment: str = ""
 
 
 def utc_now() -> datetime:
@@ -41,22 +43,43 @@ def session_name(session_number: int) -> str:
     return session_key(session_number)
 
 
-def command_plan(session_number: int, audio_file_path: str = "") -> list[WorkflowCommand]:
+def existing_transcript_path(session_number: int) -> Path:
+    return campaign.raw_dir() / f"{session_name(session_number)}_transcript.txt"
+
+
+def normalize_transcript_policy(value: str | None) -> str:
+    return "recreate" if (value or "").strip() == "recreate" else "use_existing"
+
+
+def command_plan(session_number: int, audio_file_path: str = "", transcript_policy: str = "use_existing") -> list[WorkflowCommand]:
     session = session_name(session_number)
     python = sys.executable
     transcribe_command = [python, "scripts/rag.py", "transcribe", session]
     if audio_file_path:
         transcribe_command.extend(["--audio-file", audio_file_path])
+    policy = normalize_transcript_policy(transcript_policy)
+    transcript_path = existing_transcript_path(session_number)
+    if policy == "use_existing" and transcript_path.exists():
+        transcribe_command = []
+        transcribe_skip_status = "complete"
+        transcribe_skip_comment = f"Existing raw transcript preserved; transcription skipped: {transcript_path}"
+    else:
+        transcribe_skip_status = "not_applicable"
+        transcribe_skip_comment = ""
     return [
         WorkflowCommand(
             "transcribe_audio",
             transcribe_command,
             ("transcribe_audio",),
+            transcribe_skip_status,
+            transcribe_skip_comment,
         ),
         WorkflowCommand(
             "diary_source_available",
             [],
             ("diary_source_available",),
+            "not_applicable",
+            "No diary source required for audio-first automatic intake.",
         ),
         WorkflowCommand(
             "source_status_check",
@@ -67,6 +90,21 @@ def command_plan(session_number: int, audio_file_path: str = "") -> list[Workflo
             "curate_transcript",
             [python, "scripts/rag.py", "curate", session],
             ("curate_transcript",),
+        ),
+        WorkflowCommand(
+            "generate_narrative_summary",
+            [python, "scripts/rag.py", "generate-narrative-summary", session],
+            ("generate_narrative_summary",),
+        ),
+        WorkflowCommand(
+            "extract_session_spine",
+            [python, "scripts/rag.py", "extract-session-spine", session],
+            ("extract_session_spine",),
+        ),
+        WorkflowCommand(
+            "validate_session_spine",
+            [python, "scripts/rag.py", "validate-session-spine", session],
+            ("validate_session_spine",),
         ),
         WorkflowCommand(
             "extract_npcs",
@@ -275,11 +313,13 @@ def mark_step_failed(session_number: int, step_id: str, log_path: Path, returnco
 
 def run_command(session_number: int, command: WorkflowCommand, run_dir: Path, dry_run: bool = False) -> None:
     if not command.argv:
-        mark_step_not_applicable(
-            session_number,
-            command.step_id,
-            "No diary source required for audio-first automatic intake.",
-        )
+        comment = command.skip_comment or "Automatic step skipped."
+        log_path = run_dir / f"{command.step_id}.log"
+        log_path.write_text(f"{comment}\n", encoding="utf-8")
+        if command.skip_status == "complete":
+            mark_steps_complete(session_number, command.completed_steps, log_path, comment)
+        else:
+            mark_step_not_applicable(session_number, command.step_id, comment)
         return
 
     log_path = run_dir / f"{command.step_id}.log"
@@ -330,11 +370,12 @@ def process_job(job_path: Path, dry_run: bool = False) -> None:
     os.environ["FARRLIND_DATABASE_URL"] = campaign.campaign_database_url(job_campaign)
     session_number = int(job["session_number"])
     audio_file_path = (job.get("audio_file_path") or "").strip()
+    transcript_policy = normalize_transcript_policy(job.get("transcript_policy"))
     run_dir = LOG_DIR / session_name(session_number) / datetime.now().strftime("%Y%m%d_%H%M%S")
     run_dir.mkdir(parents=True, exist_ok=True)
     mark_run_running(session_number)
     try:
-        for command in command_plan(session_number, audio_file_path):
+        for command in command_plan(session_number, audio_file_path, transcript_policy):
             run_command(session_number, command, run_dir, dry_run=dry_run)
     except SystemExit as exc:
         mark_run_failed(session_number, f"Auto-intake failed before human review. Exit code {exc.code}.")

@@ -36,11 +36,40 @@ PARTY_INTERPRETATION_MARKERS = {
 }
 
 WORLD_FACT_MARKERS = {
+    "dm says",
     "letter says",
+    "letter explained",
+    "letter explains",
+    "letter reveals",
+    "narrator describes",
+    "knocks slowly and says",
+    "have repeatedly harassed",
     "npc says",
     "narrator says",
     "revealed by",
     "source confirms",
+}
+PARTY_FRAMING_MARKERS = {
+    "complain",
+    "complains",
+    "complaint",
+    "decided",
+    "decides",
+    "i think",
+    "i have a bone to pick",
+    "let's",
+    "lets",
+    "meal plan",
+    "maybe",
+    "plan",
+    "plans",
+    "probably",
+    "review",
+    "reviews",
+    "upgrade",
+    "we think",
+    "we should",
+    "yelp",
 }
 
 
@@ -208,6 +237,27 @@ def looks_like_party_interpretation(
     return not has_any_marker(combined, WORLD_FACT_MARKERS)
 
 
+def looks_like_unconfirmed_party_framing(
+    candidate: dict[str, Any],
+    source_text: str,
+    name_fields: list[str],
+    context_fields: list[str],
+) -> bool:
+    phrases = [
+        str(candidate.get(field) or "").strip()
+        for field in name_fields
+        if str(candidate.get(field) or "").strip()
+    ]
+    candidate_text = compact_candidate_text(candidate, [*name_fields, *context_fields])
+    contexts = [candidate_text]
+    for phrase in phrases:
+        contexts.extend(source_windows(source_text, phrase))
+    combined = " ".join(contexts)
+    if not has_any_marker(combined, PARTY_FRAMING_MARKERS):
+        return False
+    return not has_any_marker(combined, WORLD_FACT_MARKERS)
+
+
 def rejection_text(candidate: dict[str, Any], *fields: str) -> str:
     for field in fields:
         value = candidate.get(field)
@@ -258,6 +308,20 @@ def neutralize_interpretive_update(
     neutral_text: str = "Mentioned in this session; no new canon update proposed.",
 ) -> bool:
     if not looks_like_party_interpretation(item, source_text, name_fields, context_fields):
+        return False
+    if "new_information" in item:
+        item["new_information"] = neutral_text
+    return True
+
+
+def neutralize_party_framed_update(
+    item: dict[str, Any],
+    source_text: str,
+    name_fields: list[str],
+    context_fields: list[str],
+    neutral_text: str = "Mentioned in this session; no new canon update proposed.",
+) -> bool:
+    if not looks_like_unconfirmed_party_framing(item, source_text, name_fields, context_fields):
         return False
     if "new_information" in item:
         item["new_information"] = neutral_text

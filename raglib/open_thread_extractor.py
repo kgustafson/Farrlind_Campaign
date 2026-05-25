@@ -13,12 +13,14 @@ from raglib.extraction_hygiene import (
     compact_name_list_for_chunk,
     compact_registry_for_chunk,
     looks_like_party_interpretation,
+    looks_like_unconfirmed_party_framing,
     merge_extraction_documents,
     rejection_text,
 )
 from raglib.io_utils import read_text, write_text
 from raglib.ollama_client import generate
 from raglib.prompts import load_prompt
+from raglib.transcript_cleaner import clean_source_text
 from web_review.services import canon
 
 
@@ -224,6 +226,11 @@ def postprocess_extraction(
             source_text,
             name_fields=["proposed_title"],
             context_fields=["description", "notes", "evidence"],
+        ) or looks_like_unconfirmed_party_framing(
+            candidate,
+            source_text,
+            name_fields=["proposed_title"],
+            context_fields=["description", "notes", "evidence"],
         ):
             reject_candidate(
                 cleaned,
@@ -268,7 +275,7 @@ def load_session_sources(session_name: str, source: str = "auto") -> list[dict[s
         if any(label == "final_summary" for label, _path in selected):
             selected = [item for item in selected if item[0] in {"final_summary", "diary"}]
         elif any(label == "curated_packet" for label, _path in selected):
-            selected = [item for item in selected if item[0] in {"curated_packet", "diary"}]
+            selected = [item for item in selected if item[0] in {"draft_summary", "curated_packet", "diary"}]
         else:
             selected = selected[:2]
     else:
@@ -277,7 +284,7 @@ def load_session_sources(session_name: str, source: str = "auto") -> list[dict[s
             raise ValueError(f"Unsupported open thread extraction source: {source}")
         selected = [(source, known[source])]
 
-    return [{"label": label, "path": str(path), "text": read_text(path)} for label, path in selected]
+    return [{"label": label, "path": str(path), "text": clean_source_text(label, read_text(path))} for label, path in selected]
 
 
 def build_prompt(

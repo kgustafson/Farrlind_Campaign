@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone
 import yaml
 
 from raglib import campaign
+from raglib.audio import resolve_session_audio_path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -339,7 +340,7 @@ def historical_step_state(number: int, step: dict[str, Any]) -> dict[str, Any]:
     final_summary = campaign.final_dir() / f"{name}_summary.md"
     clean_summary = campaign.clean_dir() / f"{name}_summary.md"
     transcript = campaign.raw_dir() / f"{name}_transcript.txt"
-    audio = campaign.audio_dir() / f"{name}.wav"
+    audio = historical_audio_path(name)
     review_status = load_review_status(review)
     extraction_review_outputs = {
         "review_npc_extraction": campaign.extracted_dir() / f"{name}_npcs_reviewed.json",
@@ -377,6 +378,9 @@ def historical_step_state(number: int, step: dict[str, Any]) -> dict[str, Any]:
 
     if step_id in {
         "extract_events",
+        "generate_narrative_summary",
+        "extract_session_spine",
+        "validate_session_spine",
         "extract_npcs",
         "extract_locations",
         "extract_artifacts",
@@ -391,7 +395,14 @@ def historical_step_state(number: int, step: dict[str, Any]) -> dict[str, Any]:
         "postextract_shortcut",
     }:
         found_outputs = existing_paths(outputs)
-        if found_outputs and len(found_outputs) == count_file_outputs(outputs):
+        if found_outputs and all_file_outputs_exist(outputs):
+            stale_inputs = stale_input_paths(inputs, outputs)
+            if stale_inputs:
+                return stale_state(
+                    step_id,
+                    f"Draft artifact outputs exist for {name}, but source inputs are newer and this step should be rerun.",
+                    found_outputs + stale_inputs,
+                )
             return complete_state(step_id, f"Draft artifact outputs exist for {name}.", found_outputs)
         if clean_summary.exists() and review.exists():
             return not_applicable_state(
@@ -457,12 +468,20 @@ def complete_state(step_id: str, comment: str, evidence: list[str]) -> dict[str,
     return {"step_id": step_id, "status": "complete", "comment": comment, "evidence": evidence}
 
 
+def historical_audio_path(name: str) -> Path:
+    return resolve_session_audio_path(name)
+
+
 def not_applicable_state(step_id: str, comment: str, evidence: list[str]) -> dict[str, Any]:
     return {"step_id": step_id, "status": "not_applicable", "comment": comment, "evidence": evidence}
 
 
 def pending_state(step_id: str, comment: str, evidence: list[str]) -> dict[str, Any]:
     return {"step_id": step_id, "status": "pending", "comment": comment, "evidence": evidence}
+
+
+def stale_state(step_id: str, comment: str, evidence: list[str]) -> dict[str, Any]:
+    return {"step_id": step_id, "status": "stale", "comment": comment, "evidence": evidence}
 
 
 def historical_session_timestamp(number: int) -> datetime:
@@ -507,6 +526,46 @@ def count_file_outputs(paths: list[Any]) -> int:
         item for item in paths
         if isinstance(item, str) and not any(token in item for token in ["operator ", "database ", "reviewed ", "source artifacts"])
     ])
+
+
+def all_file_outputs_exist(paths: list[Any]) -> bool:
+    file_outputs = [
+        item for item in paths
+        if isinstance(item, str) and not any(token in item for token in ["operator ", "database ", "reviewed ", "source artifacts"])
+    ]
+    if not file_outputs:
+        return False
+    for item in file_outputs:
+        if "*" in item:
+            if not list(REPO_ROOT.glob(item)):
+                return False
+            continue
+        if not (REPO_ROOT / item).exists():
+            return False
+    return True
+
+
+def stale_input_paths(inputs: list[Any], outputs: list[Any]) -> list[str]:
+    input_paths = concrete_existing_paths(inputs)
+    output_paths = concrete_existing_paths(outputs)
+    if not input_paths or not output_paths:
+        return []
+    oldest_output_mtime = min(path.stat().st_mtime for path in output_paths)
+    return sorted(
+        relative(path)
+        for path in input_paths
+        if path.stat().st_mtime > oldest_output_mtime
+    )
+
+
+def concrete_existing_paths(paths: list[Any]) -> list[Path]:
+    found: list[Path] = []
+    for item in paths:
+        if not isinstance(item, str) or any(token in item for token in ["operator ", "database ", "reviewed ", "source artifacts"]):
+            continue
+        matches = list(REPO_ROOT.glob(item)) if "*" in item else [REPO_ROOT / item]
+        found.extend(path for path in matches if path.exists())
+    return found
 
 
 def relative(path: Path) -> str:

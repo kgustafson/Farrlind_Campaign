@@ -16,6 +16,7 @@ KNOWLEDGE_DIR = campaign.campaign_root()
 CLEAN_DIR = KNOWLEDGE_DIR / "clean"
 FINAL_DIR = KNOWLEDGE_DIR / "final"
 REVIEWS_DIR = KNOWLEDGE_DIR / "reviews"
+RAW_DIR = KNOWLEDGE_DIR / "raw"
 
 VALID_DECISIONS = {"pending", "accepted", "rejected", "corrected", "added"}
 VALID_STATUSES = {"in_review", "reviewed", "applied"}
@@ -114,6 +115,10 @@ def draft_summary_path(session_number: int) -> Path:
 
 def final_summary_path(session_number: int) -> Path:
     return FINAL_DIR / f"{session_key(session_number)}_summary.md"
+
+
+def raw_transcript_path(session_number: int) -> Path:
+    return RAW_DIR / f"{session_key(session_number)}_transcript.txt"
 
 
 def read_text_if_exists(path: Path) -> str:
@@ -327,6 +332,7 @@ def source_text(session_number: int, source: str) -> tuple[str, str]:
         "diary": ("Diary", diary_path(session_number)),
         "draft": ("Draft Summary", draft_summary_path(session_number)),
         "final": ("Final Summary", final_summary_path(session_number)),
+        "transcript": ("Raw Transcript", raw_transcript_path(session_number)),
     }
     label, path = choices.get(source, choices["diary"])
     text = read_text_if_exists(path)

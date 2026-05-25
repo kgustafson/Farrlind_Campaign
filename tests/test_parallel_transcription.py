@@ -1,6 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from raglib import parallel_transcription
 from raglib.parallel_transcription import capped_worker_count, write_parallel_outputs
@@ -70,6 +71,16 @@ class ParallelTranscriptionTest(unittest.TestCase):
             default_output_path("session21"),
             Path("campaigns/farrlind/raw/session21_transcript.txt").resolve(),
         )
+
+    def test_default_audio_path_prefers_existing_mp3(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            audio_dir = root / "audio"
+            audio_dir.mkdir()
+            mp3 = audio_dir / "session21.mp3"
+            mp3.write_text("audio", encoding="utf-8")
+            with patch("raglib.audio.campaign.audio_dir", return_value=audio_dir):
+                self.assertEqual(default_audio_path("session21"), mp3)
 
 
 if __name__ == "__main__":

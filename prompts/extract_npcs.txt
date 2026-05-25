@@ -14,6 +14,9 @@ Core rules:
 - Do not create NPC candidates for party members, players, or the DM.
 - Party member mentions may be used as context, but they must not appear in known_npc_mentions or new_npc_candidates.
 - The current NPC registry is for identity matching only. Do not output a known NPC mention unless that NPC is explicitly mentioned in the session source material.
+- Campaign glossary entries are spelling/context hints only. They are not database registry rows and do not have npc_id values unless the same NPC appears in the Current NPC registry JSON.
+- Never invent npc_id values. Use only npc_id values present in the Current NPC registry JSON.
+- If a real named NPC appears in the source but is only present in campaign metadata/glossary, output it under new_npc_candidates, not known_npc_mentions.
 - Known NPC updates must contain genuinely new information from this session source, not old facts copied from the registry.
 - First try to match mentions to existing NPCs using canonical names, aliases, titles, spelling drift, partial names, and role references.
 - Do not create a new NPC if the mention is probably an alias/title/reference for an existing NPC.

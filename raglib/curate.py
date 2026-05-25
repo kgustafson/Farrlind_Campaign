@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 import re
@@ -173,7 +175,41 @@ def canon_scrub(text: str) -> str:
     replacements = campaign_glossary_replacements()
     scrubbed = text
     for alias, replacement in replacements.items():
-        scrubbed = re.sub(rf"\b{re.escape(alias)}\b", replacement, scrubbed, flags=re.IGNORECASE)
+        suffix_guard = alias_suffix_guard(alias, replacement)
+        scrubbed = re.sub(
+            rf"\b{re.escape(alias)}\b{suffix_guard}",
+            replacement,
+            scrubbed,
+            flags=re.IGNORECASE,
+        )
+    scrubbed = collapse_repeated_canon_names(scrubbed, replacements.values())
+    return scrubbed
+
+
+def alias_suffix_guard(alias: str, replacement: str) -> str:
+    if not replacement.lower().startswith(alias.lower()):
+        return ""
+    suffix = replacement[len(alias):].strip()
+    if not suffix:
+        return ""
+    suffix_pattern = r"\s+".join(re.escape(part) for part in suffix.split())
+    return rf"(?!\s+{suffix_pattern}\b)"
+
+
+def collapse_repeated_canon_names(text: str, names: list[str] | set[str] | tuple[str, ...]) -> str:
+    scrubbed = text
+    for name in sorted(set(names), key=len, reverse=True):
+        parts = name.split()
+        if len(parts) < 2:
+            continue
+        suffix = r"\s+".join(re.escape(part) for part in parts[1:])
+        scrubbed = re.sub(
+            rf"\b{re.escape(name)}(?:\s+{suffix})+\b",
+            name,
+            scrubbed,
+            flags=re.IGNORECASE,
+        )
+    scrubbed = re.sub(r"\b([A-Z][A-Za-z0-9' .-]{1,80})\s+\(\1\)", r"\1", scrubbed)
     return scrubbed
 
 

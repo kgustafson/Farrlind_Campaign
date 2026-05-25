@@ -18,16 +18,29 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from raglib.campaign import campaign_container_name, campaign_database_name, campaign_path
+from raglib.transcript_cleaner import clean_source_text
 
 
 DEFAULT_CONTAINER = campaign_container_name()
 DEFAULT_USER = "admin"
 DEFAULT_DATABASE = campaign_database_name()
 MAX_LIMIT = 1000
+GENERIC_EVENT_MATCH_WORDS = {
+    "attack",
+    "attacks",
+    "combat",
+    "encounter",
+    "event",
+    "party",
+    "members",
+    "familiar",
+    "imp",
+}
 CANON_DECISIONS_PATH = campaign_path("canon_decisions.yaml")
 REVIEWS_DIR = campaign_path("reviews")
 FINAL_DIR = campaign_path("final")
 CLEAN_DIR = campaign_path("clean")
+RAW_DIR = campaign_path("raw")
 
 
 def bounded_int(value: str, minimum: int = 1, maximum: int = MAX_LIMIT) -> int:
@@ -587,6 +600,10 @@ def merged_events_path(session_number: int) -> Path:
     return CLEAN_DIR / f"{session_key(session_number)}_merged.md"
 
 
+def raw_transcript_path(session_number: int) -> Path:
+    return RAW_DIR / f"{session_key(session_number)}_transcript.txt"
+
+
 def review_source_files(session_number: int) -> dict[str, str]:
     paths = {
         "draft_summary": draft_summary_path(session_number),
@@ -759,6 +776,16 @@ def review_item_from_event(event: dict) -> dict:
         "sequence": sequence_number,
         "source_type": event.get("source_type") or "db_event",
         "source_text": event.get("description") or "",
+        "source_context": event.get("source_context") or "",
+        "timestamps": event.get("timestamps") or "",
+        "actors": event.get("actors") or "",
+        "targets": event.get("targets") or "",
+        "mechanical_tags": event.get("mechanical_tags") or "",
+        "story_tags": event.get("story_tags") or "",
+        "confidence": event.get("confidence") or "",
+        "verify": event.get("verify") or "",
+        "summary_context": event.get("summary_context") or "",
+        "related_db_events": event.get("related_db_events") or [],
         "decision": "pending",
         "canonical_text": "",
         "event_type": event.get("event_type") or "",
@@ -809,6 +836,13 @@ def parse_merged_event_block(sequence: int, body: str) -> dict:
         "description": description,
         "significance": significance_from_importance(fields.get("importance")),
         "source_type": "draft_merged_event",
+        "timestamps": fields.get("timestamps") or "",
+        "actors": fields.get("actors") or "",
+        "targets": fields.get("targets") or "",
+        "mechanical_tags": fields.get("mechanical_tags") or "",
+        "story_tags": fields.get("story_tags") or "",
+        "confidence": fields.get("confidence") or "",
+        "verify": fields.get("verify") or "",
     }
 
 
@@ -826,10 +860,188 @@ def parse_merged_events(path: Path) -> list[dict]:
     return [event for event in events if event.get("description")]
 
 
+def normalized_match_text(value: object) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", str(value or "").lower()).strip()
+
+
+def is_sparse_db_event(event: dict) -> bool:
+    description = (event.get("description") or "").strip()
+    if not description:
+        return True
+    if description.lower() in {"zombie encounter", "imp familiar attack"}:
+        return True
+    if event.get("event_type") or event.get("location"):
+        return False
+    return len(description.split()) <= 4
+
+
+def prefer_draft_events(db_events: list[dict], draft_events: list[dict]) -> bool:
+    if not draft_events:
+        return False
+    if not db_events:
+        return True
+    sparse_count = sum(1 for event in db_events if is_sparse_db_event(event))
+    return sparse_count == len(db_events) and len(draft_events) > len(db_events)
+
+
+def transcript_context_text(session_number: int) -> str:
+    path = raw_transcript_path(session_number)
+    if not path.exists():
+        return ""
+    return clean_source_text("transcript", path.read_text(encoding="utf-8"))
+
+
+def model_summary_context_text(session_number: int) -> str:
+    return read_first_existing([
+        draft_summary_path(session_number),
+        curated_packet_path(session_number),
+    ])
+
+
+def event_context_terms(event: dict) -> list[str]:
+    values = [
+        event.get("location"),
+        event.get("actors"),
+        event.get("targets"),
+        event.get("description"),
+        event.get("mechanical_tags"),
+        event.get("story_tags"),
+    ]
+    stop_phrases = {
+        "party",
+        "the party",
+        "party members",
+        "none",
+        "n a",
+        "not specified",
+        "unknown",
+    }
+    terms: list[str] = []
+    for value in values:
+        text = str(value or "")
+        for phrase in re.findall(r"\b[A-Z][A-Za-z']+(?:\s+(?:of|on|the|von|de|[A-Z][A-Za-z']+))*", text):
+            normalized = normalized_match_text(phrase)
+            if len(normalized) < 4 or normalized in stop_phrases:
+                continue
+            terms.append(phrase.strip())
+        normalized_text = normalized_match_text(text)
+        for keyword in ["zombie", "zombies", "mansion", "tavern", "lantern", "letter", "envelope", "tongue", "ghoul", "vampire", "burgomaster"]:
+            if keyword in normalized_text:
+                terms.append(keyword)
+    deduped: list[str] = []
+    seen = set()
+    for term in terms:
+        key = normalized_match_text(term)
+        if key and key not in seen:
+            deduped.append(term)
+            seen.add(key)
+    return sorted(deduped, key=len, reverse=True)
+
+
+def transcript_window(source_text: str, terms: list[str], radius_lines: int = 4) -> str:
+    if not source_text or not terms:
+        return ""
+    lines = source_text.splitlines()
+    for term in terms:
+        normalized_term = normalized_match_text(term)
+        if not normalized_term:
+            continue
+        for index, line in enumerate(lines):
+            if normalized_term in normalized_match_text(line):
+                start = max(0, index - radius_lines)
+                end = min(len(lines), index + radius_lines + 1)
+                return "\n".join(lines[start:end]).strip()
+    return ""
+
+
+def enrich_events_with_transcript_context(events: list[dict], session_number: int) -> list[dict]:
+    source_text = transcript_context_text(session_number)
+    if not source_text:
+        return events
+    enriched = []
+    for event in events:
+        item = dict(event)
+        if not item.get("source_context"):
+            context = transcript_window(source_text, event_context_terms(item))
+            if context:
+                item["source_context"] = context
+        enriched.append(item)
+    return enriched
+
+
+def enrich_events_with_model_summary_context(events: list[dict], session_number: int) -> list[dict]:
+    source_text = model_summary_context_text(session_number)
+    if not source_text:
+        return events
+    enriched = []
+    for event in events:
+        item = dict(event)
+        if not item.get("summary_context"):
+            context = transcript_window(source_text, event_context_terms(item), radius_lines=2)
+            if context:
+                item["summary_context"] = context
+        enriched.append(item)
+    return enriched
+
+
+def db_event_reference(event: dict) -> dict:
+    return {
+        "sequence_order": event.get("sequence_order") or "",
+        "event_type": event.get("event_type") or "",
+        "location": event.get("location") or "",
+        "description": event.get("description") or "",
+        "significance": int(event["significance"]) if event.get("significance") else None,
+        "source_type": event.get("source_type") or "db_event",
+    }
+
+
+def related_db_events_for_draft(draft_event: dict, db_events: list[dict]) -> list[dict]:
+    draft_terms = set(event_context_terms(draft_event))
+    draft_words = {
+        word for word in normalized_match_text(draft_event.get("description")).split()
+        if len(word) >= 5 and word not in GENERIC_EVENT_MATCH_WORDS
+    }
+    related = []
+    draft_normalized = normalized_match_text(" ".join(str(draft_event.get(key) or "") for key in ["description", "actors", "targets", "story_tags", "mechanical_tags"]))
+    for event in db_events:
+        db_normalized = normalized_match_text(event.get("description"))
+        db_words = {
+            word for word in db_normalized.split()
+            if len(word) >= 5 and word not in GENERIC_EVENT_MATCH_WORDS
+        }
+        db_terms = {normalized_match_text(term) for term in event_context_terms(event)}
+        if (
+            draft_words & db_words
+            or {normalized_match_text(term) for term in draft_terms} & db_terms
+            or ("bluetooth" in draft_normalized and "imp familiar" in db_normalized)
+        ):
+            related.append(db_event_reference(event))
+    return related
+
+
+def combine_review_events(db_events: list[dict], draft_events: list[dict]) -> list[dict]:
+    if draft_events:
+        combined = []
+        for event in draft_events:
+            item = dict(event)
+            item["related_db_events"] = related_db_events_for_draft(item, db_events)
+            combined.append(item)
+        return combined
+    return [db_event_reference(event) for event in db_events]
+
+
 def review_events_for_init(args, session_number: int, db_events: list[dict]) -> list[dict]:
-    if db_events:
-        return db_events
-    return parse_merged_events(merged_events_path(session_number))
+    draft_events = parse_merged_events(merged_events_path(session_number))
+    selected = combine_review_events(db_events, draft_events)
+    selected = enrich_events_with_model_summary_context(selected, session_number)
+    return enrich_events_with_transcript_context(selected, session_number)
+
+
+def review_events_source_label(db_events: list[dict], selected_events: list[dict], session_number: int) -> str:
+    draft_events = parse_merged_events(merged_events_path(session_number))
+    if draft_events and db_events:
+        return "Draft Merged Events + DB Context"
+    return "Draft Merged Events" if draft_events else "Current DB Events"
 
 
 def build_review_document(session: dict, events: list[dict]) -> dict:
@@ -848,6 +1060,7 @@ def build_review_document(session: dict, events: list[dict]) -> dict:
         "in_game_date": session.get("in_game_date") or "",
         "primary_location": session.get("location") or "",
         "source_files": review_source_files(session_number),
+        "db_event_context": [db_event_reference(event) for event in events if (event.get("source_type") or "db_event") == "db_event"],
         "items": [review_item_from_event(event) for event in events],
         "added_items": [],
     }
@@ -964,7 +1177,7 @@ def review_events(args):
     review = query_event_review(args, session_number)
     session = review["session"] or draft_session_for_review(session_number)
     events = review_events_for_init(args, session_number, review["events"])
-    event_source_label = "Current DB Events" if review["events"] else "Draft Merged Events"
+    event_source_label = review_events_source_label(review["events"], events, session_number)
     decisions = canon_decisions_for_session(load_canon_decisions(), session_number)
 
     print_section(f"Session {session_number:02d} Event Review")

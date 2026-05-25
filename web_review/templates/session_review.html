@@ -196,6 +196,26 @@
           {% if item.location %}<span class="muted">{{ item.location }}</span>{% endif %}
         </div>
         <p>{{ item.source_text or item.canonical_text }}</p>
+        {% if item.source_context %}
+        <details class="item-context">
+          <summary>Context</summary>
+          <pre>{{ item.source_context }}</pre>
+        </details>
+        {% endif %}
+        {% if item.summary_context %}
+        <details class="item-context">
+          <summary>Model Summary Context</summary>
+          <pre>{{ item.summary_context }}</pre>
+        </details>
+        {% endif %}
+        {% if item.related_db_events %}
+        <details class="item-context">
+          <summary>DB Context</summary>
+          {% for db_event in item.related_db_events %}
+          <p class="db-context-line">{{ db_event.sequence_order or "?" }}. {{ db_event.event_type }}{% if db_event.location %} [{{ db_event.location }}]{% endif %}: {{ db_event.description }}</p>
+          {% endfor %}
+        </details>
+        {% endif %}
       </article>
       {% endfor %}
     </div>
@@ -225,6 +245,26 @@
         {% if item.decision == "rejected" %}<span class="badge decision-rejected">rejected</span>{% endif %}
       </div>
       <p class="source-snippet">{{ item.source_text or item.canonical_text }}</p>
+      {% if item.source_context %}
+      <details class="item-context">
+        <summary>Context</summary>
+        <pre>{{ item.source_context }}</pre>
+      </details>
+      {% endif %}
+      {% if item.summary_context %}
+      <details class="item-context">
+        <summary>Model Summary Context</summary>
+        <pre>{{ item.summary_context }}</pre>
+      </details>
+      {% endif %}
+      {% if item.related_db_events %}
+      <details class="item-context">
+        <summary>DB Context</summary>
+        {% for db_event in item.related_db_events %}
+        <p class="db-context-line">{{ db_event.sequence_order or "?" }}. {{ db_event.event_type }}{% if db_event.location %} [{{ db_event.location }}]{% endif %}: {{ db_event.description }}</p>
+        {% endfor %}
+      </details>
+      {% endif %}
       <div class="bucketing-controls">
         <label>
           <span>Bucket</span>
@@ -258,6 +298,7 @@
       <div class="segmented" aria-label="Source selector">
         <a class="{% if source == "diary" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=diary&view={{ source_view }}&bucket={{ selected_bucket }}">Diary</a>
         <a class="{% if source == "draft" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=draft&view={{ source_view }}&bucket={{ selected_bucket }}">Draft Summary</a>
+        <a class="{% if source == "transcript" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=transcript&view={{ source_view }}&bucket={{ selected_bucket }}">Transcript</a>
         <a class="{% if source == "final" %}active{% endif %}" href="/sessions/{{ session_key }}/review?source=final&view={{ source_view }}&bucket={{ selected_bucket }}">Final Summary</a>
       </div>
     {% else %}
@@ -355,6 +396,26 @@
       </div>
 
       <p class="source-snippet">{{ item.source_text or item.canonical_text }}</p>
+      {% if item.source_context %}
+      <details class="item-context">
+        <summary>Context</summary>
+        <pre>{{ item.source_context }}</pre>
+      </details>
+      {% endif %}
+      {% if item.summary_context %}
+      <details class="item-context">
+        <summary>Model Summary Context</summary>
+        <pre>{{ item.summary_context }}</pre>
+      </details>
+      {% endif %}
+      {% if item.related_db_events %}
+      <details class="item-context">
+        <summary>DB Context</summary>
+        {% for db_event in item.related_db_events %}
+        <p class="db-context-line">{{ db_event.sequence_order or "?" }}. {{ db_event.event_type }}{% if db_event.location %} [{{ db_event.location }}]{% endif %}: {{ db_event.description }}</p>
+        {% endfor %}
+      </details>
+      {% endif %}
 
       <label class="field-block">
         <span>Canonical Text</span>
