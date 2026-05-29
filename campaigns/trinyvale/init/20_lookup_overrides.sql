@@ -2,12 +2,13 @@
 -- Intended for fresh campaign database initialization after generic lookup seeds.
 
 -- Artifact Types
-DELETE FROM artifact_type WHERE type_name NOT IN ('armor', 'axe', 'bow', 'cap', 'container', 'grimoire', 'magic item', 'orb', 'other', 'relic', 'shield', 'spell', 'staff', 'tool', 'treasure', 'trinket', 'wand', 'weapon');
+DELETE FROM artifact_type WHERE type_name NOT IN ('armor', 'axe', 'bow', 'cap', 'container', 'feature', 'grimoire', 'magic item', 'orb', 'other', 'relic', 'shield', 'spell', 'staff', 'tool', 'treasure', 'trinket', 'wand', 'weapon');
 INSERT INTO artifact_type (type_name) VALUES ('armor') ON CONFLICT (type_name) DO NOTHING;
 INSERT INTO artifact_type (type_name) VALUES ('axe') ON CONFLICT (type_name) DO NOTHING;
 INSERT INTO artifact_type (type_name) VALUES ('bow') ON CONFLICT (type_name) DO NOTHING;
 INSERT INTO artifact_type (type_name) VALUES ('cap') ON CONFLICT (type_name) DO NOTHING;
 INSERT INTO artifact_type (type_name) VALUES ('container') ON CONFLICT (type_name) DO NOTHING;
+INSERT INTO artifact_type (type_name) VALUES ('feature') ON CONFLICT (type_name) DO NOTHING;
 INSERT INTO artifact_type (type_name) VALUES ('grimoire') ON CONFLICT (type_name) DO NOTHING;
 INSERT INTO artifact_type (type_name) VALUES ('magic item') ON CONFLICT (type_name) DO NOTHING;
 INSERT INTO artifact_type (type_name) VALUES ('orb') ON CONFLICT (type_name) DO NOTHING;
@@ -23,7 +24,7 @@ INSERT INTO artifact_type (type_name) VALUES ('wand') ON CONFLICT (type_name) DO
 INSERT INTO artifact_type (type_name) VALUES ('weapon') ON CONFLICT (type_name) DO NOTHING;
 
 -- Location Types
-DELETE FROM location_type WHERE type_name NOT IN ('building', 'city', 'coastal', 'dungeon', 'dwarven_hold', 'feywild', 'inn', 'island', 'landmark', 'monastery', 'road', 'settlement', 'tavern', 'temple', 'town', 'underwater', 'wilderness');
+DELETE FROM location_type WHERE type_name NOT IN ('building', 'city', 'coastal', 'dungeon', 'dwarven_hold', 'feywild', 'inn', 'island', 'landmark', 'monastery', 'realm', 'road', 'settlement', 'tavern', 'temple', 'town', 'underwater', 'wilderness');
 INSERT INTO location_type (type_name) VALUES ('building') ON CONFLICT (type_name) DO NOTHING;
 INSERT INTO location_type (type_name) VALUES ('city') ON CONFLICT (type_name) DO NOTHING;
 INSERT INTO location_type (type_name) VALUES ('coastal') ON CONFLICT (type_name) DO NOTHING;
@@ -34,6 +35,7 @@ INSERT INTO location_type (type_name) VALUES ('inn') ON CONFLICT (type_name) DO 
 INSERT INTO location_type (type_name) VALUES ('island') ON CONFLICT (type_name) DO NOTHING;
 INSERT INTO location_type (type_name) VALUES ('landmark') ON CONFLICT (type_name) DO NOTHING;
 INSERT INTO location_type (type_name) VALUES ('monastery') ON CONFLICT (type_name) DO NOTHING;
+INSERT INTO location_type (type_name) VALUES ('realm') ON CONFLICT (type_name) DO NOTHING;
 INSERT INTO location_type (type_name) VALUES ('road') ON CONFLICT (type_name) DO NOTHING;
 INSERT INTO location_type (type_name) VALUES ('settlement') ON CONFLICT (type_name) DO NOTHING;
 INSERT INTO location_type (type_name) VALUES ('tavern') ON CONFLICT (type_name) DO NOTHING;

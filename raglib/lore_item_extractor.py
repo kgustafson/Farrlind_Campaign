@@ -55,6 +55,8 @@ def output_path(session_name: str) -> Path:
 def source_candidates(session_name: str) -> list[tuple[str, Path]]:
     return [
         ("final_summary", BASE / "final" / f"{session_name}_summary.md"),
+        ("session_spine", CLEAN / f"{session_name}_spine.yaml"),
+        ("narrative", CLEAN / f"{session_name}_narrative.md"),
         ("curated_packet", CLEAN / f"{session_name}_curated.md"),
         ("draft_summary", CLEAN / f"{session_name}_summary.md"),
         ("diary", CLEAN / f"{session_name}_diary.md"),
@@ -83,6 +85,42 @@ def normalized_name(value: Any) -> str:
 def source_contains_any(source_text: str, values: list[Any]) -> bool:
     source = normalized_name(source_text)
     return any(value and normalized_name(value) in source for value in values)
+
+
+def collapse_repeated_canon_names(text: str, names: list[str]) -> str:
+    scrubbed = str(text or "")
+    for name in sorted({name for name in names if name}, key=len, reverse=True):
+        parts = name.split()
+        if len(parts) < 2:
+            continue
+        suffix = r"\s+".join(re.escape(part) for part in parts[1:])
+        scrubbed = re.sub(
+            rf"\b{re.escape(name)}(?:\s+{suffix})+\b",
+            name,
+            scrubbed,
+            flags=re.IGNORECASE,
+        )
+    scrubbed = re.sub(
+        r"\b([A-Z][A-Za-z']+(?:\s+(?:[A-Z][A-Za-z']+|von|de)){0,3})\s+((?:von|de)\s+[A-Z][A-Za-z']+)(?:\s+\2)+\b",
+        r"\1 \2",
+        scrubbed,
+    )
+    scrubbed = re.sub(
+        r"\b([A-Z][A-Za-z']+(?:\s+(?:[A-Z][A-Za-z']+|von|de)){0,3})\s+([A-Z][A-Za-z']+)(?:\s+\2)+(\b|'s\b)",
+        r"\1 \2\3",
+        scrubbed,
+    )
+    return re.sub(r"\b([A-Z][A-Za-z0-9' .-]{1,80})\s+\(\1\)", r"\1", scrubbed)
+
+
+def clean_lore_strings(value: Any, names: list[str]) -> Any:
+    if isinstance(value, dict):
+        return {key: clean_lore_strings(item, names) for key, item in value.items()}
+    if isinstance(value, list):
+        return [clean_lore_strings(item, names) for item in value]
+    if isinstance(value, str):
+        return collapse_repeated_canon_names(value, names)
+    return value
 
 
 def lore_registry() -> list[dict[str, Any]]:
@@ -190,6 +228,12 @@ def postprocess_extraction(
 ) -> tuple[dict[str, Any], list[str]]:
     cleaned = normalize_extraction(document)
     warnings = []
+    canon_names = [
+        *(row.get("title") or "" for row in registry),
+        *(row.get("source_npc") or "" for row in registry),
+        *(row.get("name") or "" for row in canon.npc_rows()),
+    ]
+    cleaned = clean_lore_strings(cleaned, canon_names)
     by_id, by_title = registry_indexes(registry)
 
     known_mentions = []
@@ -308,7 +352,7 @@ def load_session_sources(session_name: str, source: str = "auto") -> list[dict[s
         if any(label == "final_summary" for label, _path in selected):
             selected = [item for item in selected if item[0] in {"final_summary", "diary"}]
         elif any(label == "curated_packet" for label, _path in selected):
-            selected = [item for item in selected if item[0] in {"draft_summary", "curated_packet", "diary"}]
+            selected = [item for item in selected if item[0] in {"session_spine", "narrative", "draft_summary", "curated_packet", "diary"}]
         else:
             selected = selected[:2]
     else:

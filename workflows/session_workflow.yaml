@@ -208,30 +208,6 @@ steps:
       obvious beats, and party-interpretation versus world-fact issues before
       downstream event/entity extraction.
 
-  - id: extract_events
-    display_name: Extract Events
-    lane: draft_generation
-    dependencies:
-      - validate_session_spine
-    command: ./rag-env/bin/python scripts/rag.py extract sessionXX
-    expected_inputs:
-      - campaigns/{campaign}/clean/sessionXX_spine.yaml
-      - campaigns/{campaign}/clean/sessionXX_narrative.md
-      - campaigns/{campaign}/clean/sessionXX_curated.md
-      - campaigns/{campaign}/raw/sessionXX_transcript.txt
-      - campaigns/{campaign}/clean/sessionXX_diary.md
-    expected_outputs:
-      - campaigns/{campaign}/clean/sessionXX_events.md
-    status_rules:
-      complete_when:
-        - events draft exists
-      stale_when:
-        - source artifact mtime is newer than events draft mtime
-    gate: automatic_allowed_before_review
-    rerun_policy: safe_before_review
-    canon_impact: draft_only
-    notes: Uses compact per-chunk registry context for large raw transcript extraction.
-
   - id: extract_npcs
     display_name: Extract NPCs
     lane: entity_extraction
@@ -373,6 +349,43 @@ steps:
     gate: automatic_allowed_before_review
     rerun_policy: safe_before_review
     canon_impact: draft_only
+
+  - id: extract_events
+    display_name: Extract Events
+    lane: draft_generation
+    dependencies:
+      - extract_npcs
+      - extract_locations
+      - extract_artifacts
+      - extract_lore_items
+      - extract_combat_encounters
+      - extract_open_threads
+    command: ./rag-env/bin/python scripts/rag.py extract sessionXX
+    expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_spine.yaml
+      - campaigns/{campaign}/clean/sessionXX_narrative.md
+      - campaigns/{campaign}/clean/sessionXX_curated.md
+      - campaigns/{campaign}/raw/sessionXX_transcript.txt
+      - campaigns/{campaign}/clean/sessionXX_diary.md
+      - campaigns/{campaign}/extracted/sessionXX_npcs.json
+      - campaigns/{campaign}/extracted/sessionXX_locations.json
+      - campaigns/{campaign}/extracted/sessionXX_artifacts.json
+      - campaigns/{campaign}/extracted/sessionXX_lore_items.json
+      - campaigns/{campaign}/extracted/sessionXX_combat_encounters.json
+      - campaigns/{campaign}/extracted/sessionXX_open_threads.json
+    expected_outputs:
+      - campaigns/{campaign}/clean/sessionXX_events.md
+    status_rules:
+      complete_when:
+        - events draft exists
+      stale_when:
+        - source artifact mtime is newer than events draft mtime
+    gate: automatic_allowed_before_review
+    rerun_policy: safe_before_review
+    canon_impact: draft_only
+    notes: >
+      Runs after entity extraction so event records can be shaped by the
+      session spine, clean narrative, and draft entity context.
 
   - id: filter_events
     display_name: Filter Events
@@ -611,7 +624,7 @@ steps:
     canon_impact: review_record_and_registry_rows
 
   - id: initialize_review
-    display_name: Initialize Human Review
+    display_name: Initialize Final Summary Review
     lane: human_review
     dependencies:
       - summarize_draft
@@ -623,8 +636,11 @@ steps:
       - review_open_thread_extraction
     command: ./rag-env/bin/python scripts/dm_query.py init-review sessionXX
     expected_inputs:
+      - campaigns/{campaign}/clean/sessionXX_spine.yaml
+      - campaigns/{campaign}/clean/sessionXX_merged.md
       - campaigns/{campaign}/clean/sessionXX_summary.md
       - campaigns/{campaign}/clean/sessionXX_events.md
+      - reviewed entity extraction decisions
     expected_outputs:
       - campaigns/{campaign}/reviews/sessionXX_review.yaml
     status_rules:
@@ -635,9 +651,14 @@ steps:
     gate: human_initiated
     rerun_policy: protected
     canon_impact: none
+    notes: >
+      Creates the review file for the final summary composition workspace.
+      Draft narrative, spine, entity extraction outputs, micro-events, and
+      source snippets are supporting evidence; the reviewed final narrative is
+      the primary canon artifact.
 
   - id: edit_review_decisions
-    display_name: Review Session Events
+    display_name: Compose Final Summary
     lane: human_review
     dependencies:
       - initialize_review
@@ -649,17 +670,40 @@ steps:
       - campaigns/{campaign}/reviews/sessionXX_review.yaml
     status_rules:
       complete_when:
-        - every review item has accepted, rejected, corrected, or added decision
-        - corrected and added items include canonical text, event type, location, significance, and reason
+        - final summary draft has been written
+        - session title, real-world date, in-world date, starting location, and ending location are filled
+        - unresolved placeholders are removed
     gate: human_required
     rerun_policy: edit_until_reviewed
     canon_impact: review_record
+    notes: >
+      Replaces the old macro-event bucketing and micro-event resolution tail.
+      Micro-events remain visible as copy/reference evidence while the human
+      writes the canonical narrative summary.
 
-  - id: mark_reviewed
-    display_name: Mark Review Reviewed
+  - id: validate_final_summary
+    display_name: Validate Final Summary
     lane: human_review
     dependencies:
       - edit_review_decisions
+    command: web_review validation panel / health
+    expected_inputs:
+      - campaigns/{campaign}/reviews/sessionXX_review.yaml
+    expected_outputs:
+      - validation notes in web review
+    status_rules:
+      complete_when:
+        - final summary required fields are filled
+        - no unresolved placeholder text remains
+    gate: safe_diagnostic
+    rerun_policy: safe
+    canon_impact: none
+
+  - id: mark_reviewed
+    display_name: Mark Final Summary Reviewed
+    lane: human_review
+    dependencies:
+      - validate_final_summary
     command: web_review mark reviewed action
     expected_inputs:
       - campaigns/{campaign}/reviews/sessionXX_review.yaml
@@ -669,13 +713,14 @@ steps:
       complete_when:
         - review status is reviewed
       blocked_when:
-        - any item is pending or missing required corrected/added fields
+        - final summary required fields are missing
+        - final summary contains unresolved placeholders
     gate: human_required
     rerun_policy: safe_if_not_applied
     canon_impact: review_record
 
   - id: apply_review
-    display_name: Apply Review To Database
+    display_name: Apply Reviewed Session To Database
     lane: canonization
     dependencies:
       - mark_reviewed
@@ -688,6 +733,7 @@ steps:
       - campaigns/{campaign}/enemy_encounters.yaml
       - campaigns/{campaign}/lore/*.md
     expected_outputs:
+      - campaigns/{campaign}/final/sessionXX_summary.md
       - farrlind/out/load_summaries.sql
       - database rows
       - review YAML marked applied
@@ -700,16 +746,20 @@ steps:
     gate: human_required
     rerun_policy: canon_affecting_requires_confirmation
     canon_impact: database_canon
+    notes: >
+      For final-summary reviews, apply writes the reviewed narrative to the
+      final summary file before loading the database so session and timeline
+      canon come from the human-reviewed summary.
 
   - id: write_final_summary
-    display_name: Write Final Summary
+    display_name: Write/Publish Final Summary
     lane: canonization
     dependencies:
       - apply_review
     command: ./rag-env/bin/python scripts/dm_query.py write-final-summary sessionXX
     expected_inputs:
       - applied review state
-      - database session and event rows
+      - reviewed final summary text and timeline fields
     expected_outputs:
       - campaigns/{campaign}/final/sessionXX_summary.md
     status_rules:
@@ -720,6 +770,10 @@ steps:
     gate: human_required
     rerun_policy: canon_affecting_requires_confirmation
     canon_impact: canon_file
+    notes: >
+      Publishes the reviewed final summary markdown. In the final-summary
+      workflow this is idempotent after apply, because apply writes the reviewed
+      narrative before the database load.
 
   - id: update_lore_sections
     display_name: Update Cross-Session Lore Sections

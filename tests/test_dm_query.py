@@ -376,9 +376,47 @@ class DmQueryTest(unittest.TestCase):
         self.assertEqual(document["items"][0]["sequence"], 1)
         self.assertEqual(document["items"][0]["decision"], "pending")
         self.assertEqual(document["items"][0]["applied_status"], "pending")
-        self.assertIn("Use sequence", document["review_instructions"][2])
+        self.assertEqual(document["review_stage"], "compose_final_summary")
+        self.assertIn("Compose", document["review_instructions"][0])
+        self.assertIn("final_summary", document)
         self.assertIn("source_files", document)
+        self.assertIn("macro_events", document)
         self.assertEqual(document["added_items"], [])
+
+    def test_macro_events_from_spine_prepopulates_review_buckets(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            spine_path = Path(tmp) / "session02_spine.yaml"
+            spine_path.write_text(
+                textwrap.dedent(
+                    """\
+                    major_events:
+                      - order: 1
+                        title: Road Corpses
+                        event_type: discovery
+                        location: Svalich Road
+                        summary: The party finds dead commoners.
+                        outcome: The corpses rise.
+                        party_interpretation: The party treats it as resort mismanagement.
+                        evidence:
+                          - corpses are found near the road
+                      - order: 2
+                        title: Tavern Cliffhanger
+                        event_type: cliffhanger
+                        location: Burgomaster's House
+                        summary: Bluetooth is ordered to attack.
+                    """
+                ),
+                encoding="utf-8",
+            )
+
+            with patch("dm_query.session_spine_path", return_value=spine_path):
+                macros = dm_query.macro_events_from_spine(2)
+
+        self.assertEqual([item["id"] for item in macros], ["macro-001", "macro-002"])
+        self.assertEqual(macros[0]["description"], "Road Corpses")
+        self.assertEqual(macros[0]["location"], "Svalich Road")
+        self.assertEqual(macros[0]["source_type"], "session_spine")
+        self.assertEqual(macros[1]["event_type"], "cliffhanger")
 
     def test_parse_merged_events_converts_draft_events_to_review_rows(self):
         with tempfile.TemporaryDirectory() as tmp:

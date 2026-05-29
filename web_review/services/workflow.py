@@ -15,6 +15,7 @@ from web_review.services import reviews
 
 QUEUE_DIR = reviews.REPO_ROOT / "ops" / "workflow_queue"
 TRANSCRIPT_POLICIES = {"use_existing", "recreate"}
+TERMINAL_STEP_STATUSES = {"complete", "not_applicable"}
 
 
 class WorkflowReadError(RuntimeError):
@@ -463,6 +464,11 @@ def workflow_rows() -> list[dict[str, Any]]:
         ORDER BY s.session_number DESC;
     """)
     for row in rows:
+        total_steps = int(row.get("total_steps") or 0)
+        complete_steps = int(row.get("complete_steps") or 0)
+        not_applicable_steps = int(row.get("not_applicable_steps") or 0)
+        if total_steps and complete_steps + not_applicable_steps == total_steps:
+            row["status"] = "completed"
         row["session_key"] = session_key(row["session_number"])
         row["workflow_url"] = f"/workflow?session={row['session_number']}"
         row["has_attention"] = bool(row.get("attention_count"))
@@ -523,6 +529,8 @@ def workflow_detail(session_number: int) -> Optional[dict[str, Any]]:
     for step in run["steps"]:
         step["links"] = step_links(step["step_id"], run["session_number"])
         step["issues"] = step_issues(step)
+    if run["steps"] and all(step.get("status") in TERMINAL_STEP_STATUSES for step in run["steps"]):
+        run["status"] = "completed"
     run["attention_items"] = [
         {"step": step["display_name"], "issues": step["issues"]}
         for step in run["steps"]

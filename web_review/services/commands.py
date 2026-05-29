@@ -42,6 +42,24 @@ def run_review_command(action: str, session_number: int, timeout: Optional[int] 
     return CommandResult(completed.returncode, completed.stdout, completed.stderr)
 
 
+def refresh_event_drafts(session_number: int, timeout: Optional[int] = 1800) -> CommandResult:
+    command = [
+        sys.executable,
+        str(reviews.REPO_ROOT / "scripts" / "rag.py"),
+        "refresh-events",
+        reviews.session_key(session_number),
+    ]
+    completed = subprocess.run(
+        command,
+        cwd=str(reviews.REPO_ROOT),
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+    )
+    return CommandResult(completed.returncode, completed.stdout, completed.stderr)
+
+
 def session_review_health(session_number: int) -> CommandResult:
     document = reviews.load_review_document(session_number)
     if not document:

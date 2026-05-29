@@ -1,6 +1,6 @@
 # Version
 
-v0.6.2
+v0.6.3
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.6.2` adds the cleaned Trinyvale audio workflow baseline with active-session narrative generation, session spine validation, and preservation-aware spine extraction.
+`v0.6.3` tightens the final-summary review flow, workflow status presentation, extractor source handling, and Farrlind songbook asset compatibility.

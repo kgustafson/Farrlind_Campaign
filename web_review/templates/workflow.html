@@ -69,6 +69,7 @@
     {% if detail.metadata and detail.metadata.timestamp_estimate %}
     <p class="timeline-note">Historical timestamps are estimated from chat work, Git history, and existing canon artifacts.</p>
     {% endif %}
+    <p class="workflow-human-legend"><span aria-hidden="true">*</span> requires human action or review</p>
     {% if detail.attention_items %}
     <section class="workflow-attention-panel" aria-label="Workflow attention items">
       <h3>Needs Attention</h3>
@@ -83,10 +84,13 @@
     <ol class="workflow-step-list">
       {% for step in detail.steps %}
       <li class="workflow-step workflow-step-{{ step.status }}">
-        <div class="workflow-step-marker">{{ step.step_order }}</div>
+        {% set human_gate = step.gate in ["human_required", "human_initiated", "operator_supplied"] %}
+        <div class="workflow-step-marker">
+          {{ step.step_order }}{% if human_gate %}<span class="workflow-human-marker" title="Requires human action or review" aria-label="requires human action or review">*</span>{% endif %}
+        </div>
         <div>
           <div class="workflow-step-title">
-            <span>{{ step.display_name }}</span>
+            <span>{{ step.display_name }}{% if human_gate %}<span class="workflow-title-human-marker" title="Requires human action or review" aria-label="requires human action or review">*</span>{% endif %}</span>
             <span class="badge workflow-{{ step.status }}">{{ step.status }}</span>
           </div>
           <p>{{ step.summary_comment or "No step comment recorded." }}</p>

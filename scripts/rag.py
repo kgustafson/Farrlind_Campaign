@@ -113,6 +113,7 @@ def parse_args():
             *STAGES.keys(),
             "transcribe",
             "postextract",
+            "refresh-events",
             "status",
             "dbload",
             "songbook-load",
@@ -134,7 +135,7 @@ def parse_args():
     parser.add_argument("--model", default=None, help="Model override for commands that support one.")
     parser.add_argument(
         "--source",
-        choices=["auto", "final_summary", "curated_packet", "draft_summary", "diary", "transcript"],
+        choices=["auto", "final_summary", "session_spine", "narrative", "curated_packet", "draft_summary", "diary", "transcript"],
         default="auto",
         help="Source material for entity extraction commands. Defaults to auto.",
     )
@@ -212,6 +213,9 @@ def main():
         args.max_workers = args.max_workers or DEFAULT_MAX_WORKERS
         run_transcription(args)
     elif args.command == "postextract":
+        run_stages(args.session_name, POSTEXTRACT_STAGES)
+    elif args.command == "refresh-events":
+        extract_session(args.session_name)
         run_stages(args.session_name, POSTEXTRACT_STAGES)
     else:
         if args.command == "extract-npcs":

@@ -1,4 +1,5 @@
 
+import json
 import re
 from dataclasses import dataclass
 from datetime import date
@@ -20,7 +21,7 @@ RAW_DIR = KNOWLEDGE_DIR / "raw"
 
 VALID_DECISIONS = {"pending", "accepted", "rejected", "corrected", "added"}
 VALID_STATUSES = {"in_review", "reviewed", "applied"}
-VALID_REVIEW_STAGES = {"high_level_order", "bucketing", "event_resolution"}
+VALID_REVIEW_STAGES = {"compose_final_summary", "high_level_order", "bucketing", "event_resolution"}
 EVENT_TYPES = [
     "combat",
     "discovery",
@@ -121,6 +122,18 @@ def raw_transcript_path(session_number: int) -> Path:
     return RAW_DIR / f"{session_key(session_number)}_transcript.txt"
 
 
+def narrative_path(session_number: int) -> Path:
+    return CLEAN_DIR / f"{session_key(session_number)}_narrative.md"
+
+
+def spine_path(session_number: int) -> Path:
+    return CLEAN_DIR / f"{session_key(session_number)}_spine.yaml"
+
+
+def spine_validation_path(session_number: int) -> Path:
+    return CLEAN_DIR / f"{session_key(session_number)}_spine_validation.md"
+
+
 def read_text_if_exists(path: Path) -> str:
     if not path.exists():
         return ""
@@ -159,8 +172,18 @@ def unapplied_count(document: dict[str, Any]) -> int:
 def next_action_for(document: dict[str, Any]) -> str:
     if not document:
         return "init-review"
-    counts = decision_counts(document)
     status = document.get("status") or "unknown"
+    if final_summary_mode(document):
+        if final_summary_readiness_errors(document):
+            return "compose-summary"
+        if status == "in_review":
+            return "mark-reviewed"
+        if status in {"reviewed", "complete"}:
+            return "apply"
+        if status == "applied":
+            return "done"
+        return "inspect"
+    counts = decision_counts(document)
     if counts["pending"] or counts["other"]:
         return "edit"
     if status == "in_review":
@@ -252,6 +275,8 @@ def sorted_review_items(document: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def review_stage(document: dict[str, Any]) -> str:
+    if final_summary_mode(document):
+        return "compose_final_summary"
     if (document.get("status") or "") in {"reviewed", "applied"}:
         return "event_resolution"
     stage = document.get("review_stage") or "high_level_order"
@@ -266,6 +291,92 @@ def set_review_stage(document: dict[str, Any], stage: str) -> dict[str, Any]:
     updated = dict(document)
     updated["review_stage"] = stage
     return updated
+
+
+def final_summary_mode(document: dict[str, Any]) -> bool:
+    return bool(document.get("final_summary")) or document.get("review_stage") == "compose_final_summary"
+
+
+def default_final_summary_for_session(session_number: int, document: dict[str, Any]) -> dict[str, Any]:
+    timeline = document.get("timeline") or {}
+    spine = {}
+    if spine_path(session_number).exists():
+        spine = yaml.safe_load(spine_path(session_number).read_text(encoding="utf-8")) or {}
+    spine_timeline = spine.get("timeline") or {}
+    existing = document.get("final_summary") or {}
+    summary = (
+        existing.get("summary_markdown")
+        or read_text_if_exists(narrative_path(session_number))
+        or read_text_if_exists(draft_summary_path(session_number))
+    ).strip()
+    return {
+        "session_title": existing.get("session_title") or document.get("session_title") or f"Session {session_number:02d}",
+        "real_world_date": existing.get("real_world_date") or document.get("session_date") or date.today().isoformat(),
+        "in_world_date": existing.get("in_world_date") or document.get("in_game_date") or "N/A",
+        "starting_location": existing.get("starting_location") or timeline.get("start_location") or spine_timeline.get("starting_location") or "",
+        "ending_location": existing.get("ending_location") or timeline.get("end_location") or spine_timeline.get("ending_location") or "",
+        "key_locations": existing.get("key_locations") or "",
+        "major_outcome": existing.get("major_outcome") or "",
+        "summary_markdown": summary,
+    }
+
+
+def final_summary_from_form(form_values: dict[str, list[str]], existing: dict[str, Any]) -> dict[str, Any]:
+    def value(name: str) -> str:
+        return _first(form_values, name, 0, str(existing.get(name) or "")).strip()
+
+    return {
+        "session_title": value("final_session_title"),
+        "real_world_date": value("final_real_world_date"),
+        "in_world_date": value("final_in_world_date") or "N/A",
+        "starting_location": value("final_starting_location"),
+        "ending_location": value("final_ending_location"),
+        "key_locations": value("final_key_locations"),
+        "major_outcome": value("final_major_outcome"),
+        "summary_markdown": value("final_summary_markdown"),
+    }
+
+
+def update_final_summary_from_form(document: dict[str, Any], form_values: dict[str, list[str]]) -> dict[str, Any]:
+    updated = dict(document)
+    final_summary = final_summary_from_form(form_values, document.get("final_summary") or {})
+    updated["review_stage"] = "compose_final_summary"
+    updated["final_summary"] = final_summary
+    updated["session_title"] = final_summary["session_title"]
+    updated["session_date"] = final_summary["real_world_date"]
+    updated["in_game_date"] = final_summary["in_world_date"]
+    updated["primary_location"] = final_summary["ending_location"] or final_summary["starting_location"]
+    updated["timeline"] = {
+        "physical_date": final_summary["real_world_date"],
+        "in_game_date": final_summary["in_world_date"] or "N/A",
+        "start_location": final_summary["starting_location"],
+        "end_location": final_summary["ending_location"],
+    }
+    if updated.get("status") == "applied":
+        updated["status"] = "in_review"
+    return updated
+
+
+def final_summary_readiness_errors(document: dict[str, Any]) -> list[str]:
+    final_summary = document.get("final_summary") or {}
+    errors = []
+    required = [
+        ("session_title", "Session title"),
+        ("real_world_date", "Real-world date"),
+        ("in_world_date", "In-world date"),
+        ("starting_location", "Starting location"),
+        ("ending_location", "Ending location"),
+        ("summary_markdown", "Canon final summary"),
+    ]
+    for field, label in required:
+        if not str(final_summary.get(field) or "").strip():
+            errors.append(f"{label} is required.")
+    text = str(final_summary.get("summary_markdown") or "")
+    if len(text.strip()) < 80:
+        errors.append("Canon final summary is too short.")
+    if re.search(r"\b(TODO|TBD|FIXME|TK)\b|\?\?\?", text, re.IGNORECASE):
+        errors.append("Canon final summary contains unresolved placeholder text.")
+    return errors
 
 
 def filtered_review_items(items: list[dict[str, Any]], bucket: str = "") -> list[dict[str, Any]]:
@@ -332,6 +443,9 @@ def source_text(session_number: int, source: str) -> tuple[str, str]:
         "diary": ("Diary", diary_path(session_number)),
         "draft": ("Draft Summary", draft_summary_path(session_number)),
         "final": ("Final Summary", final_summary_path(session_number)),
+        "narrative": ("Narrative Draft", narrative_path(session_number)),
+        "spine": ("Session Spine", spine_path(session_number)),
+        "spine_validation": ("Spine Validation", spine_validation_path(session_number)),
         "transcript": ("Raw Transcript", raw_transcript_path(session_number)),
     }
     label, path = choices.get(source, choices["diary"])
@@ -350,26 +464,168 @@ def render_markdown(text: str) -> str:
     )
 
 
+def evidence_sources(session_number: int) -> list[dict[str, str]]:
+    sources = [
+        ("Narrative Draft", "narrative", narrative_path(session_number)),
+        ("Session Spine", "spine", spine_path(session_number)),
+        ("Draft Summary", "draft", draft_summary_path(session_number)),
+        ("Spine Validation", "spine_validation", spine_validation_path(session_number)),
+        ("Transcript", "transcript", raw_transcript_path(session_number)),
+    ]
+    evidence = []
+    for label, key, path in sources:
+        text = read_text_if_exists(path)
+        if not text:
+            continue
+        evidence.append({
+            "label": label,
+            "source": key,
+            "text": text,
+            "html": render_markdown(text),
+        })
+    return evidence
+
+
+def _entity_label(item: Any) -> str:
+    if not isinstance(item, dict):
+        return str(item)
+    for key in [
+        "canonical_name",
+        "proposed_name",
+        "name",
+        "canonical_title",
+        "proposed_title",
+        "title",
+        "encounter_name",
+        "thread_title",
+        "description",
+    ]:
+        value = str(item.get(key) or "").strip()
+        if value:
+            return value
+    return json.dumps(item, ensure_ascii=False)[:120]
+
+
+def _entity_note(item: Any) -> str:
+    if not isinstance(item, dict):
+        return ""
+    for key in ["new_information", "description", "lore_significance", "evidence", "summary", "status"]:
+        value = item.get(key)
+        if isinstance(value, list):
+            value = ", ".join(str(part) for part in value if str(part).strip())
+        value = str(value or "").strip()
+        if value:
+            return value
+    return ""
+
+
+def entity_evidence(session_number: int) -> list[dict[str, Any]]:
+    extracted_dir = KNOWLEDGE_DIR / "extracted"
+    def row(item: Any, status: str) -> dict[str, str]:
+        if isinstance(item, str):
+            label = item
+            note = ""
+        else:
+            label = _entity_label(item)
+            note = _entity_note(item)
+        return {
+            "label": label,
+            "note": note,
+            "status": status,
+        }
+
+    specs = [
+        ("NPCs", f"{session_key(session_number)}_npcs.json", f"{session_key(session_number)}_npcs_reviewed.json", {
+            "known_npc_mentions": "known",
+            "new_npc_candidates": "candidate",
+            "rejected_candidates": "rejected",
+        }),
+        ("Locations", f"{session_key(session_number)}_locations.json", f"{session_key(session_number)}_locations_reviewed.json", {
+            "known_location_mentions": "known",
+            "new_location_candidates": "candidate",
+            "rejected_candidates": "rejected",
+        }),
+        ("Artifacts", f"{session_key(session_number)}_artifacts.json", f"{session_key(session_number)}_artifacts_reviewed.json", {
+            "known_artifact_mentions": "known",
+            "new_artifact_candidates": "candidate",
+            "rejected_candidates": "rejected",
+        }),
+        ("Lore", f"{session_key(session_number)}_lore_items.json", f"{session_key(session_number)}_lore_items_reviewed.json", {
+            "known_lore_mentions": "known",
+            "new_lore_item_candidates": "candidate",
+            "new_lore_candidates": "candidate",
+            "rejected_candidates": "rejected",
+        }),
+        ("Combat", f"{session_key(session_number)}_combat_encounters.json", f"{session_key(session_number)}_combat_encounters_reviewed.json", {
+            "known_encounter_mentions": "known",
+            "new_combat_encounter_candidates": "candidate",
+            "combat_encounters": "candidate",
+            "proposed_combat_encounters": "candidate",
+            "rejected_candidates": "rejected",
+        }),
+        ("Open Threads", f"{session_key(session_number)}_open_threads.json", f"{session_key(session_number)}_open_threads_reviewed.json", {
+            "known_open_thread_mentions": "known",
+            "known_thread_mentions": "known",
+            "new_open_thread_candidates": "candidate",
+            "new_thread_candidates": "candidate",
+            "open_threads": "candidate",
+            "rejected_candidates": "rejected",
+        }),
+    ]
+    groups = []
+    for label, filename, reviewed_filename, keys in specs:
+        path = extracted_dir / filename
+        rows = []
+        if path.exists():
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                data = {}
+            for key, status in keys.items():
+                for item in data.get(key) or []:
+                    rows.append(row(item, status))
+        reviewed_path = extracted_dir / reviewed_filename
+        if reviewed_path.exists():
+            try:
+                reviewed_data = json.loads(reviewed_path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                reviewed_data = {}
+            for item in reviewed_data.get("applied") or []:
+                rows.append(row(item, "applied"))
+            for item in reviewed_data.get("skipped") or []:
+                rows.append(row(item, "ignored"))
+        if rows:
+            groups.append({"label": label, "rows": rows})
+    return groups
+
+
 def session_workspace(session_number: int, source: str = "diary", source_view: str = "raw", bucket: str = "") -> dict[str, Any]:
     document = load_review_document(session_number)
     label, text = source_text(session_number, source)
     items = sorted_review_items(document)
+    final_summary = default_final_summary_for_session(session_number, document) if document else {}
+    validation_document = {**document, "final_summary": final_summary} if document else document
     return {
         "session_number": session_number,
         "session_key": session_key(session_number),
         "summary": summarize_review_document(session_number, document),
         "document": document,
         "items": filtered_review_items(items, bucket),
+        "all_items": items,
         "macro_events": sorted_macro_events(document),
         "bucket_counts": bucket_counts(document),
         "selected_bucket": bucket or "all",
-        "review_stage": review_stage(document),
+        "review_stage": "compose_final_summary" if document else review_stage(document),
         "source": source,
         "source_label": label,
         "source_text": text,
         "source_html": render_markdown(text),
         "source_view": source_view if source_view in {"raw", "print"} else "raw",
-        "validation": validate_review_document(document),
+        "validation": validate_review_document(validation_document),
+        "final_summary": final_summary,
+        "summary_validation": final_summary_readiness_errors({"final_summary": final_summary}) if document else [],
+        "evidence_sources": evidence_sources(session_number),
+        "entity_evidence": entity_evidence(session_number),
         "event_types": EVENT_TYPES,
         "review_locked": (document.get("status") == "applied"),
     }
@@ -423,20 +679,31 @@ def update_macro_events_from_form(document: dict[str, Any], form_values: dict[st
     macro_ids = form_values.get("macro_id") or []
     macro_events = []
     remove_ids = set(form_values.get("remove_macro_id") or [])
+    seen_macro_ids = set()
 
-    for index, macro_id in enumerate(macro_ids):
-        description = _first(form_values, "macro_description", index).strip()
-        location = _first(form_values, "macro_location", index).strip()
-        order = _coerce_macro_order(_first(form_values, "macro_order", index))
-        if macro_id in remove_ids or not (description or location or order):
-            continue
-        macro_events.append({
-            **existing.get(macro_id, {}),
-            "id": macro_id,
-            "order": order,
-            "description": description,
-            "location": location,
-        })
+    if macro_ids:
+        for index, macro_id in enumerate(macro_ids):
+            if not macro_id or macro_id in seen_macro_ids:
+                continue
+            seen_macro_ids.add(macro_id)
+            description = _first(form_values, "macro_description", index).strip()
+            location = _first(form_values, "macro_location", index).strip()
+            order = _coerce_macro_order(_first(form_values, "macro_order", index))
+            if macro_id in remove_ids or not (description or location or order):
+                continue
+            macro_events.append({
+                **existing.get(macro_id, {}),
+                "id": macro_id,
+                "order": order,
+                "description": description,
+                "location": location,
+            })
+    else:
+        macro_events = [
+            dict(item)
+            for item in document.get("macro_events") or []
+            if item.get("id") not in remove_ids
+        ]
 
     new_description = _first(form_values, "new_macro_description", 0).strip()
     new_location = _first(form_values, "new_macro_location", 0).strip()
@@ -771,6 +1038,8 @@ def reopen_review_document(document: dict[str, Any], reopened_on: Optional[str] 
 
 
 def review_readiness_errors(document: dict[str, Any]) -> list[str]:
+    if final_summary_mode(document):
+        return final_summary_readiness_errors(document)
     errors = []
     counts = decision_counts(document)
     if counts["pending"]:
@@ -812,6 +1081,10 @@ def validate_review_document(document: dict[str, Any]) -> list[str]:
     status = document.get("status") or ""
     if status not in VALID_STATUSES:
         notes.append(f"Review status is not recognized: {status or 'blank'}.")
+
+    if final_summary_mode(document):
+        notes.extend(final_summary_readiness_errors(document))
+        return notes or ["No review validation issues found."]
 
     seen_sequences = set()
     seen_ids = set()

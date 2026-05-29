@@ -189,6 +189,18 @@ def canon_location_names() -> list[str]:
         return []
 
 
+def macro_locations_to_validate(form_values: dict[str, list[str]]) -> list[str]:
+    remove_ids = set(form_values.get("remove_macro_id") or [])
+    macro_ids = form_values.get("macro_id") or []
+    macro_locations = form_values.get("macro_location") or []
+    kept_locations = [
+        location
+        for index, location in enumerate(macro_locations)
+        if index >= len(macro_ids) or macro_ids[index] not in remove_ids
+    ]
+    return kept_locations + (form_values.get("new_macro_location") or [])
+
+
 def sync_after_extraction_review(session_number: int) -> list[str]:
     messages: list[str] = []
     try:
@@ -197,15 +209,30 @@ def sync_after_extraction_review(session_number: int) -> list[str]:
         messages.append("Workflow sync skipped after extraction review.")
 
     if reviews.event_review_ready(session_number) and not reviews.review_path(session_number).exists():
+        refresh_result = commands.refresh_event_drafts(session_number)
+        if refresh_result.ok:
+            messages.append("Refreshed event drafts.")
+            try:
+                workflow.sync_session_workflow(session_number)
+            except workflow.WorkflowWriteError:
+                messages.append("Workflow sync skipped after event draft refresh.")
+        else:
+            messages.append("Event draft refresh failed.")
+            if refresh_result.stderr.strip():
+                messages.append(refresh_result.stderr.strip())
+            elif refresh_result.stdout.strip():
+                messages.append(refresh_result.stdout.strip())
+            return messages
+
         init_result = commands.init_review(session_number)
         if init_result.ok:
-            messages.append("Initialized event review.")
+            messages.append("Initialized final summary review.")
             try:
                 workflow.sync_session_workflow(session_number)
             except workflow.WorkflowWriteError:
                 messages.append("Workflow sync skipped after event review initialization.")
         else:
-            messages.append("Event review initialization failed.")
+            messages.append("Final summary review initialization failed.")
             if init_result.stderr.strip():
                 messages.append(init_result.stderr.strip())
     return messages
@@ -517,7 +544,7 @@ async def init_session_review(request: Request, session: str):
         return redirect_to_review(session_number, "diary", "raw", "event_review_blocked=1")
 
     result = commands.init_review(session_number)
-    token = store_command_result("Initialize Event Review", result)
+    token = store_command_result("Initialize Final Summary Review", result)
     flag = "init_reviewed=1" if result.ok else "init_failed=1"
     return redirect_to_review(session_number, "diary", "raw", f"{flag}&command_result={token}")
 
@@ -539,15 +566,26 @@ async def save_session_review(request: Request, session: str):
     form = await request.form()
     form_values = {key: form.getlist(key) for key in form.keys()}
     known_locations = canon_location_names()
-    if location_confirmation_failed(form_values, form, known_locations):
+    if reviews.final_summary_mode(document) or "final_summary_markdown" in form:
+        location_values = {
+            "new_location": [
+                form.get("final_starting_location") or "",
+                form.get("final_ending_location") or "",
+            ]
+        }
+        if location_confirmation_failed(location_values, form, known_locations):
+            return redirect_to_review(session_number, form.get("source") or "narrative", form.get("view") or "raw", "location_confirm_failed=1", form.get("bucket") or "")
+        updated = reviews.update_final_summary_from_form(document, form_values)
+    elif location_confirmation_failed(form_values, form, known_locations):
         return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_confirm_failed=1", form.get("bucket") or "")
-    updated = reviews.update_review_document_from_form(document, form_values)
+    else:
+        updated = reviews.update_review_document_from_form(document, form_values)
     try:
         reviews.save_review_document(session_number, updated)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
 
-    source = form.get("source") or "diary"
+    source = form.get("source") or "narrative"
     view = form.get("view") or "raw"
     return redirect_to_review(session_number, source, view, "saved=1", form.get("bucket") or "")
 
@@ -566,6 +604,9 @@ async def save_session_review_item(request: Request, session: str):
         raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
 
     form = await request.form()
+    if reviews.final_summary_mode(document):
+        return redirect_to_review(session_number, form.get("source") or "narrative", form.get("view") or "raw", "saved=1", form.get("bucket") or "")
+
     form_values = {key: form.getlist(key) for key in form.keys()}
     known_locations = canon_location_names()
     if location_confirmation_failed(form_values, form, known_locations):
@@ -593,6 +634,9 @@ async def batch_session_review_items(request: Request, session: str):
         raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
 
     form = await request.form()
+    if reviews.final_summary_mode(document):
+        return redirect_to_review(session_number, form.get("source") or "narrative", form.get("view") or "raw", "saved=1", form.get("bucket") or "")
+
     updated, errors = reviews.update_batch_decision(
         document,
         form.getlist("selected_item_id"),
@@ -624,9 +668,12 @@ async def save_session_review_macros(request: Request, session: str):
         raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
 
     form = await request.form()
+    if reviews.final_summary_mode(document):
+        return redirect_to_review(session_number, form.get("source") or "narrative", form.get("view") or "raw", "saved=1", form.get("bucket") or "")
+
     form_values = {key: form.getlist(key) for key in form.keys()}
     known_locations = canon_location_names()
-    macro_locations = form_values.get("macro_location", []) + form_values.get("new_macro_location", [])
+    macro_locations = macro_locations_to_validate(form_values)
     if not create_missing_review_locations(macro_locations, known_locations, session_number, "Added from high-level event order."):
         return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_add_failed=1&macro_modal=1", form.get("bucket") or "")
     updated = reviews.update_macro_events_from_form(document, form_values)
@@ -638,7 +685,10 @@ async def save_session_review_macros(request: Request, session: str):
     flag = "macros_saved=1"
     if form.get("review_stage") != "bucketing":
         flag += "&macro_modal=1"
-    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", flag, form.get("bucket") or "")
+    selected_bucket = form.get("bucket") or ""
+    if selected_bucket in set(form_values.get("remove_macro_id") or []):
+        selected_bucket = "all"
+    return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", flag, selected_bucket)
 
 
 @app.post("/sessions/{session}/review/bucketing")
@@ -655,6 +705,9 @@ async def save_session_review_bucketing(request: Request, session: str):
         raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
 
     form = await request.form()
+    if reviews.final_summary_mode(document):
+        return redirect_to_review(session_number, form.get("source") or "narrative", form.get("view") or "raw", "saved=1", form.get("bucket") or "")
+
     form_values = {key: form.getlist(key) for key in form.keys()}
     requested_stage = form.get("review_stage") or ""
     updated = reviews.update_bucketing_from_form(document, form_values)
@@ -690,6 +743,9 @@ async def apply_session_review_macros(request: Request, session: str):
         raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
 
     form = await request.form()
+    if reviews.final_summary_mode(document):
+        return redirect_to_review(session_number, form.get("source") or "narrative", form.get("view") or "raw", "saved=1", form.get("bucket") or "")
+
     form_values = {key: form.getlist(key) for key in form.keys()}
     updated = reviews.update_review_document_from_form(document, form_values)
     updated, errors = reviews.apply_macro_event_order(updated)
@@ -874,9 +930,20 @@ async def mark_session_reviewed(request: Request, session: str):
     form = await request.form()
     form_values = {key: form.getlist(key) for key in form.keys()}
     known_locations = canon_location_names()
-    if location_confirmation_failed(form_values, form, known_locations):
+    if reviews.final_summary_mode(document) or "final_summary_markdown" in form:
+        location_values = {
+            "new_location": [
+                form.get("final_starting_location") or "",
+                form.get("final_ending_location") or "",
+            ]
+        }
+        if location_confirmation_failed(location_values, form, known_locations):
+            return redirect_to_review(session_number, form.get("source") or "narrative", form.get("view") or "raw", "location_confirm_failed=1")
+        updated = reviews.update_final_summary_from_form(document, form_values)
+    elif location_confirmation_failed(form_values, form, known_locations):
         return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_confirm_failed=1")
-    updated = reviews.update_review_document_from_form(document, form_values)
+    else:
+        updated = reviews.update_review_document_from_form(document, form_values)
     marked, errors = reviews.mark_reviewed_document(updated)
     try:
         reviews.save_review_document(session_number, marked)
@@ -887,7 +954,7 @@ async def mark_session_reviewed(request: Request, session: str):
     except workflow.WorkflowWriteError:
         pass
 
-    source = form.get("source") or "diary"
+    source = form.get("source") or "narrative"
     view = form.get("view") or "raw"
     if errors:
         result = commands.CommandResult(1, "", "\n".join(errors))

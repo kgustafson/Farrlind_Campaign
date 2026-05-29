@@ -1,5 +1,8 @@
 Extract factual D&D gameplay events from the transcript.
 
+When the source is a clean narrative and spine packet, use the session spine as the
+major-scene guide and the clean narrative as the factual detail source.
+
 Use this exact event record format:
 
 EVENT:
@@ -78,6 +81,9 @@ Rules:
 - Separate confirmed world facts from party jokes, nicknames, sarcasm, mistaken assumptions, hypotheticals, and misunderstandings.
 - It is valid to extract a character moment where the party misunderstands something, but the summary/outcome must label it as party interpretation rather than objective canon.
 - Do not turn a pun, misread title, or invented player theory into a real NPC, location, artifact, lore fact, or combat outcome.
+- Do not create event records for workflow metadata, validation comments, missing-beat warnings, source manifests, or Needs Review notes unless they describe an actual in-session event.
+- Do not extract events from Needs Review, Source Manifest, validation, metadata, or workflow sections.
+- Do not resurrect recap-only events that the clean narrative/spine excluded.
 
 High importance examples:
 - initiative begins

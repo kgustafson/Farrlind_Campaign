@@ -1425,6 +1425,13 @@ def _safe_repo_path(path_value: str) -> Path:
     if not path.is_absolute():
         path = REPO_ROOT / path
     resolved = path.resolve()
+    if not resolved.exists():
+        legacy_prefix = Path("knowledge") / "Faban"
+        legacy_path = Path(path_value)
+        if not legacy_path.is_absolute() and legacy_path.parts[:2] == legacy_prefix.parts:
+            migrated = campaign_path(*legacy_path.parts[2:]).resolve()
+            if migrated.exists():
+                resolved = migrated
     if REPO_ROOT.resolve() not in [resolved, *resolved.parents]:
         raise CanonReadError("Songbook asset path is outside the repository.")
     return resolved

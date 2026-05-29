@@ -217,6 +217,37 @@ class LoreItemExtractorTest(unittest.TestCase):
         self.assertEqual(cleaned["rejected_candidates"][0]["text"], "unknown candidate")
         self.assertIn("missing proposed title", warnings[0])
 
+    def test_postprocess_collapses_repeated_npc_surnames(self):
+        document = {
+            "known_lore_mentions": [],
+            "new_lore_candidates": [{
+                "proposed_title": "Marina Kulyana's Vampire Bite",
+                "category": "history",
+                "description": "Marina Kulyana Kulyana was bitten by a vampire according to Kolyan Indirovich Indirovich.",
+                "source_npc": "Kolyan Indirovich Indirovich",
+                "is_confirmed": True,
+                "confidence": "high",
+                "evidence": "Kolyan Indirovich Indirovich wrote that Marina Kulyana Kulyana was bitten and Strahd von Zarovich von Zarovich is involved.",
+            }],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        with patch("raglib.lore_item_extractor.canon.npc_rows", return_value=[
+            {"name": "Marina Kulyana"},
+            {"name": "Kolyan Indirovich"},
+        ]):
+            cleaned, _warnings = lore_item_extractor.postprocess_extraction(document, [], "session02")
+
+        candidate = cleaned["new_lore_candidates"][0]
+        self.assertEqual(candidate["source_npc"], "Kolyan Indirovich")
+        self.assertIn("Marina Kulyana was bitten", candidate["description"])
+        self.assertIn("Kolyan Indirovich wrote", candidate["evidence"])
+        self.assertIn("Strahd von Zarovich is involved", candidate["evidence"])
+        self.assertNotIn("Kulyana Kulyana", json.dumps(candidate))
+        self.assertNotIn("Indirovich Indirovich", json.dumps(candidate))
+        self.assertNotIn("Zarovich von Zarovich", json.dumps(candidate))
+
     def test_extract_lore_items_writes_review_json(self):
         output = {
             "known_lore_mentions": [],

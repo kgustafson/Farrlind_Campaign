@@ -11,6 +11,7 @@ lookups:
     - value: bow
     - value: cap
     - value: container
+    - value: feature
     - value: grimoire
     - value: magic item
     - value: orb
@@ -39,6 +40,7 @@ lookups:
     - value: island
     - value: landmark
     - value: monastery
+    - value: realm
     - value: road
     - value: settlement
     - value: tavern

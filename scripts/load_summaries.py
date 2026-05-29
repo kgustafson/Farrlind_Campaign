@@ -1208,6 +1208,8 @@ def ordered_review_items(review: dict) -> list[dict]:
 def review_events_for_session(summary: dict, review: Optional[dict]) -> Optional[list[dict]]:
     if not review or review.get("status") not in {"reviewed", "complete", "applied"}:
         return None
+    if review.get("final_summary"):
+        return []
 
     events = []
     for item in ordered_review_items(review):

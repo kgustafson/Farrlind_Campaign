@@ -8,7 +8,7 @@ from unittest.mock import patch
 import yaml
 
 from web_review.services import artifact_extraction_review, canon, combat_extraction_review, commands, location_extraction_review, lore_item_extraction_review, npc_extraction_review, open_thread_extraction_review, reviews, workflow
-from web_review.app import BACKUP_DOWNLOADS, COMMAND_RESULTS, app, app_git_hash_short, app_version, sync_after_extraction_review
+from web_review.app import BACKUP_DOWNLOADS, COMMAND_RESULTS, app, app_git_hash_short, app_version, macro_locations_to_validate, sync_after_extraction_review
 from scripts import export_static_archive
 from scripts.load_songbook import songbook_source_sql
 from fastapi.testclient import TestClient
@@ -122,7 +122,8 @@ class WebReviewServiceTest(unittest.TestCase):
         self.assertEqual(workspace["source_view"], "raw")
         self.assertTrue(workspace["review_locked"])
         self.assertEqual([item["id"] for item in workspace["items"]], ["event-001", "added-001", "event-002"])
-        self.assertEqual(workspace["validation"], ["No review validation issues found."])
+        self.assertIn("Starting location is required.", workspace["validation"])
+        self.assertIn("Ending location is required.", workspace["validation"])
 
     def test_validate_review_document_reports_required_corrected_fields(self):
         notes = reviews.validate_review_document({
@@ -364,6 +365,60 @@ class WebReviewServiceTest(unittest.TestCase):
         self.assertEqual(updated["macro_events"][1]["description"], "Party dives to Catur")
         self.assertNotIn("macro_event_id", updated["items"][0])
 
+    def test_macro_locations_to_validate_ignores_removed_bucket_location(self):
+        locations = macro_locations_to_validate({
+            "macro_id": ["macro-001", "macro-002"],
+            "macro_location": ["Road", "Unknown Removed Place"],
+            "remove_macro_id": ["macro-002"],
+            "new_macro_location": ["New Place"],
+        })
+
+        self.assertEqual(locations, ["Road", "New Place"])
+
+    def test_update_macro_events_from_form_deduplicates_modal_and_page_rows(self):
+        document = {
+            "macro_events": [
+                {"id": "macro-001", "order": 1, "description": "Keep", "location": "Road"},
+                {"id": "macro-002", "order": 2, "description": "Remove me", "location": "Boat"},
+            ],
+            "items": [
+                {"id": "event-001", "macro_event_id": "macro-002"},
+            ],
+            "added_items": [],
+        }
+
+        updated = reviews.update_macro_events_from_form(document, {
+            "macro_id": ["macro-001", "macro-002", "macro-001", "macro-002"],
+            "macro_order": ["1", "2", "1", "2"],
+            "macro_description": ["Keep", "Remove me", "Keep", "Remove me"],
+            "macro_location": ["Road", "Boat", "Road", "Boat"],
+            "remove_macro_id": ["macro-002"],
+        })
+
+        self.assertEqual([item["id"] for item in updated["macro_events"]], ["macro-001"])
+        self.assertEqual(updated["macro_events"][0]["description"], "Keep")
+        self.assertNotIn("macro_event_id", updated["items"][0])
+
+    def test_update_macro_events_from_form_delete_without_rows_preserves_other_buckets(self):
+        document = {
+            "macro_events": [
+                {"id": "macro-001", "order": 1, "description": "Keep", "location": "Road"},
+                {"id": "macro-002", "order": 2, "description": "Remove me", "location": "Boat"},
+            ],
+            "items": [
+                {"id": "event-001", "macro_event_id": "macro-002"},
+            ],
+            "added_items": [],
+        }
+
+        updated = reviews.update_macro_events_from_form(document, {
+            "remove_macro_id": ["macro-002"],
+        })
+
+        self.assertEqual([item["id"] for item in updated["macro_events"]], ["macro-001"])
+        self.assertEqual(updated["macro_events"][0]["description"], "Keep")
+        self.assertNotIn("macro_event_id", updated["items"][0])
+
     def test_update_macro_events_from_form_renumbers_decimal_insertions(self):
         document = {
             "macro_events": [
@@ -576,6 +631,52 @@ class WebReviewServiceTest(unittest.TestCase):
         self.assertEqual(updated["status"], "reviewed")
         self.assertEqual(updated["reviewed_on"], "2026-05-06")
 
+    def test_final_summary_review_does_not_require_micro_event_decisions(self):
+        document = {
+            "session": "session01",
+            "status": "in_review",
+            "review_stage": "compose_final_summary",
+            "final_summary": {
+                "session_title": "Session 01",
+                "real_world_date": "2026-05-25",
+                "in_world_date": "N/A",
+                "starting_location": "Road",
+                "ending_location": "Village",
+                "summary_markdown": "The party travels from the road to the village and establishes the core conflict for the session.",
+            },
+            "items": [
+                {"id": "event-001", "sequence": 1, "decision": "pending"},
+            ],
+            "added_items": [],
+        }
+
+        updated, errors = reviews.mark_reviewed_document(document, reviewed_on="2026-05-06")
+
+        self.assertEqual(errors, [])
+        self.assertEqual(updated["status"], "reviewed")
+
+    def test_final_summary_review_requires_timeline_fields(self):
+        document = {
+            "session": "session01",
+            "status": "in_review",
+            "review_stage": "compose_final_summary",
+            "final_summary": {
+                "session_title": "Session 01",
+                "real_world_date": "2026-05-25",
+                "in_world_date": "N/A",
+                "starting_location": "",
+                "ending_location": "Village",
+                "summary_markdown": "The party travels from the road to the village and establishes the core conflict for the session.",
+            },
+            "items": [],
+            "added_items": [],
+        }
+
+        updated, errors = reviews.mark_reviewed_document(document, reviewed_on="2026-05-06")
+
+        self.assertIs(updated, document)
+        self.assertIn("Starting location is required.", errors)
+
 
     def test_render_markdown_interprets_headings_and_emphasis(self):
         html = reviews.render_markdown("# Title\n\nA **bold** line")
@@ -655,7 +756,7 @@ class WebReviewAppTest(unittest.TestCase):
             self.assertFalse((assets / "world-map.png").exists())
             self.assertEqual((assets / "world-map.jpg").read_bytes(), b"new")
 
-    def test_high_level_event_order_shows_micro_events_without_buckets(self):
+    def test_final_summary_composer_shows_micro_events_without_buckets(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             reviews_dir = root / "reviews"
@@ -684,10 +785,12 @@ class WebReviewAppTest(unittest.TestCase):
                 response = client.get("/sessions/session01/review")
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Micro Events To Group", response.text)
+        self.assertIn("Compose Final Summary", response.text)
+        self.assertIn("Micro Events", response.text)
         self.assertIn("The party reaches the inn.", response.text)
         self.assertIn("A stranger enters.", response.text)
         self.assertIn("2 draft", response.text)
+        self.assertNotIn("High-Level Event Order", response.text)
 
     def test_event_review_dashboard_disables_blocked_sessions(self):
         row = reviews.ReviewSummary(
@@ -751,14 +854,13 @@ class WebReviewAppTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('href="/sessions/session01/review"', response.text)
 
-    def test_print_view_renders_source_markdown(self):
+    def test_print_view_keeps_final_summary_composer(self):
         client = TestClient(app)
         response = client.get("/sessions/session20/review?source=final&view=print")
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("source-rendered", response.text)
-        self.assertIn("Source</a>", response.text)
-        self.assertIn("Print</a>", response.text)
+        self.assertIn("Compose Final Summary", response.text)
+        self.assertIn("Canon Final Summary", response.text)
 
     def test_session_review_renders_command_result(self):
         COMMAND_RESULTS["abc"] = {
@@ -785,6 +887,89 @@ class WebReviewAppTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("source-text", response.text)
+
+    def test_final_summary_review_ignores_stale_macro_modal_query(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            reviews_dir.mkdir()
+            clean.mkdir()
+            final.mkdir()
+            (reviews_dir / "session01_review.yaml").write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "in_review",
+                "review_stage": "compose_final_summary",
+                "final_summary": {
+                    "session_title": "Session 01",
+                    "real_world_date": "2026-05-25",
+                    "in_world_date": "N/A",
+                    "starting_location": "Road",
+                    "ending_location": "Village",
+                    "summary_markdown": "The party travels from the road to the village and establishes the core conflict for the session.",
+                },
+                "macro_events": [{"id": "macro-001", "order": 1, "description": "Old Bucket", "location": "Road"}],
+                "items": [{"id": "event-001", "sequence": 1, "decision": "pending", "source_text": "Micro event text."}],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final), \
+                 patch.object(reviews, "event_review_access_blocked", return_value=False), \
+                 patch("web_review.services.canon.locations", return_value=["Road", "Village"]), \
+                 patch("web_review.services.canon.location_types", return_value=[]):
+                client = TestClient(app)
+                response = client.get("/sessions/session01/review?macro_modal=1")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Compose Final Summary", response.text)
+        self.assertIn("Micro event text.", response.text)
+        self.assertNotIn("High-Level Event Order", response.text)
+
+    def test_final_summary_review_macro_post_does_not_change_stage(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            reviews_dir.mkdir()
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session01_review.yaml"
+            path.write_text(yaml.safe_dump({
+                "session": "session01",
+                "status": "in_review",
+                "review_stage": "compose_final_summary",
+                "final_summary": {
+                    "session_title": "Session 01",
+                    "real_world_date": "2026-05-25",
+                    "in_world_date": "N/A",
+                    "starting_location": "Road",
+                    "ending_location": "Village",
+                    "summary_markdown": "The party travels from the road to the village and establishes the core conflict for the session.",
+                },
+                "macro_events": [{"id": "macro-001", "order": 1, "description": "Old Bucket", "location": "Road"}],
+                "items": [],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final):
+                client = TestClient(app)
+                response = client.post("/sessions/session01/review/macros", data={
+                    "source": "narrative",
+                    "view": "raw",
+                    "review_stage": "bucketing",
+                    "remove_macro_id": "macro-001",
+                }, follow_redirects=False)
+                saved = yaml.safe_load(path.read_text(encoding="utf-8"))
+
+        self.assertEqual(response.status_code, 303)
+        self.assertEqual(saved["review_stage"], "compose_final_summary")
+        self.assertEqual(saved["macro_events"][0]["id"], "macro-001")
 
     def test_session_review_blocks_until_extraction_reviews_complete(self):
         with patch.object(reviews, "event_review_access_blocked", return_value=True), \
@@ -1071,6 +1256,54 @@ class WebReviewAppTest(unittest.TestCase):
             self.assertEqual(values["first_visited_session"], 21)
             saved = yaml.safe_load(path.read_text(encoding="utf-8"))
             self.assertEqual(saved["macro_events"][0]["location"], "Western Coast of Farrlind")
+
+    def test_macro_route_delete_bucket_ignores_removed_unknown_location_and_redirects_all(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reviews_dir = root / "reviews"
+            clean = root / "clean"
+            final = root / "final"
+            clean.mkdir()
+            final.mkdir()
+            path = reviews_dir / "session21_review.yaml"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump({
+                "session": "session21",
+                "status": "in_review",
+                "macro_events": [
+                    {"id": "macro-001", "order": 1, "description": "Keep", "location": "Road"},
+                    {"id": "macro-002", "order": 2, "description": "Remove", "location": "Unknown Removed Place"},
+                ],
+                "items": [
+                    {"id": "event-001", "sequence": 1, "macro_event_id": "macro-002", "decision": "pending"},
+                ],
+                "added_items": [],
+            }, sort_keys=False), encoding="utf-8")
+
+            with patch.object(reviews, "REVIEWS_DIR", reviews_dir), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final), \
+                 patch("web_review.services.canon.locations", return_value=["Road"]), \
+                 patch("web_review.services.canon.create_location") as create_location:
+                client = TestClient(app)
+                response = client.post("/sessions/session21/review/macros", data={
+                    "source": "diary",
+                    "view": "raw",
+                    "bucket": "macro-002",
+                    "macro_id": ["macro-001", "macro-002"],
+                    "macro_order": ["1", "2"],
+                    "macro_description": ["Keep", "Remove"],
+                    "macro_location": ["Road", "Unknown Removed Place"],
+                    "remove_macro_id": "macro-002",
+                }, follow_redirects=False)
+
+            self.assertEqual(response.status_code, 303)
+            self.assertIn("macros_saved=1", response.headers["location"])
+            self.assertIn("bucket=all", response.headers["location"])
+            create_location.assert_not_called()
+            saved = yaml.safe_load(path.read_text(encoding="utf-8"))
+            self.assertEqual([macro["id"] for macro in saved["macro_events"]], ["macro-001"])
+            self.assertNotIn("macro_event_id", saved["items"][0])
 
     def test_save_review_route_rejects_applied_review(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -2099,13 +2332,32 @@ class LocationExtractionReviewRouteTest(unittest.TestCase):
             review_path = Path(tmp) / "session02_review.yaml"
             with patch.object(reviews, "event_review_ready", return_value=True), \
                  patch.object(reviews, "review_path", return_value=review_path), \
+                 patch("web_review.services.commands.refresh_event_drafts", return_value=commands.CommandResult(0, "Refreshed events", "")) as refresh, \
                  patch("web_review.services.commands.init_review", return_value=commands.CommandResult(0, "Wrote review", "")) as init, \
                  patch("web_review.services.workflow.sync_session_workflow") as sync:
                 messages = sync_after_extraction_review(2)
 
+        refresh.assert_called_once_with(2)
         init.assert_called_once_with(2)
-        self.assertEqual(sync.call_count, 2)
-        self.assertIn("Initialized event review.", messages)
+        self.assertEqual(sync.call_count, 3)
+        self.assertIn("Refreshed event drafts.", messages)
+        self.assertIn("Initialized final summary review.", messages)
+
+    def test_post_extraction_review_does_not_initialize_when_event_refresh_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            review_path = Path(tmp) / "session02_review.yaml"
+            with patch.object(reviews, "event_review_ready", return_value=True), \
+                 patch.object(reviews, "review_path", return_value=review_path), \
+                 patch("web_review.services.commands.refresh_event_drafts", return_value=commands.CommandResult(1, "", "extract failed")) as refresh, \
+                 patch("web_review.services.commands.init_review") as init, \
+                 patch("web_review.services.workflow.sync_session_workflow") as sync:
+                messages = sync_after_extraction_review(2)
+
+        refresh.assert_called_once_with(2)
+        init.assert_not_called()
+        sync.assert_called_once_with(2)
+        self.assertIn("Event draft refresh failed.", messages)
+        self.assertIn("extract failed", messages)
 
     def test_archive_mode_blocks_location_extraction_review_page(self):
         with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}):
@@ -3895,6 +4147,33 @@ class WorkflowServiceTest(unittest.TestCase):
         self.assertIn("workflow_run", fetch.call_args.args[0])
         self.assertIn("workflow_step_state", fetch.call_args.args[0])
 
+    def test_workflow_rows_treats_not_applicable_as_complete_for_state(self):
+        rows = [{
+            "session_number": 20,
+            "session_title": "Salt, Steel",
+            "workflow_id": "farrlind_session_canon",
+            "workflow_version": 1,
+            "status": "partially_completed",
+            "started_at": None,
+            "completed_at": None,
+            "summary_comment": "Seeded.",
+            "total_steps": 26,
+            "complete_steps": 24,
+            "not_applicable_steps": 2,
+            "pending_steps": 0,
+            "blocked_steps": 0,
+            "stale_steps": 0,
+            "attention_count": 0,
+            "progress_percent": 100,
+            "next_step_name": None,
+            "next_step_status": None,
+        }]
+        with patch("web_review.db.fetch_all", return_value=rows):
+            loaded = workflow.workflow_rows()
+
+        self.assertEqual(loaded[0]["status"], "completed")
+        self.assertEqual(loaded[0]["progress_percent"], 100)
+
     def test_workflow_detail_reads_run_and_ordered_steps(self):
         run = {
             "id": 9,
@@ -3935,6 +4214,67 @@ class WorkflowServiceTest(unittest.TestCase):
         self.assertEqual(loaded["session_number"], 20)
         self.assertEqual(loaded["review_url"], "/sessions/session20/review")
         self.assertEqual(loaded["steps"][0]["step_id"], "source_audio_registered")
+        self.assertEqual(loaded["attention_items"], [])
+
+    def test_workflow_detail_treats_not_applicable_as_complete_for_state(self):
+        run = {
+            "id": 9,
+            "session_number": 20,
+            "session_title": "Salt, Steel",
+            "workflow_id": "farrlind_session_canon",
+            "workflow_version": 1,
+            "workflow_name": "Farrlind Session Canon Workflow",
+            "status": "partially_completed",
+            "initiated_at": None,
+            "started_at": None,
+            "completed_at": None,
+            "summary_comment": "Seeded.",
+            "metadata": {},
+        }
+        steps = [
+            {
+                "step_order": 1,
+                "step_id": "source_audio_registered",
+                "display_name": "Source Audio Registered",
+                "lane": "intake",
+                "status": "complete",
+                "started_at": None,
+                "completed_at": None,
+                "summary_comment": "Audio exists.",
+                "inputs": [],
+                "outputs": [],
+                "dependencies": [],
+                "gate": "operator_supplied",
+                "rerun_policy": "safe",
+                "canon_impact": "none",
+                "command": None,
+                "status_rules": {},
+                "metadata": {},
+            },
+            {
+                "step_order": 2,
+                "step_id": "diary_source_available",
+                "display_name": "Diary Source Available",
+                "lane": "intake",
+                "status": "not_applicable",
+                "started_at": None,
+                "completed_at": None,
+                "summary_comment": "No diary source needed.",
+                "inputs": [],
+                "outputs": [],
+                "dependencies": [],
+                "gate": "operator_supplied",
+                "rerun_policy": "safe",
+                "canon_impact": "source_material",
+                "command": None,
+                "status_rules": {},
+                "metadata": {},
+            },
+        ]
+        with patch("web_review.db.fetch_all", side_effect=[[run], steps]):
+            loaded = workflow.workflow_detail(20)
+
+        self.assertEqual(loaded["status"], "completed")
         self.assertEqual(loaded["attention_items"], [])
 
     def test_sync_session_workflow_reseeds_single_session_from_artifacts(self):
@@ -4187,6 +4527,10 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertIn("Needs Attention", response.text)
         self.assertIn("Missing output artifact knowledge/Faban/raw/session21_transcript.txt.", response.text)
         self.assertIn("Historical timestamps are estimated", response.text)
+        self.assertIn("requires human action or review", response.text)
+        self.assertIn("Source Audio Registered", response.text)
+        self.assertIn("Review Session Events", response.text)
+        self.assertIn('workflow-title-human-marker', response.text)
         self.assertIn('href="/workflow?session=20"', response.text)
         self.assertIn('href="/sessions/session20/review"', response.text)
         self.assertIn('href="/lore-items"', response.text)
@@ -4269,6 +4613,23 @@ class CommandServiceTest(unittest.TestCase):
         self.assertEqual(command[-3:], [
             str(reviews.REPO_ROOT / "scripts" / "dm_query.py"),
             "write-final-summary",
+            "session20",
+        ])
+
+    def test_refresh_event_drafts_runs_rag_refresh_events_command(self):
+        completed = type("Completed", (), {
+            "returncode": 0,
+            "stdout": "refreshed",
+            "stderr": "",
+        })()
+        with patch("web_review.services.commands.subprocess.run", return_value=completed) as run:
+            result = commands.refresh_event_drafts(20)
+
+        self.assertTrue(result.ok)
+        command = run.call_args.args[0]
+        self.assertEqual(command[-3:], [
+            str(reviews.REPO_ROOT / "scripts" / "rag.py"),
+            "refresh-events",
             "session20",
         ])
 

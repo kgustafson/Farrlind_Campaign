@@ -374,6 +374,44 @@ party:
         self.assertEqual(cleaned["new_npc_candidates"][0]["proposed_name"], "Bluetooth")
         self.assertIn("Recovered mismatched-id known mention", warnings[0])
 
+    def test_postprocess_keeps_explicit_npc_despite_party_framing_nearby(self):
+        document = {
+            "known_npc_mentions": [{
+                "npc_id": 2,
+                "canonical_name": "Doru",
+                "mentioned_as": ["Doru"],
+                "new_information": "Doru is trapped behind a trap door.",
+                "confidence": "high",
+                "evidence": "I am Doru.",
+            }],
+            "new_npc_candidates": [{
+                "proposed_name": "Doru",
+                "npc_kind": "named_individual",
+                "role": "Father Donovich's brother.",
+                "description": "A captive brother of the priest trapped behind a trap door.",
+                "first_seen_session": 3,
+                "first_seen_location": "Church",
+                "aliases": [],
+                "status": "unknown",
+                "confidence": "high",
+                "evidence": "I am Doru.",
+            }],
+            "rejected_candidates": [{"text": "Doru", "reason": "party interpretation"}],
+            "uncertainties": [],
+        }
+
+        cleaned, _warnings = npc_extractor.postprocess_extraction(
+            document,
+            [{"id": 2, "name": "Dolphin", "alias": ""}],
+            {"party": []},
+            "session03",
+            "- **Doru** - A captive brother of the priest, trapped behind a trap door.\n"
+            "The party plans what to do about the fate of Doru.",
+        )
+
+        self.assertEqual(cleaned["new_npc_candidates"][0]["proposed_name"], "Doru")
+        self.assertEqual(cleaned["rejected_candidates"], [])
+
     def test_postprocess_adds_glossary_names_found_in_source(self):
         cleaned, _warnings = npc_extractor.postprocess_extraction(
             {

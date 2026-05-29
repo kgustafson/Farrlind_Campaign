@@ -596,6 +596,10 @@ def validation_report_path(session_number: int) -> Path:
     return CLEAN_DIR / f"{session_key(session_number)}_validation.md"
 
 
+def session_spine_path(session_number: int) -> Path:
+    return CLEAN_DIR / f"{session_key(session_number)}_spine.yaml"
+
+
 def merged_events_path(session_number: int) -> Path:
     return CLEAN_DIR / f"{session_key(session_number)}_merged.md"
 
@@ -608,6 +612,7 @@ def review_source_files(session_number: int) -> dict[str, str]:
     paths = {
         "draft_summary": draft_summary_path(session_number),
         "curated_packet": curated_packet_path(session_number),
+        "session_spine": session_spine_path(session_number),
         "merged_events": merged_events_path(session_number),
         "validation_report": validation_report_path(session_number),
     }
@@ -676,11 +681,17 @@ def summarize_review(document: dict, path: Optional[Path] = None) -> dict:
         "other": 0,
     }
 
-    for item in all_items:
-        decision = item.get("decision") or "pending"
-        decisions[decision if decision in decisions else "other"] += 1
-        applied_status = item.get("applied_status") or "pending"
-        applied[applied_status if applied_status in applied else "other"] += 1
+    if document.get("final_summary"):
+        if document.get("status") == "applied":
+            applied["applied"] = 1
+        else:
+            applied["pending"] = 1
+    else:
+        for item in all_items:
+            decision = item.get("decision") or "pending"
+            decisions[decision if decision in decisions else "other"] += 1
+            applied_status = item.get("applied_status") or "pending"
+            applied[applied_status if applied_status in applied else "other"] += 1
 
     return {
         "session": document.get("session") or (path.stem.replace("_review", "") if path else "unknown"),
@@ -696,6 +707,8 @@ def summarize_review(document: dict, path: Optional[Path] = None) -> dict:
 
 
 def review_has_pending_decisions(document: dict) -> bool:
+    if document.get("final_summary"):
+        return False
     summary = summarize_review(document)
     return summary["decisions"]["pending"] > 0
 
@@ -1044,16 +1057,60 @@ def review_events_source_label(db_events: list[dict], selected_events: list[dict
     return "Draft Merged Events" if draft_events else "Current DB Events"
 
 
-def build_review_document(session: dict, events: list[dict]) -> dict:
+def macro_events_from_spine(session_number: int) -> list[dict]:
+    path = session_spine_path(session_number)
+    if not path.exists():
+        return []
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    spine_events = data.get("major_events") or []
+    macro_events = []
+    for index, event in enumerate([item for item in spine_events if isinstance(item, dict)], start=1):
+        order = event.get("order") or index
+        title = str(event.get("title") or "").strip()
+        summary = str(event.get("summary") or "").strip()
+        description = title or summary
+        if not description:
+            continue
+        macro_events.append({
+            "id": f"macro-{int(order):03d}" if str(order).isdigit() else f"macro-{index:03d}",
+            "order": order,
+            "description": description,
+            "location": str(event.get("location") or "").strip(),
+            "source_type": "session_spine",
+            "spine_order": order,
+            "event_type": str(event.get("event_type") or "").strip(),
+            "summary": summary,
+            "outcome": str(event.get("outcome") or "").strip(),
+            "party_interpretation": str(event.get("party_interpretation") or "").strip(),
+            "evidence": event.get("evidence") or [],
+        })
+    return macro_events
+
+
+def build_review_document(session: dict, events: list[dict], macro_events: Optional[list[dict]] = None) -> dict:
     session_number = int(session["session_number"])
+    macros = macro_events or macro_events_from_spine(session_number)
+    spine_data = {}
+    spine = session_spine_path(session_number)
+    if spine.exists():
+        spine_data = yaml.safe_load(spine.read_text(encoding="utf-8")) or {}
+    spine_timeline = spine_data.get("timeline") or {}
+    narrative_path = CLEAN_DIR / f"{session_key(session_number)}_narrative.md"
+    summary_path = CLEAN_DIR / f"{session_key(session_number)}_summary.md"
+    summary_markdown = ""
+    if narrative_path.exists():
+        summary_markdown = narrative_path.read_text(encoding="utf-8").strip()
+    elif summary_path.exists():
+        summary_markdown = summary_path.read_text(encoding="utf-8").strip()
     return {
         "session": session_key(session_number),
         "status": "in_review",
+        "review_stage": "compose_final_summary",
         "review_instructions": [
-            "For each item, set decision to accepted, rejected, corrected, or added.",
-            "For corrected or added items, fill canonical_text and any changed metadata.",
-            "Use sequence to keep final events chronological; decimals can insert added items between drafted events.",
-            "Leave applied_status as pending until an apply-review step updates the database.",
+            "Compose the canon final summary from the draft narrative, spine, extracted entities, micro-events, and source snippets.",
+            "Confirm timeline fields: real-world date, in-world date or N/A, starting location, and ending location.",
+            "Micro-events are evidence for writing; they do not need individual decisions unless you choose to use them.",
+            "Mark reviewed only when the final summary text and timeline fields are canon.",
         ],
         "session_title": session.get("title") or "",
         "session_date": str(session.get("session_date") or ""),
@@ -1061,6 +1118,23 @@ def build_review_document(session: dict, events: list[dict]) -> dict:
         "primary_location": session.get("location") or "",
         "source_files": review_source_files(session_number),
         "db_event_context": [db_event_reference(event) for event in events if (event.get("source_type") or "db_event") == "db_event"],
+        "final_summary": {
+            "session_title": session.get("title") or f"Session {session_number:02d}",
+            "real_world_date": str(session.get("session_date") or date.today().isoformat()),
+            "in_world_date": session.get("in_game_date") or spine_timeline.get("in_world_date") or "N/A",
+            "starting_location": spine_timeline.get("starting_location") or (macros[0].get("location") if macros else ""),
+            "ending_location": spine_timeline.get("ending_location") or (macros[-1].get("location") if macros else ""),
+            "key_locations": "",
+            "major_outcome": "",
+            "summary_markdown": summary_markdown,
+        },
+        "timeline": {
+            "physical_date": str(session.get("session_date") or date.today().isoformat()),
+            "in_game_date": session.get("in_game_date") or spine_timeline.get("in_world_date") or "N/A",
+            "start_location": spine_timeline.get("starting_location") or (macros[0].get("location") if macros else ""),
+            "end_location": spine_timeline.get("ending_location") or (macros[-1].get("location") if macros else ""),
+        },
+        "macro_events": macros,
         "items": [review_item_from_event(event) for event in events],
         "added_items": [],
     }
@@ -1243,7 +1317,7 @@ def init_review(args):
         raise SystemExit(f"No session found for session{session_number:02d}")
 
     events = review_events_for_init(args, session_number, review["events"])
-    document = build_review_document(session, events)
+    document = build_review_document(session, events, macro_events_from_spine(session_number))
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(
         yaml.safe_dump(document, sort_keys=False, allow_unicode=True),
@@ -1357,7 +1431,41 @@ def canon_summary_event_line(event: dict) -> str:
     return f"- {event.get('description', '').strip()}{location}{event_type}"
 
 
+def render_reviewed_final_summary(review_document: dict, session_number: int) -> str:
+    final_summary = review_document.get("final_summary") or {}
+    title = final_summary.get("session_title") or review_document.get("session_title") or f"Session {session_number:02d}"
+    summary_text = (final_summary.get("summary_markdown") or "").strip()
+    lines = [
+        f"# Session {session_number:02d}: {title}",
+        "",
+        "## Canon Summary",
+        "",
+    ]
+    if final_summary.get("real_world_date"):
+        lines.append(f"- Physical date: {final_summary['real_world_date']}")
+    if final_summary.get("in_world_date"):
+        lines.append(f"- In-game date: {final_summary['in_world_date']}")
+    if final_summary.get("starting_location"):
+        lines.append(f"- Starting location: {final_summary['starting_location']}")
+    if final_summary.get("ending_location"):
+        lines.append(f"- Ending location: {final_summary['ending_location']}")
+    if final_summary.get("key_locations"):
+        lines.append(f"- Key locations: {final_summary['key_locations']}")
+    if final_summary.get("major_outcome"):
+        lines.append(f"- Major outcome: {final_summary['major_outcome']}")
+    if review_document.get("status"):
+        applied = f", applied {review_document['applied_on']}" if review_document.get("applied_on") else ""
+        lines.append(f"- Review status: {review_document['status']}{applied}")
+    lines.extend(["", summary_text or "No canon summary recorded.", "", "## Provenance", ""])
+    lines.append(f"- Reviewed narrative from {REVIEWS_DIR.relative_to(REPO_ROOT)}/session{session_number:02d}_review.yaml.")
+    lines.append("- Draft micro-events and extracted entities were used as composition evidence, not as direct canon.")
+    lines.append("")
+    return "\n".join(lines)
+
+
 def render_final_summary(session: dict, events: list[dict], review_document: dict, decisions: dict, session_number: int) -> str:
+    if review_document.get("final_summary"):
+        return render_reviewed_final_summary(review_document, session_number)
     title = session.get("title") or f"Session {session_number:02d}"
     lines = [
         f"# Session {session_number:02d}: {title}",
@@ -1526,6 +1634,11 @@ def apply_review(args):
         raise SystemExit(
             f"Review status must be reviewed, complete, or applied before DB update: {document.get('status')}"
         )
+
+    if document.get("final_summary"):
+        output_path = final_summary_path(session_number)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(render_reviewed_final_summary(document, session_number), encoding="utf-8")
 
     command = [sys.executable, "scripts/rag.py", "dbload", "--apply"]
     result = subprocess.run(command, cwd=REPO_ROOT, check=False, text=True)

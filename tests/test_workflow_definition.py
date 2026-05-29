@@ -100,7 +100,8 @@ class WorkflowDefinitionTest(unittest.TestCase):
             self.assertIn(command_name, by_id[step_id]["command"])
 
         self.assertIn("extract_session_spine", by_id["validate_session_spine"]["dependencies"])
-        self.assertIn("validate_session_spine", by_id["extract_events"]["dependencies"])
+        for step_id in expected_extractors:
+            self.assertIn(step_id, by_id["extract_events"]["dependencies"])
 
         review_dependencies = {
             "review_npc_extraction": "extract_npcs",

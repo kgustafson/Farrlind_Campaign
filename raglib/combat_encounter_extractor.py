@@ -50,6 +50,8 @@ def output_path(session_name: str) -> Path:
 def source_candidates(session_name: str) -> list[tuple[str, Path]]:
     return [
         ("final_summary", BASE / "final" / f"{session_name}_summary.md"),
+        ("session_spine", CLEAN / f"{session_name}_spine.yaml"),
+        ("narrative", CLEAN / f"{session_name}_narrative.md"),
         ("curated_packet", CLEAN / f"{session_name}_curated.md"),
         ("draft_summary", CLEAN / f"{session_name}_summary.md"),
         ("diary", CLEAN / f"{session_name}_diary.md"),
@@ -310,7 +312,7 @@ def load_session_sources(session_name: str, source: str = "auto") -> list[dict[s
         if any(label == "final_summary" for label, _path in selected):
             selected = [item for item in selected if item[0] in {"final_summary", "diary"}]
         elif any(label == "curated_packet" for label, _path in selected):
-            selected = [item for item in selected if item[0] in {"draft_summary", "curated_packet", "diary"}]
+            selected = [item for item in selected if item[0] in {"session_spine", "narrative", "draft_summary", "curated_packet", "diary"}]
         else:
             selected = selected[:2]
     else:

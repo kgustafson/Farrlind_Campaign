@@ -71,11 +71,12 @@ class WorkflowStateTest(unittest.TestCase):
         self.assertIn("'generate_narrative_summary', 6", self.sql)
         self.assertIn("'extract_session_spine', 7", self.sql)
         self.assertIn("'validate_session_spine', 8", self.sql)
-        self.assertIn("'extract_npcs', 10", self.sql)
-        self.assertIn("'extract_open_threads', 15", self.sql)
+        self.assertIn("'extract_npcs', 9", self.sql)
+        self.assertIn("'extract_open_threads', 14", self.sql)
+        self.assertIn("'extract_events', 15", self.sql)
         self.assertIn("'review_npc_extraction', 23", self.sql)
         self.assertIn("'initialize_review', 29", self.sql)
-        self.assertIn("'git_push', 42", self.sql)
+        self.assertIn("'git_push', 43", self.sql)
 
     def test_initialize_sql_uses_rendered_session_inputs_outputs_and_commands(self):
         self.assertIn("audio/session21.*", self.sql)

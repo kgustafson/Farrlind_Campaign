@@ -627,6 +627,25 @@ button:disabled {
   color: #f8e6b6;
   font-size: 12px;
   font-weight: 700;
+  position: relative;
+}
+.workflow-human-marker {
+  position: absolute;
+  top: -7px;
+  right: -5px;
+  color: #6b2e25;
+  font-size: 14px;
+  line-height: 1;
+}
+.workflow-title-human-marker {
+  color: #6b2e25;
+  margin-left: 3px;
+}
+.workflow-human-legend {
+  color: #6b2e25;
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 8px;
 }
 .workflow-step-title {
   display: flex;
@@ -1560,11 +1579,14 @@ dd { margin: 0; }
   font-size: 20px;
   font-weight: 800;
 }
-.macro-remove input {
-  position: absolute;
-  opacity: 0;
-  width: 1px;
-  height: 1px;
+.macro-remove:hover,
+.macro-remove:focus-visible {
+  background: rgba(83, 39, 28, .18);
+  outline: none;
+}
+.macro-remove:disabled {
+  cursor: not-allowed;
+  opacity: .45;
 }
 .macro-modal-actions {
   gap: 10px;
@@ -1572,6 +1594,131 @@ dd { margin: 0; }
   bottom: -16px;
   padding-top: 12px;
   background: linear-gradient(180deg, rgba(244, 224, 171, 0), var(--parchment) 35%);
+}
+.compose-grid {
+  display: grid;
+  grid-template-columns: minmax(620px, 1fr) minmax(300px, 360px);
+  gap: 14px;
+  align-items: start;
+}
+.compose-editor,
+.compose-evidence section {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 253, 244, .86);
+  box-shadow: var(--shadow);
+}
+.compose-editor {
+  padding: 14px;
+}
+.compose-evidence {
+  display: grid;
+  gap: 10px;
+  max-height: calc(100vh - 120px);
+  overflow: auto;
+  position: sticky;
+  top: 16px;
+}
+.compose-evidence section {
+  padding: 10px;
+}
+.compose-evidence h2 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+.final-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 0;
+}
+.final-fields label,
+.final-summary-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.final-fields span,
+.final-summary-field span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.final-fields input,
+.final-summary-field textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  padding: 8px 9px;
+}
+.final-summary-field textarea {
+  min-height: calc(100vh - 330px);
+  line-height: 1.5;
+  font-size: 16px;
+}
+.entity-evidence-list {
+  display: grid;
+  gap: 2px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.entity-evidence-list li {
+  display: block;
+  border-top: 1px solid rgba(139, 95, 39, .16);
+  padding: 5px 0;
+  font-size: 13px;
+}
+.entity-evidence-list span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.entity-evidence-list strong {
+  margin-right: 5px;
+}
+.entity-status {
+  display: inline-block;
+  min-width: 58px;
+  margin-right: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.entity-status-applied,
+.entity-status-candidate {
+  color: #276955;
+}
+.entity-status-ignored,
+.entity-status-rejected {
+  color: #8a4b3c;
+}
+.compact-micro-list {
+  max-height: 300px;
+  overflow: auto;
+  margin: 0;
+  padding-left: 18px;
+}
+.compact-micro-list li {
+  padding: 5px 0;
+  border-top: 1px solid rgba(139, 95, 39, .16);
+  font-size: 13px;
+  line-height: 1.35;
+}
+.compact-micro-list .sequence {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  margin-right: 6px;
+}
+.compact-source-text {
+  max-height: 260px;
+  margin-top: 8px;
+  font-size: 12px;
 }
 .stacked-actions {
   gap: 8px;
@@ -2748,6 +2895,16 @@ dd { margin: 0; }
 @media (max-width: 1100px) {
   
 .review-form { margin: 0; }
+.compose-grid {
+  grid-template-columns: 1fr;
+}
+.compose-evidence {
+  max-height: none;
+  position: static;
+}
+.final-fields {
+  grid-template-columns: 1fr;
+}
 .flash {
   margin: 0 0 16px;
   padding: 10px 12px;

@@ -66,6 +66,8 @@ def output_path(session_name: str) -> Path:
 def source_candidates(session_name: str) -> list[tuple[str, Path]]:
     return [
         ("final_summary", BASE / "final" / f"{session_name}_summary.md"),
+        ("session_spine", CLEAN / f"{session_name}_spine.yaml"),
+        ("narrative", CLEAN / f"{session_name}_narrative.md"),
         ("curated_packet", CLEAN / f"{session_name}_curated.md"),
         ("draft_summary", CLEAN / f"{session_name}_summary.md"),
         ("diary", CLEAN / f"{session_name}_diary.md"),
@@ -347,6 +349,20 @@ def remove_rejections_for_accepted_candidates(document: dict[str, Any]) -> None:
     ]
 
 
+def has_explicit_npc_source(candidate: dict[str, Any], source_text: str) -> bool:
+    name = str(candidate.get("proposed_name") or "").strip()
+    if not name or not source_text:
+        return False
+    escaped = re.escape(name)
+    explicit_patterns = [
+        rf"(?im)^\s*[-*]\s*\*\*{escaped}\*\*\s*[-–:]",
+        rf"(?i)\bI\s+am\s+{escaped}\b",
+        rf"(?i)\bI'm\s+{escaped}\b",
+        rf"(?i)\bmy\s+name\s+is\s+{escaped}\b",
+    ]
+    return any(re.search(pattern, source_text) for pattern in explicit_patterns)
+
+
 def postprocess_extraction(
     document: dict[str, Any],
     registry: list[dict[str, Any]],
@@ -437,7 +453,7 @@ def postprocess_extraction(
             name_fields=["proposed_name"],
             context_fields=["role", "description", "evidence"],
         )
-        if party_framed and not registry_row:
+        if party_framed and not registry_row and not has_explicit_npc_source(candidate, source_text):
             reject_candidate(
                 cleaned,
                 candidate,
@@ -510,7 +526,7 @@ def load_session_sources(session_name: str, source: str = "auto") -> list[dict[s
         if any(label == "final_summary" for label, _path in selected):
             selected = [item for item in selected if item[0] in {"final_summary", "diary"}]
         elif any(label == "curated_packet" for label, _path in selected):
-            selected = [item for item in selected if item[0] in {"draft_summary", "curated_packet", "diary"}]
+            selected = [item for item in selected if item[0] in {"session_spine", "narrative", "draft_summary", "curated_packet", "diary"}]
         else:
             selected = selected[:2]
     else:

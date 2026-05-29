@@ -1,5 +1,18 @@
 # Revision History - D&D Campaign Manager
 
+## v0.6.3 - 5/29/2026
+
+Tightened the post-spine review workflow and restored Farrlind songbook audio compatibility.
+
+- App: Reworked session review toward final-summary composition instead of high-level event bucketing for post-extraction review.
+- App: Improved workflow status display for human-review markers, not-applicable steps, and stale downstream artifacts.
+- Workflow: Added event-draft refresh wiring before final review initialization.
+- Workflow: Expanded session workflow definition for narrative and spine processing gates.
+- Extraction: Strengthened extractor source/context handling to reduce unsupported candidates and campaign bleed.
+- Canon: Restored Farrlind songbook MP3/lyrics resolution for legacy `knowledge/Faban/songbook` database paths after the multi-campaign folder move.
+- Data: Updated Trinyvale lookup overrides for campaign-specific normalization.
+- Tests: Added coverage for entity source selection, event extraction, final-summary review behavior, workflow state, and songbook legacy path compatibility.
+
 ## v0.6.2 - 5/25/2026
 
 Baselined the cleaned Trinyvale audio-first workflow through the session spine validation stage.
