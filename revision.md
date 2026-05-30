@@ -1,5 +1,15 @@
 # Revision History - D&D Campaign Manager
 
+## v0.6.4 - 5/29/2026
+
+Fixed campaign timeline compatibility and static archive publishing.
+
+- App: Campaign Timeline now tolerates databases without `session.start_location_id` and `session.end_location_id`, falling back to existing primary-location data.
+- Static Export: Restored songbook MP3 copying for legacy `knowledge/Faban/songbook` database paths after the multi-campaign folder move.
+- Static Publish: Allows publish to replace generated static output even when a previous partial export left the static repo dirty.
+- Static Publish: Sets a repository-local Git author identity before committing, so publishing works from the Docker web container.
+- Tests: Added regression coverage for legacy songbook media export and static publish Git identity setup.
+
 ## v0.6.3 - 5/29/2026
 
 Tightened the post-spine review workflow and restored Farrlind songbook audio compatibility.

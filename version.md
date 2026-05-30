@@ -1,6 +1,6 @@
 # Version
 
-v0.6.3
+v0.6.4
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.6.3` tightens the final-summary review flow, workflow status presentation, extractor source handling, and Farrlind songbook asset compatibility.
+`v0.6.4` fixes timeline compatibility for older campaign databases and restores reliable static archive publishing from the web app.

@@ -1,5 +1,6 @@
 import json
 import os
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,7 +10,7 @@ import yaml
 
 from web_review.services import artifact_extraction_review, canon, combat_extraction_review, commands, location_extraction_review, lore_item_extraction_review, npc_extraction_review, open_thread_extraction_review, reviews, workflow
 from web_review.app import BACKUP_DOWNLOADS, COMMAND_RESULTS, app, app_git_hash_short, app_version, macro_locations_to_validate, sync_after_extraction_review
-from scripts import export_static_archive
+from scripts import export_static_archive, publish_static_archive
 from scripts.load_songbook import songbook_source_sql
 from fastapi.testclient import TestClient
 
@@ -4750,6 +4751,32 @@ class StaticArchiveExportTest(unittest.TestCase):
     def test_discover_session_keys_from_dashboard_links(self):
         html = '<a href="/sessions/session02/review">Open</a><a href="/sessions/session21/review">Open</a>'
         self.assertEqual(export_static_archive.discover_session_keys(html), ["session02", "session21"])
+
+    def test_resolve_repo_media_path_maps_legacy_songbook_path_to_campaign_folder(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            migrated = root / "campaigns" / "farrlind" / "songbook" / "Song" / "song.mp3"
+            migrated.parent.mkdir(parents=True)
+            migrated.write_bytes(b"mp3")
+
+            with patch.object(export_static_archive, "REPO_ROOT", root), \
+                 patch("raglib.campaign.REPO_ROOT", root):
+                resolved = export_static_archive.resolve_repo_media_path("knowledge/Faban/songbook/Song/song.mp3")
+
+        self.assertEqual(resolved, migrated)
+
+    def test_publish_archive_sets_repo_local_git_identity(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            subprocess.run(["git", "init"], cwd=repo, check=True, capture_output=True, text=True)
+
+            publish_static_archive.ensure_git_identity(repo)
+
+            name = subprocess.run(["git", "config", "--get", "user.name"], cwd=repo, check=True, capture_output=True, text=True)
+            email = subprocess.run(["git", "config", "--get", "user.email"], cwd=repo, check=True, capture_output=True, text=True)
+
+        self.assertEqual(name.stdout.strip(), "Kurt Gustafson")
+        self.assertEqual(email.stdout.strip(), "kgustafson2@gmail.com")
 
     def test_apply_review_route_requires_reviewed_status(self):
         with tempfile.TemporaryDirectory() as tmp:

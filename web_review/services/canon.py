@@ -1234,7 +1234,29 @@ def murder_hobo_count(encounters: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def campaign_timeline() -> dict[str, Any]:
-    sessions = _fetch("""
+    session_columns = {
+        row["column_name"]
+        for row in _fetch(
+            """
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = 'session';
+            """
+        )
+    }
+    start_location_join = ""
+    end_location_join = ""
+    start_location_select = "NULL AS start_location"
+    end_location_select = "NULL AS end_location"
+    if "start_location_id" in session_columns:
+        start_location_select = "sl.name AS start_location"
+        start_location_join = "LEFT JOIN location sl ON sl.id = s.start_location_id"
+    if "end_location_id" in session_columns:
+        end_location_select = "el.name AS end_location"
+        end_location_join = "LEFT JOIN location el ON el.id = s.end_location_id"
+
+    sessions = _fetch(f"""
         SELECT
             s.id,
             s.session_number,
@@ -1243,12 +1265,12 @@ def campaign_timeline() -> dict[str, Any]:
             s.title,
             s.summary,
             l.name AS primary_location,
-            sl.name AS start_location,
-            el.name AS end_location
+            {start_location_select},
+            {end_location_select}
         FROM session s
         LEFT JOIN location l ON l.id = s.location_id
-        LEFT JOIN location sl ON sl.id = s.start_location_id
-        LEFT JOIN location el ON el.id = s.end_location_id
+        {start_location_join}
+        {end_location_join}
         ORDER BY s.session_number;
     """)
     events = _fetch("""

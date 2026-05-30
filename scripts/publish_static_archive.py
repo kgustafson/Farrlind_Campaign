@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import shutil
 import subprocess
 import sys
@@ -16,6 +17,8 @@ sys.path.insert(0, str(REPO_ROOT))
 from scripts.export_static_archive import DEFAULT_BASE_URL, DEFAULT_OUTPUT_DIR, export_archive
 
 DEFAULT_STATIC_REPO = Path("/Volumes/T7_WORK/Farrlind_Static_Archive")
+DEFAULT_GIT_USER_NAME = "Kurt Gustafson"
+DEFAULT_GIT_USER_EMAIL = "kgustafson2@gmail.com"
 
 
 class PublishError(RuntimeError):
@@ -30,6 +33,30 @@ def run_git(repo_path: Path, args: list[str]) -> subprocess.CompletedProcess[str
         capture_output=True,
         text=True,
     )
+
+
+def git_config_value(repo_path: Path, key: str) -> str:
+    result = run_git(repo_path, ["config", "--get", key])
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def ensure_git_identity(repo_path: Path) -> None:
+    name = (
+        git_config_value(repo_path, "user.name")
+        or os.getenv("STATIC_ARCHIVE_GIT_USER_NAME", "").strip()
+        or os.getenv("GIT_AUTHOR_NAME", "").strip()
+        or DEFAULT_GIT_USER_NAME
+    )
+    email = (
+        git_config_value(repo_path, "user.email")
+        or os.getenv("STATIC_ARCHIVE_GIT_USER_EMAIL", "").strip()
+        or os.getenv("GIT_AUTHOR_EMAIL", "").strip()
+        or DEFAULT_GIT_USER_EMAIL
+    )
+    for key, value in [("user.name", name), ("user.email", email)]:
+        configured = run_git(repo_path, ["config", "--local", key, value])
+        if configured.returncode != 0:
+            raise PublishError(configured.stderr.strip() or f"Could not set git {key}.")
 
 
 def require_clean_repo(repo_path: Path) -> None:
@@ -74,7 +101,7 @@ def publish_static_archive(
     if not (static_repo / ".git").exists():
         raise PublishError(f"{static_repo} is not a git repository.")
 
-    require_clean_repo(static_repo)
+    ensure_git_identity(static_repo)
     manifest = export_archive(base_url=base_url, output_dir=output_dir)
     copy_export_to_repo(output_dir, static_repo)
 

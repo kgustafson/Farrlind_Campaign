@@ -18,7 +18,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from raglib.campaign import active_campaign_name, assets_dir, campaign_feature_enabled
+from raglib.campaign import active_campaign_name, assets_dir, campaign_feature_enabled, campaign_path
 
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "dist" / "archive"
 DEFAULT_BASE_URL = "http://127.0.0.1:8002"
@@ -119,6 +119,22 @@ def copy_static_assets(output_dir: Path) -> None:
     shutil.copytree(source, destination)
 
 
+def resolve_repo_media_path(path_value: str) -> Path:
+    source = Path(path_value)
+    if not source.is_absolute():
+        source = REPO_ROOT / source
+    if source.exists():
+        return source
+
+    legacy_path = Path(path_value)
+    legacy_prefix = Path("knowledge") / "Faban"
+    if not legacy_path.is_absolute() and legacy_path.parts[:2] == legacy_prefix.parts:
+        migrated = campaign_path(*legacy_path.parts[2:])
+        if migrated.exists():
+            return migrated
+    return source
+
+
 def copy_songbook_media(output_dir: Path, songs: list[dict]) -> int:
     copied = 0
     for song in songs:
@@ -126,9 +142,7 @@ def copy_songbook_media(output_dir: Path, songs: list[dict]) -> int:
         mp3_path = song.get("mp3_local_path")
         if not mp3_path:
             continue
-        source = Path(mp3_path)
-        if not source.is_absolute():
-            source = REPO_ROOT / source
+        source = resolve_repo_media_path(mp3_path)
         if not source.exists():
             continue
         destination = output_dir / "media" / "songbook" / f"{song_number:02d}" / "song.mp3"
