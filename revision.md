@@ -1,5 +1,21 @@
 # Revision History - D&D Campaign Manager
 
+## v0.7.0 - 6/1/2026
+
+Baselined the summary-first review workflow and cleaned up the campaign management surface after the Session 22 intake cycle.
+
+- Workflow: Added high-level workflow status rollups for kickoff, audio validation, transcription progress, draft preparation, six entity reviews, final summary review, and session ingest completion.
+- Workflow: Fixed workflow ledger pending counts to use the actual unresolved step count and display only the latest workflow run per session.
+- Workflow: Treats applied entity reviews and accepted final summaries as canon boundaries so stale YAML or draft artifacts do not overwrite reviewed database canon.
+- App: Reframed Event Review as Session Review, with micro-events treated as evidence for final-summary composition instead of required per-event decision work.
+- App: Prevents final-summary locking/writing from reloading entity database canon, preserving human-approved NPCs, locations, artifacts, lore items, combat encounters, and open threads.
+- App: Added timeline editing, world-map access, cleaner workflow modals, and archive-mode review behavior refinements.
+- App: Added Factions to Project Utilities lookup-table CRUD alongside artifact types, location types, combat outcomes, NPC status, workflow status states, and artifact flags.
+- Canon: Fixed combat encounter kill-count preservation and restored Murder Hobo Count accuracy after Session 22 processing.
+- Canon: Added Session 22 reviewed summary/diary artifacts and lookup override export support for campaign-specific reference data.
+- Runtime: Added configurable `OLLAMA_URL` for Docker containers so app-side model calls reach the host Ollama service reliably.
+- Tests: Added regression coverage for final-summary review behavior, workflow rollups, pending-count semantics, lookup-table factions, timeline editing, and combat display cleanup.
+
 ## v0.6.4 - 5/29/2026
 
 Fixed campaign timeline compatibility and static archive publishing.

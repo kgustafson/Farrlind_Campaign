@@ -101,7 +101,7 @@ def event_review_ready(session_number: int) -> bool:
 
 def event_review_access_blocked(session_number: int) -> bool:
     document = load_review_document(session_number)
-    if (document.get("status") or "") in {"reviewed", "applied"}:
+    if (document.get("status") or "") in {"reviewed", "applied"} or final_summary_path(session_number).exists():
         return False
     return not event_review_ready(session_number)
 
@@ -201,19 +201,23 @@ def summarize_review_document(session_number: int, document: dict[str, Any]) -> 
     counts = decision_counts(document)
     items = document.get("items") or []
     added_items = document.get("added_items") or []
-    missing_reviews = missing_extraction_reviews(session_number)
+    final_exists = final_summary_path(session_number).exists()
+    status = document.get("status") or ("missing" if not document else "unknown")
+    final_mode = final_summary_mode(document)
+    pending_decisions = 0 if final_mode else counts["pending"]
+    missing_reviews = [] if status == "applied" or final_exists else missing_extraction_reviews(session_number)
     return ReviewSummary(
         session=key,
         session_number=session_number,
-        status=document.get("status") or ("missing" if not document else "unknown"),
+        status=status,
         title=document.get("session_title") or "",
         path=str(path),
         review_exists=path.exists(),
-        final_exists=final_summary_path(session_number).exists(),
+        final_exists=final_exists,
         total_items=len(items) + len(added_items),
         base_items=len(items),
         added_items=len(added_items),
-        pending_decisions=counts["pending"],
+        pending_decisions=pending_decisions,
         accepted=counts["accepted"],
         rejected=counts["rejected"],
         corrected=counts["corrected"],
@@ -624,6 +628,7 @@ def session_workspace(session_number: int, source: str = "diary", source_view: s
         "validation": validate_review_document(validation_document),
         "final_summary": final_summary,
         "summary_validation": final_summary_readiness_errors({"final_summary": final_summary}) if document else [],
+        "final_exists": final_summary_path(session_number).exists(),
         "evidence_sources": evidence_sources(session_number),
         "entity_evidence": entity_evidence(session_number),
         "event_types": EVENT_TYPES,

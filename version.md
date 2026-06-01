@@ -1,6 +1,6 @@
 # Version
 
-v0.6.4
+v0.7.0
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.6.4` fixes timeline compatibility for older campaign databases and restores reliable static archive publishing from the web app.
+`v0.7.0` baselines the summary-first session review workflow, high-level workflow status reporting, entity canon protections, combat/timeline cleanup, and expanded project lookup utilities.

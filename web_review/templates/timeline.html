@@ -10,6 +10,21 @@
   </div>
 </section>
 
+{% if can_edit() %}
+  {% if request.query_params.get("updated") %}
+    <div class="flash">Timeline session updated.</div>
+  {% endif %}
+  {% if request.query_params.get("location_confirm_failed") %}
+    <div class="flash error-flash">New location detected. Check "Confirm newly typed locations" before saving.</div>
+  {% endif %}
+  {% if request.query_params.get("location_create_failed") %}
+    <div class="flash error-flash">New location could not be created.</div>
+  {% endif %}
+  {% if request.query_params.get("update_failed") %}
+    <div class="flash error-flash">Timeline update failed.</div>
+  {% endif %}
+{% endif %}
+
 <section class="archive-stat-row timeline-stats" aria-label="Campaign timeline statistics">
   <div class="archive-stat-card timeline-stat-card">
     <img class="timeline-stat-icon" src="/static/timeline-sessions-icon.png" alt="" aria-hidden="true">
@@ -72,6 +87,12 @@
         <div><dt>Primary Location</dt><dd>{{ row.primary_location or "unknown" }}</dd></div>
       </dl>
 
+      {% if can_edit() %}
+        <div class="timeline-modal-actions">
+          <a class="small-action" href="#edit-session-{{ "%02d"|format(row.session_number) }}-modal" aria-label="Edit {{ row.session_label }} timeline facts">Edit Timeline Facts</a>
+        </div>
+      {% endif %}
+
       {% if row.travel %}
         <section class="timeline-modal-block">
           <h3>Travel</h3>
@@ -110,4 +131,73 @@
     </div>
   </section>
 {% endfor %}
+
+{% if can_edit() %}
+  <datalist id="timeline-location-options">
+    {% for location in locations %}
+      <option value="{{ location }}"></option>
+    {% endfor %}
+  </datalist>
+
+  {% for row in timeline.rows %}
+    <section id="edit-session-{{ "%02d"|format(row.session_number) }}-modal" class="timeline-modal-backdrop" aria-labelledby="edit-session-{{ "%02d"|format(row.session_number) }}-title">
+      <div class="archive-modal timeline-session-modal" role="dialog" aria-modal="true">
+        <div class="modal-head">
+          <div>
+            <p class="eyebrow">Edit Timeline Facts</p>
+            <h2 id="edit-session-{{ "%02d"|format(row.session_number) }}-title">{{ row.session_label }}</h2>
+          </div>
+          <a class="modal-close" href="/timeline#session-{{ "%02d"|format(row.session_number) }}-modal" aria-label="Close timeline edit">x</a>
+        </div>
+
+        <form method="post" action="/timeline/session/{{ row.session_number }}/update" class="timeline-edit-form">
+          <div class="form-grid two-col">
+            <label class="field-block">
+              <span>Title</span>
+              <input name="title" value="{{ row.title or '' }}">
+            </label>
+            <label class="field-block">
+              <span>Real-World Date</span>
+              <input type="date" name="session_date" value="{{ row.session_date or '' }}">
+            </label>
+            <label class="field-block">
+              <span>In-World Date</span>
+              <input name="in_game_date" value="{{ row.in_game_date or '' }}" placeholder="1832 AS Namal 25">
+            </label>
+            <label class="field-block">
+              <span>Primary Location</span>
+              <input name="primary_location" list="timeline-location-options" value="{{ row.primary_location or '' }}">
+            </label>
+            <label class="field-block">
+              <span>Starting Location</span>
+              <input name="start_location" list="timeline-location-options" value="{{ row.start_location or '' }}">
+            </label>
+            <label class="field-block">
+              <span>Ending Location</span>
+              <input name="end_location" list="timeline-location-options" value="{{ row.end_location or '' }}">
+            </label>
+          </div>
+
+          <label class="field-block">
+            <span>Summary</span>
+            <textarea name="summary" rows="5">{{ row.summary or '' }}</textarea>
+          </label>
+          <label class="field-block">
+            <span>Notes</span>
+            <textarea name="notes" rows="4">{{ row.notes or '' }}</textarea>
+          </label>
+          <label class="modal-check-row">
+            <input type="checkbox" name="confirm_new_locations" value="1">
+            <span>Confirm newly typed locations</span>
+          </label>
+
+          <div class="form-actions">
+            <a class="button secondary-button" href="/timeline#session-{{ "%02d"|format(row.session_number) }}-modal">Cancel</a>
+            <button type="submit">Save Timeline Facts</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  {% endfor %}
+{% endif %}
 {% endblock %}

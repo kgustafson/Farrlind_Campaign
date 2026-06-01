@@ -106,7 +106,7 @@ steps:
     expected_inputs:
       - campaigns/{campaign}/raw/sessionXX_transcript.txt
       - campaigns/{campaign}/sessions/sessionXX_context.yaml
-      - campaigns/{campaign}/final/session##_summary.md
+      - prior final summaries when available
     expected_outputs:
       - campaigns/{campaign}/clean/sessionXX_curated.md
       - campaigns/{campaign}/clean/sessionXX_curated_metadata.json
@@ -218,8 +218,6 @@ steps:
       - campaigns/{campaign}/clean/sessionXX_spine.yaml
       - campaigns/{campaign}/clean/sessionXX_narrative.md
       - campaigns/{campaign}/clean/sessionXX_curated.md
-      - campaigns/{campaign}/final/sessionXX_summary.md
-      - campaigns/{campaign}/clean/sessionXX_diary.md
       - campaigns/{campaign}/raw/sessionXX_transcript.txt
     expected_outputs:
       - campaigns/{campaign}/extracted/sessionXX_npcs.json
@@ -227,10 +225,15 @@ steps:
     status_rules:
       complete_when:
         - NPC extraction JSON exists
+        - or NPC extraction review has been applied, making database canon authoritative
     gate: automatic_allowed_before_review
     rerun_policy: safe_before_review
     canon_impact: draft_only
-    notes: Uses compact per-chunk registry context for large raw transcript extraction.
+    notes: >
+      Uses compact per-chunk registry context for large raw transcript extraction.
+      After human review is applied, this draft extraction step is terminally
+      complete for workflow-status purposes; later diary or final-summary files
+      must not make accepted entity canon appear stale.
 
   - id: extract_locations
     display_name: Extract Locations
@@ -242,8 +245,6 @@ steps:
       - campaigns/{campaign}/clean/sessionXX_spine.yaml
       - campaigns/{campaign}/clean/sessionXX_narrative.md
       - campaigns/{campaign}/clean/sessionXX_curated.md
-      - campaigns/{campaign}/final/sessionXX_summary.md
-      - campaigns/{campaign}/clean/sessionXX_diary.md
       - campaigns/{campaign}/raw/sessionXX_transcript.txt
     expected_outputs:
       - campaigns/{campaign}/extracted/sessionXX_locations.json
@@ -251,10 +252,15 @@ steps:
     status_rules:
       complete_when:
         - location extraction JSON exists
+        - or location extraction review has been applied, making database canon authoritative
     gate: automatic_allowed_before_review
     rerun_policy: safe_before_review
     canon_impact: draft_only
-    notes: Uses compact per-chunk registry context for large raw transcript extraction.
+    notes: >
+      Uses compact per-chunk registry context for large raw transcript extraction.
+      After human review is applied, this draft extraction step is terminally
+      complete for workflow-status purposes; later diary or final-summary files
+      must not make accepted entity canon appear stale.
 
   - id: extract_artifacts
     display_name: Extract Artifacts
@@ -266,8 +272,6 @@ steps:
       - campaigns/{campaign}/clean/sessionXX_spine.yaml
       - campaigns/{campaign}/clean/sessionXX_narrative.md
       - campaigns/{campaign}/clean/sessionXX_curated.md
-      - campaigns/{campaign}/final/sessionXX_summary.md
-      - campaigns/{campaign}/clean/sessionXX_diary.md
       - campaigns/{campaign}/raw/sessionXX_transcript.txt
     expected_outputs:
       - campaigns/{campaign}/extracted/sessionXX_artifacts.json
@@ -275,10 +279,15 @@ steps:
     status_rules:
       complete_when:
         - artifact extraction JSON exists
+        - or artifact extraction review has been applied, making database canon authoritative
     gate: automatic_allowed_before_review
     rerun_policy: safe_before_review
     canon_impact: draft_only
-    notes: Uses compact per-chunk location context for large raw transcript extraction.
+    notes: >
+      Uses compact per-chunk location context for large raw transcript extraction.
+      After human review is applied, this draft extraction step is terminally
+      complete for workflow-status purposes; later diary or final-summary files
+      must not make accepted entity canon appear stale.
 
   - id: extract_lore_items
     display_name: Extract Lore Items
@@ -290,8 +299,6 @@ steps:
       - campaigns/{campaign}/clean/sessionXX_spine.yaml
       - campaigns/{campaign}/clean/sessionXX_narrative.md
       - campaigns/{campaign}/clean/sessionXX_curated.md
-      - campaigns/{campaign}/final/sessionXX_summary.md
-      - campaigns/{campaign}/clean/sessionXX_diary.md
       - campaigns/{campaign}/raw/sessionXX_transcript.txt
     expected_outputs:
       - campaigns/{campaign}/extracted/sessionXX_lore_items.json
@@ -299,10 +306,15 @@ steps:
     status_rules:
       complete_when:
         - lore item extraction JSON exists
+        - or lore item extraction review has been applied, making database canon authoritative
     gate: automatic_allowed_before_review
     rerun_policy: safe_before_review
     canon_impact: draft_only
-    notes: Uses compact per-chunk registry context for large raw transcript extraction.
+    notes: >
+      Uses compact per-chunk registry context for large raw transcript extraction.
+      After human review is applied, this draft extraction step is terminally
+      complete for workflow-status purposes; later diary or final-summary files
+      must not make accepted entity canon appear stale.
 
   - id: extract_combat_encounters
     display_name: Extract Combat Encounters
@@ -314,8 +326,6 @@ steps:
       - campaigns/{campaign}/clean/sessionXX_spine.yaml
       - campaigns/{campaign}/clean/sessionXX_narrative.md
       - campaigns/{campaign}/clean/sessionXX_curated.md
-      - campaigns/{campaign}/final/sessionXX_summary.md
-      - campaigns/{campaign}/clean/sessionXX_diary.md
       - campaigns/{campaign}/raw/sessionXX_transcript.txt
     expected_outputs:
       - campaigns/{campaign}/extracted/sessionXX_combat_encounters.json
@@ -323,9 +333,14 @@ steps:
     status_rules:
       complete_when:
         - combat encounter extraction JSON exists
+        - or combat encounter extraction review has been applied, making database canon authoritative
     gate: automatic_allowed_before_review
     rerun_policy: safe_before_review
     canon_impact: draft_only
+    notes: >
+      After human review is applied, this draft extraction step is terminally
+      complete for workflow-status purposes; later diary or final-summary files
+      must not make accepted entity canon appear stale.
 
   - id: extract_open_threads
     display_name: Extract Open Threads
@@ -337,8 +352,6 @@ steps:
       - campaigns/{campaign}/clean/sessionXX_spine.yaml
       - campaigns/{campaign}/clean/sessionXX_narrative.md
       - campaigns/{campaign}/clean/sessionXX_curated.md
-      - campaigns/{campaign}/final/sessionXX_summary.md
-      - campaigns/{campaign}/clean/sessionXX_diary.md
       - campaigns/{campaign}/raw/sessionXX_transcript.txt
     expected_outputs:
       - campaigns/{campaign}/extracted/sessionXX_open_threads.json
@@ -346,9 +359,14 @@ steps:
     status_rules:
       complete_when:
         - open thread extraction JSON exists
+        - or open thread extraction review has been applied, making database canon authoritative
     gate: automatic_allowed_before_review
     rerun_policy: safe_before_review
     canon_impact: draft_only
+    notes: >
+      After human review is applied, this draft extraction step is terminally
+      complete for workflow-status purposes; later diary or final-summary files
+      must not make accepted entity canon appear stale.
 
   - id: extract_events
     display_name: Extract Events
@@ -720,36 +738,29 @@ steps:
     canon_impact: review_record
 
   - id: apply_review
-    display_name: Apply Reviewed Session To Database
+    display_name: Lock Final Summary Review
     lane: canonization
     dependencies:
       - mark_reviewed
     command: ./rag-env/bin/python scripts/dm_query.py apply-review sessionXX
     expected_inputs:
       - campaigns/{campaign}/reviews/sessionXX_review.yaml
-      - campaigns/{campaign}/final/session*_summary.md
-      - campaigns/{campaign}/travel.yaml
-      - campaigns/{campaign}/encounters.yaml
-      - campaigns/{campaign}/enemy_encounters.yaml
-      - campaigns/{campaign}/lore/*.md
     expected_outputs:
       - campaigns/{campaign}/final/sessionXX_summary.md
-      - farrlind/out/load_summaries.sql
-      - database rows
       - review YAML marked applied
     status_rules:
       complete_when:
         - review status is applied
-        - database load succeeds
       blocked_when:
         - review status is not reviewed
     gate: human_required
     rerun_policy: canon_affecting_requires_confirmation
-    canon_impact: database_canon
+    canon_impact: canon_file
     notes: >
-      For final-summary reviews, apply writes the reviewed narrative to the
-      final summary file before loading the database so session and timeline
-      canon come from the human-reviewed summary.
+      Final-summary reviews do not reload the database. Entity extraction
+      review steps have already applied structured canon to the database; this
+      step only locks the human-reviewed narrative and writes the final summary
+      markdown.
 
   - id: write_final_summary
     display_name: Write/Publish Final Summary

@@ -8,6 +8,7 @@ encounters:
     enemy: Regenerating construct
     enemy_type: construct
     quantity: 1
+    quantity_killed: 1
     outcome: defeated
     confidence: high
     notes: "Large rock-being/construct-like creature attacks the newly formed party in Bentrios and is destroyed in the session01 continuation."
@@ -17,6 +18,7 @@ encounters:
     enemy: Fey witch
     enemy_type: fey_witch
     quantity: 1
+    quantity_killed: 1
     outcome: defeated
     confidence: high
     notes: "Fey witch fought in the Fey Woods; killed by Corvinas."
@@ -26,6 +28,7 @@ encounters:
     enemy: Goblin
     enemy_type: goblin
     quantity: 2
+    quantity_killed: 2
     outcome: defeated
     confidence: high
     notes: "Two goblins summoned by the fey witch."
@@ -35,6 +38,7 @@ encounters:
     enemy: Dinosaur
     enemy_type: beast
     quantity: 1
+    quantity_killed: 1
     outcome: defeated
     confidence: medium
     notes: "Large lizard/dinosaur terrorizing the edge of the Fey forest."
@@ -53,6 +57,7 @@ encounters:
     enemy: Bellemaine construct
     enemy_type: construct
     quantity: 1
+    quantity_killed: 1
     outcome: defeated
     confidence: high
     notes: "Construct attacking Bellemaine under control of an orb-bearing controller."
@@ -62,6 +67,7 @@ encounters:
     enemy: Cultist controller
     enemy_type: cultist
     quantity: 1
+    quantity_killed: 1
     outcome: defeated
     confidence: medium
     notes: "Orb-bearing individual controlling the Bellemaine construct; likely a cultist."
@@ -71,6 +77,7 @@ encounters:
     enemy: Dao
     enemy_type: elemental
     quantity: 1
+    quantity_killed: 1
     outcome: defeated
     confidence: high
     notes: "Elemental transforms into a Dao after reaching the dropped orb."
@@ -85,10 +92,11 @@ encounters:
     notes: "Dao summons a marl during the Bellemaine battle."
 
   - session: session12
-    event_sequence: 1
+    event_sequence: 3
     enemy: Sam
     enemy_type: necrotic_agent
     quantity: 1
+    quantity_killed: 1
     outcome: defeated
     confidence: high
     notes: "Sam attacks Faban at the rear of the caravan and is defeated by the party."
@@ -98,15 +106,17 @@ encounters:
     enemy: Hostile ranger
     enemy_type: ranger
     quantity: 5
+    quantity_killed: 5
     outcome: defeated_or_fled
     confidence: high
     notes: "Five hostile rangers engage the party during the Sam battle."
 
   - session: session12
-    event_sequence: 6
+    event_sequence: 3
     enemy: Frog-like creature
     enemy_type: summoned_beast
     quantity: 2
+    quantity_killed: 2
     outcome: defeated
     confidence: high
     notes: "Two large foul-smelling frog-like creatures summoned by Sam's necrotic magic."
@@ -125,6 +135,7 @@ encounters:
     enemy: Biha-Bibir
     enemy_type: sea_entity
     quantity: 1
+    quantity_killed: 1
     outcome: defeated
     confidence: high
     notes: "Mass of seaweed and living current fought at Paramon."
@@ -134,6 +145,7 @@ encounters:
     enemy: Water elemental
     enemy_type: elemental
     quantity: 1
+    quantity_killed: 1
     outcome: defeated
     confidence: high
     notes: "Water elemental summoned with Biha-Bibir and split by Mikani's trident."
@@ -143,6 +155,7 @@ encounters:
     enemy: Iron Paw
     enemy_type: warlock
     quantity: 1
+    quantity_killed: 1
     outcome: defeated
     confidence: high
     notes: "Iron Paw summons additional creatures and is defeated at Paramon."
@@ -152,6 +165,7 @@ encounters:
     enemy: Wasterlich
     enemy_type: undead
     quantity: 1
+    quantity_killed: 1
     outcome: defeated
     confidence: high
     notes: "Summoned by Iron Paw during the Paramon battle."
@@ -161,6 +175,7 @@ encounters:
     enemy: Fish-thing
     enemy_type: aquatic_creature
     quantity: 3
+    quantity_killed: 3
     outcome: defeated
     confidence: high
     notes: "Three fish-things summoned by Iron Paw."
@@ -170,6 +185,7 @@ encounters:
     enemy: Orsydon
     enemy_type: dragon
     quantity: 1
+    quantity_killed: 1
     outcome: defeated
     confidence: high
     notes: "Dragon summoned by cultists in Balrog and defeated by the party."
@@ -179,6 +195,7 @@ encounters:
     enemy: Cultist spellcaster
     enemy_type: cultist_spellcaster
     quantity: 2
+    quantity_killed: 2
     outcome: killed
     confidence: high
     notes: "Two spellcasting cultists in Balrog helped summon Orsydon; both were killed."
@@ -188,6 +205,7 @@ encounters:
     enemy: Cultist melee fighter
     enemy_type: cultist_melee
     quantity: 3
+    quantity_killed: 3
     outcome: killed
     confidence: high
     notes: "Three melee cultists in Balrog helped defend the Orsydon summoning; all were killed."

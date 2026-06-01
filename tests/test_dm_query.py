@@ -818,6 +818,42 @@ class DmQueryTest(unittest.TestCase):
         self.assertIn("Applied review", output.getvalue())
         self.assertEqual(run.call_args.args[0][-2:], ["dbload", "--apply"])
 
+    def test_apply_final_summary_review_does_not_run_dbload(self):
+        document = {
+            "session": "session20",
+            "status": "reviewed",
+            "review_stage": "compose_final_summary",
+            "final_summary": {
+                "session_title": "Session Twenty",
+                "real_world_date": "2026-04-27",
+                "in_world_date": "1832 AS Namal 24",
+                "starting_location": "Balrog",
+                "ending_location": "Coast near Catur",
+                "summary_markdown": "The party prepared for Catur and preserved the canon summary.",
+            },
+            "items": [],
+            "added_items": [],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "session20_review.yaml"
+            output_path = Path(tmp) / "session20_summary.md"
+            path.write_text(yaml.safe_dump(document), encoding="utf-8")
+            with patch("dm_query.review_path", return_value=path), \
+                 patch("dm_query.final_summary_path", return_value=output_path), \
+                 patch("dm_query.subprocess.run") as run:
+                with contextlib.redirect_stdout(io.StringIO()) as output:
+                    dm_query.apply_review(args(session_number=20, applied_on="2026-05-04"))
+
+            updated = yaml.safe_load(path.read_text(encoding="utf-8"))
+            summary_exists = output_path.exists()
+
+        self.assertEqual(updated["status"], "applied")
+        self.assertEqual(updated["applied_on"], "2026-05-04")
+        self.assertTrue(summary_exists)
+        self.assertIn("Applied final summary review without database reload", output.getvalue())
+        run.assert_not_called()
+
     def test_review_events_prints_db_and_pending_canon_decisions(self):
         review_data = {
             "session": {

@@ -1,0 +1,1456 @@
+session: session22
+status: applied
+review_stage: compose_final_summary
+review_instructions:
+- Compose the canon final summary from the draft narrative, spine, extracted entities,
+  micro-events, and source snippets.
+- 'Confirm timeline fields: real-world date, in-world date or N/A, starting location,
+  and ending location.'
+- Micro-events are evidence for writing; they do not need individual decisions unless
+  you choose to use them.
+- Mark reviewed only when the final summary text and timeline fields are canon.
+session_title: Session 22
+session_date: '2026-05-31'
+in_game_date: 1832 AS — Namal 25
+primary_location: Catur's Well Chamber
+source_files:
+  draft_summary: /app/campaigns/farrlind/clean/session22_summary.md
+  curated_packet: /app/campaigns/farrlind/clean/session22_curated.md
+  session_spine: /app/campaigns/farrlind/clean/session22_spine.yaml
+  merged_events: /app/campaigns/farrlind/clean/session22_merged.md
+  validation_report: /app/campaigns/farrlind/clean/session22_validation.md
+db_event_context: []
+final_summary:
+  session_title: Session 22
+  real_world_date: '2026-05-31'
+  in_world_date: 1832 AS — Namal 25
+  starting_location: Catur's Well Chamber
+  ending_location: Catur's Well Chamber
+  key_locations: Catur's Well Chamber
+  major_outcome: ''
+  summary_markdown: "They established a diplomatic approach, with Mikani presenting\
+    \ herself as an emissary from the Celestial Isles and Faban as a water-touched\
+    \ human believer of Namaloa, while Corvinus maintained a role of protection. Upon\
+    \ reaching Catur, they gained access to the city, learning that forging skills\
+    \ were important, and they sought an audience with the Queen to gain access to\
+    \ the city's hidden magical well.\r\n\r\nThe party entered the Catur's Well Chamber,\
+    \ an underwater cave containing a dormant magical well named Nibane, which had\
+    \ been inactive for more than ten years.\r\n\r\nThe party engaged in a desperate\
+    \ confrontation with Niebain/Nebain and the Queen, involving complex combat mechanics,\
+    \ including the use of spells, physical manipulation, and the deployment of a\
+    \ web restraint. The entity demonstrated immense power, healing itself, and possessed\
+    \ Legendary and Lair actions, and the party struggled against the resulting whirlpool.\r\
+    \n\r\nAs the crisis escalated, the party focused on managing the flooding, using\
+    \ a *Control Water* spell to redirect the water back through the crack. They attempted\
+    \ to build a structure of cement and sand to plug the hole, realizing they had\
+    \ to suppress the expansion using the water control spell, which they held in\
+    \ place with a web.\r\n\r\nDuring the ensuing struggle, the party encountered\
+    \ a monstrous version of a Merfolk that emerged from a hole, and they engaged\
+    \ in a physical confrontation where a player attempted to use a large boulder\
+    \ as an improvised weapon against the creature. The party discussed the mechanics\
+    \ of combat, including advantage, sneak attacks, and damage rolls, while dealing\
+    \ with the complex rules of concentration spells like *Sanctuary*.\r\n\r\nThe\
+    \ party then faced a confrontation with a Marrow, a fish-like humanoid described\
+    \ as the ogres of merfolk, which emerged from a 20-foot hole where water was being\
+    \ held back. They successfully used a web trap on the Marrow, restraining it,\
+    \ and dealt damage, resulting in a final damage roll of 13.\r\n\r\nLater, the\
+    \ party engaged in a more intense combat sequence involving multiple attacks,\
+    \ including the use of lightning bolts and a character's thunderous smite attack.\
+    \ They confronted a gargantuan water creature, the Leviathan, which acted as a\
+    \ damage sponge, and the party discussed the mechanics of Legendary Actions and\
+    \ Lair Actions.\r\n\r\nThe session concluded with a final, desperate confrontation\
+    \ where the party fought the Leviathan. The party discussed the fate of the wells\
+    \ (Korog, Ordor, Scythe) and the central role of the stolen Wand of Wells, which\
+    \ is believed to be held by infernal or demonic forces. They also discussed the\
+    \ political machinations of Salazar and the potential hostile takeover of the\
+    \ realms.\r\n\r\nThe discussion shifted to the broader lore, addressing how to\
+    \ reverse a negative event (a recall) and the damage caused by Salazar. They were\
+    \ advised to seek the Monastery of the Open Hand, which worships Poe and is inhabited\
+    \ by various races, as a path to gaining trust and reversing the damage.\r\n\r\
+    \n## Chronological Major Events\r\n\r\n*   The party met Samuel and proceeded\
+    \ to the underground city.\r\n*   The party met King Triton and discussed evil\
+    \ forces and magic.\r\n*   The party discovered the well named Nibane, which was\
+    \ inactive for more than 10 years.\r\n*   The party used a *Control Water* spell\
+    \ to redirect the flooding water.\r\n*   The party encountered a monstrous Merfolk-like\
+    \ creature emerging from a hole.\r\n*   The party engaged in combat against a\
+    \ Marrow, using web traps and physical attacks.\r\n*   The party confronted the\
+    \ Leviathan, a gargantuan water creature acting as a damage sponge.\r\n*   The\
+    \ party discussed the mechanics of combat, including Legendary Actions and Lair\
+    \ Actions.\r\n*   The party discussed the fate of the wells (Korog, Ordor, Scythe)\
+    \ and the Wand of Wells.\r\n*   The party discussed the political machinations\
+    \ of Salazar and the hostile takeover of the realms.\r\n*   The party was advised\
+    \ to seek the Monastery of the Open Hand to gain trust and reverse damage.\r\n\
+    \r\n## Key Locations\r\n\r\n- **Catur's Well Chamber** - The location where the\
+    \ party found the dormant magical well (Nibane) and faced the immediate threat\
+    \ of flooding.\r\n- **Wreckaway Cove** - A human settlement on the outer rim composed\
+    \ of pirates (mentioned in context).\r\n- **The Gale** - A location mentioned\
+    \ in relation to future travel, infected with the elemental plane of air.\r\n\
+    - **Honeydoll** - Mentioned as the origin of magic, linked to Omnium.\r\n- **Monastery\
+    \ of the Open Hand** - A location where the party was advised to go to gain trust\
+    \ and understand the source of magic.\r\n\r\n## Key NPCs And Entities\r\n\r\n\
+    - **The Queen** - The ruler of the Celestial Isles; martial, possessing a Domain\
+    \ spell.\r\n- **The Maven in the Basin** - Turned into an aboleth when the well\
+    \ was disturbed.\r\n- **Marrow** - A fish-like creature that looks humanoid, described\
+    \ as the ogres of merfolk, who was fought and restrained.\r\n- **Leviathan** -\
+    \ A gargantuan water creature that acted as a damage sponge and possessed Legendary/Lair\
+    \ actions.\r\n- **Salazar** - A dangerous figure attempting a hostile takeover\
+    \ of the realms, associated with the Wand of Wells.\r\n- **Gusan** - An entity\
+    \ predicted to take the form of a wind thing when visiting the Monastery of the\
+    \ Hand."
+timeline:
+  physical_date: '2026-05-31'
+  in_game_date: 1832 AS — Namal 25
+  start_location: Catur's Well Chamber
+  end_location: Catur's Well Chamber
+macro_events:
+- id: macro-001
+  order: 1
+  description: Diplomatic Approach and Access
+  location: Catur
+  source_type: session_spine
+  spine_order: 1
+  event_type: travel
+  summary: The party established diplomatic roles (Mikani, Faban, Corvinus) and gained
+    access to the city, seeking an audience with the Queen to access the hidden magical
+    well.
+  outcome: Gained access to the city and the well chamber.
+  party_interpretation: The party learned the Queen was less receptive and concerned
+    about disturbing the land.
+  evidence: They sought an audience with the Queen to gain access to the city's hidden
+    magical well.
+- id: macro-002
+  order: 2
+  description: Discovery of the Dormant Well
+  location: Catur's Well Chamber
+  source_type: session_spine
+  spine_order: 2
+  event_type: discovery
+  summary: The party entered the underwater cave containing the dormant magical well
+    named Nibane, which had been inactive for more than ten years.
+  outcome: Found the dormant well Nibane.
+  party_interpretation: The party discovered a dormant magical well.
+  evidence: The party entered the Catur's Well Chamber, an underwater cave containing
+    a dormant magical well named Nibane.
+- id: macro-003
+  order: 3
+  description: Confrontation with Niebain/Nebain and the Queen
+  location: Catur's Well Chamber
+  source_type: session_spine
+  spine_order: 3
+  event_type: combat
+  summary: A desperate confrontation with Niebain/Nebain and the Queen, involving
+    complex combat mechanics, physical manipulation, and the deployment of a web restraint,
+    resulting in a whirlpool.
+  outcome: The immediate threat of flooding and the appearance of Niebain/Nebain was
+    resolved, but the larger threat of Salazar remains.
+  party_interpretation: The party struggled against the resulting whirlpool and managed
+    to use spellcasting abilities (*Control Water*, *Sanctuary*) to manage the flooding
+    and combat.
+  evidence: The party engaged in a desperate confrontation with Niebain/Nebain and
+    the Queen, involving complex combat mechanics, including the use of spells, physical
+    manipulation, and the deployment of a web restraint.
+- id: macro-004
+  order: 4
+  description: Physical Confrontation with Merfolk-like Creature
+  location: Catur's Well Chamber
+  source_type: session_spine
+  spine_order: 4
+  event_type: combat
+  summary: The party encountered a monstrous Merfolk-like creature emerging from a
+    hole and engaged in a physical confrontation where a player used a boulder as
+    an improvised weapon.
+  outcome: The party successfully used a web trap on the Marrow.
+  party_interpretation: The party discussed the mechanics of combat, including advantage,
+    sneak attacks, and damage rolls, while dealing with the complex rules of concentration
+    spells like *Sanctuary*.
+  evidence: The party encountered a monstrous version of a Merfolk that emerged from
+    a hole, and they engaged in a physical confrontation where a player attempted
+    to use a large boulder as an improvised weapon against the creature.
+- id: macro-005
+  order: 5
+  description: Combat against the Marrow
+  location: Catur's Well Chamber
+  source_type: session_spine
+  spine_order: 5
+  event_type: combat
+  summary: The party confronted the Marrow, a fish-like humanoid, using web traps
+    and physical attacks, resulting in a final damage roll of 13.
+  outcome: The Marrow was restrained and dealt damage.
+  party_interpretation: ''
+  evidence: They successfully used a web trap on the Marrow, restraining it, and dealt
+    damage, resulting in a final damage roll of 13.
+- id: macro-006
+  order: 6
+  description: Confrontation with the Leviathan
+  location: Catur's Well Chamber
+  source_type: session_spine
+  spine_order: 6
+  event_type: combat
+  summary: The party faced a confrontation with the gargantuan water creature, the
+    Leviathan, which acted as a damage sponge, and attempted to hit it with a thunderous
+    smite.
+  outcome: The party managed to defeat the Leviathan.
+  party_interpretation: The party discussed the mechanics of Legendary Actions and
+    Lair Actions, and the Leviathan acted as a damage sponge.
+  evidence: They confronted a gargantuan water creature, the Leviathan, which acted
+    as a damage sponge, and the party discussed the mechanics of Legendary Actions
+    and Lair Actions.
+- id: macro-007
+  order: 7
+  description: Final Confrontation and Lore Discussion
+  location: Catur's Well Chamber
+  source_type: session_spine
+  spine_order: 7
+  event_type: combat
+  summary: A final, desperate combat sequence involving the party and the Leviathan,
+    followed by a discussion regarding the fate of the wells (Korog, Ordor, Scythe)
+    and the central role of the stolen Wand of Wells.
+  outcome: The party discussed the fate of the wells and the Wand of Wells.
+  party_interpretation: The party discussed the political machinations of Salazar
+    and the potential hostile takeover of the realms, and the fate of the wells.
+  evidence: The session concluded with a final, desperate confrontation where the
+    party fought the Leviathan. The party discussed the fate of the wells (Korog,
+    Ordor, Scythe) and the central role of the stolen Wand of Wells, which is believed
+    to be held by infernal or demonic forces.
+- id: macro-008
+  order: 8
+  description: Seeking Guidance and Reversal
+  location: Monastery of the Open Hand
+  source_type: session_spine
+  spine_order: 8
+  event_type: lore_reveal
+  summary: The party was advised to seek the Monastery of the Open Hand, which worships
+    Poe, as a path to gaining trust and reversing the damage caused by Salazar and
+    the negative event (recall).
+  outcome: Received advice on reversing damage and finding a path forward.
+  party_interpretation: The party learned that seeking the Monastery was a path to
+    gaining trust and reversing damage.
+  evidence: They were advised to seek the Monastery of the Open Hand, which worships
+    Poe and is inhabited by various races, as a path to gaining trust and reversing
+    the damage.
+items:
+- id: event-001
+  sequence: 1
+  source_type: draft_merged_event
+  source_text: The party met Samuel and proceeded to the underground city.
+  source_context: '[00:00:39 - 00:00:48] wreckaway cove affectionately known but not
+    official not officially and we sail and a storm
+
+    [00:00:48 - 00:00:54] is brewing i get knocked out of the boat and i acquire cold
+    damage and the party tries to pull
+
+    [00:00:54 - 00:00:56] me in and then gildas saves me
+
+    [00:00:56 - 00:01:00] with levitation we meet
+
+    [00:01:00 - 00:01:07] samuel at the entrance gate and as we finally get to the
+    underground city is there stuff in
+
+    [00:01:07 - 00:01:13] between there that we need to talk about nothing important
+    he will take us to the monarch monarchical
+
+    [00:01:13 - 00:01:19] leadership is what he says and he says avoid the queen avoid
+    talking of namaloa
+
+    [00:01:19 - 00:01:26] we mean i''m sorry my dragon i know we meet king triton
+    and converse a bit about the
+
+    [00:01:26 - 00:01:26] evil'
+  timestamps: N/A
+  actors: Party
+  targets: ''
+  mechanical_tags: source=Chronological Major Events
+  story_tags: ''
+  confidence: high
+  verify: ''
+  summary_context: 'Title: The Sea Held at Bay
+
+
+    The party met Samuel and proceeded to the underground city. They discovered the
+    well named Nibane, which was inactive for more than 10 years. After resolving
+    the immediate threat of flooding and the appearance of Niebain/Nebain, the party
+    successfully used spellcasting abilities (*Control Water*, *Sanctuary*) to manage
+    the flooding and combat.
+
+
+    The party confronted a monstrous Merfolk-like creature emerging from a hole and
+    engaged in combat against a Marrow using web traps and physical attacks. They
+    managed to defeat the Leviathan, a gargantuan water creature acting as a damage
+    sponge. The party also discussed complex combat mechanics, including advantage,
+    sneak attacks, and damage rolls.'
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-002
+  sequence: 2
+  source_type: draft_merged_event
+  source_text: 'The party discovered the well named Nibane, which was inactive for
+    more than 10 years. Outcome: Found the dormant well Nibane.'
+  source_context: '[00:03:00 - 00:03:04] But for some reason, she decides to trust
+    us.
+
+    [00:03:04 - 00:03:13] Oh, because our bard, with his flowery language, was able
+    to persuade her to trust us.
+
+    [00:03:13 - 00:03:17] So the queen takes us down to the magic through large double
+    doors.
+
+    [00:03:17 - 00:03:23] It''s in an underwater cave, and she tells us that it hasn''t
+    been active for more than 10 years.
+
+    [00:03:23 - 00:03:28] We do find the well named Nibane.
+
+    [00:03:28 - 00:03:31] But it was empty.
+
+    [00:03:31 - 00:03:34] No, and then an abalith appears.
+
+    [00:03:34 - 00:03:36] Oh, no, no, no. So you skipped over a lot.
+
+    [00:03:36 - 00:03:37] You could take over.'
+  timestamps: N/A
+  actors: Party
+  targets: ''
+  mechanical_tags: Potions of water breathing, source=Chronological Major Events
+  story_tags: 2. Discovery of the Dormant Well, The party discovered a dormant magical
+    well.
+  confidence: high
+  verify: 'spine needs_review: Preserved narrative item/resource beat(s): Potions
+    of water breathing.'
+  summary_context: 'Title: The Sea Held at Bay
+
+
+    The party met Samuel and proceeded to the underground city. They discovered the
+    well named Nibane, which was inactive for more than 10 years. After resolving
+    the immediate threat of flooding and the appearance of Niebain/Nebain, the party
+    successfully used spellcasting abilities (*Control Water*, *Sanctuary*) to manage
+    the flooding and combat.
+
+
+    The party confronted a monstrous Merfolk-like creature emerging from a hole and
+    engaged in combat against a Marrow using web traps and physical attacks. They
+    managed to defeat the Leviathan, a gargantuan water creature acting as a damage
+    sponge. The party also discussed complex combat mechanics, including advantage,
+    sneak attacks, and damage rolls.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Combat against the Marrow
+    significance: 3
+    source_type: db_event
+  - sequence_order: '2'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Confrontation with the Leviathan
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: Catur's Well Chamber
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-003
+  sequence: 3
+  source_type: draft_merged_event
+  source_text: 'The party successfully used spellcasting abilities (*Control Water*,
+    *Sanctuary*) to manage the flooding and combat. Outcome: The immediate threat
+    of flooding and the appearance of Niebain/Nebain was resolved, but the larger
+    threat of Salazar remains.'
+  source_context: '[00:07:20 - 00:07:46] affords of our coaches plus we have other
+    mushrooms uh immediate reactions from everyone
+
+    [00:07:54 - 00:07:56] i know for the party too
+
+    [00:07:57 - 00:08:03] the water''s coming in you might want to eat a mushroom
+    i already have or those of you that
+
+    [00:08:03 - 00:08:31] haven''t can you stop the water miss water person i do have
+    a spell what are you doing all right
+
+    [00:08:33 - 00:08:47] i cast control water okay and i redirect the water to go
+    backwards if i''ve got a mushroom
+
+    [00:08:50 - 00:09:03] we all do so i think you have a potion
+
+    [00:09:03 - 00:09:09] so
+
+    [00:09:09 - 00:09:15] so
+
+    [00:09:15 - 00:09:16] so'
+  timestamps: N/A
+  actors: Party
+  targets: The Queen, Niebain/Nebain
+  mechanical_tags: The Queen, Niebain/Nebain, source=Chronological Major Events; Character
+    Notes
+  story_tags: 3. Confrontation with Niebain/Nebain and the Queen, The party struggled
+    against the resulting whirlpool and managed to use spellcasting abilities (*Control
+    Water*, *Sanctuary*) to manage the flooding and combat.
+  confidence: high
+  verify: 'spine needs_review: Preserved narrative character/resource beat: The party
+    successfully used spellcasting abilities (*Control Water*, *Sanctuary*) to manage
+    the flooding and combat., Preserved narrative character/resource beat: Corvinus
+    attempted to use *Cure Wounds* to heal himself., Preserved narrative character/resource
+    beat: Gildas successfully used *levitate* to move a creature., Preserved narrative
+    character/resource beat: The party members discussed complex combat mechanics,
+    damage rolls, and spellcasting rules., Preserved narrative character/resource
+    beat: The party members were physically injured and discussed the mechanics of
+    Legendary Resistance and damage.'
+  summary_context: 'Title: The Sea Held at Bay
+
+
+    The party met Samuel and proceeded to the underground city. They discovered the
+    well named Nibane, which was inactive for more than 10 years. After resolving
+    the immediate threat of flooding and the appearance of Niebain/Nebain, the party
+    successfully used spellcasting abilities (*Control Water*, *Sanctuary*) to manage
+    the flooding and combat.
+
+
+    The party confronted a monstrous Merfolk-like creature emerging from a hole and
+    engaged in combat against a Marrow using web traps and physical attacks. They
+    managed to defeat the Leviathan, a gargantuan water creature acting as a damage
+    sponge. The party also discussed complex combat mechanics, including advantage,
+    sneak attacks, and damage rolls.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Combat against the Marrow
+    significance: 3
+    source_type: db_event
+  - sequence_order: '2'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Confrontation with the Leviathan
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: Catur's Well Chamber
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-004
+  sequence: 4
+  source_type: draft_merged_event
+  source_text: Corvinus attempted to use *Cure Wounds* to heal himself.
+  source_context: '[01:46:06 - 01:46:06] We''ll get to that.
+
+    [01:46:06 - 01:46:10] But is there anything else you would want to do to try and
+    help yourself here?
+
+    [01:46:11 - 01:46:13] I would want to try to heal myself.
+
+    [01:46:13 - 01:46:13] Okay.
+
+    [01:46:13 - 01:46:20] Healing spell, I believe, is Cure Wounds.
+
+    [01:46:20 - 01:46:21] Yeah.
+
+    [01:46:22 - 01:46:25] Well, eight, I guess, but not really the best place.
+
+    [01:46:25 - 01:46:26] Yeah.
+
+    [01:46:26 - 01:46:32] I am going to do it at a level one, because I don''t think
+    he sees or cares about me at this moment.'
+  timestamps: N/A
+  actors: Party
+  targets: ''
+  mechanical_tags: source=Character Notes
+  story_tags: ''
+  confidence: high
+  verify: ''
+  summary_context: 'The party confronted a monstrous Merfolk-like creature emerging
+    from a hole and engaged in combat against a Marrow using web traps and physical
+    attacks. They managed to defeat the Leviathan, a gargantuan water creature acting
+    as a damage sponge. The party also discussed complex combat mechanics, including
+    advantage, sneak attacks, and damage rolls.
+
+
+    The party was advised to seek the Monastery of the Open Hand to gain trust and
+    reverse damage caused by Salazar. They established diplomatic roles (Mikani, Faban,
+    Corvinus) and gained access to the city, seeking an audience with the Queen to
+    access the hidden magical well.
+
+
+    Key Events:'
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-005
+  sequence: 5
+  source_type: draft_merged_event
+  source_text: 'Gildas successfully used *levitate* to move a creature. Outcome: The
+    party successfully used a web trap on the Marrow.'
+  source_context: '[00:20:14 - 00:20:20] That sound like a creature of some sort that
+    sounds not fun.
+
+    [00:20:20 - 00:20:31] What we could do is we could build a big.
+
+    [00:20:31 - 00:20:32] Let Carvinas talk.
+
+    [00:20:32 - 00:20:42] One thing I''m going to do, since Makani, you''re holding
+    the water at this point, and we don''t know if something can pop out.
+
+    [00:20:42 - 00:20:45] I would almost want to cast Sanctuary on Makani.
+
+    [00:20:45 - 00:20:50] Okay, I like that.
+
+    [00:20:50 - 00:20:52] She''s the one that''s doing the most good.
+
+    [00:20:52 - 00:20:52] Yeah.
+
+    [00:20:52 - 00:20:55] And I will cast.'
+  timestamps: N/A
+  actors: Party
+  targets: Marrow
+  mechanical_tags: Marrow, source=Character Notes
+  story_tags: 4. Physical Confrontation with Merfolk-like Creature, The party discussed
+    the mechanics of combat, including advantage, sneak attacks, and damage rolls,
+    while dealing with the complex rules of concentration spells like *Sanctuary*.
+  confidence: high
+  verify: ''
+  summary_context: 'Title: The Sea Held at Bay
+
+
+    The party met Samuel and proceeded to the underground city. They discovered the
+    well named Nibane, which was inactive for more than 10 years. After resolving
+    the immediate threat of flooding and the appearance of Niebain/Nebain, the party
+    successfully used spellcasting abilities (*Control Water*, *Sanctuary*) to manage
+    the flooding and combat.
+
+
+    The party confronted a monstrous Merfolk-like creature emerging from a hole and
+    engaged in combat against a Marrow using web traps and physical attacks. They
+    managed to defeat the Leviathan, a gargantuan water creature acting as a damage
+    sponge. The party also discussed complex combat mechanics, including advantage,
+    sneak attacks, and damage rolls.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Combat against the Marrow
+    significance: 3
+    source_type: db_event
+  - sequence_order: '2'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Confrontation with the Leviathan
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: Catur's Well Chamber
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-006
+  sequence: 6
+  source_type: draft_merged_event
+  source_text: 'The party members discussed complex combat mechanics, damage rolls,
+    and spellcasting rules.; The party members were physically injured and discussed
+    the mechanics of Legendary Resistance and damage.; The party needs to figure out
+    how to guard against the disappearing of magic and reverse the damage caused by
+    Salazar. Outcome: The party successfully used a web trap on the Marrow.; The party
+    managed to defeat the Leviathan.; Received advice on reversing damage and finding
+    a path forward.'
+  source_context: '[03:01:18 - 03:01:19] I do not have the answers.
+
+    [03:01:27 - 03:01:27] With ether?
+
+    [03:01:28 - 03:01:31] And the abbey of the hand.
+
+    [03:01:31 - 03:01:32] Is it the abbey of the hand?
+
+    [03:01:34 - 03:01:36] The monastery of the open hand.
+
+    [03:01:36 - 03:01:36] That''s it.
+
+    [03:01:36 - 03:01:38] The monastery of the open hand.
+
+    [03:01:40 - 03:01:41] How do we find that?
+
+    [03:01:43 - 03:01:46] That is the more difficult question.'
+  timestamps: N/A
+  actors: Party
+  targets: Gusan, Leviathan, Marrow
+  mechanical_tags: Gusan, source=Open Threads, spine_type=lore_reveal, Leviathan,
+    source=Character Notes, Marrow, source=Character Notes
+  story_tags: 4. Physical Confrontation with Merfolk-like Creature, The party discussed
+    the mechanics of combat, including advantage, sneak attacks, and damage rolls,
+    while dealing with the complex rules of concentration spells like *Sanctuary*.,
+    6. Confrontation with the Leviathan, The party discussed the mechanics of Legendary
+    Actions and Lair Actions, and the Leviathan acted as a damage sponge., 8. Seeking
+    Guidance and Reversal, The party learned that seeking the Monastery was a path
+    to gaining trust and reversing damage.
+  confidence: high
+  verify: open thread from narrative; confirm resolution status during review
+  summary_context: 'The party confronted a monstrous Merfolk-like creature emerging
+    from a hole and engaged in combat against a Marrow using web traps and physical
+    attacks. They managed to defeat the Leviathan, a gargantuan water creature acting
+    as a damage sponge. The party also discussed complex combat mechanics, including
+    advantage, sneak attacks, and damage rolls.
+
+
+    The party was advised to seek the Monastery of the Open Hand to gain trust and
+    reverse damage caused by Salazar. They established diplomatic roles (Mikani, Faban,
+    Corvinus) and gained access to the city, seeking an audience with the Queen to
+    access the hidden magical well.
+
+
+    Key Events:'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Combat against the Marrow
+    significance: 3
+    source_type: db_event
+  - sequence_order: '2'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Confrontation with the Leviathan
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: Catur's Well Chamber, Monastery of the Open Hand
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-007
+  sequence: 7
+  source_type: draft_merged_event
+  source_text: 'The immediate threat of flooding and the appearance of Niebain/Nebain
+    was resolved, but the larger threat of Salazar and the fate of the wells remains.
+    Outcome: The immediate threat of flooding and the appearance of Niebain/Nebain
+    was resolved, but the larger threat of Salazar remains.'
+  source_context: '[00:07:20 - 00:07:46] affords of our coaches plus we have other
+    mushrooms uh immediate reactions from everyone
+
+    [00:07:54 - 00:07:56] i know for the party too
+
+    [00:07:57 - 00:08:03] the water''s coming in you might want to eat a mushroom
+    i already have or those of you that
+
+    [00:08:03 - 00:08:31] haven''t can you stop the water miss water person i do have
+    a spell what are you doing all right
+
+    [00:08:33 - 00:08:47] i cast control water okay and i redirect the water to go
+    backwards if i''ve got a mushroom
+
+    [00:08:50 - 00:09:03] we all do so i think you have a potion
+
+    [00:09:03 - 00:09:09] so
+
+    [00:09:09 - 00:09:15] so
+
+    [00:09:15 - 00:09:16] so'
+  timestamps: N/A
+  actors: Party
+  targets: The Queen, Niebain/Nebain
+  mechanical_tags: The Queen, Niebain/Nebain, source=Open Threads
+  story_tags: 3. Confrontation with Niebain/Nebain and the Queen, The party struggled
+    against the resulting whirlpool and managed to use spellcasting abilities (*Control
+    Water*, *Sanctuary*) to manage the flooding and combat.
+  confidence: high
+  verify: 'spine needs_review: Preserved narrative character/resource beat: The party
+    successfully used spellcasting abilities (*Control Water*, *Sanctuary*) to manage
+    the flooding and combat., Preserved narrative character/resource beat: Corvinus
+    attempted to use *Cure Wounds* to heal himself., Preserved narrative character/resource
+    beat: Gildas successfully used *levitate* to move a creature., Preserved narrative
+    character/resource beat: The party members discussed complex combat mechanics,
+    damage rolls, and spellcasting rules., Preserved narrative character/resource
+    beat: The party members were physically injured and discussed the mechanics of
+    Legendary Resistance and damage.; open thread from narrative; confirm resolution
+    status during review'
+  summary_context: 'Title: The Sea Held at Bay
+
+
+    The party met Samuel and proceeded to the underground city. They discovered the
+    well named Nibane, which was inactive for more than 10 years. After resolving
+    the immediate threat of flooding and the appearance of Niebain/Nebain, the party
+    successfully used spellcasting abilities (*Control Water*, *Sanctuary*) to manage
+    the flooding and combat.
+
+
+    The party confronted a monstrous Merfolk-like creature emerging from a hole and
+    engaged in combat against a Marrow using web traps and physical attacks. They
+    managed to defeat the Leviathan, a gargantuan water creature acting as a damage
+    sponge. The party also discussed complex combat mechanics, including advantage,
+    sneak attacks, and damage rolls.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Combat against the Marrow
+    significance: 3
+    source_type: db_event
+  - sequence_order: '2'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Confrontation with the Leviathan
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: Catur's Well Chamber
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-008
+  sequence: 8
+  source_type: draft_merged_event
+  source_text: 'The exact location of the Monastery of the Open Hand and the full
+    identity of Gusan in the Monarch are still being explored. Outcome: Received advice
+    on reversing damage and finding a path forward.'
+  source_context: '[03:01:18 - 03:01:19] I do not have the answers.
+
+    [03:01:27 - 03:01:27] With ether?
+
+    [03:01:28 - 03:01:31] And the abbey of the hand.
+
+    [03:01:31 - 03:01:32] Is it the abbey of the hand?
+
+    [03:01:34 - 03:01:36] The monastery of the open hand.
+
+    [03:01:36 - 03:01:36] That''s it.
+
+    [03:01:36 - 03:01:38] The monastery of the open hand.
+
+    [03:01:40 - 03:01:41] How do we find that?
+
+    [03:01:43 - 03:01:46] That is the more difficult question.'
+  timestamps: N/A
+  actors: Party
+  targets: Gusan
+  mechanical_tags: Gusan, source=Open Threads, spine_type=lore_reveal
+  story_tags: 8. Seeking Guidance and Reversal, The party learned that seeking the
+    Monastery was a path to gaining trust and reversing damage.
+  confidence: high
+  verify: open thread from narrative; confirm resolution status during review
+  summary_context: 'The party confronted a monstrous Merfolk-like creature emerging
+    from a hole and engaged in combat against a Marrow using web traps and physical
+    attacks. They managed to defeat the Leviathan, a gargantuan water creature acting
+    as a damage sponge. The party also discussed complex combat mechanics, including
+    advantage, sneak attacks, and damage rolls.
+
+
+    The party was advised to seek the Monastery of the Open Hand to gain trust and
+    reverse damage caused by Salazar. They established diplomatic roles (Mikani, Faban,
+    Corvinus) and gained access to the city, seeking an audience with the Queen to
+    access the hidden magical well.
+
+
+    Key Events:'
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: Monastery of the Open Hand
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-009
+  sequence: 9
+  source_type: draft_merged_event
+  source_text: The ultimate method to stop the cataclysm remains elusive, requiring
+    divine pressure they do not possess.
+  source_context: ''
+  timestamps: N/A
+  actors: Party
+  targets: ''
+  mechanical_tags: source=Open Threads
+  story_tags: ''
+  confidence: high
+  verify: open thread from narrative; confirm resolution status during review
+  summary_context: ''
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: combat
+  location: ''
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-010
+  sequence: 10
+  source_type: draft_merged_event
+  source_text: 'The party met King Triton and discussed evil forces and magic. Outcome:
+    The party discussed the fate of the wells and the Wand of Wells.'
+  source_context: '[00:00:56 - 00:01:00] with levitation we meet
+
+    [00:01:00 - 00:01:07] samuel at the entrance gate and as we finally get to the
+    underground city is there stuff in
+
+    [00:01:07 - 00:01:13] between there that we need to talk about nothing important
+    he will take us to the monarch monarchical
+
+    [00:01:13 - 00:01:19] leadership is what he says and he says avoid the queen avoid
+    talking of namaloa
+
+    [00:01:19 - 00:01:26] we mean i''m sorry my dragon i know we meet king triton
+    and converse a bit about the
+
+    [00:01:26 - 00:01:26] evil
+
+    [00:01:26 - 00:01:31] forces and we ask about the magic but he says we have to
+    wait for the queen
+
+    [00:01:32 - 00:01:40] and she''s away so we are supposed to wait for her return
+    in the meantime um they had us meet in the
+
+    [00:01:40 - 00:01:47] courtyard they had us in the courtyard but then he mentioned
+    something about is there some kind of'
+  timestamps: N/A
+  actors: Party
+  targets: Leviathan
+  mechanical_tags: Wand of Wells, Ordor, Leviathan, source=Chronological Major Events
+  story_tags: 7. Final Confrontation and Lore Discussion, The party discussed the
+    political machinations of Salazar and the potential hostile takeover of the realms,
+    and the fate of the wells.
+  confidence: high
+  verify: ''
+  summary_context: 'The party met Samuel and proceeded to the underground city. They
+    discovered the well named Nibane, which was inactive for more than 10 years. After
+    resolving the immediate threat of flooding and the appearance of Niebain/Nebain,
+    the party successfully used spellcasting abilities (*Control Water*, *Sanctuary*)
+    to manage the flooding and combat.
+
+
+    The party confronted a monstrous Merfolk-like creature emerging from a hole and
+    engaged in combat against a Marrow using web traps and physical attacks. They
+    managed to defeat the Leviathan, a gargantuan water creature acting as a damage
+    sponge. The party also discussed complex combat mechanics, including advantage,
+    sneak attacks, and damage rolls.
+
+
+    The party was advised to seek the Monastery of the Open Hand to gain trust and
+    reverse damage caused by Salazar. They established diplomatic roles (Mikani, Faban,
+    Corvinus) and gained access to the city, seeking an audience with the Queen to
+    access the hidden magical well.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Combat against the Marrow
+    significance: 3
+    source_type: db_event
+  - sequence_order: '2'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Confrontation with the Leviathan
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: combat
+  location: Catur's Well Chamber
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-011
+  sequence: 11
+  source_type: draft_merged_event
+  source_text: 'The party encountered a monstrous Merfolk-like creature emerging from
+    a hole. Outcome: The party successfully used a web trap on the Marrow.'
+  source_context: '[00:20:14 - 00:20:20] That sound like a creature of some sort that
+    sounds not fun.
+
+    [00:20:20 - 00:20:31] What we could do is we could build a big.
+
+    [00:20:31 - 00:20:32] Let Carvinas talk.
+
+    [00:20:32 - 00:20:42] One thing I''m going to do, since Makani, you''re holding
+    the water at this point, and we don''t know if something can pop out.
+
+    [00:20:42 - 00:20:45] I would almost want to cast Sanctuary on Makani.
+
+    [00:20:45 - 00:20:50] Okay, I like that.
+
+    [00:20:50 - 00:20:52] She''s the one that''s doing the most good.
+
+    [00:20:52 - 00:20:52] Yeah.
+
+    [00:20:52 - 00:20:55] And I will cast.'
+  timestamps: N/A
+  actors: Party
+  targets: Marrow
+  mechanical_tags: Marrow, source=Chronological Major Events
+  story_tags: 4. Physical Confrontation with Merfolk-like Creature, The party discussed
+    the mechanics of combat, including advantage, sneak attacks, and damage rolls,
+    while dealing with the complex rules of concentration spells like *Sanctuary*.
+  confidence: high
+  verify: ''
+  summary_context: 'Title: The Sea Held at Bay
+
+
+    The party met Samuel and proceeded to the underground city. They discovered the
+    well named Nibane, which was inactive for more than 10 years. After resolving
+    the immediate threat of flooding and the appearance of Niebain/Nebain, the party
+    successfully used spellcasting abilities (*Control Water*, *Sanctuary*) to manage
+    the flooding and combat.
+
+
+    The party confronted a monstrous Merfolk-like creature emerging from a hole and
+    engaged in combat against a Marrow using web traps and physical attacks. They
+    managed to defeat the Leviathan, a gargantuan water creature acting as a damage
+    sponge. The party also discussed complex combat mechanics, including advantage,
+    sneak attacks, and damage rolls.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Combat against the Marrow
+    significance: 3
+    source_type: db_event
+  - sequence_order: '2'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Confrontation with the Leviathan
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: combat
+  location: Catur's Well Chamber
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-012
+  sequence: 12
+  source_type: draft_merged_event
+  source_text: 'The party engaged in combat against a Marrow, using web traps and
+    physical attacks. Outcome: The Marrow was restrained and dealt damage.'
+  source_context: '=== 00:33:00 ===
+
+
+    [00:33:00 - 00:33:08] go okay so you add 4d6 from your speed attack okay and whatever
+    your base die is for your weapon
+
+    [00:33:11 - 00:33:25] which is a six okay so 5d6 effectively okay 12 13 14 15
+    16 no no 18 um 19 20 21 22.
+
+    [00:33:25 - 00:33:43] uh so you uh you all watch as the arrow streams across into
+    one of the marrow''s uh like upper
+
+    [00:33:43 - 00:33:50] chest uh and you just see blood starts to splurt out of
+    the wound that you leave in this thing
+
+    [00:33:50 - 00:33:56] what is she killing it''s a marrow it''s uh like one of
+    the big fish creatures
+
+    [00:33:56 - 00:33:58] oh the ones that came out of the ground yeah
+
+    [00:33:58 - 00:34:05] human type people so they''re so far we''ve been room killed
+    one that came out and then two more'
+  timestamps: N/A
+  actors: Party
+  targets: Marrow
+  mechanical_tags: Webs, Marrow, source=Chronological Major Events
+  story_tags: 5. Combat against the Marrow
+  confidence: high
+  verify: ''
+  summary_context: 'The party met Samuel and proceeded to the underground city. They
+    discovered the well named Nibane, which was inactive for more than 10 years. After
+    resolving the immediate threat of flooding and the appearance of Niebain/Nebain,
+    the party successfully used spellcasting abilities (*Control Water*, *Sanctuary*)
+    to manage the flooding and combat.
+
+
+    The party confronted a monstrous Merfolk-like creature emerging from a hole and
+    engaged in combat against a Marrow using web traps and physical attacks. They
+    managed to defeat the Leviathan, a gargantuan water creature acting as a damage
+    sponge. The party also discussed complex combat mechanics, including advantage,
+    sneak attacks, and damage rolls.
+
+
+    The party was advised to seek the Monastery of the Open Hand to gain trust and
+    reverse damage caused by Salazar. They established diplomatic roles (Mikani, Faban,
+    Corvinus) and gained access to the city, seeking an audience with the Queen to
+    access the hidden magical well.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Combat against the Marrow
+    significance: 3
+    source_type: db_event
+  - sequence_order: '2'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Confrontation with the Leviathan
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: combat
+  location: Catur's Well Chamber
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-013
+  sequence: 13
+  source_type: draft_merged_event
+  source_text: 'The party confronted the Leviathan, a gargantuan water creature acting
+    as a damage sponge. Outcome: The party managed to defeat the Leviathan.'
+  source_context: '[01:35:28 - 01:35:29] All right.
+
+    [01:35:29 - 01:35:30] Okay.
+
+    [01:35:30 - 01:35:31] Cool.
+
+    [01:35:31 - 01:35:32] That was simply them trying to get the leviathan into the
+    room.
+
+    [01:35:32 - 01:35:35] This thing has legendary actions.
+
+    [01:35:35 - 01:35:36] It also has lair actions.
+
+    [01:35:36 - 01:35:37] It has what?
+
+    [01:35:37 - 01:35:38] Lair.
+
+    [01:35:38 - 01:35:39] L-I-A-R.'
+  timestamps: N/A
+  actors: Party
+  targets: Leviathan
+  mechanical_tags: Leviathan, source=Chronological Major Events
+  story_tags: 6. Confrontation with the Leviathan, The party discussed the mechanics
+    of Legendary Actions and Lair Actions, and the Leviathan acted as a damage sponge.
+  confidence: high
+  verify: ''
+  summary_context: 'The party met Samuel and proceeded to the underground city. They
+    discovered the well named Nibane, which was inactive for more than 10 years. After
+    resolving the immediate threat of flooding and the appearance of Niebain/Nebain,
+    the party successfully used spellcasting abilities (*Control Water*, *Sanctuary*)
+    to manage the flooding and combat.
+
+
+    The party confronted a monstrous Merfolk-like creature emerging from a hole and
+    engaged in combat against a Marrow using web traps and physical attacks. They
+    managed to defeat the Leviathan, a gargantuan water creature acting as a damage
+    sponge. The party also discussed complex combat mechanics, including advantage,
+    sneak attacks, and damage rolls.
+
+
+    The party was advised to seek the Monastery of the Open Hand to gain trust and
+    reverse damage caused by Salazar. They established diplomatic roles (Mikani, Faban,
+    Corvinus) and gained access to the city, seeking an audience with the Queen to
+    access the hidden magical well.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Combat against the Marrow
+    significance: 3
+    source_type: db_event
+  - sequence_order: '2'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Confrontation with the Leviathan
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: combat
+  location: Catur's Well Chamber
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-014
+  sequence: 14
+  source_type: draft_merged_event
+  source_text: 'The party discussed the mechanics of combat, including Legendary Actions
+    and Lair Actions. Outcome: The party managed to defeat the Leviathan.'
+  source_context: '[01:35:28 - 01:35:29] All right.
+
+    [01:35:29 - 01:35:30] Okay.
+
+    [01:35:30 - 01:35:31] Cool.
+
+    [01:35:31 - 01:35:32] That was simply them trying to get the leviathan into the
+    room.
+
+    [01:35:32 - 01:35:35] This thing has legendary actions.
+
+    [01:35:35 - 01:35:36] It also has lair actions.
+
+    [01:35:36 - 01:35:37] It has what?
+
+    [01:35:37 - 01:35:38] Lair.
+
+    [01:35:38 - 01:35:39] L-I-A-R.'
+  timestamps: N/A
+  actors: Party
+  targets: Leviathan
+  mechanical_tags: Leviathan, source=Chronological Major Events
+  story_tags: 6. Confrontation with the Leviathan, The party discussed the mechanics
+    of Legendary Actions and Lair Actions, and the Leviathan acted as a damage sponge.
+  confidence: high
+  verify: ''
+  summary_context: 'The party met Samuel and proceeded to the underground city. They
+    discovered the well named Nibane, which was inactive for more than 10 years. After
+    resolving the immediate threat of flooding and the appearance of Niebain/Nebain,
+    the party successfully used spellcasting abilities (*Control Water*, *Sanctuary*)
+    to manage the flooding and combat.
+
+
+    The party confronted a monstrous Merfolk-like creature emerging from a hole and
+    engaged in combat against a Marrow using web traps and physical attacks. They
+    managed to defeat the Leviathan, a gargantuan water creature acting as a damage
+    sponge. The party also discussed complex combat mechanics, including advantage,
+    sneak attacks, and damage rolls.
+
+
+    The party was advised to seek the Monastery of the Open Hand to gain trust and
+    reverse damage caused by Salazar. They established diplomatic roles (Mikani, Faban,
+    Corvinus) and gained access to the city, seeking an audience with the Queen to
+    access the hidden magical well.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Combat against the Marrow
+    significance: 3
+    source_type: db_event
+  - sequence_order: '2'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Confrontation with the Leviathan
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: combat
+  location: Catur's Well Chamber
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-015
+  sequence: 15
+  source_type: draft_merged_event
+  source_text: 'The party discussed the fate of the wells (Korog, Ordor, Scythe) and
+    the Wand of Wells. Outcome: The party discussed the fate of the wells and the
+    Wand of Wells.'
+  source_context: '[01:35:27 - 01:35:28] All right.
+
+    [01:35:28 - 01:35:29] All right.
+
+    [01:35:29 - 01:35:30] Okay.
+
+    [01:35:30 - 01:35:31] Cool.
+
+    [01:35:31 - 01:35:32] That was simply them trying to get the leviathan into the
+    room.
+
+    [01:35:32 - 01:35:35] This thing has legendary actions.
+
+    [01:35:35 - 01:35:36] It also has lair actions.
+
+    [01:35:36 - 01:35:37] It has what?
+
+    [01:35:37 - 01:35:38] Lair.'
+  timestamps: N/A
+  actors: Party
+  targets: Leviathan
+  mechanical_tags: Wand of Wells, Ordor, Leviathan, source=Chronological Major Events
+  story_tags: 7. Final Confrontation and Lore Discussion, The party discussed the
+    political machinations of Salazar and the potential hostile takeover of the realms,
+    and the fate of the wells.
+  confidence: high
+  verify: ''
+  summary_context: 'The party met Samuel and proceeded to the underground city. They
+    discovered the well named Nibane, which was inactive for more than 10 years. After
+    resolving the immediate threat of flooding and the appearance of Niebain/Nebain,
+    the party successfully used spellcasting abilities (*Control Water*, *Sanctuary*)
+    to manage the flooding and combat.
+
+
+    The party confronted a monstrous Merfolk-like creature emerging from a hole and
+    engaged in combat against a Marrow using web traps and physical attacks. They
+    managed to defeat the Leviathan, a gargantuan water creature acting as a damage
+    sponge. The party also discussed complex combat mechanics, including advantage,
+    sneak attacks, and damage rolls.
+
+
+    The party was advised to seek the Monastery of the Open Hand to gain trust and
+    reverse damage caused by Salazar. They established diplomatic roles (Mikani, Faban,
+    Corvinus) and gained access to the city, seeking an audience with the Queen to
+    access the hidden magical well.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Combat against the Marrow
+    significance: 3
+    source_type: db_event
+  - sequence_order: '2'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Confrontation with the Leviathan
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: combat
+  location: Catur's Well Chamber
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-016
+  sequence: 16
+  source_type: draft_merged_event
+  source_text: 'The party discussed the political machinations of Salazar and the
+    hostile takeover of the realms. Outcome: The party discussed the fate of the wells
+    and the Wand of Wells.'
+  source_context: '[01:35:27 - 01:35:28] All right.
+
+    [01:35:28 - 01:35:29] All right.
+
+    [01:35:29 - 01:35:30] Okay.
+
+    [01:35:30 - 01:35:31] Cool.
+
+    [01:35:31 - 01:35:32] That was simply them trying to get the leviathan into the
+    room.
+
+    [01:35:32 - 01:35:35] This thing has legendary actions.
+
+    [01:35:35 - 01:35:36] It also has lair actions.
+
+    [01:35:36 - 01:35:37] It has what?
+
+    [01:35:37 - 01:35:38] Lair.'
+  timestamps: N/A
+  actors: Party
+  targets: Leviathan
+  mechanical_tags: Wand of Wells, Ordor, Leviathan, source=Chronological Major Events
+  story_tags: 7. Final Confrontation and Lore Discussion, The party discussed the
+    political machinations of Salazar and the potential hostile takeover of the realms,
+    and the fate of the wells.
+  confidence: high
+  verify: ''
+  summary_context: 'The party met Samuel and proceeded to the underground city. They
+    discovered the well named Nibane, which was inactive for more than 10 years. After
+    resolving the immediate threat of flooding and the appearance of Niebain/Nebain,
+    the party successfully used spellcasting abilities (*Control Water*, *Sanctuary*)
+    to manage the flooding and combat.
+
+
+    The party confronted a monstrous Merfolk-like creature emerging from a hole and
+    engaged in combat against a Marrow using web traps and physical attacks. They
+    managed to defeat the Leviathan, a gargantuan water creature acting as a damage
+    sponge. The party also discussed complex combat mechanics, including advantage,
+    sneak attacks, and damage rolls.
+
+
+    The party was advised to seek the Monastery of the Open Hand to gain trust and
+    reverse damage caused by Salazar. They established diplomatic roles (Mikani, Faban,
+    Corvinus) and gained access to the city, seeking an audience with the Queen to
+    access the hidden magical well.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Combat against the Marrow
+    significance: 3
+    source_type: db_event
+  - sequence_order: '2'
+    event_type: combat
+    location: Catur's Well Chamber
+    description: Confrontation with the Leviathan
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: lore
+  location: Catur's Well Chamber
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-017
+  sequence: 17
+  source_type: draft_merged_event
+  source_text: 'The party was advised to seek the Monastery of the Open Hand to gain
+    trust and reverse damage. Outcome: Received advice on reversing damage and finding
+    a path forward.'
+  source_context: '[03:01:18 - 03:01:19] I do not have the answers.
+
+    [03:01:27 - 03:01:27] With ether?
+
+    [03:01:28 - 03:01:31] And the abbey of the hand.
+
+    [03:01:31 - 03:01:32] Is it the abbey of the hand?
+
+    [03:01:34 - 03:01:36] The monastery of the open hand.
+
+    [03:01:36 - 03:01:36] That''s it.
+
+    [03:01:36 - 03:01:38] The monastery of the open hand.
+
+    [03:01:40 - 03:01:41] How do we find that?
+
+    [03:01:43 - 03:01:46] That is the more difficult question.'
+  timestamps: N/A
+  actors: Party
+  targets: Gusan
+  mechanical_tags: Gusan, source=Chronological Major Events, spine_type=lore_reveal
+  story_tags: 8. Seeking Guidance and Reversal, The party learned that seeking the
+    Monastery was a path to gaining trust and reversing damage.
+  confidence: high
+  verify: ''
+  summary_context: 'The party confronted a monstrous Merfolk-like creature emerging
+    from a hole and engaged in combat against a Marrow using web traps and physical
+    attacks. They managed to defeat the Leviathan, a gargantuan water creature acting
+    as a damage sponge. The party also discussed complex combat mechanics, including
+    advantage, sneak attacks, and damage rolls.
+
+
+    The party was advised to seek the Monastery of the Open Hand to gain trust and
+    reverse damage caused by Salazar. They established diplomatic roles (Mikani, Faban,
+    Corvinus) and gained access to the city, seeking an audience with the Queen to
+    access the hidden magical well.
+
+
+    Key Events:'
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: exploration
+  location: Monastery of the Open Hand
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-018
+  sequence: 18
+  source_type: draft_merged_event
+  source_text: 'The party established diplomatic roles (Mikani, Faban, Corvinus) and
+    gained access to the city, seeking an audience with the Queen to access the hidden
+    magical well. Outcome: Gained access to the city and the well chamber.'
+  source_context: '[00:00:54 - 00:00:56] me in and then gildas saves me
+
+    [00:00:56 - 00:01:00] with levitation we meet
+
+    [00:01:00 - 00:01:07] samuel at the entrance gate and as we finally get to the
+    underground city is there stuff in
+
+    [00:01:07 - 00:01:13] between there that we need to talk about nothing important
+    he will take us to the monarch monarchical
+
+    [00:01:13 - 00:01:19] leadership is what he says and he says avoid the queen avoid
+    talking of namaloa
+
+    [00:01:19 - 00:01:26] we mean i''m sorry my dragon i know we meet king triton
+    and converse a bit about the
+
+    [00:01:26 - 00:01:26] evil
+
+    [00:01:26 - 00:01:31] forces and we ask about the magic but he says we have to
+    wait for the queen
+
+    [00:01:32 - 00:01:40] and she''s away so we are supposed to wait for her return
+    in the meantime um they had us meet in the'
+  timestamps: N/A
+  actors: Corvinus
+  targets: The Queen
+  mechanical_tags: The Queen, source=session spine
+  story_tags: 1. Diplomatic Approach and Access, The party learned the Queen was less
+    receptive and concerned about disturbing the land.
+  confidence: high
+  verify: ''
+  summary_context: 'The party confronted a monstrous Merfolk-like creature emerging
+    from a hole and engaged in combat against a Marrow using web traps and physical
+    attacks. They managed to defeat the Leviathan, a gargantuan water creature acting
+    as a damage sponge. The party also discussed complex combat mechanics, including
+    advantage, sneak attacks, and damage rolls.
+
+
+    The party was advised to seek the Monastery of the Open Hand to gain trust and
+    reverse damage caused by Salazar. They established diplomatic roles (Mikani, Faban,
+    Corvinus) and gained access to the city, seeking an audience with the Queen to
+    access the hidden magical well.
+
+
+    Key Events:'
+  related_db_events: []
+  decision: pending
+  canonical_text: ''
+  event_type: exploration
+  location: Catur
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+added_items: []
+reviewed_on: '2026-06-01'
+applied_on: '2026-06-01'
+reopened_on: '2026-06-01'

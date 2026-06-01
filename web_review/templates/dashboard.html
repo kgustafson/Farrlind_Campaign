@@ -5,8 +5,8 @@
 <section class="page-head archive-hero">
   <div>
     <p class="eyebrow">{% if event_review_mode %}Human Review Gate{% else %}Campaign Canon Ledger{% endif %}</p>
-    <h1>{% if event_review_mode %}Event Review{% else %}{{ archive_title() }}{% endif %}</h1>
-    <p>{% if event_review_mode %}Review session event YAML after all extraction reviews are complete.{% else %}{{ archive_subtitle() }}{% endif %}</p>
+    <h1>{% if event_review_mode %}Session Review{% else %}{{ archive_title() }}{% endif %}</h1>
+    <p>{% if event_review_mode %}Review final session summaries after entity extraction reviews are complete. Entity canon is edited in its registry pages.{% else %}{{ archive_subtitle() }}{% endif %}</p>
   </div>
 </section>
 
@@ -39,7 +39,7 @@
           {% if event_review_mode and not row.event_review_ready %}
             <span class="muted" title="Missing: {{ row.missing_extraction_reviews|join(', ') }}">Waiting</span>
           {% else %}
-            <a class="icon-link" title="Open review" href="/sessions/{{ row.session }}/review">Open</a>
+            <a class="icon-link" title="{% if row.final_exists and row.status == 'applied' %}View canon summary{% else %}Open review{% endif %}" href="/sessions/{{ row.session }}/review">{% if row.final_exists and row.status == "applied" %}View{% else %}Open{% endif %}</a>
           {% endif %}
         </td>
       </tr>

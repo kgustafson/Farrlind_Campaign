@@ -92,8 +92,10 @@
                   <span class="enemy-outcome">{{ enemy.outcome or "unknown" }}</span>
                   {% if enemy.quantity_killed is not none and enemy.quantity_killed %}
                     <span class="enemy-kill-count">{{ enemy.quantity_killed }} killed</span>
-                  {% elif enemy.quantity_killed is none and (enemy.outcome or "") in ["killed", "defeated"] %}
-                    <span class="enemy-kill-count">unknown killed</span>
+                  {% elif enemy.quantity_killed is none and (enemy.outcome or "") == "killed" %}
+                    <span class="enemy-kill-count">kills unknown</span>
+                  {% elif enemy.outcome %}
+                    <span class="enemy-kill-count">{{ enemy.outcome|replace("_", " ") }}</span>
                   {% endif %}
                 </li>
               {% endfor %}

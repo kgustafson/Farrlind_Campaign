@@ -23,7 +23,7 @@
         <a class="sidebar-link {% if request.url.path == '/' %}active{% endif %}" href="/">Sessions</a>
         {% if can_edit() %}
         <a class="sidebar-link {% if request.url.path.startswith('/workflow') %}active{% endif %}" href="/workflow">Workflow Status</a>
-        <a class="sidebar-link {% if request.url.path.startswith('/event-review') or (request.url.path.startswith('/sessions/') and request.url.path.endswith('/review')) %}active{% endif %}" href="/event-review">Event Review</a>
+        <a class="sidebar-link {% if request.url.path.startswith('/event-review') or (request.url.path.startswith('/sessions/') and request.url.path.endswith('/review')) %}active{% endif %}" href="/event-review">Session Review</a>
         {% endif %}
         <a class="sidebar-link {% if request.url.path.startswith('/npcs') %}active{% endif %}" href="/npcs">NPC Registry</a>
         <a class="sidebar-link {% if request.url.path.startswith('/locations') %}active{% endif %}" href="/locations">Locations</a>
@@ -37,7 +37,6 @@
         <a class="sidebar-link world-map-link" href="#world-map-modal">World Map</a>
         {% if can_edit() %}
         <a class="sidebar-link {% if request.url.path.startswith('/project-utilities') %}active{% endif %}" href="/project-utilities">Project Utilities</a>
-        <span class="sidebar-link disabled" aria-disabled="true">Validation Queue</span>
         {% endif %}
         <a class="sidebar-link {% if request.url.path.startswith('/timeline') %}active{% endif %}" href="/timeline">Campaign Timeline</a>
       </nav>

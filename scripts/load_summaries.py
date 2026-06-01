@@ -1055,6 +1055,7 @@ def load_enemy_encounters() -> list[dict]:
             "enemy_name": entry.get("enemy", ""),
             "enemy_type": entry.get("enemy_type", ""),
             "quantity": entry.get("quantity"),
+            "quantity_killed": entry.get("quantity_killed"),
             "outcome": entry.get("outcome", "encountered"),
             "confidence": entry.get("confidence", "medium"),
             "notes": entry.get("notes", ""),
@@ -1746,7 +1747,7 @@ WHERE s.session_number = {session_number}
 ON CONFLICT (event_id, enemy_id) DO UPDATE SET
     outcome = EXCLUDED.outcome,
     quantity = EXCLUDED.quantity,
-    quantity_killed = EXCLUDED.quantity_killed,
+    quantity_killed = COALESCE(EXCLUDED.quantity_killed, event_enemy.quantity_killed),
     confidence = EXCLUDED.confidence,
     notes = EXCLUDED.notes;
 """.strip()
@@ -1883,7 +1884,7 @@ WHERE s.session_number = {session_number}
 ON CONFLICT (event_id, enemy_id) DO UPDATE SET
     outcome = EXCLUDED.outcome,
     quantity = EXCLUDED.quantity,
-    quantity_killed = EXCLUDED.quantity_killed,
+    quantity_killed = COALESCE(EXCLUDED.quantity_killed, event_enemy.quantity_killed),
     confidence = EXCLUDED.confidence,
     notes = EXCLUDED.notes;
 """.strip()

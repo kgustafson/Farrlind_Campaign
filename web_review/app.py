@@ -316,6 +316,32 @@ def artifact_form_values(form) -> dict:
     }
 
 
+def timeline_form_text(form, field_name: str, current: dict, current_field: Optional[str] = None) -> str:
+    if field_name in form:
+        return (form.get(field_name) or "").strip()
+    value = current.get(current_field or field_name)
+    return str(value or "")
+
+
+def timeline_location_id(form, field_name: str, current: dict, current_field: Optional[str] = None) -> Optional[int]:
+    location_name = timeline_form_text(form, field_name, current, current_field)
+    return canon.location_id(location_name)
+
+
+def timeline_form_values(form, current: dict) -> dict:
+    session_date = timeline_form_text(form, "session_date", current)
+    return {
+        "title": timeline_form_text(form, "title", current),
+        "session_date": session_date or None,
+        "in_game_date": timeline_form_text(form, "in_game_date", current),
+        "primary_location_id": timeline_location_id(form, "primary_location", current),
+        "start_location_id": timeline_location_id(form, "start_location", current),
+        "end_location_id": timeline_location_id(form, "end_location", current),
+        "summary": timeline_form_text(form, "summary", current),
+        "notes": timeline_form_text(form, "notes", current),
+    }
+
+
 def lore_item_form_values(form) -> dict:
     return {
         "title": (form.get("title") or "").strip(),
@@ -1006,7 +1032,10 @@ async def write_session_final_summary(request: Request, session: str):
 
     form = await request.form()
     result = commands.write_final_summary(session_number)
-    post_apply_messages = sync_after_extraction_review(session_number)
+    try:
+        workflow.sync_session_workflow(session_number)
+    except workflow.WorkflowWriteError:
+        pass
     source = form.get("source") or "diary"
     view = form.get("view") or "raw"
     flag = "final_written=1" if result.ok else "final_failed=1"
@@ -1857,13 +1886,47 @@ async def delete_combat_encounter(encounter_id: int):
 def timeline_index(request: Request):
     try:
         timeline = canon.campaign_timeline()
+        locations = canon.locations()
     except canon.CanonReadError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
     return templates.TemplateResponse(
         request,
         "timeline.html",
-        {"timeline": timeline},
+        {"timeline": timeline, "locations": locations},
     )
+
+
+@app.post("/timeline/session/{session_number}/update")
+async def update_timeline_session(request: Request, session_number: int):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Timeline editing is not available in archive mode.")
+    form = await request.form()
+    current = canon.session_timeline_detail(session_number)
+    if not current:
+        raise HTTPException(status_code=404, detail="Session was not found.")
+    known_locations = canon_location_names()
+    location_values = {
+        "new_location": [
+            timeline_form_text(form, "primary_location", current),
+            timeline_form_text(form, "start_location", current),
+            timeline_form_text(form, "end_location", current),
+        ]
+    }
+    if location_confirmation_failed(location_values, form, known_locations):
+        return RedirectResponse(url=f"/timeline?location_confirm_failed=1#edit-session-{session_number:02d}-modal", status_code=303)
+    if not create_missing_review_locations(
+        reviews.form_locations(location_values),
+        known_locations,
+        session_number,
+        "Created from campaign timeline edit.",
+    ):
+        return RedirectResponse(url=f"/timeline?location_create_failed=1#edit-session-{session_number:02d}-modal", status_code=303)
+    try:
+        canon.update_session_timeline(session_number, timeline_form_values(form, current))
+        workflow.sync_session_workflow(session_number)
+    except (canon.CanonWriteError, workflow.WorkflowWriteError):
+        return RedirectResponse(url=f"/timeline?update_failed=1#edit-session-{session_number:02d}-modal", status_code=303)
+    return RedirectResponse(url=f"/timeline?updated=1#session-{session_number:02d}-modal", status_code=303)
 
 
 @app.get("/project-utilities", response_class=HTMLResponse)

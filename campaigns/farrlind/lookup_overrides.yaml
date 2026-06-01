@@ -1,0 +1,126 @@
+description: Campaign lookup values exported from Project Utilities. This file is
+  used to regenerate init/20_lookup_overrides.sql after lookup edits.
+lookups:
+  artifact-types:
+    table: artifact_type
+    value_column: type_name
+    description_column: null
+    values:
+    - value: armor
+    - value: axe
+    - value: bow
+    - value: cap
+    - value: grimoire
+    - value: Musical Instrament
+    - value: orb
+    - value: shield
+    - value: staff
+    - value: wand
+    - value: weapon
+    - value: World Item
+  location-types:
+    table: location_type
+    value_column: type_name
+    description_column: null
+    values:
+    - value: camp
+    - value: city
+    - value: coastal
+    - value: dungeon
+    - value: dwarven_hold
+    - value: feywild
+    - value: inn
+    - value: island
+    - value: monastery
+    - value: temple
+    - value: underwater
+    - value: wilderness
+  combat-outcomes:
+    table: combat_outcome
+    value_column: outcome_code
+    description_column: description
+    values:
+    - value: captured
+      description: Enemy was captured.
+    - value: defeated
+      description: Enemy or encounter was overcome.
+    - value: escaped
+      description: Enemy escaped the encounter.
+    - value: fled
+      description: Enemy fled the encounter.
+    - value: killed
+      description: Enemy was killed.
+    - value: summoned
+      description: Enemy was summoned or appeared.
+    - value: unknown
+      description: Outcome has not been established.
+  npc-status:
+    table: entity_status
+    value_column: status_code
+    description_column: description
+    values:
+    - value: alive
+      description: Confirmed living
+    - value: corrupted
+      description: Corrupted
+    - value: dead
+      description: Confirmed dead
+    - value: fled
+      description: Escaped encounter
+    - value: imprisoned
+      description: Captured or confined
+    - value: missing
+      description: Last known location unknown
+    - value: unknown
+      description: Status not confirmed
+  workflow-status-states:
+    table: workflow_status_state
+    value_column: status_code
+    description_column: description
+    values:
+    - value: blocked
+      description: Step cannot proceed until a blocker is cleared.
+    - value: completed
+      description: Step or workflow completed successfully.
+    - value: failed
+      description: Step or workflow failed.
+    - value: initialized
+      description: Workflow has been created but not started.
+    - value: needs_attention
+      description: Human attention is required.
+    - value: partially_completed
+      description: Workflow has completed some but not all steps.
+    - value: pending
+      description: Step is waiting to run.
+    - value: running
+      description: Step is currently running.
+    - value: skipped
+      description: Step was intentionally skipped.
+  artifact-flags:
+    table: artifact_flag
+    value_column: flag_code
+    description_column: description
+    values:
+    - value: cursed
+      description: Artifact carries a harmful curse.
+    - value: infernal
+      description: Artifact has infernal origin, influence, or binding.
+    - value: sentient
+      description: Artifact has awareness or agency.
+  factions:
+    table: faction
+    value_column: name
+    description_column: description
+    values:
+    - value: Abyssal Agents
+      description: Agents of the Abyss working against wells
+    - value: Demon Lords
+      description: Demonic forces actively interfering with the wells
+    - value: Dwarves of Balrog
+      description: Dwarven hold; allies of the party
+    - value: Elemental Cults
+      description: Cults aligned with elemental/chaos forces
+    - value: Fey of Thataways
+      description: Fey community around the World Tree
+    - value: Well of Magic
+      description: Well of Magic

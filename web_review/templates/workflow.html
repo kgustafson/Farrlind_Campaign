@@ -81,6 +81,23 @@
     </section>
     {% endif %}
 
+    {% if detail.major_status %}
+    <section class="workflow-major-panel" aria-label="Major workflow status">
+      <h3>Major Status</h3>
+      <ol class="workflow-major-list">
+        {% for item in detail.major_status %}
+        <li class="workflow-major-item workflow-major-{{ item.status }}">
+          <div class="workflow-major-head">
+            <span>{{ item.label }}</span>
+            <span class="badge workflow-{{ item.status }}">{{ item.display_status or item.status }}</span>
+          </div>
+          <p>{{ item.detail }}</p>
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+    {% endif %}
+
     <ol class="workflow-step-list">
       {% for step in detail.steps %}
       <li class="workflow-step workflow-step-{{ step.status }}">

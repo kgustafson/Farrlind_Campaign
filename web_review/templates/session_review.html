@@ -15,8 +15,10 @@
     <button type="submit" {% if not document or review_locked %}disabled{% endif %}>Save Final Summary Draft</button>
     <button type="submit" formaction="/sessions/{{ session_key }}/review/reopen" formmethod="post" {% if not review_locked %}disabled{% endif %}>Reopen Review</button>
     <button type="submit" formaction="/sessions/{{ session_key }}/review/mark-reviewed" formmethod="post" {% if not document or review_locked %}disabled{% endif %}>Mark Reviewed</button>
-    <button type="submit" formaction="/sessions/{{ session_key }}/review/apply" formmethod="post" {% if summary.status != "reviewed" %}disabled{% endif %}>Apply to Database</button>
-    <button type="submit" formaction="/sessions/{{ session_key }}/review/write-final-summary" formmethod="post" {% if summary.status != "applied" %}disabled{% endif %}>Write Final Summary</button>
+    <button type="submit" formaction="/sessions/{{ session_key }}/review/apply" formmethod="post" {% if summary.status != "reviewed" %}disabled{% endif %}>
+      {% if review_stage == "compose_final_summary" %}Lock Summary Review{% else %}Apply to Database{% endif %}
+    </button>
+    <button type="submit" formaction="/sessions/{{ session_key }}/review/write-final-summary" formmethod="post" {% if summary.status != "applied" or final_exists %}disabled{% endif %}>Write Final Summary</button>
     <button type="submit" formaction="/sessions/{{ session_key }}/review/health" formmethod="post">Run Health</button>
   </div>
   {% elif not can_edit() %}
@@ -65,7 +67,14 @@
   <div class="flash error-flash">Event review is blocked until extraction reviews are complete.</div>
 {% endif %}
 {% if review_locked %}
-  <div class="flash muted-flash">Applied review is locked. Use Reopen Review to make YAML edits.</div>
+  <div class="flash muted-flash">
+    Applied review is locked.
+    {% if final_exists %}
+      Final summary has been written. Use Reopen Review only if you need to change canon.
+    {% else %}
+      Write Final Summary to finish, or use Reopen Review to make YAML edits.
+    {% endif %}
+  </div>
 {% endif %}
 {% if request.query_params.get("item_added") %}
   <div class="flash">Added review item.</div>

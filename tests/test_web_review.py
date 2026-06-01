@@ -58,8 +58,8 @@ class WebReviewServiceTest(unittest.TestCase):
         self.assertEqual(rows[0].unapplied_items, 2)
         self.assertTrue(rows[0].final_exists)
         self.assertEqual(rows[0].next_action, "apply")
-        self.assertFalse(rows[0].event_review_ready)
-        self.assertIn("NPC Extraction", rows[0].missing_extraction_reviews)
+        self.assertTrue(rows[0].event_review_ready)
+        self.assertEqual(rows[0].missing_extraction_reviews, [])
 
     def test_dashboard_rows_mark_event_review_ready_after_extraction_reviews(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -81,6 +81,39 @@ class WebReviewServiceTest(unittest.TestCase):
 
         self.assertTrue(rows[0].event_review_ready)
         self.assertEqual(rows[0].missing_extraction_reviews, [])
+
+    def test_dashboard_rows_do_not_count_final_summary_evidence_as_pending(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "clean").mkdir()
+            final = root / "final"
+            final.mkdir()
+            (final / "session22_summary.md").write_text("final", encoding="utf-8")
+            self.write_review(root, "session22", {
+                "session": "session22",
+                "status": "applied",
+                "review_stage": "compose_final_summary",
+                "final_summary": {
+                    "session_title": "Session 22",
+                    "real_world_date": "2026-05-31",
+                    "in_world_date": "1832 AS - Namal 25",
+                    "starting_location": "Catur",
+                    "ending_location": "Catur",
+                    "summary_markdown": "Canon summary with enough detail to satisfy validation while proving micro-event evidence does not count as pending work.",
+                },
+                "items": [
+                    {"id": "event-001", "decision": "pending", "canonical_text": "Evidence only."},
+                    {"id": "event-002", "decision": "pending", "canonical_text": "More evidence."},
+                ],
+            })
+
+            with patch.object(reviews, "REVIEWS_DIR", root / "reviews"), \
+                 patch.object(reviews, "CLEAN_DIR", root / "clean"), \
+                 patch.object(reviews, "FINAL_DIR", final):
+                rows = reviews.dashboard_rows()
+
+        self.assertEqual(rows[0].pending_decisions, 0)
+        self.assertEqual(rows[0].next_action, "done")
 
     def test_session_workspace_loads_selected_source_and_sorts_items(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -821,7 +854,7 @@ class WebReviewAppTest(unittest.TestCase):
             response = client.get("/event-review")
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Event Review", response.text)
+        self.assertIn("Session Review", response.text)
         self.assertIn("Waiting", response.text)
         self.assertIn("Missing extraction reviews: NPC Extraction", response.text)
 
@@ -2056,6 +2089,15 @@ class CanonServiceTest(unittest.TestCase):
 
         self.assertEqual(rows[0]["value"], "weapon")
         self.assertIn("FROM artifact_type", fetch.call_args.args[0])
+
+    def test_lookup_rows_include_factions_table(self):
+        with patch("web_review.db.fetch_all", return_value=[{"id": 1, "value": "Celestial Isles", "description": "Dragonkin society."}]) as fetch:
+            rows = canon.lookup_rows("factions")
+
+        self.assertEqual(rows[0]["value"], "Celestial Isles")
+        self.assertIn("FROM faction", fetch.call_args.args[0])
+        self.assertIn("name AS value", fetch.call_args.args[0])
+        self.assertIn("description AS description", fetch.call_args.args[0])
 
     def test_custom_lookup_rows_ensures_table_and_seed_values(self):
         with patch("web_review.db.execute") as execute, \
@@ -4130,6 +4172,7 @@ class WorkflowServiceTest(unittest.TestCase):
             "complete_steps": 26,
             "not_applicable_steps": 0,
             "pending_steps": 0,
+            "raw_pending_steps": 0,
             "blocked_steps": 0,
             "stale_steps": 0,
             "attention_count": 0,
@@ -4145,6 +4188,7 @@ class WorkflowServiceTest(unittest.TestCase):
         self.assertEqual(loaded[0]["session_key"], "session20")
         self.assertEqual(loaded[0]["workflow_url"], "/workflow?session=20")
         self.assertFalse(loaded[0]["has_attention"])
+        self.assertIn("DISTINCT ON", fetch.call_args.args[0])
         self.assertIn("workflow_run", fetch.call_args.args[0])
         self.assertIn("workflow_step_state", fetch.call_args.args[0])
 
@@ -4162,6 +4206,7 @@ class WorkflowServiceTest(unittest.TestCase):
             "complete_steps": 24,
             "not_applicable_steps": 2,
             "pending_steps": 0,
+            "raw_pending_steps": 0,
             "blocked_steps": 0,
             "stale_steps": 0,
             "attention_count": 0,
@@ -4174,6 +4219,35 @@ class WorkflowServiceTest(unittest.TestCase):
 
         self.assertEqual(loaded[0]["status"], "completed")
         self.assertEqual(loaded[0]["progress_percent"], 100)
+
+    def test_workflow_rows_pending_steps_use_unresolved_count(self):
+        rows = [{
+            "session_number": 21,
+            "session_title": "The Road to Sunken Catur",
+            "workflow_id": "farrlind_session_canon",
+            "workflow_version": 2,
+            "status": "partially_completed",
+            "started_at": None,
+            "completed_at": None,
+            "summary_comment": "Seeded.",
+            "total_steps": 43,
+            "complete_steps": 39,
+            "not_applicable_steps": 0,
+            "raw_pending_steps": 3,
+            "pending_steps": 4,
+            "blocked_steps": 0,
+            "stale_steps": 1,
+            "attention_count": 4,
+            "progress_percent": 91,
+            "next_step_name": "Draft Canon Packet With Gemma",
+            "next_step_status": "pending",
+        }]
+        with patch("web_review.db.fetch_all", return_value=rows):
+            loaded = workflow.workflow_rows()
+
+        self.assertEqual(loaded[0]["pending_steps"], 4)
+        self.assertEqual(loaded[0]["attention_count"], 4)
+        self.assertTrue(loaded[0]["has_attention"])
 
     def test_workflow_detail_reads_run_and_ordered_steps(self):
         run = {
@@ -4215,7 +4289,47 @@ class WorkflowServiceTest(unittest.TestCase):
         self.assertEqual(loaded["session_number"], 20)
         self.assertEqual(loaded["review_url"], "/sessions/session20/review")
         self.assertEqual(loaded["steps"][0]["step_id"], "source_audio_registered")
+        self.assertEqual(loaded["major_status"][0]["label"], "Session Kickoff")
+        self.assertEqual(loaded["major_status"][0]["status"], "complete")
         self.assertEqual(loaded["attention_items"], [])
+
+    def test_major_status_reports_entity_reviews_and_session_completion(self):
+        steps = {
+            "source_audio_registered": {"status": "complete", "summary_comment": "Audio exists."},
+            "transcribe_audio": {"status": "complete", "summary_comment": "Transcript written."},
+            "curate_transcript": {"status": "complete"},
+            "generate_narrative_summary": {"status": "complete"},
+            "extract_session_spine": {"status": "complete"},
+            "validate_session_spine": {"status": "complete"},
+            "extract_npcs": {"status": "complete"},
+            "extract_locations": {"status": "complete"},
+            "extract_artifacts": {"status": "complete"},
+            "extract_lore_items": {"status": "complete"},
+            "extract_combat_encounters": {"status": "complete"},
+            "extract_open_threads": {"status": "complete"},
+            "extract_events": {"status": "complete"},
+            "postextract_shortcut": {"status": "complete"},
+            "review_npc_extraction": {"status": "complete", "summary_comment": "NPCs applied."},
+            "review_location_extraction": {"status": "pending"},
+            "review_artifact_extraction": {"status": "complete"},
+            "review_lore_item_extraction": {"status": "complete"},
+            "review_combat_encounter_extraction": {"status": "complete"},
+            "review_open_thread_extraction": {"status": "complete"},
+            "apply_review": {"status": "complete"},
+            "write_final_summary": {"status": "complete"},
+        }
+        run = {
+            "summary_comment": "Started.",
+            "steps": [{"step_id": key, **value} for key, value in steps.items()],
+        }
+
+        items = workflow.major_status_items(run)
+        by_label = {item["label"]: item for item in items}
+
+        self.assertEqual(by_label["Session Kickoff"]["status"], "complete")
+        self.assertEqual(by_label["NPC Review"]["display_status"], "review completed")
+        self.assertEqual(by_label["Location Review"]["display_status"], "needs review")
+        self.assertEqual(by_label["Session Ingest"]["status"], "pending")
 
     def test_workflow_detail_treats_not_applicable_as_complete_for_state(self):
         run = {

@@ -1,4 +1,5 @@
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
@@ -423,6 +424,12 @@ def sync_session_workflow(session_number: int) -> None:
 
 def workflow_rows() -> list[dict[str, Any]]:
     rows = _fetch("""
+        WITH latest_run AS (
+            SELECT DISTINCT ON (wr.session_id)
+                wr.*
+            FROM workflow_run wr
+            ORDER BY wr.session_id, wr.workflow_version DESC, wr.id DESC
+        )
         SELECT
             s.session_number,
             COALESCE(s.title, 'Session ' || LPAD(s.session_number::text, 2, '0')) AS session_title,
@@ -435,10 +442,11 @@ def workflow_rows() -> list[dict[str, Any]]:
             COUNT(wss.id) AS total_steps,
             COUNT(wss.id) FILTER (WHERE wss.status = 'complete') AS complete_steps,
             COUNT(wss.id) FILTER (WHERE wss.status = 'not_applicable') AS not_applicable_steps,
-            COUNT(wss.id) FILTER (WHERE wss.status = 'pending') AS pending_steps,
+            COUNT(wss.id) FILTER (WHERE wss.status = 'pending') AS raw_pending_steps,
+            COUNT(wss.id) FILTER (WHERE wss.status NOT IN ('complete', 'not_applicable')) AS pending_steps,
             COUNT(wss.id) FILTER (WHERE wss.status = 'blocked') AS blocked_steps,
             COUNT(wss.id) FILTER (WHERE wss.status = 'stale') AS stale_steps,
-            COUNT(wss.id) FILTER (WHERE wss.status IN ('pending', 'blocked', 'stale')) AS attention_count,
+            COUNT(wss.id) FILTER (WHERE wss.status NOT IN ('complete', 'not_applicable')) AS attention_count,
             ROUND(
                 100.0 * COUNT(wss.id) FILTER (WHERE wss.status IN ('complete', 'not_applicable'))
                 / NULLIF(COUNT(wss.id), 0),
@@ -446,7 +454,7 @@ def workflow_rows() -> list[dict[str, Any]]:
             )::int AS progress_percent,
             next_step.display_name AS next_step_name,
             next_step.status AS next_step_status
-        FROM workflow_run wr
+        FROM latest_run wr
         JOIN session s ON s.id = wr.session_id
         LEFT JOIN workflow_step_state wss ON wss.workflow_run_id = wr.id
         LEFT JOIN LATERAL (
@@ -529,6 +537,7 @@ def workflow_detail(session_number: int) -> Optional[dict[str, Any]]:
     for step in run["steps"]:
         step["links"] = step_links(step["step_id"], run["session_number"])
         step["issues"] = step_issues(step)
+    run["major_status"] = major_status_items(run)
     if run["steps"] and all(step.get("status") in TERMINAL_STEP_STATUSES for step in run["steps"]):
         run["status"] = "completed"
     run["attention_items"] = [
@@ -537,6 +546,242 @@ def workflow_detail(session_number: int) -> Optional[dict[str, Any]]:
         if step["issues"]
     ]
     return run
+
+
+def major_status_items(run: dict[str, Any]) -> list[dict[str, Any]]:
+    steps = {step["step_id"]: step for step in run.get("steps") or []}
+    items = [
+        {
+            "label": "Session Kickoff",
+            "status": "complete",
+            "display_status": "complete",
+            "detail": run.get("summary_comment") or "Workflow row exists for this session.",
+        },
+        audio_validation_status(steps),
+        transcription_status_item(steps),
+        draft_preparation_status(steps),
+    ]
+    items.extend(entity_review_status_items(steps))
+    items.append(final_summary_status_item(steps))
+    items.append(session_complete_status_item(steps))
+    return items
+
+
+def audio_validation_status(steps: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    step = steps.get("source_audio_registered") or {}
+    status = step.get("status") or "pending"
+    if status == "complete":
+        label = "Audio Validated"
+    elif status == "not_applicable":
+        label = "Audio Not Required"
+    elif status == "pending":
+        label = "Audio Needed"
+    else:
+        label = "Audio Problem"
+    return {
+        "label": "Audio File",
+        "status": status,
+        "display_status": label,
+        "detail": step.get("summary_comment") or "Audio file has not been checked yet.",
+    }
+
+
+def transcription_status_item(steps: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    step = steps.get("transcribe_audio") or {}
+    progress = transcription_progress(step)
+    detail_parts = [step.get("summary_comment") or "Transcription has not started."]
+    if progress.get("chunk_label"):
+        detail_parts.append(progress["chunk_label"])
+    if progress.get("elapsed_label"):
+        detail_parts.append(progress["elapsed_label"])
+    return {
+        "label": "Transcription",
+        "status": step.get("status") or "pending",
+        "display_status": major_status_label(step.get("status") or "pending"),
+        "detail": " ".join(part for part in detail_parts if part),
+        "progress": progress,
+    }
+
+
+def draft_preparation_status(steps: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    ids = [
+        "curate_transcript",
+        "generate_narrative_summary",
+        "extract_session_spine",
+        "validate_session_spine",
+        "extract_npcs",
+        "extract_locations",
+        "extract_artifacts",
+        "extract_lore_items",
+        "extract_combat_encounters",
+        "extract_open_threads",
+        "extract_events",
+        "postextract_shortcut",
+    ]
+    selected = [steps.get(step_id) for step_id in ids if steps.get(step_id)]
+    status = major_status_from_steps(selected)
+    complete_count = sum(1 for step in selected if step.get("status") in TERMINAL_STEP_STATUSES)
+    return {
+        "label": "Draft Preparation",
+        "status": status,
+        "display_status": major_status_label(status),
+        "detail": f"{complete_count} of {len(selected)} draft/extraction steps complete.",
+    }
+
+
+def entity_review_status_items(steps: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
+    specs = [
+        ("NPC Review", "review_npc_extraction"),
+        ("Location Review", "review_location_extraction"),
+        ("Artifact Review", "review_artifact_extraction"),
+        ("Lore Review", "review_lore_item_extraction"),
+        ("Combat Review", "review_combat_encounter_extraction"),
+        ("Open Thread Review", "review_open_thread_extraction"),
+    ]
+    items = []
+    for label, step_id in specs:
+        step = steps.get(step_id) or {}
+        status = step.get("status") or "pending"
+        if status == "complete":
+            display_status = "review completed"
+        elif status in {"pending", "not_applicable"}:
+            display_status = "needs review"
+        elif status in {"blocked", "stale", "failed"}:
+            display_status = "needs attention"
+        else:
+            display_status = major_status_label(status)
+        items.append({
+            "label": label,
+            "status": status,
+            "display_status": display_status,
+            "detail": step.get("summary_comment") or "Review has not been applied yet.",
+        })
+    return items
+
+
+def final_summary_status_item(steps: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    ids = ["initialize_review", "edit_review_decisions", "validate_final_summary", "mark_reviewed", "apply_review", "write_final_summary"]
+    selected = [steps.get(step_id) for step_id in ids if steps.get(step_id)]
+    status = major_status_from_steps(selected)
+    final_step = steps.get("write_final_summary") or {}
+    return {
+        "label": "Final Summary Review",
+        "status": status,
+        "display_status": "review completed" if status == "complete" else major_status_label(status),
+        "detail": final_step.get("summary_comment") or "Final summary review is not complete.",
+    }
+
+
+def session_complete_status_item(steps: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    apply_step = steps.get("apply_review") or {}
+    final_step = steps.get("write_final_summary") or {}
+    entity_steps = [
+        steps.get("review_npc_extraction") or {},
+        steps.get("review_location_extraction") or {},
+        steps.get("review_artifact_extraction") or {},
+        steps.get("review_lore_item_extraction") or {},
+        steps.get("review_combat_encounter_extraction") or {},
+        steps.get("review_open_thread_extraction") or {},
+    ]
+    entities_complete = all(step.get("status") == "complete" for step in entity_steps)
+    complete = entities_complete and apply_step.get("status") == "complete" and final_step.get("status") == "complete"
+    return {
+        "label": "Session Ingest",
+        "status": "complete" if complete else "pending",
+        "display_status": "complete" if complete else "not complete",
+        "detail": "Session ingest complete." if complete else "Waiting for entity reviews and accepted final summary.",
+    }
+
+
+def major_status_from_steps(steps: list[Optional[dict[str, Any]]], complete_when_any_terminal: bool = False) -> str:
+    real_steps = [step for step in steps if step]
+    if not real_steps:
+        return "pending"
+    statuses = [step.get("status") or "pending" for step in real_steps]
+    if any(status == "failed" for status in statuses):
+        return "failed"
+    if any(status == "running" for status in statuses):
+        return "running"
+    if any(status in {"blocked", "stale"} for status in statuses):
+        return "blocked" if "blocked" in statuses else "stale"
+    if all(status in TERMINAL_STEP_STATUSES for status in statuses):
+        return "complete"
+    if complete_when_any_terminal and any(status in TERMINAL_STEP_STATUSES for status in statuses):
+        return "complete"
+    return "pending"
+
+
+def major_status_label(status: str) -> str:
+    labels = {
+        "complete": "complete",
+        "not_applicable": "not required",
+        "pending": "waiting",
+        "running": "running",
+        "blocked": "blocked",
+        "stale": "needs attention",
+        "failed": "failed",
+    }
+    return labels.get(status, status)
+
+
+def transcription_progress(step: dict[str, Any]) -> dict[str, Any]:
+    metadata = step.get("metadata") or {}
+    log_path = metadata.get("log_path") if isinstance(metadata, dict) else ""
+    progress: dict[str, Any] = {}
+    if log_path:
+        path = reviews.REPO_ROOT / log_path
+        if path.exists():
+            text = path.read_text(encoding="utf-8", errors="replace")
+            total_match = re.search(r"\bchunks=(\d+)\b", text)
+            done_chunks = len(re.findall(r"parallel done chunk-\d+", text))
+            if total_match:
+                total = int(total_match.group(1))
+                progress["chunks_done"] = done_chunks
+                progress["chunks_total"] = total
+                progress["chunk_label"] = f"Chunks: {done_chunks} of {total}."
+            elapsed_match = re.search(r"done parallel transcription elapsed=([\d.]+)s", text)
+            if elapsed_match:
+                progress["elapsed_seconds"] = float(elapsed_match.group(1))
+                progress["elapsed_label"] = f"Elapsed: {format_duration(float(elapsed_match.group(1)))}."
+    elapsed = elapsed_seconds(step.get("started_at"), step.get("completed_at"))
+    if elapsed is not None and "elapsed_label" not in progress:
+        progress["elapsed_seconds"] = elapsed
+        progress["elapsed_label"] = f"Elapsed: {format_duration(elapsed)}."
+    return progress
+
+
+def elapsed_seconds(started_at: Any, completed_at: Any) -> Optional[float]:
+    if not started_at:
+        return None
+    start = coerce_datetime(started_at)
+    end = coerce_datetime(completed_at) if completed_at else datetime.now(timezone.utc)
+    if not start or not end:
+        return None
+    return max(0.0, (end - start).total_seconds())
+
+
+def coerce_datetime(value: Any) -> Optional[datetime]:
+    if isinstance(value, datetime):
+        return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+    if isinstance(value, str):
+        try:
+            normalized = value.replace("Z", "+00:00")
+            parsed = datetime.fromisoformat(normalized)
+            return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+        except ValueError:
+            return None
+    return None
+
+
+def format_duration(seconds: float) -> str:
+    total = int(seconds)
+    hours, remainder = divmod(total, 3600)
+    minutes, secs = divmod(remainder, 60)
+    if hours:
+        return f"{hours}h {minutes}m {secs}s"
+    if minutes:
+        return f"{minutes}m {secs}s"
+    return f"{secs}s"
 
 
 def session_key(session_number: int) -> str:
@@ -628,4 +873,8 @@ def is_file_artifact(value: str) -> bool:
 
 
 def is_optional_artifact(value: str) -> bool:
-    return "/notes/" in value and value.endswith("_corrections.md")
+    return (
+        ("/notes/" in value and value.endswith("_corrections.md"))
+        or value.endswith("_diary.md")
+        or value.endswith("_context.yaml")
+    )

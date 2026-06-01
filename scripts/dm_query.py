@@ -1601,15 +1601,22 @@ def session_final(args):
 
 def write_final_summary(args):
     session_number = args.session_number
-    review = query_event_review(args, session_number)
-    session = review["session"]
-    if not session:
-        raise SystemExit(f"No session found for session{session_number:02d}")
-
     path = review_path(session_number)
     document = load_review_file(path) if path.exists() else {}
     if document.get("status") != "applied":
         raise SystemExit(f"Review must be applied before writing final summary: {path}")
+
+    if document.get("final_summary"):
+        output_path = final_summary_path(session_number)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(render_reviewed_final_summary(document, session_number), encoding="utf-8")
+        print(f"Wrote {output_path}")
+        return
+
+    review = query_event_review(args, session_number)
+    session = review["session"]
+    if not session:
+        raise SystemExit(f"No session found for session{session_number:02d}")
 
     decisions = canon_decisions_for_session(load_canon_decisions(), session_number)
     output_path = final_summary_path(session_number)
@@ -1635,17 +1642,21 @@ def apply_review(args):
             f"Review status must be reviewed, complete, or applied before DB update: {document.get('status')}"
         )
 
+    applied_on = args.applied_on or date.today().isoformat()
     if document.get("final_summary"):
+        document = mark_review_applied(document, applied_on)
         output_path = final_summary_path(session_number)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(render_reviewed_final_summary(document, session_number), encoding="utf-8")
+        save_review_file(path, document)
+        print(f"Applied final summary review without database reload: {path}")
+        return
 
     command = [sys.executable, "scripts/rag.py", "dbload", "--apply"]
     result = subprocess.run(command, cwd=REPO_ROOT, check=False, text=True)
     if result.returncode != 0:
         raise SystemExit(result.returncode)
 
-    applied_on = args.applied_on or date.today().isoformat()
     save_review_file(path, mark_review_applied(document, applied_on))
     print(f"Applied review: {path}")
 

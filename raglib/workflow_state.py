@@ -342,6 +342,7 @@ def historical_step_state(number: int, step: dict[str, Any]) -> dict[str, Any]:
     transcript = campaign.raw_dir() / f"{name}_transcript.txt"
     audio = historical_audio_path(name)
     review_status = load_review_status(review)
+    review_document = load_review_document(review)
     extraction_review_outputs = {
         "review_npc_extraction": campaign.extracted_dir() / f"{name}_npcs_reviewed.json",
         "review_location_extraction": campaign.extracted_dir() / f"{name}_locations_reviewed.json",
@@ -349,6 +350,28 @@ def historical_step_state(number: int, step: dict[str, Any]) -> dict[str, Any]:
         "review_lore_item_extraction": campaign.extracted_dir() / f"{name}_lore_items_reviewed.json",
         "review_combat_encounter_extraction": campaign.extracted_dir() / f"{name}_combat_encounters_reviewed.json",
         "review_open_thread_extraction": campaign.extracted_dir() / f"{name}_open_threads_reviewed.json",
+    }
+    extraction_to_reviewed_output = {
+        "extract_npcs": extraction_review_outputs["review_npc_extraction"],
+        "extract_locations": extraction_review_outputs["review_location_extraction"],
+        "extract_artifacts": extraction_review_outputs["review_artifact_extraction"],
+        "extract_lore_items": extraction_review_outputs["review_lore_item_extraction"],
+        "extract_combat_encounters": extraction_review_outputs["review_combat_encounter_extraction"],
+        "extract_open_threads": extraction_review_outputs["review_open_thread_extraction"],
+    }
+    draft_steps_that_stop_mattering_after_final_summary = {
+        "curate_transcript",
+        "generate_narrative_summary",
+        "extract_session_spine",
+        "validate_session_spine",
+        "extract_events",
+        "filter_events",
+        "classify_events",
+        "normalize_events",
+        "merge_events",
+        "validate_draft",
+        "summarize_draft",
+        "postextract_shortcut",
     }
 
     if step_id == "source_audio_registered":
@@ -375,6 +398,22 @@ def historical_step_state(number: int, step: dict[str, Any]) -> dict[str, Any]:
         if transcript.exists() or (campaign.clean_dir() / f"{name}_diary.md").exists():
             return complete_state(step_id, "At least one source artifact exists and was used for historical review.", existing_paths(inputs))
         return pending_state(step_id, "No usable source artifact was found.", [])
+
+    if step_id in draft_steps_that_stop_mattering_after_final_summary and final_summary.exists() and review_status == "applied":
+        return complete_state(
+            step_id,
+            f"Draft step is superseded by the applied final summary for {name}; later source-file edits do not make canon stale.",
+            existing_paths(outputs) or [relative(final_summary), relative(review)],
+        )
+
+    if step_id in extraction_to_reviewed_output:
+        reviewed = extraction_to_reviewed_output[step_id]
+        if reviewed.exists():
+            return complete_state(
+                step_id,
+                f"Entity extraction for {name} has been human-reviewed and applied; accepted database canon is authoritative.",
+                [relative(reviewed)],
+            )
 
     if step_id in {
         "extract_events",
@@ -428,6 +467,13 @@ def historical_step_state(number: int, step: dict[str, Any]) -> dict[str, Any]:
             return complete_state(step_id, f"Human review file exists for {name}.", [relative(review)])
         return pending_state(step_id, "No review file was found.", [])
 
+    if step_id == "validate_final_summary":
+        if review_document.get("final_summary") and not final_summary_readiness_errors(review_document):
+            return complete_state(step_id, "Final summary review fields pass validation.", [relative(review)])
+        if final_summary.exists() and review_status == "applied":
+            return complete_state(step_id, "Final canonical summary exists and review has been applied.", [relative(final_summary), relative(review)])
+        return pending_state(step_id, "Final summary review still has required fields or placeholders to resolve.", existing_paths([str(review)]))
+
     if step_id in {"edit_review_decisions", "mark_reviewed"}:
         if review_status in {"reviewed", "applied"}:
             return complete_state(step_id, f"Review status is {review_status}.", [relative(review)])
@@ -435,7 +481,7 @@ def historical_step_state(number: int, step: dict[str, Any]) -> dict[str, Any]:
 
     if step_id == "apply_review":
         if review_status == "applied":
-            return complete_state(step_id, "Review has been applied to canon/database workflow.", [relative(review)])
+            return complete_state(step_id, "Final summary review has been locked/applied without changing accepted entity database canon.", [relative(review)])
         return pending_state(step_id, f"Review status is {review_status or 'missing'}, not applied.", existing_paths([str(review)]))
 
     if step_id == "write_final_summary":
@@ -511,10 +557,38 @@ def load_review_status(path: Path) -> str | None:
     return data.get("status") if isinstance(data, dict) else None
 
 
+def load_review_document(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    return data if isinstance(data, dict) else {}
+
+
+def final_summary_readiness_errors(document: dict[str, Any]) -> list[str]:
+    final_summary = document.get("final_summary") or {}
+    errors: list[str] = []
+    for field, label in [
+        ("session_title", "Session title"),
+        ("real_world_date", "Real-world date"),
+        ("in_world_date", "In-world date"),
+        ("starting_location", "Starting location"),
+        ("ending_location", "Ending location"),
+        ("summary_markdown", "Canon final summary"),
+    ]:
+        if not str(final_summary.get(field) or "").strip():
+            errors.append(f"{label} is required.")
+    text = str(final_summary.get("summary_markdown") or "")
+    if len(text.strip()) < 80:
+        errors.append("Canon final summary is too short.")
+    if re.search(r"\b(TODO|TBD|FIXME|TK)\b|\?\?\?", text, re.IGNORECASE):
+        errors.append("Canon final summary contains unresolved placeholder text.")
+    return errors
+
+
 def existing_paths(paths: list[Any]) -> list[str]:
     found = []
     for item in paths:
-        if not isinstance(item, str) or any(token in item for token in ["operator ", "database ", "reviewed ", "source artifacts"]):
+        if not isinstance(item, str) or any(token in item for token in ["operator ", "database ", "reviewed ", "source artifacts", "prior "]):
             continue
         matches = list(REPO_ROOT.glob(item)) if "*" in item else [REPO_ROOT / item]
         found.extend(relative(path) for path in matches if path.exists())
@@ -524,14 +598,14 @@ def existing_paths(paths: list[Any]) -> list[str]:
 def count_file_outputs(paths: list[Any]) -> int:
     return len([
         item for item in paths
-        if isinstance(item, str) and not any(token in item for token in ["operator ", "database ", "reviewed ", "source artifacts"])
+        if isinstance(item, str) and not any(token in item for token in ["operator ", "database ", "reviewed ", "source artifacts", "prior "])
     ])
 
 
 def all_file_outputs_exist(paths: list[Any]) -> bool:
     file_outputs = [
         item for item in paths
-        if isinstance(item, str) and not any(token in item for token in ["operator ", "database ", "reviewed ", "source artifacts"])
+        if isinstance(item, str) and not any(token in item for token in ["operator ", "database ", "reviewed ", "source artifacts", "prior "])
     ]
     if not file_outputs:
         return False
@@ -561,7 +635,7 @@ def stale_input_paths(inputs: list[Any], outputs: list[Any]) -> list[str]:
 def concrete_existing_paths(paths: list[Any]) -> list[Path]:
     found: list[Path] = []
     for item in paths:
-        if not isinstance(item, str) or any(token in item for token in ["operator ", "database ", "reviewed ", "source artifacts"]):
+        if not isinstance(item, str) or any(token in item for token in ["operator ", "database ", "reviewed ", "source artifacts", "prior "]):
             continue
         matches = list(REPO_ROOT.glob(item)) if "*" in item else [REPO_ROOT / item]
         found.extend(path for path in matches if path.exists())

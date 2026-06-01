@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from raglib.campaign import active_campaign_name, campaign_root, clean_dir, notes_dir, raw_dir, sessions_dir, ensure_campaign_dirs
@@ -16,7 +17,7 @@ NOTES = notes_dir(CAMPAIGN_NAME)
 PROMPTS = BASE2 / "prompts"
 
 # ===== Ollama =====
-OLLAMA_URL = "http://localhost:11434"
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434").rstrip("/")
 MODEL = "llama3"  # use small model for extract; upgrade later for summarize
 
 # ===== Chunking =====

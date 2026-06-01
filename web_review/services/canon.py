@@ -272,6 +272,15 @@ LOOKUP_TABLES: dict[str, dict[str, Any]] = {
         ],
         "custom": True,
     },
+    "factions": {
+        "key": "factions",
+        "label": "Factions",
+        "table": "faction",
+        "value_column": "name",
+        "description_column": "description",
+        "seed": [],
+        "custom": False,
+    },
 }
 
 
@@ -301,6 +310,44 @@ def session_rows() -> list[dict[str, Any]]:
         FROM session
         ORDER BY session_number;
     """)
+
+
+def session_timeline_detail(session_number: int) -> Optional[dict[str, Any]]:
+    rows = _fetch("""
+        SELECT
+            s.session_number,
+            s.title,
+            s.session_date,
+            s.in_game_date,
+            p.name AS primary_location,
+            sl.name AS start_location,
+            el.name AS end_location,
+            s.summary,
+            s.notes
+        FROM session s
+        LEFT JOIN location p ON p.id = s.location_id
+        LEFT JOIN location sl ON sl.id = s.start_location_id
+        LEFT JOIN location el ON el.id = s.end_location_id
+        WHERE s.session_number = :session_number;
+    """, {"session_number": session_number})
+    return rows[0] if rows else None
+
+
+def update_session_timeline(session_number: int, values: dict[str, Any]) -> None:
+    params = {**values, "session_number": session_number}
+    _execute("""
+        UPDATE session
+        SET
+            title = :title,
+            session_date = :session_date,
+            in_game_date = :in_game_date,
+            location_id = :primary_location_id,
+            start_location_id = :start_location_id,
+            end_location_id = :end_location_id,
+            summary = :summary,
+            notes = :notes
+        WHERE session_number = :session_number;
+    """, params)
 
 
 def location_id(name: Optional[str]) -> Optional[int]:
@@ -1224,7 +1271,7 @@ def murder_hobo_count(encounters: list[dict[str, Any]]) -> dict[str, Any]:
             if quantity_killed is not None:
                 total += quantity_killed
                 continue
-            if (enemy.get("outcome") or "").lower() in {"killed", "defeated"}:
+            if (enemy.get("outcome") or "").lower() == "killed":
                 unknown_rows += 1
     return {
         "total": total,
@@ -1264,6 +1311,7 @@ def campaign_timeline() -> dict[str, Any]:
             s.in_game_date,
             s.title,
             s.summary,
+            s.notes,
             l.name AS primary_location,
             {start_location_select},
             {end_location_select}
@@ -1333,6 +1381,7 @@ def campaign_timeline() -> dict[str, Any]:
             "in_game_date_latest": in_game_date_latest,
             "title": session["title"],
             "summary": session["summary"],
+            "notes": session["notes"],
             "primary_location": session["primary_location"],
             "start_location": session["start_location"],
             "end_location": session["end_location"],

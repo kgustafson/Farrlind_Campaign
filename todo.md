@@ -9,11 +9,11 @@ The workflow should eventually make it easy to see where each session is in the 
 ```text
 audio/transcript
   -> draft canon packet with gemma4:e2b
-  -> human canon packet review
-  -> accepted canon summary
-  -> accepted structured canon items
-  -> apply review
-  -> final summary
+  -> dedicated entity extraction
+  -> human review/apply of NPCs, locations, artifacts, lore items, combat encounters, and open threads
+  -> structured database canon is locked as the golden entity truth
+  -> compose human-reviewed final summary from evidence
+  -> lock/write final summary markdown only
   -> database/canon health
 ```
 
@@ -25,6 +25,8 @@ audio/transcript
 - Audio ingestion is now part of the per-session intake path, but remains upstream draft/source material.
 - Reruns must never overwrite reviewed or applied canon automatically.
 - Reruns may only affect canon after explicit human review and approval.
+- After entity extraction reviews are applied, later final-summary review steps must not reload, reinterpret, or overwrite accepted entity database canon.
+- Final-summary review is a narrative/canon-file publishing step; it writes markdown and marks the review applied, but does not run `dbload --apply`.
 - Which steps can run automatically versus require user approval will be decided over time.
 - Gemma curation should be treated as a draft canon packet generator, not merely a prose summarizer.
 - Draft canon packets should extract coherent sections for summary, major events, NPCs/entities, locations, artifacts/items, lore items, combat encounters, open threads, timeline notes, and inventory/resource notes.
