@@ -1,5 +1,15 @@
 # Revision History - D&D Campaign Manager
 
+## v0.7.1 - 6/5/2026
+
+Added a Docker-managed workflow worker for automatic queued session intake.
+
+- Runtime: Added a `workflow_worker` Docker Compose service that watches `ops/workflow_queue/` and runs queued auto-intake jobs through transcription, draft preparation, and entity extraction.
+- Workflow: Added `--watch` mode and polling support to `scripts/workflow_auto_intake.py` so the worker stays alive instead of exiting when the queue is empty.
+- Runtime: Added `ffmpeg`, `ffprobe`, and `faster-whisper` to the Docker image so transcription can run inside the worker container.
+- Docs: Updated README startup guidance and worker log command.
+- Tests: Added coverage for the queue watch loop.
+
 ## v0.7.0 - 6/1/2026
 
 Baselined the summary-first review workflow and cleaned up the campaign management surface after the Session 22 intake cycle.

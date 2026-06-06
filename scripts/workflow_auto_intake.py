@@ -6,6 +6,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -407,15 +408,36 @@ def process_queue(session_number: int | None = None, dry_run: bool = False) -> i
     return 0
 
 
+def watch_queue(
+    session_number: int | None = None,
+    dry_run: bool = False,
+    poll_seconds: int = 30,
+    stop_after: int | None = None,
+) -> int:
+    poll_seconds = max(1, poll_seconds)
+    iterations = 0
+    print(f"Watching workflow intake queue every {poll_seconds} seconds.", flush=True)
+    while True:
+        process_queue(session_number=session_number, dry_run=dry_run)
+        iterations += 1
+        if stop_after is not None and iterations >= stop_after:
+            return 0
+        time.sleep(poll_seconds)
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run queued campaign workflow intake jobs through draft extraction.")
     parser.add_argument("--session", type=int, default=None, help="Only process one session number.")
     parser.add_argument("--dry-run", action="store_true", help="Mark steps without executing commands.")
+    parser.add_argument("--watch", action="store_true", help="Keep polling for queued workflow intake jobs.")
+    parser.add_argument("--poll-seconds", type=int, default=30, help="Queue polling interval for --watch.")
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
+    if args.watch:
+        return watch_queue(args.session, dry_run=args.dry_run, poll_seconds=args.poll_seconds)
     return process_queue(args.session, dry_run=args.dry_run)
 
 

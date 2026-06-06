@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from scripts.workflow_auto_intake import command_plan
+from scripts.workflow_auto_intake import command_plan, watch_queue
 
 
 class WorkflowAutoIntakeTest(unittest.TestCase):
@@ -88,3 +88,13 @@ class WorkflowAutoIntakeTest(unittest.TestCase):
                 "campaigns/trinyvale/audio/session02.mp3",
             ],
         )
+
+    def test_watch_queue_polls_without_exiting_after_empty_queue(self):
+        with patch("scripts.workflow_auto_intake.process_queue", return_value=0) as process, \
+             patch("scripts.workflow_auto_intake.time.sleep") as sleep:
+            result = watch_queue(poll_seconds=0, stop_after=2)
+
+        self.assertEqual(result, 0)
+        self.assertEqual(process.call_count, 2)
+        self.assertEqual(sleep.call_count, 1)
+        self.assertEqual(sleep.call_args.args[0], 1)

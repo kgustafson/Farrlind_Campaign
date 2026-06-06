@@ -1,6 +1,6 @@
 # Version
 
-v0.7.0
+v0.7.1
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.7.0` baselines the summary-first session review workflow, high-level workflow status reporting, entity canon protections, combat/timeline cleanup, and expanded project lookup utilities.
+`v0.7.1` adds a Docker-managed workflow worker so queued session intake jobs are picked up automatically, with container transcription dependencies included.

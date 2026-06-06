@@ -62,11 +62,10 @@ The benchmark defaults to two parallel workers. Treat two workers as the normal 
 
 ## Web Review App
 
-Run the database, Adminer, and the Farrlind review UI with Docker Compose:
+Run the database, Adminer, Farrlind review UI, archive UI, and workflow worker with Docker Compose:
 
 ```bash
-cd farrlind
-docker compose up --build -d
+./scripts/start_campaign.sh farrlind up --build -d
 ```
 
 Then open:
@@ -79,6 +78,12 @@ Docker Compose also starts a read-only archive viewer at:
 
 ```text
 http://127.0.0.1:8002
+```
+
+The `workflow_worker` service watches `ops/workflow_queue/` and runs queued session intake jobs through transcription, draft preparation, and entity extraction:
+
+```bash
+docker logs -f farrlind_workflow_worker
 ```
 
 ## Campaign Database Init
