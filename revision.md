@@ -1,5 +1,15 @@
 # Revision History - D&D Campaign Manager
 
+## v0.7.2 - 6/6/2026
+
+Tightened session workflow status around the summary-first review model.
+
+- Workflow: Treats completed final summaries as satisfying the final-summary review lane so legacy micro-event pending decisions no longer keep session ingest stuck.
+- Workflow: Keeps applied entity extraction reviews authoritative for workflow status, preserving the database as the golden structured canon boundary.
+- App: Adjusted the workflow ledger progress and pending counts to focus on session ingest lanes instead of downstream verification/version-control bookkeeping.
+- App: Preserved legacy review dashboard behavior where older reviewed-but-unapplied event reviews still show `apply` as the next action.
+- Tests: Added regression coverage for final summaries satisfying legacy micro-event review steps and reran focused workflow/web review suites.
+
 ## v0.7.1 - 6/5/2026
 
 Added a Docker-managed workflow worker for automatic queued session intake.

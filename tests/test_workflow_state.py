@@ -1,5 +1,7 @@
 import unittest
 from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 from raglib.workflow_state import (
     historical_step_state,
@@ -108,10 +110,44 @@ class WorkflowStateTest(unittest.TestCase):
         state = historical_step_state(20, review_step)
         self.assertEqual(state["status"], "complete")
 
+    def test_final_summary_satisfies_legacy_micro_event_review_steps(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            campaign_root = root / "campaigns" / "test"
+            reviews_dir = campaign_root / "reviews"
+            final_dir = campaign_root / "final"
+            clean_dir = campaign_root / "clean"
+            raw_dir = campaign_root / "raw"
+            extracted_dir = campaign_root / "extracted"
+            for directory in [reviews_dir, final_dir, clean_dir, raw_dir, extracted_dir]:
+                directory.mkdir(parents=True, exist_ok=True)
+            (final_dir / "session22_summary.md").write_text("Final canon summary.", encoding="utf-8")
+            (reviews_dir / "session22_review.yaml").write_text(
+                "status: in_review\nitems:\n  - id: event-001\n    decision: pending\n",
+                encoding="utf-8",
+            )
+
+            patches = [
+                patch("raglib.workflow_state.REPO_ROOT", root),
+                patch("raglib.workflow_state.campaign.reviews_dir", return_value=reviews_dir),
+                patch("raglib.workflow_state.campaign.final_dir", return_value=final_dir),
+                patch("raglib.workflow_state.campaign.clean_dir", return_value=clean_dir),
+                patch("raglib.workflow_state.campaign.raw_dir", return_value=raw_dir),
+                patch("raglib.workflow_state.campaign.extracted_dir", return_value=extracted_dir),
+            ]
+            for active in patches:
+                active.start()
+            try:
+                for step_id in ["edit_review_decisions", "mark_reviewed", "apply_review", "write_final_summary"]:
+                    state = historical_step_state(22, {"id": step_id, "expected_inputs": [], "expected_outputs": []})
+                    self.assertEqual(state["status"], "complete", step_id)
+            finally:
+                for active in reversed(patches):
+                    active.stop()
+
     def test_stale_input_paths_flags_newer_inputs(self):
         import tempfile
         import time
-        from unittest.mock import patch
 
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

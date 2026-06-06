@@ -343,6 +343,7 @@ def historical_step_state(number: int, step: dict[str, Any]) -> dict[str, Any]:
     audio = historical_audio_path(name)
     review_status = load_review_status(review)
     review_document = load_review_document(review)
+    summary_ready = final_summary_review_ready(review_document) or final_summary.exists()
     extraction_review_outputs = {
         "review_npc_extraction": campaign.extracted_dir() / f"{name}_npcs_reviewed.json",
         "review_location_extraction": campaign.extracted_dir() / f"{name}_locations_reviewed.json",
@@ -468,20 +469,31 @@ def historical_step_state(number: int, step: dict[str, Any]) -> dict[str, Any]:
         return pending_state(step_id, "No review file was found.", [])
 
     if step_id == "validate_final_summary":
-        if review_document.get("final_summary") and not final_summary_readiness_errors(review_document):
-            return complete_state(step_id, "Final summary review fields pass validation.", [relative(review)])
         if final_summary.exists() and review_status == "applied":
             return complete_state(step_id, "Final canonical summary exists and review has been applied.", [relative(final_summary), relative(review)])
+        if final_summary.exists():
+            return complete_state(step_id, "Final canonical summary exists; old micro-event pending state is no longer a workflow blocker.", [relative(final_summary)])
+        if final_summary_review_ready(review_document):
+            return complete_state(step_id, "Final summary review fields pass validation.", [relative(review)])
         return pending_state(step_id, "Final summary review still has required fields or placeholders to resolve.", existing_paths([str(review)]))
 
-    if step_id in {"edit_review_decisions", "mark_reviewed"}:
+    if step_id == "edit_review_decisions":
+        if summary_ready:
+            return complete_state(step_id, "Final summary has been composed; micro-event decisions are supporting evidence only.", existing_paths([str(final_summary), str(review)]))
+        return pending_state(step_id, "Final summary still needs to be composed.", existing_paths([str(review)]))
+
+    if step_id == "mark_reviewed":
         if review_status in {"reviewed", "applied"}:
             return complete_state(step_id, f"Review status is {review_status}.", [relative(review)])
+        if final_summary.exists():
+            return complete_state(step_id, "Final summary exists; treating historical/manual summary acceptance as reviewed.", [relative(final_summary)])
         return pending_state(step_id, f"Review status is {review_status or 'missing'}.", existing_paths([str(review)]))
 
     if step_id == "apply_review":
         if review_status == "applied":
             return complete_state(step_id, "Final summary review has been locked/applied without changing accepted entity database canon.", [relative(review)])
+        if final_summary.exists():
+            return complete_state(step_id, "Final summary exists; no database entity reload is required for this summary step.", [relative(final_summary)])
         return pending_state(step_id, f"Review status is {review_status or 'missing'}, not applied.", existing_paths([str(review)]))
 
     if step_id == "write_final_summary":
@@ -562,6 +574,10 @@ def load_review_document(path: Path) -> dict[str, Any]:
         return {}
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     return data if isinstance(data, dict) else {}
+
+
+def final_summary_review_ready(document: dict[str, Any]) -> bool:
+    return bool(document.get("final_summary")) and not final_summary_readiness_errors(document)
 
 
 def final_summary_readiness_errors(document: dict[str, Any]) -> list[str]:

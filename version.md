@@ -1,6 +1,6 @@
 # Version
 
-v0.7.1
+v0.7.2
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.7.1` adds a Docker-managed workflow worker so queued session intake jobs are picked up automatically, with container transcription dependencies included.
+`v0.7.2` tightens workflow status around entity review completion and final-summary canonization so old micro-event review state no longer blocks completed session ingest.

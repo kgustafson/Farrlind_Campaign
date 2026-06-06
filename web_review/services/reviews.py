@@ -203,9 +203,13 @@ def summarize_review_document(session_number: int, document: dict[str, Any]) -> 
     added_items = document.get("added_items") or []
     final_exists = final_summary_path(session_number).exists()
     status = document.get("status") or ("missing" if not document else "unknown")
-    final_mode = final_summary_mode(document)
+    final_mode = final_summary_mode(document) or (final_exists and status == "applied")
     pending_decisions = 0 if final_mode else counts["pending"]
     missing_reviews = [] if status == "applied" or final_exists else missing_extraction_reviews(session_number)
+    unapplied_items = 0 if final_mode else unapplied_count(document)
+    next_action = "done" if final_exists and status == "applied" else next_action_for(document)
+    if final_exists and status != "applied" and final_summary_mode(document):
+        next_action = "inspect"
     return ReviewSummary(
         session=key,
         session_number=session_number,
@@ -223,8 +227,8 @@ def summarize_review_document(session_number: int, document: dict[str, Any]) -> 
         corrected=counts["corrected"],
         added=counts["added"],
         unknown_decisions=counts["other"],
-        unapplied_items=unapplied_count(document),
-        next_action=next_action_for(document),
+        unapplied_items=unapplied_items,
+        next_action=next_action,
         event_review_ready=not missing_reviews,
         missing_extraction_reviews=missing_reviews,
     )

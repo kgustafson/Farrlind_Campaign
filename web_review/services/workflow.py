@@ -17,6 +17,7 @@ from web_review.services import reviews
 QUEUE_DIR = reviews.REPO_ROOT / "ops" / "workflow_queue"
 TRANSCRIPT_POLICIES = {"use_existing", "recreate"}
 TERMINAL_STEP_STATUSES = {"complete", "not_applicable"}
+SESSION_INGEST_LANES = {"intake", "draft_generation", "entity_extraction", "human_review", "canonization"}
 
 
 class WorkflowReadError(RuntimeError):
@@ -439,17 +440,17 @@ def workflow_rows() -> list[dict[str, Any]]:
             wr.started_at,
             wr.completed_at,
             wr.summary_comment,
-            COUNT(wss.id) AS total_steps,
-            COUNT(wss.id) FILTER (WHERE wss.status = 'complete') AS complete_steps,
-            COUNT(wss.id) FILTER (WHERE wss.status = 'not_applicable') AS not_applicable_steps,
-            COUNT(wss.id) FILTER (WHERE wss.status = 'pending') AS raw_pending_steps,
-            COUNT(wss.id) FILTER (WHERE wss.status NOT IN ('complete', 'not_applicable')) AS pending_steps,
+            COUNT(wss.id) FILTER (WHERE wss.lane IN ('intake', 'draft_generation', 'entity_extraction', 'human_review', 'canonization')) AS total_steps,
+            COUNT(wss.id) FILTER (WHERE wss.lane IN ('intake', 'draft_generation', 'entity_extraction', 'human_review', 'canonization') AND wss.status = 'complete') AS complete_steps,
+            COUNT(wss.id) FILTER (WHERE wss.lane IN ('intake', 'draft_generation', 'entity_extraction', 'human_review', 'canonization') AND wss.status = 'not_applicable') AS not_applicable_steps,
+            COUNT(wss.id) FILTER (WHERE wss.lane IN ('intake', 'draft_generation', 'entity_extraction', 'human_review', 'canonization') AND wss.status = 'pending') AS raw_pending_steps,
+            COUNT(wss.id) FILTER (WHERE wss.lane IN ('intake', 'draft_generation', 'entity_extraction', 'human_review', 'canonization') AND wss.status NOT IN ('complete', 'not_applicable')) AS pending_steps,
             COUNT(wss.id) FILTER (WHERE wss.status = 'blocked') AS blocked_steps,
             COUNT(wss.id) FILTER (WHERE wss.status = 'stale') AS stale_steps,
-            COUNT(wss.id) FILTER (WHERE wss.status NOT IN ('complete', 'not_applicable')) AS attention_count,
+            COUNT(wss.id) FILTER (WHERE wss.lane IN ('intake', 'draft_generation', 'entity_extraction', 'human_review', 'canonization') AND wss.status NOT IN ('complete', 'not_applicable')) AS attention_count,
             ROUND(
-                100.0 * COUNT(wss.id) FILTER (WHERE wss.status IN ('complete', 'not_applicable'))
-                / NULLIF(COUNT(wss.id), 0),
+                100.0 * COUNT(wss.id) FILTER (WHERE wss.lane IN ('intake', 'draft_generation', 'entity_extraction', 'human_review', 'canonization') AND wss.status IN ('complete', 'not_applicable'))
+                / NULLIF(COUNT(wss.id) FILTER (WHERE wss.lane IN ('intake', 'draft_generation', 'entity_extraction', 'human_review', 'canonization')), 0),
                 0
             )::int AS progress_percent,
             next_step.display_name AS next_step_name,
@@ -461,6 +462,7 @@ def workflow_rows() -> list[dict[str, Any]]:
             SELECT display_name, status
             FROM workflow_step_state
             WHERE workflow_run_id = wr.id
+              AND lane IN ('intake', 'draft_generation', 'entity_extraction', 'human_review', 'canonization')
               AND status NOT IN ('complete', 'not_applicable')
             ORDER BY step_order
             LIMIT 1
@@ -538,12 +540,13 @@ def workflow_detail(session_number: int) -> Optional[dict[str, Any]]:
         step["links"] = step_links(step["step_id"], run["session_number"])
         step["issues"] = step_issues(step)
     run["major_status"] = major_status_items(run)
-    if run["steps"] and all(step.get("status") in TERMINAL_STEP_STATUSES for step in run["steps"]):
+    ingest_steps = [step for step in run["steps"] if step.get("lane") in SESSION_INGEST_LANES]
+    if ingest_steps and all(step.get("status") in TERMINAL_STEP_STATUSES for step in ingest_steps):
         run["status"] = "completed"
     run["attention_items"] = [
         {"step": step["display_name"], "issues": step["issues"]}
         for step in run["steps"]
-        if step["issues"]
+        if step.get("lane") in SESSION_INGEST_LANES and step["issues"]
     ]
     return run
 
