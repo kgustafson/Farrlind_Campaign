@@ -134,6 +134,16 @@ To restore from Git Bash, macOS, or another shell with `cat`:
 cat backups/farrlind_YYYYMMDD_HHMMSS.sql | docker exec -i farrlind_db psql -U admin -d farrlind -v ON_ERROR_STOP=1
 ```
 
+If restoring onto a database that has already been initialized by the Compose init scripts, first clear the `public` schema so the dump owns the object order:
+
+```bash
+docker exec farrlind_db psql -U admin -d farrlind -v ON_ERROR_STOP=1 \
+  -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public AUTHORIZATION admin; GRANT ALL ON SCHEMA public TO admin; GRANT ALL ON SCHEMA public TO public;'
+cat backups/farrlind_YYYYMMDD_HHMMSS.sql | docker exec -i farrlind_db psql -U admin -d farrlind -v ON_ERROR_STOP=1
+```
+
+The Docker stack currently runs PostgreSQL 18 with matching `postgresql-client-18` tools in the web image.
+
 ### Daily macOS Backup
 
 The repo includes a user-level launchd plist at:

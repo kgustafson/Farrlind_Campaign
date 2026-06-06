@@ -1,5 +1,17 @@
 # Revision History - D&D Campaign Manager
 
+## v0.7.3 - 6/6/2026
+
+Upgraded the local Docker database stack to PostgreSQL 18.
+
+- Runtime: Changed the Docker database image from `postgres:16` to `postgres:18`.
+- Runtime: Moved the database service to a fresh `postgres_data_18` volume mounted at `/var/lib/postgresql`, matching the PostgreSQL 18 official image layout.
+- Runtime: Updated the web image from `postgresql-client-16` to `postgresql-client-18` so `pg_dump` and `psql` match the server major version.
+- Data: Created a pre-upgrade PostgreSQL 16 dump, restored it into PostgreSQL 18, and verified restored canon counts.
+- Data: Generated a new PG18 utility backup and restore-tested it with a clean `public` schema restore.
+- Docs: Updated database restore guidance with the clean-schema restore path for initialized databases.
+- Tests: Ran focused backup/workflow/web review tests and Project Utilities smoke checks after the migration.
+
 ## v0.7.2 - 6/6/2026
 
 Tightened session workflow status around the summary-first review model.

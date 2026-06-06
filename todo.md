@@ -35,34 +35,17 @@ audio/transcript
 
 ### Review Workflow Refinement
 
-- Human review is not done yet.
-  - The current fragment/event review flow is too large for long recorded sessions.
-  - Session 21 showed that reviewing 200+ extracted event fragments is not the right primary operator experience.
-  - Replace the primary review surface with a Gemma-curated summary review first.
-  - The user should review and edit a coherent session summary into canon before structured database extraction is applied.
-  - Event fragments should become supporting evidence or secondary detail, not the main review workload.
-- Build the next review flow around:
-  - Review Gemma draft canon packet.
-  - Edit the narrative section into a human-approved canon summary.
-  - Confirm key locations, NPCs, artifacts, lore items, combat encounters, open threads, inventory/resource notes, and timeline updates from that packet.
-  - Only then apply reviewed canon to the database.
-- Add a session initiation action for future sessions.
-  - Capture the real-world session date.
-  - Accept an uploaded audio file or a filesystem path to the audio file.
-  - Create the session row and workflow run.
-  - Seed ordered workflow step state from `workflows/session_workflow.yaml`.
-  - Record the audio path in session/workflow state without starting transcription automatically unless explicitly confirmed.
-- Add buttons for safe existing commands, such as:
-  - initialize review
-  - run health
-  - apply review
-  - write final summary
-  - run summarize/postextract steps where appropriate
+- Continue refining the final-summary composition step as the primary human review surface after entity extraction.
+- Keep event fragments as supporting evidence only; they must not dictate session workflow status or block final-summary completion.
+- Improve the summary-writing workspace so the user can more easily use the Gemma draft canon packet, entity reviews, transcript, and event fragments as evidence while writing the final canon summary.
+- Consider a protected "Re-run Draft Extraction" action for sessions whose entity reviews have not yet been applied.
+  - It may rerun transcript-to-draft/entity extraction artifacts.
+  - It must not overwrite reviewed entity decisions, database canon, final summaries, or applied review state.
+  - If entity reviews have already been applied, the action should be disabled or generate new draft candidates only.
 - Keep human approval gates explicit.
 - Do not allow automated reruns to overwrite reviewed or applied canon.
 - Any canon-changing rerun must end in human review before it can become canon.
 - Capture command output in the same command-result style already used by the review UI.
-- Prefer "Run next step" only after the graph status rules are trustworthy.
 
 ### Future: Consider LangGraph Or Similar Orchestration
 
@@ -104,11 +87,9 @@ audio/transcript
 - Define backup and restore expectations for local development.
 - Track seed/reference data that should be treated as managed project data.
 - Strengthen canon integrity checks as the review workflow grows.
-- Plan and execute a deliberate PostgreSQL major-version upgrade from `postgres:16` to latest current PostgreSQL, presently PostgreSQL 18. Use dump/restore or `pg_upgrade` with a fresh volume, verify the web container `postgresql-client` major version matches the database server, restore-test the backup, and run the Project Utilities smoke test before retiring the PostgreSQL 16 volume.
 - Evaluate upgrading the local development virtual environment from Python 3.9 to Python 3.11 by creating a parallel venv, installing requirements, and validating faster-whisper transcription, the worker skeleton, the web app, and the full test suite before replacing `rag-env`.
 
 ## Open Questions
 
 - Which steps are safe to run automatically, and which must always require user confirmation?
-- Which workflow status values should the web UI expose first?
 - How should the UI distinguish stale artifacts from missing artifacts?

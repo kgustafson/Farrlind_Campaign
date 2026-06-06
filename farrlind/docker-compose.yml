@@ -1,7 +1,7 @@
 services:
 
   db:
-    image: postgres:16
+    image: postgres:18
     container_name: ${CAMPAIGN_NAME:-farrlind}_db
     restart: unless-stopped
     environment:
@@ -9,7 +9,7 @@ services:
       POSTGRES_USER:     ${CAMPAIGN_DB_USER:-admin}
       POSTGRES_PASSWORD: ${CAMPAIGN_DB_PASSWORD:-gofaban}   # change before any exposure
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_18:/var/lib/postgresql
       - ../campaigns/init/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
       - ../campaigns/init/02_generic_lookups.sql:/docker-entrypoint-initdb.d/02_generic_lookups.sql:ro
       - ../campaigns/init/99_campaign_seed.sh:/docker-entrypoint-initdb.d/99_campaign_seed.sh:ro
@@ -99,4 +99,4 @@ services:
     command: sh -c 'python scripts/workflow_auto_intake.py --watch --poll-seconds "$${WORKFLOW_WORKER_POLL_SECONDS}"'
 
 volumes:
-  postgres_data:
+  postgres_data_18:

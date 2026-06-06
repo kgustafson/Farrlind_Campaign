@@ -1,6 +1,6 @@
 # Version
 
-v0.7.2
+v0.7.3
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.7.2` tightens workflow status around entity review completion and final-summary canonization so old micro-event review state no longer blocks completed session ingest.
+`v0.7.3` upgrades the Docker database runtime to PostgreSQL 18, updates the web image to matching PostgreSQL 18 client tools, and restore-tests the migrated database backup.
