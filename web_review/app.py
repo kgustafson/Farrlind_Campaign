@@ -316,6 +316,32 @@ def artifact_form_values(form) -> dict:
     }
 
 
+def song_form_values(form, current: Optional[dict] = None) -> dict:
+    return {
+        "song_number": optional_int(form.get("song_number")) if current is None else current.get("song_number"),
+        "order_number": optional_int(form.get("order_number")),
+        "title": (form.get("title") or "").strip(),
+        "style_id": optional_int(form.get("style_id")),
+        "category_id": optional_int(form.get("category_id")),
+        "song_type": (form.get("song_type") or "").strip(),
+        "short_description": (form.get("short_description") or "").strip(),
+        "long_description": (form.get("long_description") or "").strip(),
+        "summary": (form.get("summary") or "").strip(),
+        "suno_prompt": (form.get("suno_prompt") or "").strip(),
+        "musical_key": (form.get("musical_key") or "").strip(),
+        "meter": (form.get("meter") or "").strip(),
+        "tempo": (form.get("tempo") or "").strip(),
+        "instrumentation": (form.get("instrumentation") or "").strip(),
+        "lyrics_local_path": (form.get("lyrics_local_path") or "").strip(),
+        "mp3_local_path": (form.get("mp3_local_path") or "").strip(),
+        "lyrics_url": (form.get("lyrics_url") or "").strip(),
+        "mp3_url": (form.get("mp3_url") or "").strip(),
+        "written_session": optional_int(form.get("written_session")),
+        "in_world_context": (form.get("in_world_context") or "").strip(),
+        "is_performed": checkbox_value(form.get("is_performed")),
+    }
+
+
 def timeline_form_text(form, field_name: str, current: dict, current_field: Optional[str] = None) -> str:
     if field_name in form:
         return (form.get(field_name) or "").strip()
@@ -2101,20 +2127,105 @@ def project_utilities_publish_static_archive():
     return RedirectResponse(url=f"/project-utilities?command_result={token}", status_code=303)
 
 
+def songbook_template_context(editing: Optional[dict] = None, show_modal: bool = False) -> dict:
+    songs = canon.songbook_rows()
+    foreword = canon.songbook_foreword()
+    return {
+        "songs": songs,
+        "foreword": foreword,
+        "foreword_html": reviews.render_markdown(foreword.get("text", "")),
+        "editing": editing,
+        "show_song_modal": show_modal,
+        "song_styles": canon.song_styles() if can_edit() and show_modal else [],
+        "song_categories": canon.song_categories() if can_edit() and show_modal else [],
+        "next_song_number": canon.next_song_number() if can_edit() and show_modal else None,
+        "next_order_number": canon.next_song_order_number() if can_edit() and show_modal else None,
+    }
+
+
 @app.get("/songbook", response_class=HTMLResponse)
-def songbook_index(request: Request):
+def songbook_index(request: Request, modal: str = ""):
     if not songbook_enabled():
         raise HTTPException(status_code=404, detail="Songbook is not enabled for this campaign.")
     try:
-        songs = canon.songbook_rows()
-        foreword = canon.songbook_foreword()
+        context = songbook_template_context(show_modal=can_edit() and modal == "add")
     except canon.CanonReadError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
     return templates.TemplateResponse(
         request,
         "songbook.html",
-        {"songs": songs, "foreword": foreword, "foreword_html": reviews.render_markdown(foreword.get("text", ""))},
+        context,
     )
+
+
+@app.post("/songbook")
+async def create_songbook_entry(request: Request):
+    if not songbook_enabled():
+        raise HTTPException(status_code=404, detail="Songbook is not enabled for this campaign.")
+    form = await request.form()
+    values = song_form_values(form)
+    try:
+        canon.create_song(values)
+    except canon.CanonWriteError:
+        return RedirectResponse(url="/songbook?modal=add&create_failed=1", status_code=303)
+    return RedirectResponse(url="/songbook?created=1", status_code=303)
+
+
+@app.get("/songbook/{song_number}/edit", response_class=HTMLResponse)
+def edit_songbook_entry(request: Request, song_number: int):
+    if not songbook_enabled():
+        raise HTTPException(status_code=404, detail="Songbook is not enabled for this campaign.")
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Songbook editing is not available in archive mode.")
+    try:
+        editing = canon.songbook_detail(song_number)
+        if not editing:
+            raise HTTPException(status_code=404, detail="Song not found.")
+        context = songbook_template_context(editing=editing, show_modal=True)
+    except canon.CanonReadError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    return templates.TemplateResponse(request, "songbook.html", context)
+
+
+@app.post("/songbook/{song_number}")
+async def update_songbook_entry(request: Request, song_number: int):
+    if not songbook_enabled():
+        raise HTTPException(status_code=404, detail="Songbook is not enabled for this campaign.")
+    form = await request.form()
+    current = canon.songbook_detail(song_number)
+    if not current:
+        raise HTTPException(status_code=404, detail="Song not found.")
+    try:
+        canon.update_song(song_number, song_form_values(form, current=current))
+    except canon.CanonWriteError:
+        return RedirectResponse(url=f"/songbook/{song_number}/edit?update_failed=1", status_code=303)
+    return RedirectResponse(url="/songbook?updated=1", status_code=303)
+
+
+@app.post("/songbook/{song_number}/delete")
+async def delete_songbook_entry(song_number: int):
+    if not songbook_enabled():
+        raise HTTPException(status_code=404, detail="Songbook is not enabled for this campaign.")
+    try:
+        canon.delete_song(song_number)
+    except canon.CanonWriteError:
+        return RedirectResponse(url="/songbook?delete_failed=1", status_code=303)
+    return RedirectResponse(url="/songbook?deleted=1", status_code=303)
+
+
+@app.post("/songbook/{song_number}/move")
+async def move_songbook_entry(request: Request, song_number: int):
+    if not songbook_enabled():
+        raise HTTPException(status_code=404, detail="Songbook is not enabled for this campaign.")
+    form = await request.form()
+    direction = (form.get("direction") or "").strip()
+    if direction not in {"up", "down"}:
+        return RedirectResponse(url="/songbook?reorder_failed=1", status_code=303)
+    try:
+        canon.move_song(song_number, direction)
+    except canon.CanonWriteError:
+        return RedirectResponse(url="/songbook?reorder_failed=1", status_code=303)
+    return RedirectResponse(url="/songbook?reordered=1", status_code=303)
 
 
 @app.get("/songbook/{song_number}/lyrics", response_class=HTMLResponse)

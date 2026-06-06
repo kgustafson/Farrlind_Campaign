@@ -11,7 +11,37 @@
     </div>
     <img class="archive-section-icon" src="/static/fabans-songbook-icon.png" alt="" aria-hidden="true">
   </div>
+  {% if can_edit() %}
+  <div class="section-actions">
+    <a class="icon-link add-new-link" href="/songbook?modal=add">Add New</a>
+  </div>
+  {% endif %}
 </section>
+
+{% if request.query_params.get("created") %}
+  <div class="flash">Song added.</div>
+{% endif %}
+{% if request.query_params.get("updated") %}
+  <div class="flash">Song updated.</div>
+{% endif %}
+{% if request.query_params.get("deleted") %}
+  <div class="flash">Song deleted.</div>
+{% endif %}
+{% if request.query_params.get("reordered") %}
+  <div class="flash">Song order updated.</div>
+{% endif %}
+{% if request.query_params.get("create_failed") %}
+  <div class="flash error-flash">Song was not added. Check the song number, title, and related fields.</div>
+{% endif %}
+{% if request.query_params.get("update_failed") %}
+  <div class="flash error-flash">Song was not updated. Check the title and related fields.</div>
+{% endif %}
+{% if request.query_params.get("delete_failed") %}
+  <div class="flash error-flash">Song was not deleted. It may still be referenced by performances or entity links.</div>
+{% endif %}
+{% if request.query_params.get("reorder_failed") %}
+  <div class="flash error-flash">Song order was not updated.</div>
+{% endif %}
 
 {% if foreword and foreword.text %}
 <section class="songbook-preface">
@@ -33,7 +63,10 @@
       <span class="song-number">{{ "%02d"|format(song.song_number) }}</span>
       <div>
         <h2><a href="/songbook/{{ song.song_number }}/lyrics">{{ song.title }}</a></h2>
-        <p>{{ song.song_type or song.short_description or song.style or "song" }}</p>
+        <p>
+          {{ song.song_type or song.short_description or song.style or "song" }}
+          {% if can_edit() %}<span class="song-order-note">Order {{ song.order_number or song.song_number }}</span>{% endif %}
+        </p>
       </div>
     </div>
     <div class="song-tags">
@@ -56,8 +89,152 @@
       {% if song.has_local_lyrics %}<a class="icon-link secondary-link" href="/songbook/{{ song.song_number }}/lyrics">Lyrics</a>{% endif %}
       {% if song.lyrics_url %}<a class="icon-link secondary-link" href="{{ song.lyrics_url }}" target="_blank" rel="noreferrer">Source Doc</a>{% endif %}
       {% if song.mp3_url %}<a class="icon-link secondary-link" href="{{ song.mp3_url }}" target="_blank" rel="noreferrer">Source Audio</a>{% endif %}
+      {% if can_edit() %}
+        <a class="icon-link icon-only-action" href="/songbook/{{ song.song_number }}/edit" aria-label="Edit {{ song.title }}" title="Edit {{ song.title }}">✎</a>
+        <form method="post" action="/songbook/{{ song.song_number }}/move">
+          <input type="hidden" name="direction" value="up">
+          <button class="icon-link icon-only-action" type="submit" aria-label="Move {{ song.title }} up" title="Move up">↑</button>
+        </form>
+        <form method="post" action="/songbook/{{ song.song_number }}/move">
+          <input type="hidden" name="direction" value="down">
+          <button class="icon-link icon-only-action" type="submit" aria-label="Move {{ song.title }} down" title="Move down">↓</button>
+        </form>
+        <form method="post" action="/songbook/{{ song.song_number }}/delete">
+          <button class="danger-button icon-only-action" type="submit" aria-label="Delete {{ song.title }}" title="Delete {{ song.title }}">×</button>
+        </form>
+      {% endif %}
     </div>
   </article>
   {% endfor %}
 </section>
+
+{% if show_song_modal %}
+<section class="modal-backdrop" role="presentation">
+  <div class="archive-modal songbook-modal" role="dialog" aria-modal="true" aria-labelledby="songbook-modal-title">
+    <div class="modal-head">
+      <div class="modal-title-with-icon">
+        <img class="modal-title-icon" src="/static/fabans-songbook-icon.png" alt="" aria-hidden="true">
+        <h2 id="songbook-modal-title">{% if editing %}Edit Song{% else %}Add Song{% endif %}</h2>
+      </div>
+      <a class="modal-close" href="/songbook" aria-label="Close song form">×</a>
+    </div>
+    <form method="post" action="{% if editing %}/songbook/{{ editing.song_number }}{% else %}/songbook{% endif %}">
+      <div class="form-grid three-col">
+        <label class="field-block">
+          <span>Song Number</span>
+          {% if editing %}
+            <input value="{{ "%02d"|format(editing.song_number) }}" disabled>
+          {% else %}
+            <input name="song_number" inputmode="numeric" required value="{{ next_song_number }}">
+          {% endif %}
+        </label>
+        <label class="field-block">
+          <span>Order Number</span>
+          <input name="order_number" inputmode="numeric" value="{{ editing.order_number if editing and editing.order_number is not none else next_order_number }}">
+        </label>
+        <label class="field-block">
+          <span>Written Session</span>
+          <input name="written_session" inputmode="numeric" value="{{ editing.written_session if editing and editing.written_session is not none else '' }}">
+        </label>
+      </div>
+      <label class="field-block">
+        <span>Title</span>
+        <input name="title" required value="{{ editing.title if editing else '' }}">
+      </label>
+      <div class="form-grid three-col">
+        <label class="field-block">
+          <span>Style</span>
+          <select name="style_id">
+            <option value="">unknown</option>
+            {% for style in song_styles %}
+              <option value="{{ style.id }}" {% if editing and editing.style_id == style.id %}selected{% endif %}>{{ style.style_name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field-block">
+          <span>Category</span>
+          <select name="category_id">
+            <option value="">unknown</option>
+            {% for category in song_categories %}
+              <option value="{{ category.id }}" {% if editing and editing.category_id == category.id %}selected{% endif %}>{{ category.category_name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field-block">
+          <span>Song Type</span>
+          <input name="song_type" value="{{ editing.song_type if editing else '' }}">
+        </label>
+      </div>
+      <div class="form-grid three-col">
+        <label class="field-block">
+          <span>Meter</span>
+          <input name="meter" value="{{ editing.meter if editing else '' }}">
+        </label>
+        <label class="field-block">
+          <span>Tempo</span>
+          <input name="tempo" value="{{ editing.tempo if editing else '' }}">
+        </label>
+        <label class="field-block">
+          <span>Key</span>
+          <input name="musical_key" value="{{ editing.musical_key if editing else '' }}">
+        </label>
+      </div>
+      <label class="field-block">
+        <span>Short Description</span>
+        <input name="short_description" value="{{ editing.short_description if editing else '' }}">
+      </label>
+      <label class="field-block">
+        <span>Long Description</span>
+        <textarea name="long_description">{{ editing.long_description if editing else '' }}</textarea>
+      </label>
+      <label class="field-block">
+        <span>Summary</span>
+        <textarea name="summary">{{ editing.summary if editing else '' }}</textarea>
+      </label>
+      <label class="field-block">
+        <span>Suno Prompt</span>
+        <textarea name="suno_prompt" rows="8">{{ editing.suno_prompt if editing else '' }}</textarea>
+      </label>
+      <label class="field-block">
+        <span>Instrumentation</span>
+        <textarea name="instrumentation">{{ editing.instrumentation if editing else '' }}</textarea>
+      </label>
+      <div class="form-grid two-col">
+        <label class="field-block">
+          <span>Lyrics Local Path</span>
+          <input name="lyrics_local_path" value="{{ editing.lyrics_local_path if editing else '' }}">
+        </label>
+        <label class="field-block">
+          <span>Audio Local Path</span>
+          <input name="mp3_local_path" value="{{ editing.mp3_local_path if editing else '' }}">
+        </label>
+      </div>
+      <div class="form-grid two-col">
+        <label class="field-block">
+          <span>Source Doc URL</span>
+          <input name="lyrics_url" value="{{ editing.lyrics_url if editing else '' }}">
+        </label>
+        <label class="field-block">
+          <span>Source Audio URL</span>
+          <input name="mp3_url" value="{{ editing.mp3_url if editing else '' }}">
+        </label>
+      </div>
+      <label class="field-block">
+        <span>In-World Context</span>
+        <textarea name="in_world_context">{{ editing.in_world_context if editing else '' }}</textarea>
+      </label>
+      <div class="location-checks">
+        <label class="check-row">
+          <input type="checkbox" name="is_performed" {% if not editing or editing.is_performed %}checked{% endif %}>
+          <span>Performed / active repertoire</span>
+        </label>
+      </div>
+      <div class="panel-actions split-actions">
+        <a class="icon-link secondary-link" href="/songbook">Cancel</a>
+        <button type="submit">{% if editing %}Save Song{% else %}Add Song{% endif %}</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endif %}
 {% endblock %}

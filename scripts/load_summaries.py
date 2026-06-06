@@ -1920,6 +1920,8 @@ WHERE song_number = {entry["song_number"]};
 def song_schema_sql() -> str:
     return """
 ALTER TABLE song ADD COLUMN IF NOT EXISTS tempo VARCHAR(60);
+ALTER TABLE song ADD COLUMN IF NOT EXISTS order_number INTEGER;
+UPDATE song SET order_number = song_number WHERE order_number IS NULL;
 
 DROP VIEW IF EXISTS v_songbook;
 ALTER TABLE song ALTER COLUMN musical_key TYPE VARCHAR(120);
@@ -1927,19 +1929,18 @@ ALTER TABLE song ALTER COLUMN meter TYPE VARCHAR(120);
 ALTER TABLE song ALTER COLUMN tempo TYPE VARCHAR(120);
 
 CREATE VIEW v_songbook AS
-    SELECT s.song_number, s.title, ss.style_name AS style,
+    SELECT s.id, s.song_number, s.order_number, s.title, s.style_id, ss.style_name AS style,
+           s.category_id,
            sc.category_name AS category, s.song_type, s.short_description,
            s.long_description, s.summary, s.suno_prompt, s.musical_key,
            s.meter, s.tempo, s.instrumentation,
-           s.lyrics_local_path, s.mp3_local_path, s.mp3_url, s.lyrics_url
+           s.lyrics_local_path, s.mp3_local_path, s.mp3_url, s.lyrics_url,
+           ws.session_number AS written_session,
+           s.in_world_context, s.is_performed
     FROM song s
     LEFT JOIN song_style ss ON s.style_id = ss.id
     LEFT JOIN song_category sc ON s.category_id = sc.id
-    LEFT JOIN song_performance sp ON s.id = sp.song_id
-    GROUP BY s.id, s.song_number, s.title, ss.style_name, sc.category_name, s.song_type,
-             s.short_description, s.long_description, s.summary, s.suno_prompt, s.musical_key,
-             s.meter, s.tempo, s.instrumentation, s.lyrics_local_path, s.mp3_local_path, s.mp3_url, s.lyrics_url
-    ORDER BY s.song_number;
+    LEFT JOIN session ws ON ws.id = s.written_session;
 """.strip()
 
 

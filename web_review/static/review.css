@@ -1842,6 +1842,9 @@ dd { margin: 0; }
 .combat-modal {
   width: min(1120px, 100%);
 }
+.songbook-modal {
+  width: min(960px, 100%);
+}
 .modal-head {
   display: flex;
   align-items: center;
@@ -2699,6 +2702,22 @@ dd { margin: 0; }
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  align-items: center;
+}
+.song-actions form {
+  display: inline-flex;
+  margin: 0;
+}
+.song-actions button.icon-link {
+  min-height: 0;
+  padding: 5px 9px;
+}
+.song-order-note {
+  display: inline-block;
+  margin-left: 6px;
+  color: var(--brass-dark);
+  font-size: 12px;
+  font-weight: 800;
 }
 .song-detail-actions {
   margin-top: 12px;

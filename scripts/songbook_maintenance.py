@@ -135,10 +135,9 @@ def load_song_rows(engine) -> list[dict[str, Any]]:
             vs.mp3_local_path,
             vs.mp3_url,
             vs.lyrics_url,
-            written_session
+            vs.written_session
         FROM v_songbook vs
-        LEFT JOIN song s ON s.song_number = vs.song_number
-        ORDER BY song_number;
+        ORDER BY COALESCE(vs.order_number, vs.song_number), vs.song_number;
         """,
     )
 

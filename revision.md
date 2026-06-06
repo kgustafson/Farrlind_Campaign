@@ -1,5 +1,15 @@
 # Revision History - D&D Campaign Manager
 
+## v0.7.5 - 6/6/2026
+
+Added edit-mode CRUD and reorder controls for Faban's Songbook.
+
+- App: Added add, edit, delete, and move controls to `/songbook` in edit mode while keeping archive mode read-only.
+- App: Treats `song_number` as the stable song identity and adds `order_number` as the editable repertoire/display order.
+- Schema: Added `song.order_number` and expanded `v_songbook` with editable metadata fields needed by the songbook form.
+- Workflow: Updated the songbook loader and maintenance report to respect songbook order without changing song identity.
+- Tests: Added route coverage for songbook creation, updates, deletes, and reordering, plus live smoke verification.
+
 ## v0.7.4 - 6/6/2026
 
 Added the first campaign-level maintenance workflow and upgraded the local development venv.

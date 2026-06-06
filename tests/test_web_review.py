@@ -1989,9 +1989,13 @@ class CanonServiceTest(unittest.TestCase):
             lyrics.write_text("Verse", encoding="utf-8")
             audio.write_bytes(b"mp3")
             db_rows = [{
+                "id": 1,
                 "song_number": 1,
+                "order_number": 1,
                 "title": "Test Song",
+                "style_id": 1,
                 "style": "ballad",
+                "category_id": 1,
                 "category": "lore",
                 "song_type": "Test ballad",
                 "short_description": "",
@@ -2006,6 +2010,9 @@ class CanonServiceTest(unittest.TestCase):
                 "mp3_local_path": "knowledge/Faban/songbook/Song/song.mp3",
                 "mp3_url": "",
                 "lyrics_url": "",
+                "written_session": None,
+                "in_world_context": "",
+                "is_performed": True,
             }]
 
             with patch("web_review.services.canon.REPO_ROOT", root), \
@@ -3897,9 +3904,13 @@ class ProjectUtilitiesRouteTest(unittest.TestCase):
 class SongbookRouteTest(unittest.TestCase):
     def song_rows(self):
         return [{
+            "id": 1,
             "song_number": 1,
+            "order_number": 1,
             "title": "The Off-Key Dragon",
+            "style_id": 1,
             "style": "tavern_song",
+            "category_id": 1,
             "category": "humor",
             "song_type": "Comic tavern song",
             "short_description": "Tavern comedy",
@@ -3914,6 +3925,9 @@ class SongbookRouteTest(unittest.TestCase):
             "mp3_local_path": "knowledge/Faban/songbook/The_Off_Key_Dragon/song.mp3",
             "mp3_url": "https://example.com/audio",
             "lyrics_url": "https://example.com/lyrics",
+            "written_session": None,
+            "in_world_context": "",
+            "is_performed": True,
             "has_local_audio": True,
             "has_local_lyrics": True,
         }]
@@ -3934,6 +3948,84 @@ class SongbookRouteTest(unittest.TestCase):
         self.assertIn("/static/fabans-songbook-icon.png", response.text)
         self.assertIn("Read Faban", response.text)
         self.assertIn("A bard", response.text)
+        self.assertIn('href="/songbook?modal=add"', response.text)
+        self.assertIn('href="/songbook/1/edit"', response.text)
+        self.assertIn("Order 1", response.text)
+
+    def test_songbook_add_modal_uses_separate_order_number(self):
+        foreword = {"title": "", "text": "", "path": "", "notes": ""}
+        with patch("web_review.services.canon.songbook_rows", return_value=self.song_rows()), \
+             patch("web_review.services.canon.songbook_foreword", return_value=foreword), \
+             patch("web_review.services.canon.song_styles", return_value=[{"id": 1, "style_name": "ballad"}]), \
+             patch("web_review.services.canon.song_categories", return_value=[{"id": 2, "category_name": "lore"}]), \
+             patch("web_review.services.canon.next_song_number", return_value=27), \
+             patch("web_review.services.canon.next_song_order_number", return_value=27):
+            client = TestClient(app)
+            response = client.get("/songbook?modal=add")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Song Number", response.text)
+        self.assertIn("Order Number", response.text)
+        self.assertIn('name="song_number"', response.text)
+        self.assertIn('name="order_number"', response.text)
+
+    def test_create_songbook_entry_posts_to_canon(self):
+        with patch("web_review.services.canon.create_song") as create:
+            client = TestClient(app)
+            response = client.post(
+                "/songbook",
+                data={
+                    "song_number": "27",
+                    "order_number": "5",
+                    "title": "The Test Ballad",
+                    "style_id": "1",
+                    "category_id": "2",
+                    "is_performed": "on",
+                },
+                follow_redirects=False,
+            )
+
+        self.assertEqual(response.status_code, 303)
+        self.assertEqual(response.headers["location"], "/songbook?created=1")
+        create.assert_called_once()
+        values = create.call_args.args[0]
+        self.assertEqual(values["song_number"], 27)
+        self.assertEqual(values["order_number"], 5)
+        self.assertEqual(values["title"], "The Test Ballad")
+
+    def test_update_songbook_entry_preserves_song_number_identity(self):
+        with patch("web_review.services.canon.songbook_detail", return_value=self.song_rows()[0]), \
+             patch("web_review.services.canon.update_song") as update:
+            client = TestClient(app)
+            response = client.post(
+                "/songbook/1",
+                data={"order_number": "9", "title": "Renamed Dragon", "is_performed": "on"},
+                follow_redirects=False,
+            )
+
+        self.assertEqual(response.status_code, 303)
+        update.assert_called_once()
+        self.assertEqual(update.call_args.args[0], 1)
+        self.assertEqual(update.call_args.args[1]["song_number"], 1)
+        self.assertEqual(update.call_args.args[1]["order_number"], 9)
+
+    def test_move_songbook_entry_updates_order_not_identity(self):
+        with patch("web_review.services.canon.move_song") as move:
+            client = TestClient(app)
+            response = client.post("/songbook/1/move", data={"direction": "down"}, follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertEqual(response.headers["location"], "/songbook?reordered=1")
+        move.assert_called_once_with(1, "down")
+
+    def test_delete_songbook_entry_uses_song_number_identity(self):
+        with patch("web_review.services.canon.delete_song") as delete:
+            client = TestClient(app)
+            response = client.post("/songbook/1/delete", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertEqual(response.headers["location"], "/songbook?deleted=1")
+        delete.assert_called_once_with(1)
 
     def test_songbook_api_returns_rows(self):
         with patch("web_review.services.canon.songbook_rows", return_value=self.song_rows()):

@@ -1,6 +1,6 @@
 # Version
 
-v0.7.4
+v0.7.5
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.7.4` adds the first campaign-level maintenance workflow for songbook prompt/repertoire review and upgrades the local development virtual environment to Python 3.11.
+`v0.7.5` adds edit-mode CRUD and reorder controls for Faban's Songbook while preserving song number as the stable song identity.

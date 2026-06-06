@@ -64,6 +64,16 @@ def _fetch_one_write(sql: str, params: dict[str, Any]) -> dict[str, Any]:
         raise CanonWriteError(str(exc)) from exc
 
 
+def _execute_transaction(statements: list[tuple[str, dict[str, Any]]]) -> None:
+    try:
+        engine = db.make_engine()
+        with engine.begin() as connection:
+            for sql, params in statements:
+                connection.execute(text(sql), params)
+    except SQLAlchemyError as exc:
+        raise CanonWriteError(str(exc)) from exc
+
+
 def timeline_in_game_date_bounds(value: Optional[str]) -> tuple[Optional[str], Optional[str]]:
     if not value:
         return None, None
@@ -106,6 +116,14 @@ def locations() -> list[str]:
 
 def location_types() -> list[dict[str, Any]]:
     return _fetch("SELECT id, type_name FROM location_type ORDER BY type_name;")
+
+
+def song_styles() -> list[dict[str, Any]]:
+    return _fetch("SELECT id, style_name FROM song_style ORDER BY style_name;")
+
+
+def song_categories() -> list[dict[str, Any]]:
+    return _fetch("SELECT id, category_name FROM song_category ORDER BY category_name;")
 
 
 def location_type_id(type_name: Optional[str]) -> Optional[int]:
@@ -1405,12 +1423,58 @@ def campaign_timeline() -> dict[str, Any]:
     }
 
 
+def ensure_songbook_schema() -> None:
+    _execute("ALTER TABLE song ADD COLUMN IF NOT EXISTS tempo VARCHAR(60);", {})
+    _execute("ALTER TABLE song ADD COLUMN IF NOT EXISTS order_number INTEGER;", {})
+    _execute("UPDATE song SET order_number = song_number WHERE order_number IS NULL;", {})
+    _execute("DROP VIEW IF EXISTS v_songbook;", {})
+    _execute("ALTER TABLE song ALTER COLUMN musical_key TYPE VARCHAR(120);", {})
+    _execute("ALTER TABLE song ALTER COLUMN meter TYPE VARCHAR(120);", {})
+    _execute("ALTER TABLE song ALTER COLUMN tempo TYPE VARCHAR(120);", {})
+    _execute("""
+        CREATE VIEW v_songbook AS
+            SELECT
+                s.id,
+                s.song_number,
+                s.order_number,
+                s.title,
+                s.style_id,
+                ss.style_name AS style,
+                s.category_id,
+                sc.category_name AS category,
+                s.song_type,
+                s.short_description,
+                s.long_description,
+                s.summary,
+                s.suno_prompt,
+                s.musical_key,
+                s.meter,
+                s.tempo,
+                s.instrumentation,
+                s.lyrics_local_path,
+                s.mp3_local_path,
+                s.mp3_url,
+                s.lyrics_url,
+                ws.session_number AS written_session,
+                s.in_world_context,
+                s.is_performed
+            FROM song s
+            LEFT JOIN song_style ss ON s.style_id = ss.id
+            LEFT JOIN song_category sc ON s.category_id = sc.id
+            LEFT JOIN session ws ON ws.id = s.written_session;
+    """, {})
+
+
 def songbook_rows() -> list[dict[str, Any]]:
     rows = _fetch("""
         SELECT
+            id,
             song_number,
+            order_number,
             title,
+            style_id,
             style,
+            category_id,
             category,
             song_type,
             short_description,
@@ -1424,9 +1488,12 @@ def songbook_rows() -> list[dict[str, Any]]:
             lyrics_local_path,
             mp3_local_path,
             mp3_url,
-            lyrics_url
+            lyrics_url,
+            written_session,
+            in_world_context,
+            is_performed
         FROM v_songbook
-        ORDER BY song_number;
+        ORDER BY COALESCE(order_number, song_number), song_number;
     """)
     for row in rows:
         row["has_local_audio"] = bool(row.get("mp3_local_path") and _safe_repo_path(row["mp3_local_path"]).exists())
@@ -1463,9 +1530,13 @@ def songbook_foreword() -> dict[str, str]:
 def songbook_detail(song_number: int) -> Optional[dict[str, Any]]:
     rows = _fetch("""
         SELECT
+            id,
             song_number,
+            order_number,
             title,
+            style_id,
             style,
+            category_id,
             category,
             song_type,
             short_description,
@@ -1479,7 +1550,10 @@ def songbook_detail(song_number: int) -> Optional[dict[str, Any]]:
             lyrics_local_path,
             mp3_local_path,
             mp3_url,
-            lyrics_url
+            lyrics_url,
+            written_session,
+            in_world_context,
+            is_performed
         FROM v_songbook
         WHERE song_number = :song_number;
     """, {"song_number": song_number})
@@ -1489,6 +1563,127 @@ def songbook_detail(song_number: int) -> Optional[dict[str, Any]]:
     row["has_local_audio"] = bool(row.get("mp3_local_path") and _safe_repo_path(row["mp3_local_path"]).exists())
     row["has_local_lyrics"] = bool(row.get("lyrics_local_path") and _safe_repo_path(row["lyrics_local_path"]).exists())
     return row
+
+
+def next_song_number() -> int:
+    ensure_songbook_schema()
+    rows = _fetch("SELECT COALESCE(MAX(song_number), 0) + 1 AS value FROM song;")
+    return int(rows[0]["value"])
+
+
+def next_song_order_number() -> int:
+    ensure_songbook_schema()
+    rows = _fetch("SELECT COALESCE(MAX(order_number), MAX(song_number), 0) + 1 AS value FROM song;")
+    return int(rows[0]["value"])
+
+
+def create_song(values: dict[str, Any]) -> None:
+    ensure_songbook_schema()
+    if not values.get("title"):
+        raise CanonWriteError("Song title is required.")
+    values = {
+        **values,
+        "song_number": values.get("song_number") or next_song_number(),
+        "order_number": values.get("order_number") or next_song_order_number(),
+    }
+    _execute("""
+        INSERT INTO song (
+            song_number, order_number, title, style_id, category_id,
+            summary, lyrics_url, mp3_url, mp3_local_path, written_session,
+            in_world_context, is_performed, song_type, short_description,
+            long_description, suno_prompt, musical_key, meter,
+            instrumentation, lyrics_local_path, tempo
+        )
+        VALUES (
+            :song_number, :order_number, :title, :style_id, :category_id,
+            :summary, :lyrics_url, :mp3_url, :mp3_local_path,
+            (SELECT id FROM session WHERE session_number = :written_session),
+            :in_world_context, :is_performed, :song_type, :short_description,
+            :long_description, :suno_prompt, :musical_key, :meter,
+            :instrumentation, :lyrics_local_path, :tempo
+        );
+    """, values)
+    normalize_song_order()
+
+
+def update_song(song_number: int, values: dict[str, Any]) -> None:
+    ensure_songbook_schema()
+    if not values.get("title"):
+        raise CanonWriteError("Song title is required.")
+    _execute("""
+        UPDATE song
+        SET
+            order_number = :order_number,
+            title = :title,
+            style_id = :style_id,
+            category_id = :category_id,
+            summary = :summary,
+            lyrics_url = :lyrics_url,
+            mp3_url = :mp3_url,
+            mp3_local_path = :mp3_local_path,
+            written_session = (SELECT id FROM session WHERE session_number = :written_session),
+            in_world_context = :in_world_context,
+            is_performed = :is_performed,
+            song_type = :song_type,
+            short_description = :short_description,
+            long_description = :long_description,
+            suno_prompt = :suno_prompt,
+            musical_key = :musical_key,
+            meter = :meter,
+            instrumentation = :instrumentation,
+            lyrics_local_path = :lyrics_local_path,
+            tempo = :tempo
+        WHERE song_number = :song_number;
+    """, {**values, "song_number": song_number})
+    normalize_song_order()
+
+
+def delete_song(song_number: int) -> None:
+    ensure_songbook_schema()
+    _execute("DELETE FROM song WHERE song_number = :song_number;", {"song_number": song_number})
+    normalize_song_order()
+
+
+def normalize_song_order() -> None:
+    ensure_songbook_schema()
+    rows = _fetch("""
+        SELECT id
+        FROM song
+        ORDER BY COALESCE(order_number, song_number), song_number, id;
+    """)
+    statements = [
+        ("UPDATE song SET order_number = :temporary_order WHERE id = :id;", {"id": row["id"], "temporary_order": -(index + 1)})
+        for index, row in enumerate(rows)
+    ]
+    statements.extend(
+        ("UPDATE song SET order_number = :order_number WHERE id = :id;", {"id": row["id"], "order_number": index + 1})
+        for index, row in enumerate(rows)
+    )
+    _execute_transaction(statements)
+
+
+def move_song(song_number: int, direction: str) -> None:
+    ensure_songbook_schema()
+    rows = _fetch("""
+        SELECT song_number, order_number
+        FROM song
+        ORDER BY COALESCE(order_number, song_number), song_number;
+    """)
+    index = next((idx for idx, row in enumerate(rows) if row["song_number"] == song_number), None)
+    if index is None:
+        raise CanonWriteError("Song not found.")
+    target_index = index - 1 if direction == "up" else index + 1
+    if target_index < 0 or target_index >= len(rows):
+        return
+    rows[index], rows[target_index] = rows[target_index], rows[index]
+    statements = [
+        (
+            "UPDATE song SET order_number = :order_number WHERE song_number = :song_number;",
+            {"song_number": row["song_number"], "order_number": order_number},
+        )
+        for order_number, row in enumerate(rows, start=1)
+    ]
+    _execute_transaction(statements)
 
 
 def _safe_repo_path(path_value: str) -> Path:
