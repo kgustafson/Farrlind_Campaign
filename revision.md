@@ -1,5 +1,15 @@
 # Revision History - D&D Campaign Manager
 
+## v0.7.4 - 6/6/2026
+
+Added the first campaign-level maintenance workflow and upgraded the local development venv.
+
+- Workflow: Added `scripts/rag.py songbook-review` for a read-only songbook prompt/repertoire maintenance report.
+- Workflow: The report flags missing Suno prompts, missing local lyric/audio assets, final-summary song mentions absent from the song table, high-significance song opportunities, theme clusters, and similar-title watchlist entries.
+- Docs: Documented campaign maintenance workflows and the songbook review command in the canonical workflow references.
+- Runtime: Rebuilt the local `rag-env` virtual environment with Python 3.11 and preserved the previous Python 3.9 venv as `rag-env-py39-backup`.
+- Tests: Added focused coverage for songbook maintenance heuristics and reran transcription, health, and workflow/web review checks.
+
 ## v0.7.3 - 6/6/2026
 
 Upgraded the local Docker database stack to PostgreSQL 18.

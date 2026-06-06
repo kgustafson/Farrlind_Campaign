@@ -30,6 +30,7 @@ from raglib.campaign_bootstrap_extractor import extract_campaign_bootstrap
 from scripts.load_summaries import apply_sql, write_sql
 from scripts.load_songbook import apply_sql as apply_songbook_sql
 from scripts.load_songbook import write_songbook_sql
+from scripts.songbook_maintenance import write_songbook_maintenance_report
 from scripts.db_backup import backup_database
 from scripts.transcribe_parallel import default_audio_path, default_output_path, run_transcription
 from raglib.workflow_state import write_historical_workflow_seed_sql, write_workflow_init_sql
@@ -117,6 +118,7 @@ def parse_args():
             "status",
             "dbload",
             "songbook-load",
+            "songbook-review",
             "db-backup",
             "workflow-init",
             "workflow-seed-history",
@@ -146,6 +148,7 @@ def parse_args():
     parser.add_argument("--start-session", type=int, default=0, help="workflow-seed-history first session number.")
     parser.add_argument("--end-session", type=int, default=20, help="workflow-seed-history final session number.")
     parser.add_argument("--sessions", nargs="+", default=None, help="Session names for extract-campaign-bootstrap.")
+    parser.add_argument("--max-opportunities", type=int, default=12, help="songbook-review opportunity limit.")
     return parser.parse_args()
 
 
@@ -162,6 +165,10 @@ def main():
         sql_path, _report_path, _prompts, _warnings = write_songbook_sql()
         if args.apply:
             apply_songbook_sql(sql_path, args.container, args.user, args.database)
+        return
+
+    if args.command == "songbook-review":
+        write_songbook_maintenance_report(args.output, args.max_opportunities)
         return
 
     if args.command == "db-backup":

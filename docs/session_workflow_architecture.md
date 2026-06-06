@@ -257,6 +257,18 @@ Reruns may regenerate draft artifacts.
 Reruns may not overwrite reviewed canon without explicit human review.
 ```
 
+## Campaign Maintenance
+
+Per-session workflows create and review canon one session at a time. Campaign-level maintenance workflows inspect the accumulated canon after those sessions have been accepted.
+
+The first maintenance workflow is the songbook prompt/repertoire review:
+
+```bash
+./rag-env/bin/python scripts/rag.py songbook-review
+```
+
+It writes a read-only report under `campaigns/{campaign}/out/` covering prompt coverage, local lyric/audio asset coverage, final-summary song mentions that are missing from the song table, high-significance song opportunities, and repertoire clustering. This gives the user a deliberate way to decide whether Faban should add a song without letting an automated run alter the songbook.
+
 ## Status Model
 
 Workflow status should describe the major operator-facing state, not every internal file detail.

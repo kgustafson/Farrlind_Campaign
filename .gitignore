@@ -1,4 +1,4 @@
-rag-env/
+rag-env*/
 __pycache__/
 *.pyc
 

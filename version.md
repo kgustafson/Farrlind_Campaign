@@ -1,6 +1,6 @@
 # Version
 
-v0.7.3
+v0.7.4
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.7.3` upgrades the Docker database runtime to PostgreSQL 18, updates the web image to matching PostgreSQL 18 client tools, and restore-tests the migrated database backup.
+`v0.7.4` adds the first campaign-level maintenance workflow for songbook prompt/repertoire review and upgrades the local development virtual environment to Python 3.11.

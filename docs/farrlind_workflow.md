@@ -213,6 +213,35 @@ transcribe
 
 The extractor JSON files are draft queues. They become canon only when reviewed and applied through the corresponding web review pages.
 
+## Campaign Maintenance Workflows
+
+Campaign maintenance workflows inspect already-reviewed canon across the whole campaign. They are diagnostic by default and must not mutate canon unless a later human action explicitly applies a change.
+
+### Songbook Prompt/Repertoire Review
+
+Run:
+
+```bash
+./rag-env/bin/python scripts/rag.py songbook-review
+```
+
+The report is written to:
+
+```text
+campaigns/{campaign}/out/songbook_maintenance_report.md
+```
+
+The current report checks:
+
+- songs missing Suno prompts
+- missing local lyric or audio assets
+- written/performed songs mentioned in final summaries but absent from the song table
+- high-significance sessions/events that may deserve a future Faban song
+- repertoire theme clusters by category and style
+- similar-title watchlist entries
+
+This workflow is read-only. It creates a maintenance report only; it does not create song rows, prompts, performances, or canon records.
+
 ## Artifact Map
 
 Plain worker skeleton artifacts:
