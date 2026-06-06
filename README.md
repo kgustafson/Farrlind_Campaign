@@ -1,8 +1,10 @@
 # AI RAG Campaign Workflow
 
-Local pipeline for turning Farrlind source material into reviewed, queryable campaign canon.
+Local pipeline for turning campaign source material into reviewed, queryable campaign canon.
 
-The canonical workflow reference is [Farrlind Campaign Workflow](docs/farrlind_workflow.md).
+The high-level architecture overview is [Campaign Session Workflow Architecture](docs/session_workflow_architecture.md).
+
+The detailed workflow and command reference is [Farrlind Campaign Workflow](docs/farrlind_workflow.md).
 
 ## Common Commands
 

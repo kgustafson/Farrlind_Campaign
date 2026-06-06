@@ -31,51 +31,9 @@ audio/transcript
 - Gemma curation should be treated as a draft canon packet generator, not merely a prose summarizer.
 - Draft canon packets should extract coherent sections for summary, major events, NPCs/entities, locations, artifacts/items, lore items, combat encounters, open threads, timeline notes, and inventory/resource notes.
 
-## Project Management
-
-### Phase 1: Version Control Best Practices - Complete
-
-- Introduced best-practice version control for campaign canon and workflow changes.
-- Defined and documented version rules using:
-  - major
-  - minor
-  - revision
-- Decided what kind of change increments each level.
-- Included database/schema versioning rules.
-- Included canon/content versioning rules.
-- Included workflow graph versioning rules.
-- Reviewed how versioning is handled in the Jubilaires membership project and adapted the useful parts here.
-- Added app-visible version display.
-- Established matching Git tags for versioned commits.
-
 ## Workflow Management
 
-### Phase 2: Define The Workflow Graph - Complete
-
-- Done - Create a plain YAML workflow definition for the Farrlind session pipeline.
-- Done - Persist workflow state in database tables rather than YAML state files.
-- Done - Model each step with:
-  - stable step id
-  - display name
-  - dependencies
-  - command, if already known
-  - expected inputs
-  - expected outputs
-  - status rules
-- Done - Add a session workflow initialization command that seeds `workflow_run` and ordered `workflow_step_state` rows from the YAML definition.
-- Done - Add a historical workflow seeding command for sessions 00 through 20, with estimated timestamps and evidence comments.
-- Done - Kept the first workflow graph deterministic, inspectable, YAML-defined, and database-backed.
-
-### Phase 3: Show Workflow State In The Web UI - Complete
-
-- Done - Add a read-only workflow/status view to the local web app.
-- Done - Show each session's progress through the graph.
-- Done - Make incomplete, blocked, stale, complete, and not-applicable steps visually distinct.
-- Done - Link workflow steps back to existing review/session, lore, and registry pages where useful.
-- Done - Surface missing artifacts and validation/status problems.
-- Done - Focused on per-session workflow state first.
-
-### Phase 4: Wire Existing Commands To Workflow Actions - Complete
+### Review Workflow Refinement
 
 - Human review is not done yet.
   - The current fragment/event review flow is too large for long recorded sessions.
@@ -106,17 +64,6 @@ audio/transcript
 - Capture command output in the same command-result style already used by the review UI.
 - Prefer "Run next step" only after the graph status rules are trustworthy.
 
-### Phase 5: Audio Ingestion - Complete
-
-- Add audio ingestion to the workflow graph after the session review and canon workflow is stable.
-- Model audio-specific steps separately, such as:
-  - audio file registration
-  - transcription
-  - transcript cleanup
-  - source artifact validation
-- Keep audio ingestion upstream from canon review.
-- Do not allow audio reprocessing to overwrite reviewed/applied canon without explicit human review.
-
 ### Future: Consider LangGraph Or Similar Orchestration
 
 - Introduce LangGraph as a future workflow enhancement if the plain Python/YAML/database model starts needing more orchestration power.
@@ -143,24 +90,13 @@ audio/transcript
   
 - Add campaign-level workflow graphs after per-session workflows are stable.
 - Candidate maintenance workflows:
-  - NPC registry cleanup - Complete
-  - location normalization - Complete
-  - enemy encounter tightening - Complete
-  - travel timeline validation - Complete
-  - open thread review - Complete
-  - Wells of Magic status review - Removed
   - songbook prompt/repertoire review 
 
 ## Web Interface Improvements
 
-### Minor Release Upgrade Candidates - Complete
-
-- Develop NPC Registry. Done in v0.2.10 with listing, add/edit modals, delete actions, API route, and canon workflow notes.
-- Develop Artifact Listing. Done in v0.2.11 with listing, add/edit modals, delete actions, API route, and artifact canon notes.
-- Develop Well of Magic Lore Section. Done in v0.2.13 with editable Markdown lore backed by `knowledge/Faban/lore/wells_of_magic.md`.
-- Develop Faban Songbook. Done in v0.3.15 with sidebar page, song cards, metadata, local playback, source links, lyrics pages, and API route.
-- Develop Campaign Timeline. Done in v0.4.4 with read-only timeline, travel movements, major events, and API route.
-- Develop Lore Items Registry. Done with sidebar page, edit/archive modes, add/edit/delete modals, API route, smoke-test coverage, and draft canon packet prompt support.
+- Continue refining the session review page around final-summary review instead of micro-event decisions.
+- Improve the operator view for queued/running workflow jobs if the worker needs more visibility.
+- Revisit static archive export/publish workflow after another full session cycle.
 
 ## Data Management
 
@@ -170,16 +106,6 @@ audio/transcript
 - Strengthen canon integrity checks as the review workflow grows.
 - Plan and execute a deliberate PostgreSQL major-version upgrade from `postgres:16` to latest current PostgreSQL, presently PostgreSQL 18. Use dump/restore or `pg_upgrade` with a fresh volume, verify the web container `postgresql-client` major version matches the database server, restore-test the backup, and run the Project Utilities smoke test before retiring the PostgreSQL 16 volume.
 - Evaluate upgrading the local development virtual environment from Python 3.9 to Python 3.11 by creating a parallel venv, installing requirements, and validating faster-whisper transcription, the worker skeleton, the web app, and the full test suite before replacing `rag-env`.
-
-## Resolved Questions
-
-- Workflow state should live in the database.
-- The first workflow graph should be per-session.
-- YAML is the canonical step definition and determines step order.
-- Database rows are the runtime state for session workflows and step progress.
-- Campaign-level maintenance workflows come later.
-- Reruns must not overwrite reviewed/applied canon automatically.
-- Audio/transcript ingestion comes later as Phase 6.
 
 ## Open Questions
 
