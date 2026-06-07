@@ -78,6 +78,10 @@ audio/transcript
 - Continue refining the session review page around final-summary review instead of micro-event decisions.
 - Improve the operator view for queued/running workflow jobs if the worker needs more visibility.
 - Revisit static archive export/publish workflow after another full session cycle.
+- Add authenticated Google Drive upload support for songbook local files.
+  - Lyrics Markdown can become native Google Docs once the app has a Drive credential path.
+  - MP3 upload requires raw Drive file upload support, not currently exposed by the local app runtime.
+  - Uploaded files should refresh the campaign `songbook/drive_files.json` manifest and then populate the songbook edit dropdowns.
 
 ## Data Management
 

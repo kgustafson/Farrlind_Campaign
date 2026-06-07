@@ -3954,12 +3954,18 @@ class SongbookRouteTest(unittest.TestCase):
 
     def test_songbook_add_modal_uses_separate_order_number(self):
         foreword = {"title": "", "text": "", "path": "", "notes": ""}
+        manifest = {
+            "lyrics": [{"title": "Song - Test Ballad", "url": "https://docs.google.com/document/d/test/edit"}],
+            "audio": [{"title": "27 - Test Ballad.mp3", "url": "https://drive.google.com/file/d/audio/view"}],
+            "updated_at": "2026-06-06",
+        }
         with patch("web_review.services.canon.songbook_rows", return_value=self.song_rows()), \
              patch("web_review.services.canon.songbook_foreword", return_value=foreword), \
              patch("web_review.services.canon.song_styles", return_value=[{"id": 1, "style_name": "ballad"}]), \
              patch("web_review.services.canon.song_categories", return_value=[{"id": 2, "category_name": "lore"}]), \
              patch("web_review.services.canon.next_song_number", return_value=27), \
-             patch("web_review.services.canon.next_song_order_number", return_value=27):
+             patch("web_review.services.canon.next_song_order_number", return_value=27), \
+             patch("web_review.services.songbook_drive.drive_manifest", return_value=manifest):
             client = TestClient(app)
             response = client.get("/songbook?modal=add")
 
@@ -3968,6 +3974,10 @@ class SongbookRouteTest(unittest.TestCase):
         self.assertIn("Order Number", response.text)
         self.assertIn('name="song_number"', response.text)
         self.assertIn('name="order_number"', response.text)
+        self.assertIn('name="lyrics_drive_url"', response.text)
+        self.assertIn('name="mp3_drive_url"', response.text)
+        self.assertIn("Song - Test Ballad", response.text)
+        self.assertIn("27 - Test Ballad.mp3", response.text)
 
     def test_create_songbook_entry_posts_to_canon(self):
         with patch("web_review.services.canon.create_song") as create:
@@ -3980,6 +3990,10 @@ class SongbookRouteTest(unittest.TestCase):
                     "title": "The Test Ballad",
                     "style_id": "1",
                     "category_id": "2",
+                    "lyrics_drive_url": "https://docs.google.com/document/d/drive-choice/edit",
+                    "lyrics_url": "https://docs.google.com/document/d/manual/edit",
+                    "mp3_drive_url": "https://drive.google.com/file/d/drive-audio/view",
+                    "mp3_url": "https://drive.google.com/file/d/manual-audio/view",
                     "is_performed": "on",
                 },
                 follow_redirects=False,
@@ -3992,6 +4006,28 @@ class SongbookRouteTest(unittest.TestCase):
         self.assertEqual(values["song_number"], 27)
         self.assertEqual(values["order_number"], 5)
         self.assertEqual(values["title"], "The Test Ballad")
+        self.assertEqual(values["lyrics_url"], "https://docs.google.com/document/d/drive-choice/edit")
+        self.assertEqual(values["mp3_url"], "https://drive.google.com/file/d/drive-audio/view")
+
+    def test_songbook_edit_modal_keeps_current_drive_url_option(self):
+        foreword = {"title": "", "text": "", "path": "", "notes": ""}
+        row = {**self.song_rows()[0], "lyrics_url": "https://docs.google.com/document/d/current/edit", "mp3_url": "https://drive.google.com/file/d/current-audio/view"}
+        manifest = {"lyrics": [], "audio": [], "updated_at": "2026-06-06"}
+        with patch("web_review.services.canon.songbook_rows", return_value=[row]), \
+             patch("web_review.services.canon.songbook_foreword", return_value=foreword), \
+             patch("web_review.services.canon.songbook_detail", return_value=row), \
+             patch("web_review.services.canon.song_styles", return_value=[]), \
+             patch("web_review.services.canon.song_categories", return_value=[]), \
+             patch("web_review.services.canon.next_song_number", return_value=2), \
+             patch("web_review.services.canon.next_song_order_number", return_value=2), \
+             patch("web_review.services.songbook_drive.drive_manifest", return_value=manifest):
+            client = TestClient(app)
+            response = client.get("/songbook/1/edit")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Current saved file", response.text)
+        self.assertIn("https://docs.google.com/document/d/current/edit", response.text)
+        self.assertIn("https://drive.google.com/file/d/current-audio/view", response.text)
 
     def test_update_songbook_entry_preserves_song_number_identity(self):
         with patch("web_review.services.canon.songbook_detail", return_value=self.song_rows()[0]), \

@@ -2719,6 +2719,12 @@ dd { margin: 0; }
   font-size: 12px;
   font-weight: 800;
 }
+.form-hint {
+  margin: 8px 0 14px;
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-style: italic;
+}
 .song-detail-actions {
   margin-top: 12px;
 }

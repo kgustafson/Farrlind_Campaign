@@ -1,5 +1,14 @@
 # Revision History - D&D Campaign Manager
 
+## v0.7.6 - 6/6/2026
+
+Added Drive-backed source file selection for Faban's Songbook.
+
+- App: Replaced raw source doc/audio URL entry as the primary songbook edit control with Drive-backed lyrics and MP3 dropdowns.
+- App: Preserves manual URL fallback fields for files not yet listed in the campaign Drive manifest.
+- Canon/Data: Added a campaign-local `drive_files.json` manifest seeded from the KoKCampaign Songbook and Songs folders.
+- Tests: Added songbook route coverage for Drive-selected URLs, current saved Drive URLs, and modal rendering.
+
 ## v0.7.5 - 6/6/2026
 
 Added edit-mode CRUD and reorder controls for Faban's Songbook.

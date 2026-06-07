@@ -1,6 +1,6 @@
 # Version
 
-v0.7.5
+v0.7.6
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.7.5` adds edit-mode CRUD and reorder controls for Faban's Songbook while preserving song number as the stable song identity.
+`v0.7.6` adds Drive-backed source file selection for Faban's Songbook lyrics and MP3 links.

@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 
 from scripts.db_backup import backup_database
 from raglib.campaign import active_campaign_name, assets_dir, audio_dir, campaign_feature_enabled, load_campaign_metadata
-from web_review.services import artifact_extraction_review, canon, combat_extraction_review, commands, location_extraction_review, lore_item_extraction_review, npc_extraction_review, open_thread_extraction_review, reviews, workflow
+from web_review.services import artifact_extraction_review, canon, combat_extraction_review, commands, location_extraction_review, lore_item_extraction_review, npc_extraction_review, open_thread_extraction_review, reviews, songbook_drive, workflow
 
 
 app = FastAPI(title="Campaign Review Workbench")
@@ -317,6 +317,8 @@ def artifact_form_values(form) -> dict:
 
 
 def song_form_values(form, current: Optional[dict] = None) -> dict:
+    lyrics_url = (form.get("lyrics_drive_url") or form.get("lyrics_url") or "").strip()
+    mp3_url = (form.get("mp3_drive_url") or form.get("mp3_url") or "").strip()
     return {
         "song_number": optional_int(form.get("song_number")) if current is None else current.get("song_number"),
         "order_number": optional_int(form.get("order_number")),
@@ -334,8 +336,8 @@ def song_form_values(form, current: Optional[dict] = None) -> dict:
         "instrumentation": (form.get("instrumentation") or "").strip(),
         "lyrics_local_path": (form.get("lyrics_local_path") or "").strip(),
         "mp3_local_path": (form.get("mp3_local_path") or "").strip(),
-        "lyrics_url": (form.get("lyrics_url") or "").strip(),
-        "mp3_url": (form.get("mp3_url") or "").strip(),
+        "lyrics_url": lyrics_url,
+        "mp3_url": mp3_url,
         "written_session": optional_int(form.get("written_session")),
         "in_world_context": (form.get("in_world_context") or "").strip(),
         "is_performed": checkbox_value(form.get("is_performed")),
@@ -2130,6 +2132,11 @@ def project_utilities_publish_static_archive():
 def songbook_template_context(editing: Optional[dict] = None, show_modal: bool = False) -> dict:
     songs = canon.songbook_rows()
     foreword = canon.songbook_foreword()
+    drive_manifest = songbook_drive.drive_manifest() if can_edit() and show_modal else {"lyrics": [], "audio": []}
+    lyrics_options = drive_manifest.get("lyrics") or []
+    audio_options = drive_manifest.get("audio") or []
+    current_lyrics_option = songbook_drive.current_file_option(editing.get("lyrics_url") if editing else "", lyrics_options)
+    current_audio_option = songbook_drive.current_file_option(editing.get("mp3_url") if editing else "", audio_options)
     return {
         "songs": songs,
         "foreword": foreword,
@@ -2140,6 +2147,9 @@ def songbook_template_context(editing: Optional[dict] = None, show_modal: bool =
         "song_categories": canon.song_categories() if can_edit() and show_modal else [],
         "next_song_number": canon.next_song_number() if can_edit() and show_modal else None,
         "next_order_number": canon.next_song_order_number() if can_edit() and show_modal else None,
+        "drive_manifest": drive_manifest,
+        "lyrics_drive_options": ([current_lyrics_option] if current_lyrics_option else []) + lyrics_options,
+        "audio_drive_options": ([current_audio_option] if current_audio_option else []) + audio_options,
     }
 
 

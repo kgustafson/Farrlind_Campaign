@@ -211,14 +211,39 @@
       </div>
       <div class="form-grid two-col">
         <label class="field-block">
-          <span>Source Doc URL</span>
+          <span>Lyrics File</span>
+          <select name="lyrics_drive_url">
+            <option value="">manual URL or not selected</option>
+            {% for option in lyrics_drive_options %}
+              <option value="{{ option.url }}" {% if editing and editing.lyrics_url == option.url %}selected{% endif %}>{{ option.title }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field-block">
+          <span>MP3 File</span>
+          <select name="mp3_drive_url">
+            <option value="">manual URL or not selected</option>
+            {% for option in audio_drive_options %}
+              <option value="{{ option.url }}" {% if editing and editing.mp3_url == option.url %}selected{% endif %}>{{ option.title }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
+      <div class="form-grid two-col">
+        <label class="field-block">
+          <span>Manual Lyrics URL</span>
           <input name="lyrics_url" value="{{ editing.lyrics_url if editing else '' }}">
         </label>
         <label class="field-block">
-          <span>Source Audio URL</span>
+          <span>Manual MP3 URL</span>
           <input name="mp3_url" value="{{ editing.mp3_url if editing else '' }}">
         </label>
       </div>
+      {% if drive_manifest.updated_at %}
+      <p class="form-hint">Drive choices loaded from the campaign songbook manifest, last refreshed {{ drive_manifest.updated_at }}.</p>
+      {% else %}
+      <p class="form-hint">No Drive manifest is available for this campaign yet. Paste source URLs manually.</p>
+      {% endif %}
       <label class="field-block">
         <span>In-World Context</span>
         <textarea name="in_world_context">{{ editing.in_world_context if editing else '' }}</textarea>
