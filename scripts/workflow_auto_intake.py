@@ -364,6 +364,19 @@ def finish_queue_file(path: Path, suffix: str) -> Path:
     return target
 
 
+def selected_command_plan(
+    session_number: int,
+    audio_file_path: str,
+    transcript_policy: str,
+    selected_steps: list[str] | None = None,
+) -> list[WorkflowCommand]:
+    plan = command_plan(session_number, audio_file_path, transcript_policy)
+    if not selected_steps:
+        return plan
+    selected = set(selected_steps)
+    return [command for command in plan if command.step_id in selected]
+
+
 def process_job(job_path: Path, dry_run: bool = False) -> None:
     job = json.loads(job_path.read_text(encoding="utf-8"))
     job_campaign = (job.get("campaign_name") or campaign.active_campaign_name()).strip()
@@ -372,11 +385,12 @@ def process_job(job_path: Path, dry_run: bool = False) -> None:
     session_number = int(job["session_number"])
     audio_file_path = (job.get("audio_file_path") or "").strip()
     transcript_policy = normalize_transcript_policy(job.get("transcript_policy"))
+    selected_steps = job.get("commands") if isinstance(job.get("commands"), list) else None
     run_dir = LOG_DIR / session_name(session_number) / datetime.now().strftime("%Y%m%d_%H%M%S")
     run_dir.mkdir(parents=True, exist_ok=True)
     mark_run_running(session_number)
     try:
-        for command in command_plan(session_number, audio_file_path, transcript_policy):
+        for command in selected_command_plan(session_number, audio_file_path, transcript_policy, selected_steps):
             run_command(session_number, command, run_dir, dry_run=dry_run)
     except SystemExit as exc:
         mark_run_failed(session_number, f"Auto-intake failed before human review. Exit code {exc.code}.")

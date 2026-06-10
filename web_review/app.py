@@ -547,8 +547,25 @@ def workflow_index(request: Request, session: Optional[int] = None):
             "rows": rows,
             "selected_session": selected_session,
             "detail": detail,
+            "draft_rerun_queued": request.query_params.get("draft_rerun_queued"),
+            "draft_rerun_blocked": request.query_params.get("draft_rerun_blocked"),
         },
     )
+
+
+@app.post("/workflow/sessions/{session}/rerun-draft")
+def workflow_rerun_draft(session: str):
+    if not can_edit():
+        raise HTTPException(status_code=404, detail="Workflow status is not available in archive mode.")
+    try:
+        session_number = reviews.parse_session_ref(session)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    try:
+        workflow.enqueue_draft_rerun(session_number)
+    except workflow.WorkflowWriteError:
+        return RedirectResponse(url=f"/workflow?session={session_number}&draft_rerun_blocked=1", status_code=303)
+    return RedirectResponse(url=f"/workflow?session={session_number}&draft_rerun_queued=1", status_code=303)
 
 
 @app.get("/sessions/{session}/review", response_class=HTMLResponse)

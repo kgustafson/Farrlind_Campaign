@@ -4286,6 +4286,50 @@ class WorkflowServiceTest(unittest.TestCase):
         self.assertIsNone(queued)
         execute.assert_not_called()
 
+    def test_enqueue_draft_rerun_writes_guarded_queue_from_transcript(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            queue_dir = root / "ops" / "workflow_queue"
+            raw = root / "campaigns" / "farrlind" / "raw"
+            raw.mkdir(parents=True)
+            (raw / "session21_transcript.txt").write_text("transcript", encoding="utf-8")
+            with patch("web_review.services.workflow.QUEUE_DIR", queue_dir), \
+                 patch("web_review.services.reviews.REPO_ROOT", root), \
+                 patch("web_review.services.reviews.KNOWLEDGE_DIR", root / "campaigns" / "farrlind"), \
+                 patch("web_review.services.reviews.FINAL_DIR", root / "campaigns" / "farrlind" / "final"), \
+                 patch("web_review.services.workflow.campaign.raw_dir", return_value=raw), \
+                 patch("web_review.services.workflow.campaign.active_campaign_name", return_value="farrlind"), \
+                 patch("web_review.services.workflow._fetch", return_value=[{"id": 21}]), \
+                 patch("web_review.services.workflow._execute_transaction") as execute:
+                queued = workflow.enqueue_draft_rerun(21)
+
+            self.assertEqual(queued, queue_dir / "session21_draft_rerun.json")
+            payload = json.loads(queued.read_text(encoding="utf-8"))
+            self.assertEqual(payload["job_type"], "draft_rerun")
+            self.assertNotIn("transcribe_audio", payload["commands"])
+            self.assertIn("extract_npcs", payload["commands"])
+            self.assertTrue(payload["guard"]["never_overwrite_reviewed_entities"])
+            execute.assert_called_once()
+
+    def test_enqueue_draft_rerun_blocks_when_entity_review_is_applied(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            raw = root / "campaigns" / "farrlind" / "raw"
+            extracted = root / "campaigns" / "farrlind" / "extracted"
+            raw.mkdir(parents=True)
+            extracted.mkdir(parents=True)
+            (raw / "session21_transcript.txt").write_text("transcript", encoding="utf-8")
+            (extracted / "session21_npcs_reviewed.json").write_text("{}", encoding="utf-8")
+            with patch("web_review.services.reviews.REPO_ROOT", root), \
+                 patch("web_review.services.workflow.campaign.raw_dir", return_value=raw), \
+                 patch("web_review.services.reviews.KNOWLEDGE_DIR", root / "campaigns" / "farrlind"), \
+                 patch("web_review.services.reviews.FINAL_DIR", root / "campaigns" / "farrlind" / "final"), \
+                 patch("web_review.services.workflow._execute_transaction") as execute:
+                with self.assertRaises(workflow.WorkflowWriteError):
+                    workflow.enqueue_draft_rerun(21)
+
+            execute.assert_not_called()
+
     def test_workflow_rows_reads_aggregate_progress(self):
         rows = [{
             "session_number": 20,
@@ -4640,6 +4684,8 @@ class WorkflowRouteTest(unittest.TestCase):
             "session_key": "session20",
             "review_url": "/sessions/session20/review",
             "workflow_url": "/workflow?session=20",
+            "can_rerun_draft": True,
+            "draft_rerun_guard": {"allowed": True, "reasons": []},
             "steps": [{
                 "step_order": 1,
                 "step_id": "source_audio_registered",
@@ -4781,6 +4827,42 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertIn('href="/npcs"', response.text)
         self.assertIn('href="/locations"', response.text)
         self.assertIn('href="/artifacts"', response.text)
+        self.assertIn("Protected Rerun", response.text)
+        self.assertIn("Re-run Draft Extraction", response.text)
+
+    def test_workflow_page_shows_blocked_draft_rerun_reasons(self):
+        detail = self.workflow_detail()
+        detail["can_rerun_draft"] = False
+        detail["draft_rerun_guard"] = {
+            "allowed": False,
+            "reasons": ["Entity reviews already applied: session20_npcs_reviewed.json"],
+        }
+        with patch("web_review.services.workflow.workflow_rows", return_value=self.workflow_rows()), \
+             patch("web_review.services.workflow.workflow_detail", return_value=detail):
+            client = TestClient(app)
+            response = client.get("/workflow?session=20&draft_rerun_blocked=1")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Draft extraction rerun was blocked", response.text)
+        self.assertIn("Entity reviews already applied", response.text)
+        self.assertNotIn("Re-run Draft Extraction</button>", response.text)
+
+    def test_workflow_rerun_draft_route_queues_guarded_job(self):
+        with patch("web_review.services.workflow.enqueue_draft_rerun") as enqueue:
+            client = TestClient(app)
+            response = client.post("/workflow/sessions/session21/rerun-draft", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertEqual(response.headers["location"], "/workflow?session=21&draft_rerun_queued=1")
+        enqueue.assert_called_once_with(21)
+
+    def test_workflow_rerun_draft_route_reports_blocked_guard(self):
+        with patch("web_review.services.workflow.enqueue_draft_rerun", side_effect=workflow.WorkflowWriteError("blocked")):
+            client = TestClient(app)
+            response = client.post("/workflow/sessions/session21/rerun-draft", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 303)
+        self.assertEqual(response.headers["location"], "/workflow?session=21&draft_rerun_blocked=1")
 
     def test_archive_mode_hides_workflow_from_navigation_and_route(self):
         with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}), \

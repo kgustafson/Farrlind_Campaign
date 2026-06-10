@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from scripts.workflow_auto_intake import command_plan, watch_queue
+from scripts.workflow_auto_intake import command_plan, selected_command_plan, watch_queue
 
 
 class WorkflowAutoIntakeTest(unittest.TestCase):
@@ -88,6 +88,21 @@ class WorkflowAutoIntakeTest(unittest.TestCase):
                 "campaigns/trinyvale/audio/session02.mp3",
             ],
         )
+
+    def test_selected_command_plan_honors_queue_command_subset(self):
+        with tempfile.TemporaryDirectory() as tmp, patch("scripts.workflow_auto_intake.campaign.raw_dir", return_value=Path(tmp)):
+            plan = selected_command_plan(
+                21,
+                "",
+                "use_existing",
+                ["curate_transcript", "extract_npcs", "postextract_shortcut"],
+            )
+
+        self.assertEqual([command.step_id for command in plan], [
+            "curate_transcript",
+            "extract_npcs",
+            "postextract_shortcut",
+        ])
 
     def test_watch_queue_polls_without_exiting_after_empty_queue(self):
         with patch("scripts.workflow_auto_intake.process_queue", return_value=0) as process, \

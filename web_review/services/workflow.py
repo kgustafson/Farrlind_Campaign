@@ -18,6 +18,21 @@ QUEUE_DIR = reviews.REPO_ROOT / "ops" / "workflow_queue"
 TRANSCRIPT_POLICIES = {"use_existing", "recreate"}
 TERMINAL_STEP_STATUSES = {"complete", "not_applicable"}
 SESSION_INGEST_LANES = {"intake", "draft_generation", "entity_extraction", "human_review", "canonization"}
+DRAFT_RERUN_COMMANDS = [
+    "source_status_check",
+    "curate_transcript",
+    "generate_narrative_summary",
+    "extract_session_spine",
+    "validate_session_spine",
+    "extract_npcs",
+    "extract_locations",
+    "extract_artifacts",
+    "extract_lore_items",
+    "extract_combat_encounters",
+    "extract_open_threads",
+    "extract_events",
+    "postextract_shortcut",
+]
 
 
 class WorkflowReadError(RuntimeError):
@@ -416,6 +431,159 @@ def enqueue_auto_intake(session_number: int, transcript_policy: str = "use_exist
     return queue_path
 
 
+def applied_entity_review_files(session_number: int) -> list[Path]:
+    paths = []
+    for _label, pattern in reviews.EXTRACTION_REVIEW_FILES:
+        path = reviews.extraction_review_path(session_number, pattern)
+        if path.exists():
+            paths.append(path)
+    return paths
+
+
+def draft_rerun_guard(session_number: int) -> dict[str, Any]:
+    session_name = session_key(session_number)
+    transcript_path = campaign.raw_dir() / f"{session_name}_transcript.txt"
+    applied_paths = applied_entity_review_files(session_number)
+    final_summary = reviews.final_summary_path(session_number)
+    reasons = []
+    if not transcript_path.exists():
+        reasons.append(f"Missing transcript: {repo_artifact(transcript_path)}")
+    if applied_paths:
+        labels = ", ".join(path.name for path in applied_paths)
+        reasons.append(f"Entity reviews already applied: {labels}")
+    if final_summary.exists():
+        reasons.append(f"Final summary already exists: {repo_artifact(final_summary)}")
+    return {
+        "allowed": not reasons,
+        "reasons": reasons,
+        "transcript": repo_artifact(transcript_path),
+        "applied_entity_reviews": [repo_artifact(path) for path in applied_paths],
+        "final_summary": repo_artifact(final_summary) if final_summary.exists() else "",
+    }
+
+
+def enqueue_draft_rerun(session_number: int) -> Path:
+    guard = draft_rerun_guard(session_number)
+    if not guard["allowed"]:
+        raise WorkflowWriteError("Draft extraction rerun is blocked. " + " ".join(guard["reasons"]))
+
+    rows = _fetch("""
+        SELECT id
+        FROM session
+        WHERE session_number = :session_number;
+    """, {"session_number": session_number})
+    if not rows:
+        raise WorkflowWriteError(f"Session {session_number:02d} does not exist.")
+
+    QUEUE_DIR.mkdir(parents=True, exist_ok=True)
+    queue_path = QUEUE_DIR / f"{session_key(session_number)}_draft_rerun.json"
+    payload = {
+        "campaign_name": campaign.active_campaign_name(),
+        "session_number": session_number,
+        "session_name": session_key(session_number),
+        "transcript_policy": "use_existing",
+        "queued_at": datetime.now(timezone.utc).isoformat(),
+        "job_type": "draft_rerun",
+        "guard": {
+            "never_overwrite_reviewed_entities": True,
+            "blocked_if_reviewed_entity_files_exist": True,
+            "transcript": guard["transcript"],
+        },
+        "commands": DRAFT_RERUN_COMMANDS,
+    }
+    temp_path = queue_path.with_suffix(".json.tmp")
+    temp_path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    temp_path.replace(queue_path)
+
+    command_step_ids = [
+        "source_status_check",
+        "curate_transcript",
+        "generate_narrative_summary",
+        "extract_session_spine",
+        "validate_session_spine",
+        "extract_npcs",
+        "extract_locations",
+        "extract_artifacts",
+        "extract_lore_items",
+        "extract_combat_encounters",
+        "extract_open_threads",
+        "extract_events",
+        "filter_events",
+        "classify_events",
+        "normalize_events",
+        "merge_events",
+        "validate_draft",
+        "summarize_draft",
+        "postextract_shortcut",
+    ]
+    review_step_ids = [
+        "review_npc_extraction",
+        "review_location_extraction",
+        "review_artifact_extraction",
+        "review_lore_item_extraction",
+        "review_combat_encounter_extraction",
+        "review_open_thread_extraction",
+    ]
+    _execute_transaction([
+        ("""
+        UPDATE workflow_run wr
+        SET
+            status = 'pending',
+            completed_at = NULL,
+            summary_comment = COALESCE(wr.summary_comment || ' ', '') || :summary_comment,
+            metadata = wr.metadata || CAST(:metadata AS jsonb)
+        FROM session s
+        WHERE wr.session_id = s.id
+          AND s.session_number = :session_number;
+        """, {
+            "session_number": session_number,
+            "summary_comment": "Protected draft extraction rerun queued; reviewed entity canon will not be overwritten.",
+            "metadata": json.dumps({
+                "draft_rerun_queued": True,
+                "draft_rerun_queue_path": str(queue_path.relative_to(reviews.REPO_ROOT)),
+                "draft_rerun_guard": payload["guard"],
+            }),
+        }),
+        ("""
+        UPDATE workflow_step_state wss
+        SET
+            status = 'pending',
+            completed_at = NULL,
+            summary_comment = :summary_comment,
+            metadata = wss.metadata || CAST(:metadata AS jsonb)
+        FROM workflow_run wr
+        JOIN session s ON s.id = wr.session_id
+        WHERE wss.workflow_run_id = wr.id
+          AND s.session_number = :session_number
+          AND wss.step_id = ANY(:step_ids);
+        """, {
+            "session_number": session_number,
+            "step_ids": command_step_ids,
+            "summary_comment": "Queued for protected draft extraction rerun from existing transcript.",
+            "metadata": json.dumps({"draft_rerun_queued": True}),
+        }),
+        ("""
+        UPDATE workflow_step_state wss
+        SET
+            status = 'pending',
+            completed_at = NULL,
+            summary_comment = :summary_comment,
+            metadata = wss.metadata || CAST(:metadata AS jsonb)
+        FROM workflow_run wr
+        JOIN session s ON s.id = wr.session_id
+        WHERE wss.workflow_run_id = wr.id
+          AND s.session_number = :session_number
+          AND wss.step_id = ANY(:step_ids);
+        """, {
+            "session_number": session_number,
+            "step_ids": review_step_ids,
+            "summary_comment": "Waiting for human review of regenerated draft entity candidates.",
+            "metadata": json.dumps({"draft_rerun_queued": True}),
+        }),
+    ])
+    return queue_path
+
+
 def sync_session_workflow(session_number: int) -> None:
     definition = workflow_state.load_workflow_definition()
     sql = workflow_state.historical_workflow_seed_sql(session_number, session_number, definition)
@@ -539,6 +707,8 @@ def workflow_detail(session_number: int) -> Optional[dict[str, Any]]:
     for step in run["steps"]:
         step["links"] = step_links(step["step_id"], run["session_number"])
         step["issues"] = step_issues(step)
+    run["draft_rerun_guard"] = draft_rerun_guard(run["session_number"])
+    run["can_rerun_draft"] = bool(run["draft_rerun_guard"]["allowed"])
     run["major_status"] = major_status_items(run)
     ingest_steps = [step for step in run["steps"] if step.get("lane") in SESSION_INGEST_LANES]
     if ingest_steps and all(step.get("status") in TERMINAL_STEP_STATUSES for step in ingest_steps):

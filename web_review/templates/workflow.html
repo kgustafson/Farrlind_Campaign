@@ -65,7 +65,35 @@
       </div>
       <span class="badge workflow-{{ detail.status }}">{{ detail.status }}</span>
     </div>
+    {% if draft_rerun_queued %}
+    <div class="flash">Protected draft extraction rerun queued.</div>
+    {% endif %}
+    {% if draft_rerun_blocked %}
+    <div class="flash error-flash">Draft extraction rerun was blocked by workflow guardrails.</div>
+    {% endif %}
     <p class="muted">{{ detail.summary_comment or "No workflow summary comment recorded." }}</p>
+    <section class="workflow-action-panel" aria-label="Workflow actions">
+      <div>
+        <h3>Protected Rerun</h3>
+        <p>Regenerate draft extraction artifacts from the existing transcript before human entity review has been applied.</p>
+      </div>
+      {% if detail.can_rerun_draft %}
+      <form method="post" action="/workflow/sessions/{{ detail.session_key }}/rerun-draft">
+        <button type="submit">Re-run Draft Extraction</button>
+      </form>
+      {% else %}
+      <div>
+        <span class="badge workflow-blocked">blocked</span>
+        {% if detail.draft_rerun_guard and detail.draft_rerun_guard.reasons %}
+        <ul class="workflow-issue-list">
+          {% for reason in detail.draft_rerun_guard.reasons %}
+          <li>{{ reason }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endif %}
+    </section>
     {% if detail.metadata and detail.metadata.timestamp_estimate %}
     <p class="timeline-note">Historical timestamps are estimated from chat work, Git history, and existing canon artifacts.</p>
     {% endif %}

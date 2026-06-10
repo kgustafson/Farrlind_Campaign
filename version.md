@@ -1,6 +1,6 @@
 # Version
 
-v0.7.6
+v0.7.7
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.7.6` adds Drive-backed source file selection for Faban's Songbook lyrics and MP3 links.
+`v0.7.7` adds a protected draft extraction rerun action that refuses to run after entity review canon has been applied.

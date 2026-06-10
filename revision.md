@@ -1,5 +1,15 @@
 # Revision History - D&D Campaign Manager
 
+## v0.7.7 - 6/9/2026
+
+Added protected draft extraction reruns with canon guardrails.
+
+- Workflow: Added a guarded "Re-run Draft Extraction" action to the workflow detail modal.
+- Workflow: The rerun requires an existing transcript and refuses to queue if reviewed entity files or a final summary already exist.
+- Workflow: Queued draft reruns run only source-status, curation, narrative, spine, entity extraction, event extraction, and postextract draft steps; they do not rerun transcription or apply canon.
+- Runtime: Updated the workflow worker to honor the command subset listed in queue payloads.
+- Tests: Added coverage for draft-rerun guardrails, queue payloads, worker command filtering, and workflow route behavior.
+
 ## v0.7.6 - 6/6/2026
 
 Added Drive-backed source file selection for Faban's Songbook.

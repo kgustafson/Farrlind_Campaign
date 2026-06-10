@@ -589,6 +589,31 @@ button:disabled {
   letter-spacing: .1em;
   text-transform: uppercase;
 }
+.workflow-action-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid rgba(110, 67, 24, .26);
+  border-radius: 8px;
+  background: rgba(255, 247, 223, .46);
+}
+.workflow-action-panel h3 {
+  margin: 0 0 4px;
+  color: var(--brass-dark);
+  font-size: 12px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.workflow-action-panel p {
+  margin: 0;
+  color: var(--ink-muted);
+}
+.workflow-action-panel .workflow-issue-list {
+  overflow-wrap: anywhere;
+}
 .workflow-attention-panel ul,
 .workflow-issue-list {
   margin: 0;
