@@ -1,6 +1,6 @@
 # Version
 
-v0.7.7
+v0.7.8
 
 ## Versioning
 
@@ -44,4 +44,4 @@ Canon-changing reruns may only become canonical after explicit human review and 
 
 ## Current Baseline
 
-`v0.7.7` adds a protected draft extraction rerun action that refuses to run after entity review canon has been applied.
+`v0.7.8` stabilizes session review saves, publishes recent Farrlind canon, and adds archive diary session navigation.

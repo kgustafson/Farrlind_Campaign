@@ -1,5 +1,17 @@
 # Revision History - D&D Campaign Manager
 
+## v0.7.8 - 7/7/2026
+
+Stabilized the session review/archive path and published recent Farrlind canon updates.
+
+- App: Removed the stale "Confirm newly typed locations" blocker from session review saves so final-summary edits are not rejected by the old event-fragment workflow.
+- App: Added previous/all/next diary navigation for archive-mode session diary pages, including static archive export support.
+- Workflow: Hardened workflow auto-intake queue claiming and Docker database URL handling.
+- Open Threads: Made reviewed thread creation merge by title instead of failing on duplicate open-thread titles.
+- Extraction: Added Open Thread JSON repair/fallback handling so malformed model output can continue to human review.
+- Canon: Added recent Farrlind session 21-23 reviewed/final summary artifacts.
+- Tests: Added coverage for archive diary navigation, location-save behavior, Open Thread upserts, Open Thread JSON repair, and workflow worker queue handling.
+
 ## v0.7.7 - 6/9/2026
 
 Added protected draft extraction reruns with canon guardrails.
