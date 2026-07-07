@@ -1,0 +1,1301 @@
+session: session23
+status: applied
+review_stage: compose_final_summary
+review_instructions:
+- Compose the canon final summary from the draft narrative, spine, extracted entities,
+  micro-events, and source snippets.
+- 'Confirm timeline fields: real-world date, in-world date or N/A, starting location,
+  and ending location.'
+- Micro-events are evidence for writing; they do not need individual decisions unless
+  you choose to use them.
+- Mark reviewed only when the final summary text and timeline fields are canon.
+session_title: Session 23
+session_date: '2026-07-06'
+in_game_date: July 5th
+primary_location: Outside the Gale
+source_files:
+  draft_summary: /app/campaigns/farrlind/clean/session23_summary.md
+  curated_packet: /app/campaigns/farrlind/clean/session23_curated.md
+  session_spine: /app/campaigns/farrlind/clean/session23_spine.yaml
+  merged_events: /app/campaigns/farrlind/clean/session23_merged.md
+  validation_report: /app/campaigns/farrlind/clean/session23_validation.md
+db_event_context: []
+final_summary:
+  session_title: Session 23
+  real_world_date: '2026-07-06'
+  in_world_date: July 5th
+  starting_location: Catur
+  ending_location: Outside the Gale
+  key_locations: The Gale
+  major_outcome: ''
+  summary_markdown: "The session started with Faban calling the party over for a talk\
+    \ while still in Catur. Faban revealed that he has been carrying a powerful artifact,\
+    \ \"Grimoire Mutandi Und Sciencetia et Memoria\".  it is tied to knowledge and\
+    \ memory, and the danger of wielding it, as speaking absolute truth can rewrite\
+    \ reality. They also discussed the motivations of infernal forces and Salazar,\
+    \ who seeks a hostile takeover of the realms.\r\n\r\nLater the queen asked if\
+    \ there is anything that the party could want for saving the realm.  Corvinas\
+    \ asked for shield and picked out the *Sentinel Shield*. Brigit visited the fletcher\
+    \ and picked out winged arrows, Gildas asked for a scroll of dispell magic so\
+    \ he could add that spell to his spell book and was given the means to do the\
+    \ copying. Mikani asked for a bag of gems and picked from it the finest diamonds\
+    \ for a spell component.  Roon asked for winged boots.  I asked for an alchemy\
+    \ jug and a passage to the Gale.\r\n\r\nA ritual was performed and a magical portal\
+    \ opened.\r\n\r\nThe party then explored The Gale, which is described as a region\
+    \ of torrentious winds and snow, almost a portal to the elemental plane of air.\
+    \  Mikani communed with nature and discovered a nearby settlement.  Roon, in the\
+    \ meantime decided to test out his boots and flew high into the sky to look over\
+    \ the gale.  He encountered a white dragon emerging from the snowy swirls, leading\
+    \ to a confrontation where the dragon dealt damage to Roon.  Roon returned to\
+    \ the ground. They discussed the possibility that the dragon might be a protector\
+    \ of the monastery or the well.\r\n\r\nAs they traveled to the settlement, the\
+    \ party discussed the history of white dragons, referencing a song from Norhundra\
+    \ about a ruthless white dragon defeated there. They learned that the area was\
+    \ home to various elemental beings, including Ice Methods, Air Elementals, Pyramidons,\
+    \ and Myrmidons.\r\n\r\nThe party then sought directions from a cartographer named\
+    \ Joshua, who provided a rough map showing the path to the monastery, noting that\
+    \ it would take at least two days due to the treacherous terrain. The journey\
+    \ through The Gale  would be fraught with danger, as the party discussed the necessity\
+    \ of being stealthy when traveling, noting that the area was monitored by patrols\r\
+    \n\r\nThe session concluded with the party discussing the nature of the elemental\
+    \ beings and the patrols, and the general safety of the area, while seeking to\
+    \ reach the Monastery of the Open Hand.\r\n\r\n## Chronological Major Events\r\
+    \n\r\n*   The party traveled from Catur toward a long rest, heading toward The\
+    \ Gale.\r\n*   A character revealed a leather satchel containing the artifact,\
+    \ \"Grimero Mutandi Uder Sciencetia et Memoria.\"\r\n*   The party discussed the\
+    \ nature and burden of the artifact, noting the danger of wielding absolute truth.\r\
+    \n*   The party discussed spell mechanics, including spell copying, *Sentinel\
+    \ Shield*, and alchemy ratios.\r\n*   The party discussed the mechanics of the\
+    \ *Revivify* spell and its stipulations.\r\n*   The party discussed obtaining\
+    \ assets or precious gems from the Queen for travel.\r\n*   The party discussed\
+    \ various ammunition types and the properties of the *Sentinel Shield*.\r\n* \
+    \  The party discussed the mechanics of spellcasting and potential enchantments.\r\
+    \n*   The party successfully used a ritual to commune with nature to gain information\
+    \ about the location of the monastery and the well.\r\n*   The party encountered\
+    \ a white dragon emerging from the snow and engaged in combat.\r\n*   The party\
+    \ received a map from a cartographer named Joshua showing the path to the Monastery\
+    \ of the Open Hand.\r\n*   The party discussed the dangers of the area, including\
+    \ elemental beings (Ice Methods, Air Elementals, Pyramidons, Myrmidons) and patrols\
+    \ (\"father trolls\").\r\n\r\n## Key Locations\r\n\r\n- **Catur** - The location\
+    \ where the party was staying before traveling toward The Gale.\r\n- **The Gale**\
+    \ - A major unvisited danger/location, described as a region of torrentious winds\
+    \ and snow, acting as an almost portal to the elemental plane of air.\r\n- **Monastery\
+    \ of the Open Hand** - The destination the party was seeking information about;\
+    \ believed to be connected to a well and located within The Gale.\r\n\r\n## Key\
+    \ NPCs And Entities\r\n\r\n- **The Queen** - Ruler of the Celestial Isles; offered\
+    \ assets (gems) to the party for services.\r\n- **Salazar** - A dangerous figure\
+    \ attempting a hostile takeover of the realms, associated with the Wand of Wells.\r\
+    \n- **The goddess of knowledge** - The divine entity associated with the artifact.\r\
+    \n- **Cartographer (Joshua)** - A small gnome who provided a map showing the path\
+    \ to the monastery.\r\n- **Dragon** - A white dragon that emerged from the snow,\
+    \ attacked the party, and retreated.\r\n- **Patrols** - The patrols that monitor\
+    \ the area.\r\n- **Elemental (Air)** - Dangerous, wild, and free elemental beings,\
+    \ including Ice Methods, Air Elementals, Pyramidons, and Myrmidons.\r\n\r\n##\
+    \ Combat And Encounters\r\n\r\n*   The party engaged in intense combat with a\
+    \ white dragon that emerged from the snow, resulting in damage dealt by the dragon.\r\
+    \n\r\n## Items Loot And Resources\r\n\r\n*   **Grimoire Mutandi Uder Sciencetia\
+    \ et Memoria** - Artifact: A book of spells/knowledge tied to memory and truth;\
+    \ can change reality when truth is spoken.\r\n*   **Leather Satchel** - Contained\
+    \ the artifact.\r\n*   **Gems** - The party acquired assets (diamonds, emeralds,\
+    \ rubies), valued at 1200 gold pieces.\r\n*   **Scroll of Magic** - Acquired during\
+    \ travel.\r\n*   **Sentinel Shield** - An enchantment granting advantage on initiative/perception,\
+    \ plus damage, and making it a spell guard.\r\n*   **Winged Boots** - Grants flying\
+    \ speed (30 feet) for one hour, with four charges, and recharge upon a long rest.\r\
+    \n*   **Alchemist jug** - Acquired by the party, capable of producing various\
+    \ liquids.\r\n*   **Rough Map** - Drawn by the cartographer, showing the path\
+    \ to the monastery, marked with pitfalls and places of interest.\r\n\r\n## Character\
+    \ Notes\r\n\r\n*   The character who possessed the artifact felt burdened by it\
+    \ and chose to hide it from the party, expressing a desire to share the truth\
+    \ but fearing the consequences.\r\n*   The party discussed the mechanics of spellcasting\
+    \ and potential enchantments, including the properties of the *Sentinel Shield*.\r\
+    \n*   The party successfully used a ritual to commune with nature to gain information\
+    \ about the location of the monastery and the well.\r\n*   The party discussed\
+    \ the mechanics of flight and the dangers associated with using the Gale as a\
+    \ portal.\r\n\r\n## Party Interpretations Versus World Facts\r\n\r\n*   The party\
+    \ discussed the nature of spell learning, noting that Paladins are limited to\
+    \ their spell list, whereas wizards can learn any spell if they have a copy.\r\
+    \n*   The party joked about the alchemy jug, detailing the various liquids it\
+    \ can produce (acid, basic poison, beer, honey, mayonnaise, etc.) and the volume\
+    \ limits.\r\n*   The party speculated that the dragon's appearance was a warning\
+    \ rather than a simple drive-by.\r\n*   The party discussed the lucrative nature\
+    \ of doing tours of The Gale, noting that people pay money for the experience.\r\
+    \n\r\n## Open Threads\r\n\r\n*   The specific location of the well and the Monastery\
+    \ of the Open Hand within The Gale remains uncertain, though they are believed\
+    \ to be in the Gale.\r\n*   The nature and control of the elemental beings (Air\
+    \ Elementals, Pyramidons) and the patrols (Father Trolls) remain a point of discussion\
+    \ regarding the monastery's influence.\r\n*   The full history and implications\
+    \ of the song from Norhundra regarding white dragons are only partially revealed.\r\
+    \n\r\n## Timeline Seeds\r\n\r\n- Ending location: Monastery of the Open Hand (within\
+    \ The Gale)\r\n- Real-world date: July 5th\r\n- In-world date: July 5th\r\n\r\n\
+    ## Needs Review\r\n\r\n*   The exact maximum height achievable with the winged\
+    \ boots is suggested as 9,000 feet, but not precisely defined.\r\n*   The specific\
+    \ details of the lore regarding the white dragons and the song from Norhundra\
+    \ are still being explored.\r\n*   The exact relationship between the Monastery\
+    \ and the elemental beings is unclear.\r\n*   The exact nature of the \"primordial\
+    \ arcana\" and its relationship to the wells is unclear."
+timeline:
+  physical_date: '2026-07-06'
+  in_game_date: July 5th
+  start_location: Catur
+  end_location: Outside the Gale
+macro_events:
+- id: macro-001
+  order: 1
+  description: Journey to The Gale and Artifact Discovery
+  location: Catur to The Gale
+  source_type: session_spine
+  spine_order: 1
+  event_type: travel
+  summary: The party began traveling from Catur toward a long rest, heading toward
+    the dangerous region of The Gale. During this travel, an artifact, "Grimero Mutandi
+    Uder Sciencetia et Memoria," was revealed.
+  outcome: The party acquired the artifact and discussed its implications.
+  party_interpretation: The party discussed the nature and burden of the artifact,
+    noting the danger of wielding absolute truth, and the danger of infernal forces
+    and Salazar.
+  evidence: The party traveled from Catur toward a long rest, heading in the direction
+    of The Gale. During this time, a powerful artifact, 'Grimero Mutandi Uder Sciencetia
+    et Memoria,' was revealed.
+- id: macro-002
+  order: 2
+  description: Discussion of Magic and Enchantments
+  location: The Gale (Travel)
+  source_type: session_spine
+  spine_order: 2
+  event_type: social
+  summary: The party focused on the mechanics of combat and magic, discussing spell
+    copying, the properties of the *Sentinel Shield*, alchemy ratios, and the mechanics
+    of spellcasting and potential enchantments.
+  outcome: The party gained a deeper understanding of magical mechanics and item properties.
+  party_interpretation: The party discussed the mechanics of spellcasting and potential
+    enchantments, including the properties of the Sentinel Shield, and joked about
+    the alchemy jug's capabilities.
+  evidence: The party discussed spell mechanics, including spell copying, Sentinel
+    Shield, and alchemy ratios. The party discussed the mechanics of spellcasting
+    and potential enchantments.
+- id: macro-003
+  order: 3
+  description: Acquisition of Assets and Travel Gear
+  location: The Gale (Travel)
+  source_type: session_spine
+  spine_order: 3
+  event_type: resource_change
+  summary: The party discussed obtaining precious gems (diamonds, emeralds, rubies)
+    from the Queen for travel. They also discussed obtaining the *Scroll of Magic*
+    and the *Winged Boots*.
+  outcome: The party acquired valuable assets and travel enhancements.
+  party_interpretation: ''
+  evidence: 'The party discussed obtaining precious gems (diamonds, emeralds, rubies)
+    from the Queen for travel. They also discussed enchanting a shield and the properties
+    of the Sentinel Shield. [Note: The acquisition of the Scroll of Magic and Winged
+    Boots is implied by the context of travel preparation.]'
+- id: macro-004
+  order: 4
+  description: Exploration of The Gale and Cartography
+  location: The Gale
+  source_type: session_spine
+  spine_order: 4
+  event_type: travel
+  summary: The party explored The Gale, a region of torrentious winds and snow. A
+    cartographer named Joshua provided a rough map showing the path to the Monastery
+    of the Open Hand, marked with pitfalls and places of interest.
+  outcome: The party received a map detailing the route to the Monastery.
+  party_interpretation: ''
+  evidence: The party explored The Gale, which is described as a region of torrentious
+    winds and snow... A cartographer provided a map showing the path to the Monastery
+    of the Open Hand, noting pitfalls and places of interest.
+- id: macro-005
+  order: 5
+  description: Elemental and Patrol Encounters
+  location: The Gale
+  source_type: session_spine
+  spine_order: 5
+  event_type: lore_reveal
+  summary: The party learned about the history of white dragons (referencing a song
+    from Norhundra) and the various elemental beings (Ice Methods, Air Elementals,
+    Pyramidons, Myrmidons) and patrols ("father trolls") that monitored the area.
+  outcome: The party gained knowledge about the dangerous nature of the region.
+  party_interpretation: ''
+  evidence: The party discussed the history of white dragons, referencing a song from
+    Norhundra... They learned that the area was home to various elemental beings,
+    including Ice Methods, Air Elementals, Pyramidons, and Myrmidons. The journey
+    through The Gale was fraught with danger, as the party discussed the necessity
+    of being stealthy when traveling, noting that the area was monitored by patrols
+    described as 'father trolls.'
+- id: macro-006
+  order: 6
+  description: Dragon Combat
+  location: The Gale
+  source_type: session_spine
+  spine_order: 6
+  event_type: combat
+  summary: The party encountered a white dragon emerging from the snow and engaged
+    in intense combat, resulting in damage dealt by the dragon.
+  outcome: The party successfully fought the dragon.
+  party_interpretation: ''
+  evidence: The party encountered a white dragon emerging from the snow, leading to
+    a confrontation where the dragon dealt damage to the party.
+- id: macro-007
+  order: 7
+  description: Locating the Monastery and Well
+  location: The Gale
+  source_type: session_spine
+  spine_order: 7
+  event_type: discovery
+  summary: The party successfully used a ritual to commune with nature to gain information
+    about the location of the monastery and the well, learning that the Monastery
+    of the Open Hand is connected to a well, suggesting the well is the location of
+    the monastery.
+  outcome: The party determined the location of the Monastery and the well.
+  party_interpretation: ''
+  evidence: The party successfully used a ritual to commune with nature to gain information
+    about the location of the monastery and the well, which was believed to be in
+    the Gale. They learned that the Monastery of the Open Hand is connected to a well,
+    suggesting the well is the location of the monastery.
+items:
+- id: event-001
+  sequence: 1
+  source_type: draft_merged_event
+  source_text: 'The party discussed spell mechanics, including spell copying, *Sentinel
+    Shield*, and alchemy ratios. Outcome: The party gained a deeper understanding
+    of magical mechanics and item properties.'
+  source_context: '[00:34:14 - 00:34:18] it''s just a regular shield yeah all right
+    i got some wicked ammo
+
+    [00:34:25 - 00:34:29] are you looking for a specific type of you still are my
+    favorite i have no idea
+
+    [00:34:30 - 00:34:35] okay um okay let me look at what they would be able to offer
+    you
+
+    [00:34:53 - 00:35:01] so they could offer you a couple things uh that one''s bad
+
+    [00:35:07 - 00:35:16] so you could um so there is one called the uh sentinel shield
+    that they could be viewed with
+
+    [00:35:16 - 00:35:24] it where alongside its usual plus two um you would have
+    advantage on initiative roles and
+
+    [00:35:24 - 00:35:34] perception checks uh there is also uh the basic plus one
+    plus two plus three okay uh and they can
+
+    [00:35:34 - 00:35:41] also make it a spell guard so uh advantage on saving throws
+    against spells and magical effects
+
+    [00:35:41 - 00:35:47] and spell attack rules would have disadvantage against you
+    i''m trying to decide because my'
+  timestamps: N/A
+  actors: Party
+  targets: ''
+  mechanical_tags: Sentinel Shield, Alchemist jug, source=Chronological Major Events
+  story_tags: 2. Discussion of Magic and Enchantments, The party discussed the mechanics
+    of spellcasting and potential enchantments, including the properties of the Sentinel
+    Shield, and joked about the alchemy jug's capabilities.
+  confidence: high
+  verify: ''
+  summary_context: 'Session Summary:
+
+
+    The party traveled from Catur to The Gale, discussing the mechanics of spellcasting
+    and potential enchantments along the way. They also acquired valuable assets and
+    travel enhancements from the Queen.
+
+
+    Upon arrival in The Gale, the party used a ritual to commune with nature, gaining
+    information about the location of the Monastery of the Open Hand and the well.
+    However, the specific location of these sites within The Gale remains uncertain.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: The Gale (Travel)
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-002
+  sequence: 2
+  source_type: draft_merged_event
+  source_text: 'The party discussed obtaining assets or precious gems from the Queen
+    for travel. Outcome: The party acquired valuable assets and travel enhancements.'
+  source_context: '[00:47:39 - 00:47:40] A bunch of gems.
+
+    [00:47:40 - 00:47:45] A bunch of money, gems, plus diamonds that would help you.
+
+    [00:47:45 - 00:47:47] You got a scroll.
+
+    [00:47:47 - 00:47:48] I got a scroll.
+
+    [00:47:48 - 00:47:49] A scroll of magic, effectively.
+
+    [00:47:49 - 00:47:52] Yeah, I got the alchemist jug.
+
+    [00:47:52 - 00:47:53] And you got a shield.
+
+    [00:47:53 - 00:47:55] Sentinel shield.
+
+    [00:47:55 - 00:47:57] I enchanted my own one.'
+  timestamps: N/A
+  actors: Party
+  targets: The Queen
+  mechanical_tags: Gems, Scroll of Magic, Winged Boots, The Queen, source=Chronological
+    Major Events, spine_type=resource_change
+  story_tags: 3. Acquisition of Assets and Travel Gear
+  confidence: high
+  verify: 'spine needs_review: Preserved narrative character/resource beat: The character
+    who possessed the artifact felt burdened by it and chose to hide it from the party,
+    expressing a desire to share the truth but fearing the consequences., Preserved
+    narrative character/resource beat: The party discussed the mechanics of flight
+    and the dangers associated with using the Gale as a portal.'
+  summary_context: 'Session Summary:
+
+
+    The party traveled from Catur to The Gale, discussing the mechanics of spellcasting
+    and potential enchantments along the way. They also acquired valuable assets and
+    travel enhancements from the Queen.
+
+
+    Upon arrival in The Gale, the party used a ritual to commune with nature, gaining
+    information about the location of the Monastery of the Open Hand and the well.
+    However, the specific location of these sites within The Gale remains uncertain.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: The Gale (Travel)
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-003
+  sequence: 3
+  source_type: draft_merged_event
+  source_text: 'The party discussed various ammunition types and the properties of
+    the *Sentinel Shield*. Outcome: The party gained a deeper understanding of magical
+    mechanics and item properties.'
+  source_context: '[00:34:14 - 00:34:18] it''s just a regular shield yeah all right
+    i got some wicked ammo
+
+    [00:34:25 - 00:34:29] are you looking for a specific type of you still are my
+    favorite i have no idea
+
+    [00:34:30 - 00:34:35] okay um okay let me look at what they would be able to offer
+    you
+
+    [00:34:53 - 00:35:01] so they could offer you a couple things uh that one''s bad
+
+    [00:35:07 - 00:35:16] so you could um so there is one called the uh sentinel shield
+    that they could be viewed with
+
+    [00:35:16 - 00:35:24] it where alongside its usual plus two um you would have
+    advantage on initiative roles and
+
+    [00:35:24 - 00:35:34] perception checks uh there is also uh the basic plus one
+    plus two plus three okay uh and they can
+
+    [00:35:34 - 00:35:41] also make it a spell guard so uh advantage on saving throws
+    against spells and magical effects
+
+    [00:35:41 - 00:35:47] and spell attack rules would have disadvantage against you
+    i''m trying to decide because my'
+  timestamps: N/A
+  actors: Party
+  targets: ''
+  mechanical_tags: Sentinel Shield, Alchemist jug, source=Chronological Major Events
+  story_tags: 2. Discussion of Magic and Enchantments, The party discussed the mechanics
+    of spellcasting and potential enchantments, including the properties of the Sentinel
+    Shield, and joked about the alchemy jug's capabilities.
+  confidence: high
+  verify: ''
+  summary_context: 'Session Summary:
+
+
+    The party traveled from Catur to The Gale, discussing the mechanics of spellcasting
+    and potential enchantments along the way. They also acquired valuable assets and
+    travel enhancements from the Queen.
+
+
+    Upon arrival in The Gale, the party used a ritual to commune with nature, gaining
+    information about the location of the Monastery of the Open Hand and the well.
+    However, the specific location of these sites within The Gale remains uncertain.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: The Gale (Travel)
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-004
+  sequence: 4
+  source_type: draft_merged_event
+  source_text: 'The party discussed the mechanics of spellcasting and potential enchantments,
+    including the properties of the *Sentinel Shield*. Outcome: The party gained a
+    deeper understanding of magical mechanics and item properties.'
+  source_context: '[00:34:14 - 00:34:18] it''s just a regular shield yeah all right
+    i got some wicked ammo
+
+    [00:34:25 - 00:34:29] are you looking for a specific type of you still are my
+    favorite i have no idea
+
+    [00:34:30 - 00:34:35] okay um okay let me look at what they would be able to offer
+    you
+
+    [00:34:53 - 00:35:01] so they could offer you a couple things uh that one''s bad
+
+    [00:35:07 - 00:35:16] so you could um so there is one called the uh sentinel shield
+    that they could be viewed with
+
+    [00:35:16 - 00:35:24] it where alongside its usual plus two um you would have
+    advantage on initiative roles and
+
+    [00:35:24 - 00:35:34] perception checks uh there is also uh the basic plus one
+    plus two plus three okay uh and they can
+
+    [00:35:34 - 00:35:41] also make it a spell guard so uh advantage on saving throws
+    against spells and magical effects
+
+    [00:35:41 - 00:35:47] and spell attack rules would have disadvantage against you
+    i''m trying to decide because my'
+  timestamps: N/A
+  actors: Party
+  targets: ''
+  mechanical_tags: Sentinel Shield, Alchemist jug, source=Chronological Major Events;
+    Character Notes
+  story_tags: 2. Discussion of Magic and Enchantments, The party discussed the mechanics
+    of spellcasting and potential enchantments, including the properties of the Sentinel
+    Shield, and joked about the alchemy jug's capabilities.
+  confidence: high
+  verify: ''
+  summary_context: 'Session Summary:
+
+
+    The party traveled from Catur to The Gale, discussing the mechanics of spellcasting
+    and potential enchantments along the way. They also acquired valuable assets and
+    travel enhancements from the Queen.
+
+
+    Upon arrival in The Gale, the party used a ritual to commune with nature, gaining
+    information about the location of the Monastery of the Open Hand and the well.
+    However, the specific location of these sites within The Gale remains uncertain.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: The Gale (Travel)
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-005
+  sequence: 5
+  source_type: draft_merged_event
+  source_text: 'The party successfully used a ritual to commune with nature to gain
+    information about the location of the monastery and the well. Outcome: The party
+    determined the location of the Monastery and the well.'
+  source_context: '[00:49:54 - 00:49:55] Why are we targeting the gale?
+
+    [00:49:55 - 00:49:56] Because we are to go to the next well.
+
+    [00:49:56 - 00:49:57] We''re meeting Gusan.
+
+    [00:49:57 - 00:49:58] Yes.
+
+    [00:49:58 - 00:49:59] At the monastery of the open hand.
+
+    [00:49:59 - 00:50:00] Right.
+
+    [00:50:00 - 00:50:01] The monastery of the open hand.
+
+    [00:50:01 - 00:50:02] Oh, okay.
+
+    [00:50:02 - 00:50:03] All right.'
+  timestamps: N/A
+  actors: Party
+  targets: ''
+  mechanical_tags: source=Chronological Major Events
+  story_tags: 7. Locating the Monastery and Well
+  confidence: high
+  verify: ''
+  summary_context: 'The party traveled from Catur to The Gale, discussing the mechanics
+    of spellcasting and potential enchantments along the way. They also acquired valuable
+    assets and travel enhancements from the Queen.
+
+
+    Upon arrival in The Gale, the party used a ritual to commune with nature, gaining
+    information about the location of the Monastery of the Open Hand and the well.
+    However, the specific location of these sites within The Gale remains uncertain.
+
+
+    The party gained knowledge about the dangerous nature of the region, including
+    the elemental beings (Ice Methods, Air Elementals, Pyramidons, Myrmidons) and
+    patrols ("father trolls"). They also discussed the full history and implications
+    of the song from Norhundra regarding white dragons, but only partial information
+    was revealed.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: The Gale
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-006
+  sequence: 6
+  source_type: draft_merged_event
+  source_text: 'The character who possessed the artifact felt burdened by it and chose
+    to hide it from the party, expressing a desire to share the truth but fearing
+    the consequences. Outcome: The party acquired the artifact and discussed its implications.'
+  source_context: '[00:04:50 - 00:04:53] And I slide it into, basically in the center
+    of the,
+
+    [00:04:53 - 00:04:58] into the circle that we start forming in the party.
+
+    [00:04:58 - 00:05:03] And he said, I would ask you not to touch it yet.
+
+    [00:05:04 - 00:05:10] Not because I don''t trust you, but because I don''t trust
+    it.
+
+    [00:05:12 - 00:05:23] And this is the Grimero Mutandi Uder Sciencetia et Memoria.
+
+    [00:05:23 - 00:05:28] It is tied to knowledge and memory and truth.
+
+    [00:05:30 - 00:05:41] There, this was something that I came across early in my
+    careers apart, and somehow I got burdened with it.
+
+    [00:05:41 - 00:05:48] It was not necessarily something I asked for, but it was
+    something that was, that came into my path,
+
+    [00:05:48 - 00:05:52] and I felt like no one else can, could characterize.'
+  timestamps: N/A
+  actors: Party
+  targets: ''
+  mechanical_tags: Grimero Mutandi Uder Sciencetia et Memoria, Leather Satchel, source=Character
+    Notes
+  story_tags: 1. Journey to The Gale and Artifact Discovery, The party discussed the
+    nature and burden of the artifact, noting the danger of wielding absolute truth,
+    and the danger of infernal forces and Salazar.
+  confidence: high
+  verify: ''
+  summary_context: 'Session Summary:
+
+
+    The party traveled from Catur to The Gale, discussing the mechanics of spellcasting
+    and potential enchantments along the way. They also acquired valuable assets and
+    travel enhancements from the Queen.
+
+
+    Upon arrival in The Gale, the party used a ritual to commune with nature, gaining
+    information about the location of the Monastery of the Open Hand and the well.
+    However, the specific location of these sites within The Gale remains uncertain.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: Catur to The Gale
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-007
+  sequence: 7
+  source_type: draft_merged_event
+  source_text: 'The party discussed the mechanics of flight and the dangers associated
+    with using the Gale as a portal. Outcome: The party gained a deeper understanding
+    of magical mechanics and item properties.'
+  source_context: '[00:34:14 - 00:34:18] it''s just a regular shield yeah all right
+    i got some wicked ammo
+
+    [00:34:25 - 00:34:29] are you looking for a specific type of you still are my
+    favorite i have no idea
+
+    [00:34:30 - 00:34:35] okay um okay let me look at what they would be able to offer
+    you
+
+    [00:34:53 - 00:35:01] so they could offer you a couple things uh that one''s bad
+
+    [00:35:07 - 00:35:16] so you could um so there is one called the uh sentinel shield
+    that they could be viewed with
+
+    [00:35:16 - 00:35:24] it where alongside its usual plus two um you would have
+    advantage on initiative roles and
+
+    [00:35:24 - 00:35:34] perception checks uh there is also uh the basic plus one
+    plus two plus three okay uh and they can
+
+    [00:35:34 - 00:35:41] also make it a spell guard so uh advantage on saving throws
+    against spells and magical effects
+
+    [00:35:41 - 00:35:47] and spell attack rules would have disadvantage against you
+    i''m trying to decide because my'
+  timestamps: N/A
+  actors: Party
+  targets: ''
+  mechanical_tags: Sentinel Shield, Alchemist jug, source=Character Notes
+  story_tags: 2. Discussion of Magic and Enchantments, The party discussed the mechanics
+    of spellcasting and potential enchantments, including the properties of the Sentinel
+    Shield, and joked about the alchemy jug's capabilities.
+  confidence: high
+  verify: ''
+  summary_context: 'Session Summary:
+
+
+    The party traveled from Catur to The Gale, discussing the mechanics of spellcasting
+    and potential enchantments along the way. They also acquired valuable assets and
+    travel enhancements from the Queen.
+
+
+    Upon arrival in The Gale, the party used a ritual to commune with nature, gaining
+    information about the location of the Monastery of the Open Hand and the well.
+    However, the specific location of these sites within The Gale remains uncertain.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: The Gale (Travel)
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-008
+  sequence: 8
+  source_type: draft_merged_event
+  source_text: 'The specific location of the well and the Monastery of the Open Hand
+    within The Gale remains uncertain, though they are believed to be in the Gale.
+    Outcome: The party determined the location of the Monastery and the well.'
+  source_context: '[00:49:54 - 00:49:55] Why are we targeting the gale?
+
+    [00:49:55 - 00:49:56] Because we are to go to the next well.
+
+    [00:49:56 - 00:49:57] We''re meeting Gusan.
+
+    [00:49:57 - 00:49:58] Yes.
+
+    [00:49:58 - 00:49:59] At the monastery of the open hand.
+
+    [00:49:59 - 00:50:00] Right.
+
+    [00:50:00 - 00:50:01] The monastery of the open hand.
+
+    [00:50:01 - 00:50:02] Oh, okay.
+
+    [00:50:02 - 00:50:03] All right.'
+  timestamps: N/A
+  actors: Party
+  targets: ''
+  mechanical_tags: source=Open Threads
+  story_tags: 7. Locating the Monastery and Well
+  confidence: high
+  verify: open thread from narrative; confirm resolution status during review
+  summary_context: 'The party traveled from Catur to The Gale, discussing the mechanics
+    of spellcasting and potential enchantments along the way. They also acquired valuable
+    assets and travel enhancements from the Queen.
+
+
+    Upon arrival in The Gale, the party used a ritual to commune with nature, gaining
+    information about the location of the Monastery of the Open Hand and the well.
+    However, the specific location of these sites within The Gale remains uncertain.
+
+
+    The party gained knowledge about the dangerous nature of the region, including
+    the elemental beings (Ice Methods, Air Elementals, Pyramidons, Myrmidons) and
+    patrols ("father trolls"). They also discussed the full history and implications
+    of the song from Norhundra regarding white dragons, but only partial information
+    was revealed.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: The Gale
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-009
+  sequence: 9
+  source_type: draft_merged_event
+  source_text: 'The nature and control of the elemental beings (Air Elementals, Pyramidons)
+    and the patrols (Father Trolls) remain a point of discussion regarding the monastery''s
+    influence. Outcome: The party gained knowledge about the dangerous nature of the
+    region.'
+  source_context: '[01:26:15 - 01:26:21] you know uh methods are the ones that you''re
+    going to see the most the little what''s up
+
+    [01:26:21 - 01:26:28] elemental sprite beings that hide themselves like uh the
+    ones that you see the most ice methods
+
+    [01:26:29 - 01:26:35] they little they like to hide us i say little amounts of
+    ice and then they''ll
+
+    [01:26:35 - 01:26:40] reveal themselves and they''re usually attacked so annoying
+    they are annoying they''re very annoying
+
+    [01:26:40 - 01:26:47] not hard to deal with though uh the other thing that you''ll
+    sometimes see are air elementals
+
+    [01:26:48 - 01:26:54] less common but very dangerous uh and the last thing you
+    might see like one or two uh
+
+
+
+    === 01:27:00 ==='
+  timestamps: N/A
+  actors: Party
+  targets: Ice Methods, Air Elementals, Pyramidons, Myrmidons, Father Trolls
+  mechanical_tags: Ice Methods, Air Elementals, Pyramidons, Myrmidons, Father Trolls,
+    source=Open Threads, spine_type=lore_reveal
+  story_tags: 5. Elemental and Patrol Encounters
+  confidence: high
+  verify: open thread from narrative; confirm resolution status during review
+  summary_context: 'Upon arrival in The Gale, the party used a ritual to commune with
+    nature, gaining information about the location of the Monastery of the Open Hand
+    and the well. However, the specific location of these sites within The Gale remains
+    uncertain.
+
+
+    The party gained knowledge about the dangerous nature of the region, including
+    the elemental beings (Ice Methods, Air Elementals, Pyramidons, Myrmidons) and
+    patrols ("father trolls"). They also discussed the full history and implications
+    of the song from Norhundra regarding white dragons, but only partial information
+    was revealed.
+
+
+    Combat occurred when a white dragon emerged from the snow, and the party successfully
+    fought it.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: other
+  location: The Gale
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-010
+  sequence: 10
+  source_type: draft_merged_event
+  source_text: 'The full history and implications of the song from Norhundra regarding
+    white dragons are only partially revealed. Outcome: The party gained knowledge
+    about the dangerous nature of the region.'
+  source_context: '[01:26:15 - 01:26:21] you know uh methods are the ones that you''re
+    going to see the most the little what''s up
+
+    [01:26:21 - 01:26:28] elemental sprite beings that hide themselves like uh the
+    ones that you see the most ice methods
+
+    [01:26:29 - 01:26:35] they little they like to hide us i say little amounts of
+    ice and then they''ll
+
+    [01:26:35 - 01:26:40] reveal themselves and they''re usually attacked so annoying
+    they are annoying they''re very annoying
+
+    [01:26:40 - 01:26:47] not hard to deal with though uh the other thing that you''ll
+    sometimes see are air elementals
+
+    [01:26:48 - 01:26:54] less common but very dangerous uh and the last thing you
+    might see like one or two uh
+
+
+
+    === 01:27:00 ==='
+  timestamps: N/A
+  actors: Party
+  targets: Ice Methods, Air Elementals, Pyramidons, Myrmidons, Father Trolls
+  mechanical_tags: Ice Methods, Air Elementals, Pyramidons, Myrmidons, Father Trolls,
+    source=Open Threads, spine_type=lore_reveal
+  story_tags: 5. Elemental and Patrol Encounters
+  confidence: high
+  verify: open thread from narrative; confirm resolution status during review
+  summary_context: 'Upon arrival in The Gale, the party used a ritual to commune with
+    nature, gaining information about the location of the Monastery of the Open Hand
+    and the well. However, the specific location of these sites within The Gale remains
+    uncertain.
+
+
+    The party gained knowledge about the dangerous nature of the region, including
+    the elemental beings (Ice Methods, Air Elementals, Pyramidons, Myrmidons) and
+    patrols ("father trolls"). They also discussed the full history and implications
+    of the song from Norhundra regarding white dragons, but only partial information
+    was revealed.
+
+
+    Combat occurred when a white dragon emerged from the snow, and the party successfully
+    fought it.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: exploration
+  location: The Gale
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-011
+  sequence: 11
+  source_type: draft_merged_event
+  source_text: 'The party traveled from Catur toward a long rest, heading toward The
+    Gale. Outcome: The party acquired the artifact and discussed its implications.'
+  source_context: '[00:04:50 - 00:04:53] And I slide it into, basically in the center
+    of the,
+
+    [00:04:53 - 00:04:58] into the circle that we start forming in the party.
+
+    [00:04:58 - 00:05:03] And he said, I would ask you not to touch it yet.
+
+    [00:05:04 - 00:05:10] Not because I don''t trust you, but because I don''t trust
+    it.
+
+    [00:05:12 - 00:05:23] And this is the Grimero Mutandi Uder Sciencetia et Memoria.
+
+    [00:05:23 - 00:05:28] It is tied to knowledge and memory and truth.
+
+    [00:05:30 - 00:05:41] There, this was something that I came across early in my
+    careers apart, and somehow I got burdened with it.
+
+    [00:05:41 - 00:05:48] It was not necessarily something I asked for, but it was
+    something that was, that came into my path,
+
+    [00:05:48 - 00:05:52] and I felt like no one else can, could characterize.'
+  timestamps: N/A
+  actors: Party
+  targets: ''
+  mechanical_tags: Grimero Mutandi Uder Sciencetia et Memoria, Leather Satchel, source=Chronological
+    Major Events
+  story_tags: 1. Journey to The Gale and Artifact Discovery, The party discussed the
+    nature and burden of the artifact, noting the danger of wielding absolute truth,
+    and the danger of infernal forces and Salazar.
+  confidence: high
+  verify: ''
+  summary_context: 'Session Summary:
+
+
+    The party traveled from Catur to The Gale, discussing the mechanics of spellcasting
+    and potential enchantments along the way. They also acquired valuable assets and
+    travel enhancements from the Queen.
+
+
+    Upon arrival in The Gale, the party used a ritual to commune with nature, gaining
+    information about the location of the Monastery of the Open Hand and the well.
+    However, the specific location of these sites within The Gale remains uncertain.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: exploration
+  location: Catur to The Gale
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-012
+  sequence: 12
+  source_type: draft_merged_event
+  source_text: 'A character revealed a leather satchel containing the artifact, "Grimero
+    Mutandi Uder Sciencetia et Memoria." Outcome: The party acquired the artifact
+    and discussed its implications.'
+  source_context: '[00:04:50 - 00:04:53] And I slide it into, basically in the center
+    of the,
+
+    [00:04:53 - 00:04:58] into the circle that we start forming in the party.
+
+    [00:04:58 - 00:05:03] And he said, I would ask you not to touch it yet.
+
+    [00:05:04 - 00:05:10] Not because I don''t trust you, but because I don''t trust
+    it.
+
+    [00:05:12 - 00:05:23] And this is the Grimero Mutandi Uder Sciencetia et Memoria.
+
+    [00:05:23 - 00:05:28] It is tied to knowledge and memory and truth.
+
+    [00:05:30 - 00:05:41] There, this was something that I came across early in my
+    careers apart, and somehow I got burdened with it.
+
+    [00:05:41 - 00:05:48] It was not necessarily something I asked for, but it was
+    something that was, that came into my path,
+
+    [00:05:48 - 00:05:52] and I felt like no one else can, could characterize.'
+  timestamps: N/A
+  actors: Party
+  targets: ''
+  mechanical_tags: Grimero Mutandi Uder Sciencetia et Memoria, Leather Satchel, source=Chronological
+    Major Events
+  story_tags: 1. Journey to The Gale and Artifact Discovery, The party discussed the
+    nature and burden of the artifact, noting the danger of wielding absolute truth,
+    and the danger of infernal forces and Salazar.
+  confidence: high
+  verify: ''
+  summary_context: 'Session Summary:
+
+
+    The party traveled from Catur to The Gale, discussing the mechanics of spellcasting
+    and potential enchantments along the way. They also acquired valuable assets and
+    travel enhancements from the Queen.
+
+
+    Upon arrival in The Gale, the party used a ritual to commune with nature, gaining
+    information about the location of the Monastery of the Open Hand and the well.
+    However, the specific location of these sites within The Gale remains uncertain.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: exploration
+  location: Catur to The Gale
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-013
+  sequence: 13
+  source_type: draft_merged_event
+  source_text: 'The party discussed the nature and burden of the artifact, noting
+    the danger of wielding absolute truth. Outcome: The party acquired the artifact
+    and discussed its implications.'
+  source_context: '[00:04:50 - 00:04:53] And I slide it into, basically in the center
+    of the,
+
+    [00:04:53 - 00:04:58] into the circle that we start forming in the party.
+
+    [00:04:58 - 00:05:03] And he said, I would ask you not to touch it yet.
+
+    [00:05:04 - 00:05:10] Not because I don''t trust you, but because I don''t trust
+    it.
+
+    [00:05:12 - 00:05:23] And this is the Grimero Mutandi Uder Sciencetia et Memoria.
+
+    [00:05:23 - 00:05:28] It is tied to knowledge and memory and truth.
+
+    [00:05:30 - 00:05:41] There, this was something that I came across early in my
+    careers apart, and somehow I got burdened with it.
+
+    [00:05:41 - 00:05:48] It was not necessarily something I asked for, but it was
+    something that was, that came into my path,
+
+    [00:05:48 - 00:05:52] and I felt like no one else can, could characterize.'
+  timestamps: N/A
+  actors: Party
+  targets: ''
+  mechanical_tags: Grimero Mutandi Uder Sciencetia et Memoria, Leather Satchel, source=Chronological
+    Major Events
+  story_tags: 1. Journey to The Gale and Artifact Discovery, The party discussed the
+    nature and burden of the artifact, noting the danger of wielding absolute truth,
+    and the danger of infernal forces and Salazar.
+  confidence: high
+  verify: ''
+  summary_context: 'Session Summary:
+
+
+    The party traveled from Catur to The Gale, discussing the mechanics of spellcasting
+    and potential enchantments along the way. They also acquired valuable assets and
+    travel enhancements from the Queen.
+
+
+    Upon arrival in The Gale, the party used a ritual to commune with nature, gaining
+    information about the location of the Monastery of the Open Hand and the well.
+    However, the specific location of these sites within The Gale remains uncertain.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: exploration
+  location: Catur to The Gale
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-014
+  sequence: 14
+  source_type: draft_merged_event
+  source_text: 'The party received a map from a cartographer named Joshua showing
+    the path to the Monastery of the Open Hand. Outcome: The party received a map
+    detailing the route to the Monastery.'
+  source_context: '[00:49:54 - 00:49:55] Why are we targeting the gale?
+
+    [00:49:55 - 00:49:56] Because we are to go to the next well.
+
+    [00:49:56 - 00:49:57] We''re meeting Gusan.
+
+    [00:49:57 - 00:49:58] Yes.
+
+    [00:49:58 - 00:49:59] At the monastery of the open hand.
+
+    [00:49:59 - 00:50:00] Right.
+
+    [00:50:00 - 00:50:01] The monastery of the open hand.
+
+    [00:50:01 - 00:50:02] Oh, okay.
+
+    [00:50:02 - 00:50:03] All right.'
+  timestamps: N/A
+  actors: Party
+  targets: Cartographer (Joshua)
+  mechanical_tags: Rough Map, Cartographer (Joshua), source=Chronological Major Events
+  story_tags: 4. Exploration of The Gale and Cartography
+  confidence: high
+  verify: ''
+  summary_context: 'The party traveled from Catur to The Gale, discussing the mechanics
+    of spellcasting and potential enchantments along the way. They also acquired valuable
+    assets and travel enhancements from the Queen.
+
+
+    Upon arrival in The Gale, the party used a ritual to commune with nature, gaining
+    information about the location of the Monastery of the Open Hand and the well.
+    However, the specific location of these sites within The Gale remains uncertain.
+
+
+    The party gained knowledge about the dangerous nature of the region, including
+    the elemental beings (Ice Methods, Air Elementals, Pyramidons, Myrmidons) and
+    patrols ("father trolls"). They also discussed the full history and implications
+    of the song from Norhundra regarding white dragons, but only partial information
+    was revealed.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: combat
+  location: The Gale
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-015
+  sequence: 15
+  source_type: draft_merged_event
+  source_text: 'The party encountered a white dragon emerging from the snow and engaged
+    in combat. Outcome: The party successfully fought the dragon.'
+  source_context: '[00:25:52 - 00:26:01] We don''t really hold gold, but we can give
+    you assets that you can then sell.
+
+    [00:26:01 - 00:26:04] You know, precious gems, the like.
+
+    [00:26:04 - 00:26:13] But we also have all manner of items we could give to you
+    if there''s anything that you''ve been looking for.
+
+    [00:26:13 - 00:26:16] Do you have a way to get south?
+
+    [00:26:17 - 00:26:20] We''re trying to we''re trying to go towards the gale.
+
+    [00:26:20 - 00:26:22] Oh, back on the coast.
+
+    [00:26:22 - 00:26:33] We have access to teleportation rooms and all manner of
+    ways of quick travel.
+
+    [00:26:33 - 00:26:42] But like anything that gets us closest to the gale, that''s
+    where we''re going next.
+
+    [00:26:42 - 00:26:46] I believe we can put that together for you.'
+  timestamps: N/A
+  actors: Party
+  targets: Dragon
+  mechanical_tags: Dragon, source=Chronological Major Events
+  story_tags: 6. Dragon Combat
+  confidence: high
+  verify: ''
+  summary_context: 'Session Summary:
+
+
+    The party traveled from Catur to The Gale, discussing the mechanics of spellcasting
+    and potential enchantments along the way. They also acquired valuable assets and
+    travel enhancements from the Queen.
+
+
+    Upon arrival in The Gale, the party used a ritual to commune with nature, gaining
+    information about the location of the Monastery of the Open Hand and the well.
+    However, the specific location of these sites within The Gale remains uncertain.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: lore
+  location: The Gale
+  significance: 5
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+- id: event-016
+  sequence: 16
+  source_type: draft_merged_event
+  source_text: 'The party discussed the dangers of the area, including elemental beings
+    (Ice Methods, Air Elementals, Pyramidons, Myrmidons) and patrols ("father trolls").
+    Outcome: The party gained knowledge about the dangerous nature of the region.'
+  source_context: '[01:26:15 - 01:26:21] you know uh methods are the ones that you''re
+    going to see the most the little what''s up
+
+    [01:26:21 - 01:26:28] elemental sprite beings that hide themselves like uh the
+    ones that you see the most ice methods
+
+    [01:26:29 - 01:26:35] they little they like to hide us i say little amounts of
+    ice and then they''ll
+
+    [01:26:35 - 01:26:40] reveal themselves and they''re usually attacked so annoying
+    they are annoying they''re very annoying
+
+    [01:26:40 - 01:26:47] not hard to deal with though uh the other thing that you''ll
+    sometimes see are air elementals
+
+    [01:26:48 - 01:26:54] less common but very dangerous uh and the last thing you
+    might see like one or two uh
+
+
+
+    === 01:27:00 ==='
+  timestamps: N/A
+  actors: Party
+  targets: Ice Methods, Air Elementals, Pyramidons, Myrmidons, Father Trolls
+  mechanical_tags: Ice Methods, Air Elementals, Pyramidons, Myrmidons, Father Trolls,
+    source=Chronological Major Events, spine_type=lore_reveal
+  story_tags: 5. Elemental and Patrol Encounters
+  confidence: high
+  verify: ''
+  summary_context: 'Upon arrival in The Gale, the party used a ritual to commune with
+    nature, gaining information about the location of the Monastery of the Open Hand
+    and the well. However, the specific location of these sites within The Gale remains
+    uncertain.
+
+
+    The party gained knowledge about the dangerous nature of the region, including
+    the elemental beings (Ice Methods, Air Elementals, Pyramidons, Myrmidons) and
+    patrols ("father trolls"). They also discussed the full history and implications
+    of the song from Norhundra regarding white dragons, but only partial information
+    was revealed.
+
+
+    Combat occurred when a white dragon emerged from the snow, and the party successfully
+    fought it.'
+  related_db_events:
+  - sequence_order: '1'
+    event_type: combat
+    location: The Gale
+    description: White Dragon Combat
+    significance: 3
+    source_type: db_event
+  decision: pending
+  canonical_text: ''
+  event_type: lore
+  location: The Gale
+  significance: 3
+  reason: ''
+  decided_by: ''
+  decided_on: ''
+  applied_status: pending
+  applied_on: ''
+added_items: []
+reviewed_on: '2026-07-07'
+applied_on: '2026-07-07'
