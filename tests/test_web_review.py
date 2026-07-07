@@ -1146,7 +1146,7 @@ class WebReviewAppTest(unittest.TestCase):
             self.assertEqual(item["significance"], 3)
             self.assertEqual(item["reason"], "Looks right.")
 
-    def test_save_review_route_requires_confirmation_for_unknown_location(self):
+    def test_save_review_route_allows_unknown_location(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             reviews_dir = root / "reviews"
@@ -1185,9 +1185,9 @@ class WebReviewAppTest(unittest.TestCase):
                 }, follow_redirects=False)
 
             self.assertEqual(response.status_code, 303)
-            self.assertIn("location_confirm_failed=1", response.headers["location"])
+            self.assertIn("saved=1", response.headers["location"])
             saved = yaml.safe_load(path.read_text(encoding="utf-8"))
-            self.assertEqual(saved["items"][0]["location"], "Bentrios")
+            self.assertEqual(saved["items"][0]["location"], "New Place")
 
     def test_macro_routes_save_and_apply_bucket_order(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1533,7 +1533,7 @@ class WebReviewAppTest(unittest.TestCase):
             self.assertEqual(saved["added_items"][0]["id"], "added-001")
             self.assertEqual(saved["added_items"][0]["canonical_text"], "The party added a missing event.")
 
-    def test_add_item_route_requires_confirmation_for_unknown_location(self):
+    def test_add_item_route_allows_unknown_location(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             reviews_dir = root / "reviews"
@@ -1567,9 +1567,9 @@ class WebReviewAppTest(unittest.TestCase):
                 }, follow_redirects=False)
 
             self.assertEqual(response.status_code, 303)
-            self.assertIn("location_confirm_failed=1", response.headers["location"])
+            self.assertIn("item_added=1", response.headers["location"])
             saved = yaml.safe_load(path.read_text(encoding="utf-8"))
-            self.assertEqual(saved["added_items"], [])
+            self.assertEqual(saved["added_items"][0]["location"], "New Place")
 
     def test_add_item_route_does_not_save_invalid_item(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -3219,6 +3219,26 @@ class OpenThreadRouteTest(unittest.TestCase):
         self.assertEqual(values["first_session"], 20)
         self.assertIsNone(values["last_session"])
         self.assertEqual(values["related_location_id"], 3)
+
+    def test_create_open_thread_merges_existing_title(self):
+        values = {
+            "title": "The Elemental Influence on the Monastery",
+            "thread_type": "faction_tension",
+            "status": "open",
+            "first_session": 23,
+            "last_session": 23,
+            "related_location_id": 922,
+            "description": "The monastery's elemental influence remains unclear.",
+            "resolution": "",
+            "notes": "Session 23 evidence.",
+        }
+        with patch("web_review.db.execute") as execute:
+            canon.create_open_thread(values)
+
+        sql = execute.call_args.args[0]
+        self.assertIn("ON CONFLICT (title) DO UPDATE", sql)
+        self.assertIn("WHEN open_thread.status <> 'open' THEN open_thread.status", sql)
+        self.assertIn("POSITION(EXCLUDED.notes IN open_thread.notes)", sql)
 
     def test_edit_open_thread_page_loads_thread(self):
         detail = {

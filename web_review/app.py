@@ -636,19 +636,8 @@ async def save_session_review(request: Request, session: str):
 
     form = await request.form()
     form_values = {key: form.getlist(key) for key in form.keys()}
-    known_locations = canon_location_names()
     if reviews.final_summary_mode(document) or "final_summary_markdown" in form:
-        location_values = {
-            "new_location": [
-                form.get("final_starting_location") or "",
-                form.get("final_ending_location") or "",
-            ]
-        }
-        if location_confirmation_failed(location_values, form, known_locations):
-            return redirect_to_review(session_number, form.get("source") or "narrative", form.get("view") or "raw", "location_confirm_failed=1", form.get("bucket") or "")
         updated = reviews.update_final_summary_from_form(document, form_values)
-    elif location_confirmation_failed(form_values, form, known_locations):
-        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_confirm_failed=1", form.get("bucket") or "")
     else:
         updated = reviews.update_review_document_from_form(document, form_values)
     try:
@@ -679,9 +668,6 @@ async def save_session_review_item(request: Request, session: str):
         return redirect_to_review(session_number, form.get("source") or "narrative", form.get("view") or "raw", "saved=1", form.get("bucket") or "")
 
     form_values = {key: form.getlist(key) for key in form.keys()}
-    known_locations = canon_location_names()
-    if location_confirmation_failed(form_values, form, known_locations):
-        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_confirm_failed=1", form.get("bucket") or "")
     updated = reviews.update_single_review_item_from_form(document, form_values, form.get("save_item_id") or "")
     try:
         reviews.save_review_document(session_number, updated)
@@ -844,9 +830,6 @@ async def merge_session_review_items(request: Request, session: str):
         raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
 
     form = await request.form()
-    known_locations = canon_location_names()
-    if location_confirmation_failed({"new_location": [form.get("merge_location") or ""]}, form, known_locations):
-        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_confirm_failed=1")
     updated, errors = reviews.merge_review_items(
         document,
         form.getlist("selected_item_id"),
@@ -934,9 +917,6 @@ async def add_session_review_item(request: Request, session: str):
         raise HTTPException(status_code=409, detail="Applied reviews are locked until explicitly reopened.")
 
     form = await request.form()
-    known_locations = canon_location_names()
-    if location_confirmation_failed({"new_location": [form.get("new_location") or ""]}, form, known_locations):
-        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_confirm_failed=1")
     item_values = {
         "sequence": form.get("new_sequence") or "",
         "canonical_text": form.get("new_canonical_text") or "",
@@ -1000,19 +980,8 @@ async def mark_session_reviewed(request: Request, session: str):
 
     form = await request.form()
     form_values = {key: form.getlist(key) for key in form.keys()}
-    known_locations = canon_location_names()
     if reviews.final_summary_mode(document) or "final_summary_markdown" in form:
-        location_values = {
-            "new_location": [
-                form.get("final_starting_location") or "",
-                form.get("final_ending_location") or "",
-            ]
-        }
-        if location_confirmation_failed(location_values, form, known_locations):
-            return redirect_to_review(session_number, form.get("source") or "narrative", form.get("view") or "raw", "location_confirm_failed=1")
         updated = reviews.update_final_summary_from_form(document, form_values)
-    elif location_confirmation_failed(form_values, form, known_locations):
-        return redirect_to_review(session_number, form.get("source") or "diary", form.get("view") or "raw", "location_confirm_failed=1")
     else:
         updated = reviews.update_review_document_from_form(document, form_values)
     marked, errors = reviews.mark_reviewed_document(updated)

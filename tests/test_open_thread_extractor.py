@@ -34,6 +34,38 @@ class OpenThreadExtractorTest(unittest.TestCase):
 ```""")
         self.assertEqual(document["known_thread_mentions"], [])
 
+    def test_extract_json_object_with_repair_uses_cleanup_pass(self):
+        repaired = {
+            "known_thread_mentions": [],
+            "new_thread_candidates": [{
+                "proposed_title": "Who wants the Grimoire?",
+                "thread_type": "active_threat",
+                "status": "open",
+            }],
+            "rejected_candidates": [],
+            "uncertainties": [],
+        }
+
+        with patch("raglib.open_thread_extractor.generate", return_value=json.dumps(repaired)):
+            document, warnings = open_thread_extractor.extract_json_object_with_repair(
+                '{"known_thread_mentions": [], "new_thread_candidates": [{"proposed_title": "broken"}',
+                "test-model",
+            )
+
+        self.assertEqual(document["new_thread_candidates"][0]["proposed_title"], "Who wants the Grimoire?")
+        self.assertIn("Initial open thread JSON parse failed", warnings[0])
+        self.assertIn("Repaired malformed open thread JSON", warnings[1])
+
+    def test_extract_json_object_with_repair_falls_back_to_empty_document(self):
+        with patch("raglib.open_thread_extractor.generate", return_value='{"still": "broken"'):
+            document, warnings = open_thread_extractor.extract_json_object_with_repair(
+                '{"known_thread_mentions": [',
+                "test-model",
+            )
+
+        self.assertEqual(document, open_thread_extractor.empty_extraction_document())
+        self.assertTrue(any("Used empty open thread extraction document" in warning for warning in warnings))
+
     def test_postprocess_moves_existing_candidate_to_known_mention(self):
         registry = [{"id": 5, "title": "What does the Gale want?", "thread_type": "lore_mystery", "status": "open"}]
         document = {

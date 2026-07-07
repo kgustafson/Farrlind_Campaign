@@ -1,10 +1,12 @@
 import sys
+import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from scripts.workflow_auto_intake import command_plan, selected_command_plan, watch_queue
+from scripts.workflow_auto_intake import claim_queue_file, command_plan, process_job, selected_command_plan, watch_queue
 
 
 class WorkflowAutoIntakeTest(unittest.TestCase):
@@ -113,3 +115,46 @@ class WorkflowAutoIntakeTest(unittest.TestCase):
         self.assertEqual(process.call_count, 2)
         self.assertEqual(sleep.call_count, 1)
         self.assertEqual(sleep.call_args.args[0], 1)
+
+    def test_claim_queue_file_does_not_reclaim_running_jobs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            queue_file = Path(tmp) / "session23.running.json"
+            queue_file.write_text("{}", encoding="utf-8")
+
+            claimed = claim_queue_file(queue_file)
+
+        self.assertIsNone(claimed)
+
+    def test_claim_queue_file_uses_single_running_suffix(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            queue_file = Path(tmp) / "session23.json"
+            queue_file.write_text("{}", encoding="utf-8")
+
+            claimed = claim_queue_file(queue_file)
+
+            self.assertEqual(claimed, Path(tmp) / "session23.running.json")
+            self.assertTrue(claimed.exists())
+
+    def test_process_job_preserves_existing_database_url(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            job_path = Path(tmp) / "session23.running.json"
+            job_path.write_text(
+                json.dumps({
+                    "campaign_name": "farrlind",
+                    "session_number": 23,
+                    "audio_file_path": "campaigns/farrlind/audio/session23.wav",
+                    "transcript_policy": "recreate",
+                    "commands": [],
+                }),
+                encoding="utf-8",
+            )
+            existing_url = "postgresql+psycopg2://admin:gofaban@db:5432/farrlind"
+
+            with patch.dict(os.environ, {"FARRLIND_DATABASE_URL": existing_url}, clear=False), \
+                 patch("scripts.workflow_auto_intake.mark_run_running"), \
+                 patch("scripts.workflow_auto_intake.mark_run_waiting_for_review"), \
+                 patch("scripts.workflow_auto_intake.finish_queue_file"), \
+                 patch("scripts.workflow_auto_intake.selected_command_plan", return_value=[]):
+                process_job(job_path)
+
+                self.assertEqual(os.environ.get("FARRLIND_DATABASE_URL"), existing_url)

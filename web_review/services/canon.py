@@ -937,7 +937,51 @@ def create_open_thread(values: dict[str, Any]) -> None:
             (SELECT id FROM session WHERE session_number = :first_session),
             (SELECT id FROM session WHERE session_number = :last_session),
             :related_location_id, :description, :resolution, :notes
-        );
+        )
+        ON CONFLICT (title) DO UPDATE SET
+            thread_type = COALESCE(NULLIF(EXCLUDED.thread_type, ''), open_thread.thread_type),
+            status = CASE
+                WHEN open_thread.status <> 'open' THEN open_thread.status
+                ELSE COALESCE(NULLIF(EXCLUDED.status, ''), open_thread.status)
+            END,
+            first_session_id = CASE
+                WHEN open_thread.first_session_id IS NULL THEN EXCLUDED.first_session_id
+                WHEN EXCLUDED.first_session_id IS NULL THEN open_thread.first_session_id
+                WHEN (
+                    SELECT session_number FROM session WHERE id = EXCLUDED.first_session_id
+                ) < (
+                    SELECT session_number FROM session WHERE id = open_thread.first_session_id
+                ) THEN EXCLUDED.first_session_id
+                ELSE open_thread.first_session_id
+            END,
+            last_session_id = CASE
+                WHEN open_thread.last_session_id IS NULL THEN EXCLUDED.last_session_id
+                WHEN EXCLUDED.last_session_id IS NULL THEN open_thread.last_session_id
+                WHEN (
+                    SELECT session_number FROM session WHERE id = EXCLUDED.last_session_id
+                ) > (
+                    SELECT session_number FROM session WHERE id = open_thread.last_session_id
+                ) THEN EXCLUDED.last_session_id
+                ELSE open_thread.last_session_id
+            END,
+            related_location_id = COALESCE(open_thread.related_location_id, EXCLUDED.related_location_id),
+            description = CASE
+                WHEN EXCLUDED.description IS NULL OR EXCLUDED.description = '' THEN open_thread.description
+                WHEN open_thread.description IS NULL OR open_thread.description = '' THEN EXCLUDED.description
+                WHEN POSITION(EXCLUDED.description IN open_thread.description) > 0 THEN open_thread.description
+                ELSE open_thread.description || CHR(10) || CHR(10) || EXCLUDED.description
+            END,
+            resolution = CASE
+                WHEN open_thread.resolution IS NULL OR open_thread.resolution = ''
+                THEN EXCLUDED.resolution
+                ELSE open_thread.resolution
+            END,
+            notes = CASE
+                WHEN EXCLUDED.notes IS NULL OR EXCLUDED.notes = '' THEN open_thread.notes
+                WHEN open_thread.notes IS NULL OR open_thread.notes = '' THEN EXCLUDED.notes
+                WHEN POSITION(EXCLUDED.notes IN open_thread.notes) > 0 THEN open_thread.notes
+                ELSE open_thread.notes || CHR(10) || EXCLUDED.notes
+            END;
     """, values)
 
 

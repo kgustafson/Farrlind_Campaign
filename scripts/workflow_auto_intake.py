@@ -348,7 +348,9 @@ def run_command(session_number: int, command: WorkflowCommand, run_dir: Path, dr
 
 
 def claim_queue_file(path: Path) -> Path | None:
-    running_path = path.with_suffix(".running.json")
+    if ".running" in path.name:
+        return None
+    running_path = path.with_name(f"{path.stem}.running.json")
     try:
         path.replace(running_path)
     except FileNotFoundError:
@@ -381,7 +383,7 @@ def process_job(job_path: Path, dry_run: bool = False) -> None:
     job = json.loads(job_path.read_text(encoding="utf-8"))
     job_campaign = (job.get("campaign_name") or campaign.active_campaign_name()).strip()
     os.environ["FARRLIND_CAMPAIGN"] = job_campaign
-    os.environ["FARRLIND_DATABASE_URL"] = campaign.campaign_database_url(job_campaign)
+    os.environ.setdefault("FARRLIND_DATABASE_URL", campaign.campaign_database_url(job_campaign))
     session_number = int(job["session_number"])
     audio_file_path = (job.get("audio_file_path") or "").strip()
     transcript_policy = normalize_transcript_policy(job.get("transcript_policy"))

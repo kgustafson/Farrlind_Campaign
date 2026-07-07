@@ -183,6 +183,10 @@ def normalize_extraction(document: dict[str, Any]) -> dict[str, Any]:
     return normalized
 
 
+def empty_extraction_document() -> dict[str, Any]:
+    return {key: [] for key in EXPECTED_TOP_LEVEL_KEYS}
+
+
 def postprocess_extraction(
     document: dict[str, Any],
     registry: list[dict[str, Any]],
@@ -333,6 +337,40 @@ def extract_json_object(text: str) -> dict[str, Any]:
         return json.loads(stripped[start:end + 1])
 
 
+def repair_json_prompt(raw_output: str) -> str:
+    return "\n\n".join([
+        "Convert the following malformed open-thread extraction output into valid JSON.",
+        "Return only one JSON object. Do not add markdown fences or explanation.",
+        "The JSON object must contain these list keys:",
+        json.dumps(EXPECTED_TOP_LEVEL_KEYS),
+        "If an item cannot be repaired safely, omit it.",
+        "Malformed output:",
+        raw_output,
+    ])
+
+
+def extract_json_object_with_repair(raw_output: str, model: str) -> tuple[dict[str, Any], list[str]]:
+    try:
+        return extract_json_object(raw_output), []
+    except json.JSONDecodeError as first_error:
+        warnings = [f"Initial open thread JSON parse failed: {first_error}"]
+
+    try:
+        repaired_output = generate(
+            repair_json_prompt(raw_output),
+            model=model,
+            timeout=600,
+            options={**OLLAMA_OPTIONS, "temperature": 0.0},
+        )
+        return extract_json_object(repaired_output), [*warnings, "Repaired malformed open thread JSON with model cleanup pass."]
+    except json.JSONDecodeError as repair_error:
+        return empty_extraction_document(), [
+            *warnings,
+            f"Open thread JSON repair failed: {repair_error}",
+            "Used empty open thread extraction document so workflow can continue to human review.",
+        ]
+
+
 def extract_open_threads(session_name: str, model: Optional[str] = None, source: str = "auto") -> Path:
     model = model or os.environ.get("FARRLIND_OPEN_THREAD_EXTRACTOR_MODEL", DEFAULT_MODEL)
     sources = load_session_sources(session_name, source)
@@ -345,6 +383,7 @@ def extract_open_threads(session_name: str, model: Optional[str] = None, source:
     started = time.monotonic()
     raw_documents = []
     registry_rows_sent = []
+    parse_warnings = []
     for index, source_set in enumerate(source_sets, start=1):
         if len(source_sets) > 1:
             print(f"  Open thread transcript chunk {index}/{len(source_sets)}...")
@@ -359,7 +398,10 @@ def extract_open_threads(session_name: str, model: Optional[str] = None, source:
         prompt_metadata = compact_campaign_metadata(campaign_metadata) if len(source_sets) > 1 else campaign_metadata
         registry_rows_sent.append(len(prompt_registry))
         prompt = build_prompt(session_name, source_set, prompt_registry, prompt_locations, prompt_metadata)
-        raw_documents.append(extract_json_object(generate(prompt, model=model, timeout=1800, options=OLLAMA_OPTIONS)))
+        raw_output = generate(prompt, model=model, timeout=1800, options=OLLAMA_OPTIONS)
+        document, warnings = extract_json_object_with_repair(raw_output, model)
+        raw_documents.append(document)
+        parse_warnings.extend([f"chunk {index}: {warning}" for warning in warnings])
     duration = time.monotonic() - started
     extracted, guardrail_warnings = postprocess_extraction(
         merge_extraction_documents(raw_documents, EXPECTED_TOP_LEVEL_KEYS),
@@ -367,6 +409,7 @@ def extract_open_threads(session_name: str, model: Optional[str] = None, source:
         session_name,
         "\n\n".join(source["text"] for source in sources),
     )
+    guardrail_warnings = [*parse_warnings, *guardrail_warnings]
     path = output_path(session_name)
     write_text(path, json.dumps(extracted, indent=2, ensure_ascii=False) + "\n")
 

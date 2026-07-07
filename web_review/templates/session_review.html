@@ -121,9 +121,6 @@
 {% if request.query_params.get("item_remove_failed") %}
   <div class="flash error-flash">Added item was not removed.</div>
 {% endif %}
-{% if request.query_params.get("location_confirm_failed") %}
-  <div class="flash error-flash">New location detected. Check "Confirm newly typed locations" before saving.</div>
-{% endif %}
 {% if request.query_params.get("location_added") %}
   <div class="flash">Location added to the registry.</div>
 {% endif %}
@@ -523,10 +520,6 @@
     </section>
     <section>
       <h2>Locations</h2>
-      <label class="check-row">
-        <input type="checkbox" name="confirm_new_locations" value="1" {% if review_locked or not can_edit() %}disabled{% endif %}>
-        <span>Confirm newly typed locations</span>
-      </label>
       <div class="quick-location">
         <label>
           <span>Add Location</span>
