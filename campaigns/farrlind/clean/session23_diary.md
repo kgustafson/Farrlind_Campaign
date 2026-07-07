@@ -1,6 +1,6 @@
 ## **Session Twenty-Three — 07/05/26**
 
-**1832 AS — Namal 25 (continued)**
+**1832 AS — Namal 26**
 
 **The Truth Beneath the Satchel**
 

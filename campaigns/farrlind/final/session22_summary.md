@@ -1,4 +1,4 @@
-# Session 22: Session 22
+# Session 22: The Well of Catur
 
 ## Canon Summary
 
@@ -7,7 +7,7 @@
 - Starting location: Catur's Well Chamber
 - Ending location: Catur's Well Chamber
 - Key locations: Catur's Well Chamber
-- Review status: reviewed, applied 2026-06-01
+- Review status: applied, applied 2026-07-07
 
 They established a diplomatic approach, with Mikani presenting herself as an emissary from the Celestial Isles and Faban as a water-touched human believer of Namaloa, while Corvinus maintained a role of protection. Upon reaching Catur, they gained access to the city, learning that forging skills were important, and they sought an audience with the Queen to gain access to the city's hidden magical well.
 
@@ -46,7 +46,7 @@ The discussion shifted to the broader lore, addressing how to reverse a negative
 - **Catur's Well Chamber** - The location where the party found the dormant magical well (Nibane) and faced the immediate threat of flooding.
 - **Wreckaway Cove** - A human settlement on the outer rim composed of pirates (mentioned in context).
 - **The Gale** - A location mentioned in relation to future travel, infected with the elemental plane of air.
-- **Honeydoll** - Mentioned as the origin of magic, linked to Omnium.
+- **Hanidal** - Mentioned as the origin of magic, linked to Omnium.
 - **Monastery of the Open Hand** - A location where the party was advised to go to gain trust and understand the source of magic.
 
 ## Key NPCs And Entities

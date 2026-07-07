@@ -6,10 +6,10 @@ review_instructions:
 - Use sequence to keep final events chronological; decimals can insert added items
   between drafted events.
 - Leave applied_status as pending until an apply-review step updates the database.
-session_title: Session 21
+session_title: The Passage to Catur
 session_date: '2026-05-18'
 in_game_date: 1832 AS Namal 25
-primary_location: ''
+primary_location: Catur
 items:
 - id: event-001
   sequence: 1
@@ -25,7 +25,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-004
 - id: event-002
   sequence: 2
@@ -40,7 +40,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-003
   sequence: 3
@@ -55,7 +55,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-004
   sequence: 4
@@ -71,7 +71,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-005
   sequence: 5
@@ -87,7 +87,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-004
 - id: event-006
   sequence: 6
@@ -103,7 +103,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-004
 - id: event-007
   sequence: 7
@@ -118,7 +118,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-008
   sequence: 8
   source_type: draft_merged_event
@@ -132,7 +132,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-009
   sequence: 9
   source_type: draft_merged_event
@@ -146,7 +146,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-010
   sequence: 10
   source_type: draft_merged_event
@@ -160,7 +160,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-011
   sequence: 11
   source_type: draft_merged_event
@@ -174,7 +174,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-012
   sequence: 12
   source_type: draft_merged_event
@@ -188,7 +188,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-013
   sequence: 13
   source_type: draft_merged_event
@@ -202,7 +202,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-014
   sequence: 14
   source_type: draft_merged_event
@@ -216,7 +216,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-015
   sequence: 15
   source_type: draft_merged_event
@@ -230,7 +230,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-016
   sequence: 16
   source_type: draft_merged_event
@@ -244,7 +244,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-017
   sequence: 17
   source_type: draft_merged_event
@@ -259,7 +259,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-018
   sequence: 18
   source_type: draft_merged_event
@@ -274,7 +274,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-019
   sequence: 19
@@ -289,7 +289,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-020
   sequence: 20
   source_type: draft_merged_event
@@ -303,7 +303,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-021
   sequence: 21
   source_type: draft_merged_event
@@ -317,7 +317,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-022
   sequence: 22
@@ -332,7 +332,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-023
   sequence: 23
@@ -348,7 +348,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-024
   sequence: 24
@@ -364,7 +364,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-025
   sequence: 25
@@ -379,7 +379,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-026
   sequence: 26
@@ -395,7 +395,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-027
   sequence: 27
@@ -411,7 +411,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-028
   sequence: 28
@@ -426,7 +426,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-029
   sequence: 29
   source_type: draft_merged_event
@@ -440,7 +440,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-030
   sequence: 30
@@ -456,7 +456,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-031
   sequence: 31
@@ -472,7 +472,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-032
   sequence: 32
@@ -488,7 +488,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-033
   sequence: 33
   source_type: draft_merged_event
@@ -503,7 +503,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-034
   sequence: 34
   source_type: draft_merged_event
@@ -518,7 +518,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-035
   sequence: 35
@@ -534,7 +534,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-036
   sequence: 36
@@ -550,7 +550,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-037
   sequence: 37
@@ -566,7 +566,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-038
   sequence: 38
   source_type: draft_merged_event
@@ -581,7 +581,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-039
   sequence: 39
   source_type: draft_merged_event
@@ -595,7 +595,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-001
 - id: event-040
   sequence: 40
@@ -611,7 +611,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-041
   sequence: 41
@@ -626,7 +626,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-042
   sequence: 42
@@ -642,7 +642,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-043
   sequence: 43
   source_type: draft_merged_event
@@ -657,7 +657,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-044
   sequence: 44
@@ -673,7 +673,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-045
   sequence: 45
@@ -688,7 +688,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-046
   sequence: 46
@@ -703,7 +703,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-047
   sequence: 47
@@ -718,7 +718,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-048
   sequence: 48
@@ -733,7 +733,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-049
   sequence: 49
@@ -748,7 +748,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-050
   sequence: 50
@@ -763,7 +763,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-051
   sequence: 51
@@ -778,7 +778,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-052
   sequence: 52
@@ -793,7 +793,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-053
   sequence: 53
@@ -808,7 +808,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-054
   sequence: 54
@@ -823,7 +823,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-055
   sequence: 55
@@ -838,7 +838,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-056
   sequence: 56
   source_type: draft_merged_event
@@ -852,7 +852,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-057
   sequence: 57
   source_type: draft_merged_event
@@ -866,7 +866,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-058
   sequence: 58
   source_type: draft_merged_event
@@ -881,7 +881,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-059
   sequence: 59
@@ -898,7 +898,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-060
   sequence: 60
@@ -913,7 +913,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-061
   sequence: 61
   source_type: draft_merged_event
@@ -927,7 +927,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-062
   sequence: 62
@@ -943,7 +943,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-063
   sequence: 63
   source_type: draft_merged_event
@@ -958,7 +958,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-064
   sequence: 64
@@ -973,7 +973,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-065
   sequence: 65
   source_type: draft_merged_event
@@ -987,7 +987,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-066
   sequence: 66
@@ -1002,7 +1002,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-067
   sequence: 67
@@ -1017,7 +1017,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-068
   sequence: 68
   source_type: draft_merged_event
@@ -1032,7 +1032,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-069
   sequence: 69
@@ -1047,7 +1047,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-070
   sequence: 70
@@ -1063,7 +1063,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-071
   sequence: 71
@@ -1078,7 +1078,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-072
   sequence: 72
@@ -1093,7 +1093,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-073
   sequence: 73
@@ -1109,7 +1109,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-003
 - id: event-074
   sequence: 74
@@ -1126,7 +1126,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-002
 - id: event-075
   sequence: 75
@@ -1143,7 +1143,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-003
 - id: event-076
   sequence: 76
@@ -1159,7 +1159,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-003
 - id: event-077
   sequence: 77
@@ -1175,7 +1175,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-078
   sequence: 78
   source_type: draft_merged_event
@@ -1190,7 +1190,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-079
   sequence: 79
   source_type: draft_merged_event
@@ -1205,7 +1205,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-003
 - id: event-080
   sequence: 80
@@ -1222,7 +1222,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-004
 - id: event-081
   sequence: 81
@@ -1238,7 +1238,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-082
   sequence: 82
   source_type: draft_merged_event
@@ -1253,7 +1253,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-083
   sequence: 83
   source_type: draft_merged_event
@@ -1267,7 +1267,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-003
 - id: event-084
   sequence: 84
@@ -1282,7 +1282,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-003
 - id: event-085
   sequence: 85
@@ -1297,7 +1297,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-003
 - id: event-086
   sequence: 86
@@ -1312,7 +1312,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-087
   sequence: 87
   source_type: draft_merged_event
@@ -1327,7 +1327,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-003
 - id: event-088
   sequence: 88
@@ -1343,7 +1343,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-089
   sequence: 89
   source_type: draft_merged_event
@@ -1358,7 +1358,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-090
   sequence: 90
   source_type: draft_merged_event
@@ -1372,7 +1372,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-004
 - id: event-091
   sequence: 91
@@ -1387,7 +1387,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-004
 - id: event-092
   sequence: 92
@@ -1402,7 +1402,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-004
 - id: event-093
   sequence: 93
@@ -1418,7 +1418,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-094
   sequence: 94
   source_type: draft_merged_event
@@ -1433,7 +1433,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-004
 - id: event-095
   sequence: 95
@@ -1449,7 +1449,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-005
 - id: event-096
   sequence: 96
@@ -1464,7 +1464,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-005
 - id: event-097
   sequence: 97
@@ -1479,7 +1479,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-005
 - id: event-098
   sequence: 98
@@ -1494,7 +1494,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-005
 - id: event-099
   sequence: 99
@@ -1509,7 +1509,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-005
 - id: event-100
   sequence: 100
@@ -1524,7 +1524,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-005
 - id: event-101
   sequence: 101
@@ -1539,7 +1539,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-005
 - id: event-102
   sequence: 102
@@ -1554,7 +1554,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-005
 - id: event-103
   sequence: 103
@@ -1569,7 +1569,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-104
   sequence: 104
   source_type: draft_merged_event
@@ -1584,7 +1584,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-005
 - id: event-105
   sequence: 105
@@ -1601,7 +1601,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-005
 - id: event-106
   sequence: 106
@@ -1617,7 +1617,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-005
 - id: event-107
   sequence: 107
@@ -1634,7 +1634,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-006
 - id: event-108
   sequence: 108
@@ -1650,7 +1650,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-006
 - id: event-109
   sequence: 109
@@ -1665,7 +1665,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-006
 - id: event-110
   sequence: 110
@@ -1681,7 +1681,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-006
 - id: event-111
   sequence: 111
@@ -1697,7 +1697,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-006
 - id: event-112
   sequence: 112
@@ -1713,7 +1713,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-006
 - id: event-113
   sequence: 113
@@ -1728,7 +1728,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-006
 - id: event-114
   sequence: 114
@@ -1743,7 +1743,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-006
 - id: event-115
   sequence: 115
@@ -1758,7 +1758,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-116
   sequence: 116
   source_type: draft_merged_event
@@ -1772,7 +1772,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-117
   sequence: 117
   source_type: draft_merged_event
@@ -1786,7 +1786,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-118
   sequence: 118
   source_type: draft_merged_event
@@ -1800,7 +1800,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-006
 - id: event-119
   sequence: 119
@@ -1815,7 +1815,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-120
   sequence: 120
   source_type: draft_merged_event
@@ -1830,7 +1830,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-006
 - id: event-121
   sequence: 121
@@ -1846,7 +1846,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-122
   sequence: 122
   source_type: draft_merged_event
@@ -1861,7 +1861,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-123
   sequence: 123
@@ -1877,7 +1877,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-124
   sequence: 124
@@ -1894,7 +1894,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-125
   sequence: 125
@@ -1909,7 +1909,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-126
   sequence: 126
   source_type: draft_merged_event
@@ -1924,7 +1924,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-127
   sequence: 127
@@ -1940,7 +1940,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-128
   sequence: 128
@@ -1955,7 +1955,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-129
   sequence: 129
@@ -1970,7 +1970,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-130
   sequence: 130
@@ -1985,7 +1985,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-131
   sequence: 131
@@ -2000,7 +2000,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-132
   sequence: 132
   source_type: draft_merged_event
@@ -2014,7 +2014,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-133
   sequence: 133
@@ -2029,7 +2029,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-134
   sequence: 134
   source_type: draft_merged_event
@@ -2043,7 +2043,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-135
   sequence: 135
@@ -2058,7 +2058,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-136
   sequence: 136
   source_type: draft_merged_event
@@ -2073,7 +2073,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-137
   sequence: 137
   source_type: draft_merged_event
@@ -2087,7 +2087,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-138
   sequence: 138
   source_type: draft_merged_event
@@ -2102,7 +2102,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-139
   sequence: 139
@@ -2117,7 +2117,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-140
   sequence: 140
@@ -2132,7 +2132,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-141
   sequence: 141
@@ -2147,7 +2147,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-142
   sequence: 142
@@ -2162,7 +2162,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-143
   sequence: 143
@@ -2177,7 +2177,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-144
   sequence: 144
@@ -2192,7 +2192,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-006
 - id: event-145
   sequence: 145
@@ -2209,7 +2209,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-006
 - id: event-146
   sequence: 146
@@ -2225,7 +2225,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-006
 - id: event-147
   sequence: 147
@@ -2242,7 +2242,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-148
   sequence: 148
@@ -2257,7 +2257,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-149
   sequence: 149
   source_type: draft_merged_event
@@ -2271,7 +2271,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-150
   sequence: 150
   source_type: draft_merged_event
@@ -2285,7 +2285,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-006
 - id: event-151
   sequence: 151
@@ -2300,7 +2300,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-152
   sequence: 152
@@ -2315,7 +2315,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-153
   sequence: 153
@@ -2330,7 +2330,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-154
   sequence: 154
   source_type: draft_merged_event
@@ -2345,7 +2345,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-155
   sequence: 155
@@ -2360,7 +2360,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-156
   sequence: 156
@@ -2375,7 +2375,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-157
   sequence: 157
@@ -2390,7 +2390,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-007
 - id: event-158
   sequence: 158
@@ -2405,7 +2405,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-159
   sequence: 159
@@ -2421,7 +2421,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-160
   sequence: 160
   source_type: draft_merged_event
@@ -2436,7 +2436,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-161
   sequence: 161
@@ -2452,7 +2452,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-162
   sequence: 162
   source_type: draft_merged_event
@@ -2467,7 +2467,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-163
   sequence: 163
   source_type: draft_merged_event
@@ -2482,7 +2482,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-164
   sequence: 164
   source_type: draft_merged_event
@@ -2497,7 +2497,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-165
   sequence: 165
@@ -2513,7 +2513,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-166
   sequence: 166
@@ -2529,7 +2529,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-167
   sequence: 167
@@ -2545,7 +2545,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-168
   sequence: 168
@@ -2561,7 +2561,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-169
   sequence: 169
@@ -2577,7 +2577,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-170
   sequence: 170
   source_type: draft_merged_event
@@ -2592,7 +2592,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-171
   sequence: 171
@@ -2608,7 +2608,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-172
   sequence: 172
   source_type: draft_merged_event
@@ -2623,7 +2623,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-173
   sequence: 173
@@ -2638,7 +2638,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-174
   sequence: 174
   source_type: draft_merged_event
@@ -2653,7 +2653,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-175
   sequence: 175
@@ -2669,7 +2669,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-176
   sequence: 176
@@ -2685,7 +2685,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-177
   sequence: 177
@@ -2701,7 +2701,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-178
   sequence: 178
@@ -2717,7 +2717,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-179
   sequence: 179
@@ -2733,7 +2733,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-180
   sequence: 180
   source_type: draft_merged_event
@@ -2748,7 +2748,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-008
 - id: event-181
   sequence: 181
@@ -2763,7 +2763,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-182
   sequence: 182
   source_type: draft_merged_event
@@ -2777,7 +2777,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-183
   sequence: 183
   source_type: draft_merged_event
@@ -2791,7 +2791,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-184
   sequence: 184
@@ -2806,7 +2806,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-185
   sequence: 185
@@ -2821,7 +2821,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-186
   sequence: 186
@@ -2836,7 +2836,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-187
   sequence: 187
@@ -2851,7 +2851,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-188
   sequence: 188
@@ -2866,7 +2866,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-189
   sequence: 189
@@ -2881,7 +2881,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-190
   sequence: 190
@@ -2897,7 +2897,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-191
   sequence: 191
@@ -2913,7 +2913,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-192
   sequence: 192
@@ -2928,7 +2928,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-193
   sequence: 193
@@ -2943,7 +2943,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-194
   sequence: 194
@@ -2958,7 +2958,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-195
   sequence: 195
@@ -2973,7 +2973,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-196
   sequence: 196
@@ -2989,7 +2989,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-197
   sequence: 197
@@ -3005,7 +3005,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-198
   sequence: 198
@@ -3021,7 +3021,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-199
   sequence: 199
@@ -3037,7 +3037,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-200
   sequence: 200
   source_type: draft_merged_event
@@ -3052,7 +3052,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-201
   sequence: 201
   source_type: draft_merged_event
@@ -3067,7 +3067,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-202
   sequence: 202
@@ -3083,7 +3083,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-203
   sequence: 203
@@ -3099,7 +3099,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-204
   sequence: 204
@@ -3115,7 +3115,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-205
   sequence: 205
@@ -3131,7 +3131,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-206
   sequence: 206
@@ -3146,7 +3146,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-207
   sequence: 207
   source_type: draft_merged_event
@@ -3160,7 +3160,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-208
   sequence: 208
   source_type: draft_merged_event
@@ -3174,7 +3174,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-209
   sequence: 209
   source_type: draft_merged_event
@@ -3188,7 +3188,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-210
   sequence: 210
@@ -3203,7 +3203,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-211
   sequence: 211
   source_type: draft_merged_event
@@ -3217,7 +3217,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-212
   sequence: 212
@@ -3232,7 +3232,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-213
   sequence: 213
@@ -3247,7 +3247,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-214
   sequence: 214
@@ -3262,7 +3262,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-215
   sequence: 215
@@ -3277,7 +3277,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-216
   sequence: 216
   source_type: draft_merged_event
@@ -3292,7 +3292,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-010
 - id: event-217
   sequence: 217
@@ -3308,7 +3308,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-009
 - id: event-218
   sequence: 218
@@ -3323,7 +3323,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-010
 - id: event-219
   sequence: 219
@@ -3338,7 +3338,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-220
   sequence: 220
   source_type: draft_merged_event
@@ -3352,7 +3352,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
   macro_event_id: macro-010
 - id: event-221
   sequence: 221
@@ -3367,7 +3367,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-222
   sequence: 222
   source_type: draft_merged_event
@@ -3381,7 +3381,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-223
   sequence: 223
   source_type: draft_merged_event
@@ -3395,7 +3395,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-224
   sequence: 224
   source_type: draft_merged_event
@@ -3410,7 +3410,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-225
   sequence: 225
   source_type: draft_merged_event
@@ -3424,7 +3424,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-226
   sequence: 226
   source_type: draft_merged_event
@@ -3439,7 +3439,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-227
   sequence: 227
   source_type: draft_merged_event
@@ -3454,7 +3454,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 - id: event-228
   sequence: 228
   source_type: draft_merged_event
@@ -3468,7 +3468,7 @@ items:
   decided_by: ''
   decided_on: ''
   applied_status: applied
-  applied_on: '2026-05-18'
+  applied_on: '2026-07-07'
 added_items: []
 macro_events:
 - id: macro-011
@@ -3515,8 +3515,101 @@ macro_events:
   order: 11
   description: End of Session
   location: Catur
-review_stage: event_resolution
-reviewed_on: '2026-05-18'
-applied_on: '2026-05-18'
+review_stage: compose_final_summary
+reviewed_on: '2026-07-07'
+applied_on: '2026-07-07'
 review_bypass_note: Fragment-level review bypassed by operator request after human-authored
   canon summary was added. Session 21 canon is represented by knowledge/Faban/final/session21_summary.md.
+reopened_on: '2026-07-07'
+final_summary:
+  session_title: The Passage to Catur
+  real_world_date: '2026-05-18'
+  in_world_date: 1832 AS Namal 25
+  starting_location: Balrog
+  ending_location: Catur
+  key_locations: ''
+  major_outcome: ''
+  summary_markdown: "Title: The Road to Sunken Catur\r\nIn-Game Date: 1832 AS Namal\
+    \ 25\r\n\r\nSession Summary:\r\n\r\nThe session opened with the party reviewing\
+    \ what they had learned after the dragon fight and the recovery of the well. The\
+    \ well had warned that the other wells may not be easily helpful, but that they\
+    \ might be persuaded by ancient things already in the party's possession, especially\
+    \ items of fiendish or celestial nature. The party considered the fragments of\
+    \ the orb of control, possible fiendish or celestial artifacts, and the larger\
+    \ concern that the outer islands were under unnatural stress.\r\n\r\nBefore moving\
+    \ toward Catur, the party reviewed the magical gifts received from Balrog. Mikani\
+    \ had the Cap of Water Breathing, activated with the word Kokyu. Brigit had a\
+    \ Shortbow of Warning, Roon had a +2 dwarven shield, Gildas had a Staff of Defense,\
+    \ Corvinus had a magical flame longsword whose fire could still work underwater,\
+    \ and Faban clarified the properties of his Acheron Blade. The Acheron Blade is\
+    \ a +1 weapon; it can grant Faban temporary hit points through Dark Blessing and\
+    \ can impose dread/disadvantage through Disheartening Strike, clarified as usable\
+    \ once per round.\r\n\r\nThe party reached the coast near Catur, confirming that\
+    \ Catur itself lies underwater, about six miles offshore. The group had spoken\
+    \ with giant fishermen and learned about water-breathing mushrooms. They had 28\
+    \ mushrooms, each good for one hour of underwater breathing, plus 20 potions of\
+    \ water breathing made by Gildas, also lasting one hour each. This gave the group\
+    \ a strong but limited underwater operating window. The fisherman also advised\
+    \ that the city is dangerous and unfriendly to outsiders, and suggested disguises\
+    \ or a cover story.\r\n\r\nFaban and Mikani settled on the main diplomatic ruse:\
+    \ Mikani would present herself as an emissary from the Celestial Isles, while\
+    \ Faban would present himself as a water-touched human connected to the Isles\
+    \ and a believer of Namaloa. The rest of the party would serve as entourage or\
+    \ protection, allowing Corvinus in particular to avoid direct falsehoods that\
+    \ might trouble his oath. The group spent some time discussing Corvinus's oath\
+    \ of devotion and the limits of deception, concluding that the safest approach\
+    \ was for him to say as little as possible while still truthfully acting as protector.\r\
+    \n\r\nDuring the crossing, Roon successfully handled the boat despite only partial\
+    \ familiarity with watercraft. Faban kept watch, Mikani prepared herself as a\
+    \ formal emissary, and the party discussed the Celestial Isles. Important lore\
+    \ emerged: the Isles are largely draconic, home to dragonborn and kobolds, and\
+    \ were one of the last places where dragonkin lived peacefully after the fall\
+    \ of dragons. Their society is a constitutional monarchy led by the gold dragonborn\
+    \ high clan, named Mensen, and the Isles are known in the Outer Rim for appraisal\
+    \ work involving gems and artifacts.\r\n\r\nOnce in Catur, the group entered an\
+    \ underwater city environment with cultivated coral, underwater mushrooms, seed\
+    \ plants, and gardeners. The party was granted access to a courtyard area rather\
+    \ than full free movement. They learned that the smith they should seek was Uthgar,\
+    \ which mattered because one member of the party could potentially assist or learn\
+    \ from the city's underwater forge work.\r\n\r\nEventually, Faban and Mikani secured\
+    \ an audience with Catur's leadership. The party explained that they came seeking\
+    \ knowledge, not conflict, and asked for access to the city's well. Faban framed\
+    \ the request as mutually beneficial: helping Catur defend itself while also helping\
+    \ the party understand the larger danger threatening the wells. The queen agreed\
+    \ and led them to the well chamber.\r\n\r\nThe party entered an underwater cave\
+    \ chamber containing a dormant magical well, described less as an obvious fountain\
+    \ and more like a large pool of magic. The queen indicated the well and guarded\
+    \ the chamber, while the party debated who should approach. They reviewed the\
+    \ known wells: Korog, Scythe/Safi, Ordor, the unknown well in the Gale, the unknown\
+    \ well in Hanidal, and this unknown Catur well. Faban approached and warned the\
+    \ well that the Wand of Wells had been stolen and that whoever held it, possibly\
+    \ infernal or demonic, might attempt to destroy or undo the wells as had happened\
+    \ to Ordor.\r\n\r\nThe situation quickly escalated. The well or its guardian revealed\
+    \ awareness of the party's true nature and pushed them back toward the surface.\
+    \ Then the largest sea creature the party had ever seen appeared. Some recognized\
+    \ it as an aboleth. It spoke telepathically and identified itself as Niebain or\
+    \ Nebain, spelling uncertain and heard as N-I-E-B-A-I-N. It warned: \"We are in\
+    \ great danger already.\" The queen then moved aside from a crack she had been\
+    \ holding, and water began rushing in. The session ended there, with the party\
+    \ suddenly facing an immediate flooding crisis.\r\n\r\nKey Events:\r\n- The party\
+    \ reviewed the well's warning that other wells may need to be persuaded with ancient\
+    \ fiendish or celestial things already in the party's possession.\r\n- The party\
+    \ reviewed magical gifts and underwater-capable gear before entering Catur.\r\n\
+    - The party confirmed Catur lies underwater about six miles offshore and prepared\
+    \ limited underwater breathing resources.\r\n- Faban and Mikani settled on a diplomatic\
+    \ ruse involving the Celestial Isles and Namaloa.\r\n- Roon handled the boat crossing\
+    \ to Catur while the party discussed the Celestial Isles.\r\n- The party entered\
+    \ underwater Catur and was kept to a courtyard area rather than given free movement.\r\
+    \n- The party learned Uthgar was the smith contact in Catur.\r\n- Faban and Mikani\
+    \ secured an audience with Catur's queen and asked for access to the city's well.\r\
+    \n- The party entered Catur's well chamber, an underwater cave containing a dormant\
+    \ magical pool or well.\r\n- Faban warned the well about the stolen Wand of Wells\
+    \ and the threat that had destroyed Ordor.\r\n- An aboleth-like sea entity, Niebain\
+    \ or Nebain, appeared and warned that the danger had already arrived.\r\n- Water\
+    \ began rushing in through a crack, ending the session on an immediate flooding\
+    \ crisis."
+timeline:
+  physical_date: '2026-05-18'
+  in_game_date: 1832 AS Namal 25
+  start_location: Balrog
+  end_location: Catur

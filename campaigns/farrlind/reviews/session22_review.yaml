@@ -9,7 +9,7 @@ review_instructions:
 - Micro-events are evidence for writing; they do not need individual decisions unless
   you choose to use them.
 - Mark reviewed only when the final summary text and timeline fields are canon.
-session_title: Session 22
+session_title: The Well of Catur
 session_date: '2026-05-31'
 in_game_date: 1832 AS — Namal 25
 primary_location: Catur's Well Chamber
@@ -21,7 +21,7 @@ source_files:
   validation_report: /app/campaigns/farrlind/clean/session22_validation.md
 db_event_context: []
 final_summary:
-  session_title: Session 22
+  session_title: The Well of Catur
   real_world_date: '2026-05-31'
   in_world_date: 1832 AS — Namal 25
   starting_location: Catur's Well Chamber
@@ -85,7 +85,7 @@ final_summary:
     \ of flooding.\r\n- **Wreckaway Cove** - A human settlement on the outer rim composed\
     \ of pirates (mentioned in context).\r\n- **The Gale** - A location mentioned\
     \ in relation to future travel, infected with the elemental plane of air.\r\n\
-    - **Honeydoll** - Mentioned as the origin of magic, linked to Omnium.\r\n- **Monastery\
+    - **Hanidal** - Mentioned as the origin of magic, linked to Omnium.\r\n- **Monastery\
     \ of the Open Hand** - A location where the party was advised to go to gain trust\
     \ and understand the source of magic.\r\n\r\n## Key NPCs And Entities\r\n\r\n\
     - **The Queen** - The ruler of the Celestial Isles; martial, possessing a Domain\
@@ -1451,6 +1451,6 @@ items:
   applied_status: pending
   applied_on: ''
 added_items: []
-reviewed_on: '2026-06-01'
-applied_on: '2026-06-01'
-reopened_on: '2026-06-01'
+reviewed_on: '2026-07-07'
+applied_on: '2026-07-07'
+reopened_on: '2026-07-07'

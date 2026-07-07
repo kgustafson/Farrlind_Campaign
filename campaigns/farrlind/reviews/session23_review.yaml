@@ -9,7 +9,7 @@ review_instructions:
 - Micro-events are evidence for writing; they do not need individual decisions unless
   you choose to use them.
 - Mark reviewed only when the final summary text and timeline fields are canon.
-session_title: Session 23
+session_title: Onward to Gale
 session_date: '2026-07-06'
 in_game_date: July 5th
 primary_location: Outside the Gale
@@ -21,7 +21,7 @@ source_files:
   validation_report: /app/campaigns/farrlind/clean/session23_validation.md
 db_event_context: []
 final_summary:
-  session_title: Session 23
+  session_title: Onward to Gale
   real_world_date: '2026-07-06'
   in_world_date: July 5th
   starting_location: Catur
@@ -1299,3 +1299,4 @@ items:
 added_items: []
 reviewed_on: '2026-07-07'
 applied_on: '2026-07-07'
+reopened_on: '2026-07-07'

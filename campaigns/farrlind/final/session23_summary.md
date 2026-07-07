@@ -1,4 +1,4 @@
-# Session 23: Session 23
+# Session 23: Onward to Gale
 
 ## Canon Summary
 

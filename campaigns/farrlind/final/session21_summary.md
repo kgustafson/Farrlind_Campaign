@@ -1,6 +1,17 @@
-# Session 21: The Road to Sunken Catur
+# Session 21: The Passage to Catur
 
 ## Canon Summary
+
+- Physical date: 2026-05-18
+- In-game date: 1832 AS Namal 25
+- Starting location: Balrog
+- Ending location: Catur
+- Review status: applied, applied 2026-07-07
+
+Title: The Road to Sunken Catur
+In-Game Date: 1832 AS Namal 25
+
+Session Summary:
 
 The session opened with the party reviewing what they had learned after the dragon fight and the recovery of the well. The well had warned that the other wells may not be easily helpful, but that they might be persuaded by ancient things already in the party's possession, especially items of fiendish or celestial nature. The party considered the fragments of the orb of control, possible fiendish or celestial artifacts, and the larger concern that the outer islands were under unnatural stress.
 
@@ -20,36 +31,21 @@ The party entered an underwater cave chamber containing a dormant magical well, 
 
 The situation quickly escalated. The well or its guardian revealed awareness of the party's true nature and pushed them back toward the surface. Then the largest sea creature the party had ever seen appeared. Some recognized it as an aboleth. It spoke telepathically and identified itself as Niebain or Nebain, spelling uncertain and heard as N-I-E-B-A-I-N. It warned: "We are in great danger already." The queen then moved aside from a crack she had been holding, and water began rushing in. The session ended there, with the party suddenly facing an immediate flooding crisis.
 
-## Key Locations
-
-- Coast near Catur: The party began on the western coast near the sunken city, using a small boat to reach the underwater location.
-- Catur: A dangerous underwater city unfriendly to outsiders, containing cultivated underwater plant life, coral, mushrooms, a courtyard, smithing work, royal authority, and a hidden magical well.
-- Catur's Well Chamber: An underwater cave with spires and a dormant magical pool/well, guarded or controlled by the queen.
-
-## Key NPCs / Entities
-
-- Giant Fishermen: Provided directions, information about the city, and advice about underwater breathing mushrooms.
-- Allister: A merchant who warned Faban that Catur is dangerous and does not like outsiders.
-- Uthgar: The main smith or smith contact in Catur.
-- Queen / Her Majesty of Catur: Allowed the party to approach the well after Faban argued that it would help both Catur and the wider struggle.
-- Niebain / Nebain: An aboleth-like ancient sea entity associated with the well or Catur's defense. It warned the party that the danger had already arrived.
-
-## Important Lore
-
-- The Wand of Wells remains central. It was stolen from someone the party trusted, and the party believes the thief may be infernal, demonic, or otherwise connected to the greater threat.
-- Ordor was destroyed in Paramon. Korog and Scythe/Safi remain known wells. The party still does not know the names of the well in Catur, the well in the Gale, or the well in Hanidal.
-- The Celestial Isles are a dragonkin society with a constitutional monarchy ruled by the gold dragonborn high clan Mensen. They are known for appraisal work, especially gems and artifacts.
-
-## Inventory / Resource Notes
-
-- The party had 28 water-breathing mushrooms and 20 potions of water breathing before submerging.
-- After initial use, the running count noted was 27 mushrooms and 16 potions, with Mikani relying on her cap instead.
-
-## Cliffhanger
-
-The party is in Catur with the queen, the aboleth-like Niebain/Nebain has appeared, and water is rushing in through a crack. The next session begins in immediate danger.
+Key Events:
+- The party reviewed the well's warning that other wells may need to be persuaded with ancient fiendish or celestial things already in the party's possession.
+- The party reviewed magical gifts and underwater-capable gear before entering Catur.
+- The party confirmed Catur lies underwater about six miles offshore and prepared limited underwater breathing resources.
+- Faban and Mikani settled on a diplomatic ruse involving the Celestial Isles and Namaloa.
+- Roon handled the boat crossing to Catur while the party discussed the Celestial Isles.
+- The party entered underwater Catur and was kept to a courtyard area rather than given free movement.
+- The party learned Uthgar was the smith contact in Catur.
+- Faban and Mikani secured an audience with Catur's queen and asked for access to the city's well.
+- The party entered Catur's well chamber, an underwater cave containing a dormant magical pool or well.
+- Faban warned the well about the stolen Wand of Wells and the threat that had destroyed Ordor.
+- An aboleth-like sea entity, Niebain or Nebain, appeared and warned that the danger had already arrived.
+- Water began rushing in through a crack, ending the session on an immediate flooding crisis.
 
 ## Provenance
 
-- Built from human-authored canon summary for session21.
-- The ingest draft summary is source material, not canon.
+- Reviewed narrative from campaigns/farrlind/reviews/session21_review.yaml.
+- Draft micro-events and extracted entities were used as composition evidence, not as direct canon.
