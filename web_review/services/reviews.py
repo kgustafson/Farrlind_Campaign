@@ -258,6 +258,34 @@ def dashboard_rows() -> list[ReviewSummary]:
     ]
 
 
+def archive_diary_navigation(session_number: int) -> dict[str, Optional[dict[str, Any]]]:
+    diary_rows = [
+        row for row in dashboard_rows()
+        if diary_path(row.session_number).exists()
+    ]
+    for index, row in enumerate(diary_rows):
+        if row.session_number != session_number:
+            continue
+        previous_row = diary_rows[index - 1] if index > 0 else None
+        next_row = diary_rows[index + 1] if index < len(diary_rows) - 1 else None
+
+        def link(target: Optional[ReviewSummary]) -> Optional[dict[str, Any]]:
+            if target is None:
+                return None
+            return {
+                "session_key": target.session,
+                "label": f"Session {target.session_number:02d}",
+                "title": target.title or "Untitled",
+                "url": f"/sessions/{target.session}/review?source=diary",
+            }
+
+        return {
+            "previous": link(previous_row),
+            "next": link(next_row),
+        }
+    return {"previous": None, "next": None}
+
+
 def sorted_review_items(document: dict[str, Any]) -> list[dict[str, Any]]:
     def sequence_value(item: dict[str, Any]) -> float:
         try:
@@ -629,6 +657,7 @@ def session_workspace(session_number: int, source: str = "diary", source_view: s
         "source_text": text,
         "source_html": render_markdown(text),
         "source_view": source_view if source_view in {"raw", "print"} else "raw",
+        "diary_navigation": archive_diary_navigation(session_number),
         "validation": validate_review_document(validation_document),
         "final_summary": final_summary,
         "summary_validation": final_summary_readiness_errors({"final_summary": final_summary}) if document else [],

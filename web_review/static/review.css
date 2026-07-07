@@ -1190,6 +1190,49 @@ button:disabled {
 .archive-source-tabs {
   max-width: 360px;
 }
+.diary-session-nav {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  margin: 0 0 14px;
+  padding: 10px;
+  border: 1px solid rgba(110, 67, 24, .28);
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 226, .62), rgba(226, 199, 141, .28)),
+    rgba(251, 239, 208, .72);
+}
+.diary-session-nav a,
+.diary-session-nav .disabled {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border: 1px solid rgba(110, 67, 24, .38);
+  border-radius: 6px;
+  color: #4d3218;
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+}
+.diary-session-nav a {
+  background: rgba(255, 250, 226, .5);
+}
+.diary-session-nav a:hover {
+  background: #3a2919;
+  color: #f8e6b6;
+}
+.diary-session-nav .disabled {
+  color: rgba(78, 50, 24, .45);
+  font-style: italic;
+}
+.diary-session-nav .all-sessions-link {
+  white-space: nowrap;
+  color: #f8e6b6;
+  background: #3a2919;
+}
 .source-text {
   margin: 0;
   white-space: pre-wrap;
@@ -2872,6 +2915,9 @@ dd { margin: 0; }
   .archive-section-icon {
     width: 74px;
     height: 74px;
+  }
+  .diary-session-nav {
+    grid-template-columns: 1fr;
   }
   .add-new-link {
     align-self: flex-start;

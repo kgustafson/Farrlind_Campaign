@@ -275,6 +275,21 @@
         </div>
       {% endif %}
     </div>
+    {% if not can_edit() and source == "diary" %}
+      <nav class="diary-session-nav" aria-label="Diary session navigation">
+        {% if diary_navigation.previous %}
+          <a href="{{ diary_navigation.previous.url }}" title="{{ diary_navigation.previous.title }}">Previous: {{ diary_navigation.previous.label }}</a>
+        {% else %}
+          <span class="disabled">Previous</span>
+        {% endif %}
+        <a href="/" class="all-sessions-link">All Sessions</a>
+        {% if diary_navigation.next %}
+          <a href="{{ diary_navigation.next.url }}" title="{{ diary_navigation.next.title }}">Next: {{ diary_navigation.next.label }}</a>
+        {% else %}
+          <span class="disabled">Next</span>
+        {% endif %}
+      </nav>
+    {% endif %}
     {% if source_view == "print" %}
       <article class="source-rendered">{{ source_html | safe }}</article>
     {% else %}

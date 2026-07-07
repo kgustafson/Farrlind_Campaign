@@ -1095,6 +1095,41 @@ class WebReviewAppTest(unittest.TestCase):
         self.assertNotIn("Reopen Review", response.text)
         self.assertNotIn("Add Item", response.text)
 
+    def test_archive_diary_renders_session_navigation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            clean = root / "clean"
+            final = root / "final"
+            reviews_dir = root / "reviews"
+            clean.mkdir()
+            final.mkdir()
+            reviews_dir.mkdir()
+            for number in [19, 20, 21]:
+                key = f"session{number:02d}"
+                (clean / f"{key}_diary.md").write_text(f"# Diary {number}\n", encoding="utf-8")
+                (reviews_dir / f"{key}_review.yaml").write_text(yaml.safe_dump({
+                    "session": key,
+                    "status": "applied",
+                    "session_title": f"Session {number} Title",
+                    "items": [],
+                    "added_items": [],
+                }, sort_keys=False), encoding="utf-8")
+
+            with patch.dict("os.environ", {"FARRLIND_INTERFACE_MODE": "archive"}), \
+                 patch.object(reviews, "CLEAN_DIR", clean), \
+                 patch.object(reviews, "FINAL_DIR", final), \
+                 patch.object(reviews, "REVIEWS_DIR", reviews_dir):
+                client = TestClient(app)
+                response = client.get("/sessions/session20/review?source=diary")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Diary 20", response.text)
+        self.assertIn('href="/sessions/session19/review?source=diary"', response.text)
+        self.assertIn('title="Session 19 Title"', response.text)
+        self.assertIn("Previous: Session 19", response.text)
+        self.assertIn('href="/sessions/session21/review?source=diary"', response.text)
+        self.assertIn("Next: Session 21", response.text)
+
     def test_save_review_route_writes_yaml_and_redirects(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -5077,6 +5112,7 @@ class StaticArchiveExportTest(unittest.TestCase):
             '<link rel="stylesheet" href="http://web_archive:8000/static/review.css">'
             '<a href="/sessions/session21/review">Open</a>'
             '<a href="/sessions/session21/review?source=diary">Diary</a>'
+            '<a href="/sessions/session20/review?source=diary" title="Previous">Previous</a>'
             '<a href="/sessions/session21/review?source=final">Summary</a>'
             '<a href="/songbook/3/lyrics">Lyrics</a>'
             '<audio src="/songbook/3/audio"></audio>'
@@ -5089,6 +5125,7 @@ class StaticArchiveExportTest(unittest.TestCase):
         self.assertIn('href="/static/review.css"', rewritten)
         self.assertIn('href="/sessions/session21/summary/"', rewritten)
         self.assertIn('href="/sessions/session21/diary/"', rewritten)
+        self.assertIn('href="/sessions/session20/diary/"', rewritten)
         self.assertIn('href="/songbook/3/lyrics/"', rewritten)
         self.assertIn('src="/media/songbook/03/song.mp3"', rewritten)
 
